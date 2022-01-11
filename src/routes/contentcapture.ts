@@ -1,10 +1,10 @@
 import express from 'express';
-import { EventClass } from '../libs/EventClass';
+import { RequestClass } from '../libs/RequestClass';
 
 const ContentCapture = express.Router();
 
 ContentCapture.post('/', (req, res) => {
-  const data = new EventClass(req, 'ContentCaptureDetail');
+  const data = new RequestClass(req, 'ContentCaptureDetail');
   res.send(data);
 });
 

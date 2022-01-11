@@ -1,6 +1,6 @@
 import Interfaces from '../Interfaces';
 import { schemaValidator } from './schemavalidator';
-export class EventClass<T extends keyof Interfaces> {
+export class RequestClass<T extends keyof Interfaces> {
   data?: Interfaces[T];
   params?: any;
   query?: any;
