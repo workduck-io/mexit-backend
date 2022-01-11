@@ -1,0 +1,22 @@
+{
+    "$id": "types",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "ContentCaptureDetail": {
+            "properties": {
+                "data": {
+                    "type": "string"
+                },
+                "nodeId": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "data",
+                "nodeId"
+            ],
+            "type": "object"
+        }
+    }
+}
+
