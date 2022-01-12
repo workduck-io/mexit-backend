@@ -1,16 +1,9 @@
+import { WDErrorType } from 'src/interfaces/WDError';
 import { errorCodes } from './errorCodes';
 import { statusCodes } from './statusCodes';
 import WDError from './WDError';
 
-interface IErrorParams {
-  message: string;
-  errorObject?: any;
-  errorCode?: errorCodes;
-  statusCode?: statusCodes;
-  metaData?: string;
-}
-
-export function errorlib(params: IErrorParams) {
+export function errorlib(params: WDErrorType) {
   const { message, errorObject, errorCode, statusCode, metaData } = params;
 
   const errorcode = errorCode ?? errorCodes.UNKNOWN;
