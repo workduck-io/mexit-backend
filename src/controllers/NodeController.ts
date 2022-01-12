@@ -18,8 +18,8 @@ class NodeController {
 
   createNode = (request, response) => {
     const requestDetail = new RequestClass(request, 'NodeDetail');
-    // this._nodeManager.createNode(requestDetail.data);
-    response.send(requestDetail);
+    this._nodeManager.createNode(requestDetail.data);
+    response.send(request.data);
   };
 }
 
