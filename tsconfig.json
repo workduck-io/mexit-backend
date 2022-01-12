@@ -7,14 +7,19 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "baseUrl": ".",
-    "target": "esnext",
     "sourceMap": true,
     "moduleResolution": "node",
     "downlevelIteration": true,
     "resolveJsonModule": true,
     "module": "commonjs",
     "declaration": true,
-    "lib": ["es6"],
-    "types": ["reflect-metadata"]
+    "lib": [
+      "es5",
+      "es6"
+    ],
+    "target": "es6",
+    "types": ["reflect-metadata"],
+    "exclude": ["./node_modules/*"],
+    "skipLibCheck": true
   }
 }
