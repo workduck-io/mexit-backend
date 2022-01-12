@@ -13,13 +13,10 @@
     "resolveJsonModule": true,
     "module": "commonjs",
     "declaration": true,
-    "lib": [
-      "es5",
-      "es6"
-    ],
+    "lib": ["es5", "es6"],
     "target": "es6",
     "types": ["reflect-metadata"],
-    "exclude": ["./node_modules/*"],
     "skipLibCheck": true
-  }
+  },
+  "exclude": ["./node_modules/*"]
 }
