@@ -13,6 +13,8 @@
     "downlevelIteration": true,
     "resolveJsonModule": true,
     "module": "commonjs",
-    "declaration": true
+    "declaration": true,
+    "lib": ["es6"],
+    "types": ["reflect-metadata"]
   }
 }

@@ -1,14 +1,14 @@
 {
   "name": "mex-browser-extension-backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
   "repository": "git@github.com:workduck-io/mex-browser-extension-backend.git",
   "author": "Rishivikram N <rishi.vikram.1@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "node dist/index.js",
-    "build": "npx tsc",
-    "dev": "nodemon src/index.ts",
+    "start": "export NODE_ENV=prod && ts-node src/app.ts",
+    "build": "tsc",
+    "dev": "export NODE_ENV=dev && nodemon src/app.ts",
     "types": "typescript-json-schema \"src/interfaces/*.ts\" \"*\" -o src/types.json --id \"types\" --required"
   },
   "devDependencies": {
@@ -19,7 +19,11 @@
   "dependencies": {
     "ajv": "7.2.4",
     "axios": "^0.24.0",
+    "cors": "^2.8.5",
     "express": "^4.17.2",
+    "inversify": "^6.0.1",
+    "reflect-metadata": "^0.1.13",
+    "ts-node": "^10.4.0",
     "typescript-json-schema": "^0.52.0"
   }
 }
