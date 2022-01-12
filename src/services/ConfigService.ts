@@ -1,4 +1,4 @@
-type Environments = 'dev' | 'prod';
+type Environments = 'local' | 'dev' | 'test' | 'prod';
 
 class ConfigClass implements Configuration {
   MEX_BACKEND_URL: string;
@@ -16,8 +16,14 @@ type Configurations = {
   [env in Environments]: Configuration;
 };
 const configurations: Configurations = {
-  dev: {
+  local: {
     MEX_BACKEND_URL: 'http://localhost:4000',
+  },
+  dev: {
+    MEX_BACKEND_URL: 'https://nefphny834.execute-api.us-east-1.amazonaws.com',
+  },
+  test: {
+    MEX_BACKEND_URL: 'https://qp5qf0k5sg.execute-api.us-east-1.amazonaws.com',
   },
   prod: {
     MEX_BACKEND_URL: 'http://localhost:4000',

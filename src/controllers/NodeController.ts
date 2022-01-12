@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request } from 'express';
 import container from '../inversify.config';
 import { NodeManager } from '../managers/NodeManager';
 import { RequestClass } from '../libs/RequestClass';
@@ -16,10 +16,31 @@ class NodeController {
     this._router.post(this._urlPath, this.createNode);
   }
 
-  createNode = (request, response) => {
-    const requestDetail = new RequestClass(request, 'NodeDetail');
-    this._nodeManager.createNode(requestDetail.data);
-    response.send(request.data);
+  createNode = async (request, response, next) => {
+    try {
+      const requestDetail = new RequestClass(request, 'NodeDetail');
+      const result = await this._nodeManager.createNode(
+        requestDetail.data,
+        requestDetail.authToken
+      );
+      response.status(result.status).send(result.data);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  appendNode = async (request, response, next) => {
+    try {
+      const requestDetail = new RequestClass(request, 'NodeDetail');
+      const result = await this._nodeManager.appendNode(
+        requestDetail.data.id,
+        requestDetail.data,
+        requestDetail.authToken
+      );
+      response.status(result.status).send(result.data);
+    } catch (error) {
+      next(error);
+    }
   };
 }
 
