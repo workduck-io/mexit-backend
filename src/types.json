@@ -2,18 +2,90 @@
     "$id": "types",
     "$schema": "http://json-schema.org/draft-07/schema#",
     "definitions": {
-        "ContentCaptureDetail": {
+        "NodeChildData": {
             "properties": {
-                "data": {
+                "content": {
                     "type": "string"
                 },
-                "nodeId": {
+                "elementType": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "properties": {
+                    "properties": {
+                        "bold": {
+                            "type": "boolean"
+                        },
+                        "italic": {
+                            "type": "boolean"
+                        }
+                    },
+                    "required": [
+                        "bold",
+                        "italic"
+                    ],
+                    "type": "object"
+                }
+            },
+            "required": [
+                "content",
+                "elementType",
+                "id",
+                "properties"
+            ],
+            "type": "object"
+        },
+        "NodeData": {
+            "properties": {
+                "children": {
+                    "items": {
+                        "$ref": "types#/definitions/NodeChildData"
+                    },
+                    "type": "array"
+                },
+                "elementType": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "children",
+                "elementType",
+                "id"
+            ],
+            "type": "object"
+        },
+        "NodeDetail": {
+            "properties": {
+                "data": {
+                    "items": {
+                        "$ref": "types#/definitions/NodeData"
+                    },
+                    "type": "array"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "lastEditedBy": {
+                    "type": "string"
+                },
+                "namespaceIdentifier": {
+                    "type": "string"
+                },
+                "workspaceIdentifier": {
                     "type": "string"
                 }
             },
             "required": [
                 "data",
-                "nodeId"
+                "id",
+                "lastEditedBy",
+                "namespaceIdentifier",
+                "workspaceIdentifier"
             ],
             "type": "object"
         }

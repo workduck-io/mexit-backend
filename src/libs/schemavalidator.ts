@@ -13,7 +13,6 @@ export function schemaValidator<T extends keyof Interfaces>(
   const validate = ajv.compile(schema.definitions[nameOfInterface]);
   const valid = validate(data);
   if (!valid) {
-    console.log(validate.errors);
     const field = validate.errors[0].dataPath;
     const message = validate.errors[0].message;
     const error = `${field.substring(1)} ${message}`;

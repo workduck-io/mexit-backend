@@ -1,4 +1,4 @@
-interface IWDErrorResponse {
+export interface IWDErrorResponse {
   message: string;
   code: string;
   statusCode: number;
