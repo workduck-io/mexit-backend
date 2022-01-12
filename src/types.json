@@ -88,6 +88,52 @@
                 "workspaceIdentifier"
             ],
             "type": "object"
+        },
+        "WDErrorType": {
+            "properties": {
+                "errorCode": {
+                    "$ref": "types#/definitions/errorCodes"
+                },
+                "errorObject": {},
+                "message": {
+                    "type": "string"
+                },
+                "metaData": {
+                    "type": "string"
+                },
+                "statusCode": {
+                    "$ref": "types#/definitions/statusCodes"
+                }
+            },
+            "required": [
+                "message"
+            ],
+            "type": "object"
+        },
+        "errorCodes": {
+            "enum": [
+                "INPUT_ERROR",
+                "NO_CONTENT",
+                "UNKNOWN"
+            ],
+            "type": "string"
+        },
+        "statusCodes": {
+            "enum": [
+                200,
+                204,
+                400,
+                401,
+                403,
+                404,
+                408,
+                429,
+                500,
+                502,
+                503,
+                504
+            ],
+            "type": "number"
         }
     }
 }
