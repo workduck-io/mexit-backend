@@ -9,6 +9,8 @@
     "start": "export NODE_ENV=prod && ts-node src/app.ts",
     "build": "tsc",
     "dev": "export NODE_ENV=dev && nodemon src/app.ts",
+    "test": "export NODE_ENV=test && nodemon src/app.ts",
+    "local": "export NODE_ENV=local && nodemon src/app.ts",
     "types": "typescript-json-schema \"src/interfaces/*.ts\" \"*\" -o src/types.json --id \"types\" --required"
   },
   "devDependencies": {
