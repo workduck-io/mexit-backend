@@ -1,4 +1,4 @@
-import express, { Request } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import container from '../inversify.config';
 import { NodeManager } from '../managers/NodeManager';
 import { RequestClass } from '../libs/RequestClass';
@@ -12,11 +12,16 @@ class NodeController {
     this.initializeRoutes();
   }
 
-  public initializeRoutes() {
+  public initializeRoutes(): void {
     this._router.post(this._urlPath, this.createNode);
+    return;
   }
 
-  createNode = async (request, response, next) => {
+  createNode = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'NodeDetail');
       const result = await this._nodeManager.createNode(
@@ -29,7 +34,11 @@ class NodeController {
     }
   };
 
-  appendNode = async (request, response, next) => {
+  appendNode = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'NodeDetail');
       const result = await this._nodeManager.appendNode(

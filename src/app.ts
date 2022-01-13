@@ -6,7 +6,7 @@ import NodeController from './controllers/NodeController';
 class App {
   public _app: express.Application;
   public _port: number;
-  private readonly _controllers: any;
+  private readonly _controllers: unknown;
 
   constructor(controllers) {
     this._port = parseInt(process.env.PORT) || 3000;

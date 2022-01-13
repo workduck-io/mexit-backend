@@ -1,8 +1,9 @@
-import { IWDErrorResponse } from 'src/libs/WDError';
+import { ErrorRequestHandler } from 'express';
+import { IWDErrorResponse } from '../libs/WDError';
 
-export const jsonErrorHandler = async (err, req, res, next) => {
+export const jsonErrorHandler: ErrorRequestHandler = async (err, req, res) => {
   const { response } = err;
   const error: IWDErrorResponse = response;
   res.setHeader('Content-Type', 'application/json');
-  res.status(error.statusCode).send(error);
+  res.status(parseInt(error.statusCode.toString())).send(error);
 };

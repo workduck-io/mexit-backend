@@ -1,16 +1,18 @@
+import { GenericType } from '../interfaces/Generics';
+
 export interface IWDErrorResponse {
-  message: string;
-  code: string;
-  statusCode: number;
-  metadata?: string;
-  stackTrace?: string;
+  message: GenericType;
+  code: GenericType;
+  statusCode: GenericType;
+  metadata?: GenericType;
+  stackTrace?: GenericType;
 }
 
 export default class WDError extends Error {
   response: IWDErrorResponse;
 
   constructor(response: IWDErrorResponse) {
-    super(response.message);
+    super(response.message.toString());
     this.response = response;
   }
 }

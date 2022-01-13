@@ -1,10 +1,7 @@
 import { injectable } from 'inversify';
-import { NodeDetail } from 'src/interfaces/Node';
+import { NodeDetail } from '../interfaces/Node';
 import { ConfigService } from '../services/ConfigService';
 import axios, { AxiosResponse } from 'axios';
-import { errorlib } from '../libs/errorlib';
-import { errorCodes } from '../libs/errorCodes';
-import { statusCodes } from '../libs/statusCodes';
 
 @injectable()
 export class NodeManager {
