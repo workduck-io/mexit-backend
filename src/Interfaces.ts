@@ -1,3 +1,4 @@
+import { GenericObjectType, GenericType } from './interfaces/Generics';
 import { NodeDetail, NodeChildData, NodeData } from './interfaces/Node';
 import { WDErrorType } from './interfaces/WDError';
 import { errorCodes } from './libs/errorCodes';
@@ -6,7 +7,7 @@ import { statusCodes } from './libs/statusCodes';
 import schema from './types.json';
 
 type SchemaType = typeof schema.definitions;
-type Definitions = { [x in keyof SchemaType]: Object };
+type Definitions = { [x in keyof SchemaType]: unknown };
 export default class Interfaces implements Definitions {
   NodeDetail: NodeDetail;
   NodeChildData: NodeChildData;
@@ -14,4 +15,6 @@ export default class Interfaces implements Definitions {
   WDErrorType: WDErrorType;
   errorCodes: errorCodes;
   statusCodes: statusCodes;
+  GenericType: GenericType;
+  GenericObjectType: GenericObjectType;
 }
