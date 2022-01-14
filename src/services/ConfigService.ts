@@ -1,4 +1,4 @@
-type Environments = 'local' | 'dev' | 'test' | 'prod';
+type Environments = 'local' | 'dev' | 'staging' | 'prod';
 
 class ConfigClass implements Configuration {
   MEX_BACKEND_URL: string;
@@ -22,7 +22,7 @@ const configurations: Configurations = {
   dev: {
     MEX_BACKEND_URL: 'https://nefphny834.execute-api.us-east-1.amazonaws.com',
   },
-  test: {
+  staging: {
     MEX_BACKEND_URL: 'https://qp5qf0k5sg.execute-api.us-east-1.amazonaws.com',
   },
   prod: {

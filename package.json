@@ -11,6 +11,7 @@
     "start": "export NODE_ENV=prod && ts-node src/app.ts",
     "build": "tsc",
     "dev": "export NODE_ENV=dev && nodemon src/app.ts",
+    "staging": "export NODE_ENV=staging && nodemon src/app.ts",
     "local": "export NODE_ENV=local && nodemon src/app.ts",
     "debug": "export DEBUG=* && npm run start",
     "test": "echo \"Error: no test specified\" && exit 1",

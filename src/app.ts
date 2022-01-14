@@ -2,6 +2,7 @@ import express from 'express';
 import { jsonErrorHandler } from './middlewares/jsonerrorhandler';
 import cors from 'cors';
 import NodeController from './controllers/NodeController';
+import WorkspaceController from './controllers/WorkspaceController';
 
 class App {
   public _app: express.Application;
@@ -36,7 +37,7 @@ class App {
   }
 }
 
-const application = new App([new NodeController()]);
+const application = new App([new NodeController(), new WorkspaceController()]);
 application.build();
 application._app.listen(application._port, () => {
   return console.log(

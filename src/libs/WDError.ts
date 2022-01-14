@@ -12,7 +12,7 @@ export default class WDError extends Error {
   response: IWDErrorResponse;
 
   constructor(response: IWDErrorResponse) {
-    super(response.message.toString());
+    super(response?.message?.toString());
     this.response = response;
   }
 }
