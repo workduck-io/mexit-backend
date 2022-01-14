@@ -5,5 +5,5 @@ export const jsonErrorHandler: ErrorRequestHandler = async (err, req, res) => {
   const { response } = err;
   const error: IWDErrorResponse = response;
   res.setHeader('Content-Type', 'application/json');
-  res.status(parseInt(error.statusCode.toString())).send(error);
+  res.status(parseInt(error?.statusCode?.toString())).send(error);
 };

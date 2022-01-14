@@ -2,6 +2,24 @@
     "$id": "types",
     "$schema": "http://json-schema.org/draft-07/schema#",
     "definitions": {
+        "Block": {
+            "properties": {
+                "elements": {
+                    "items": {
+                        "$ref": "types#/definitions/NodeChildData"
+                    },
+                    "type": "array"
+                },
+                "type": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "elements",
+                "type"
+            ],
+            "type": "object"
+        },
         "GenericObjectType": {
             "additionalProperties": {
                 "$ref": "types#/definitions/GenericType"
@@ -28,9 +46,37 @@
                 }
             ]
         },
+        "Namespace": {
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "workspaceIdentifier": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "name",
+                "workspaceIdentifier"
+            ],
+            "type": "object"
+        },
         "NodeChildData": {
             "properties": {
+                "children": {
+                    "items": {
+                        "$ref": "types#/definitions/NodeChildData"
+                    },
+                    "type": "array"
+                },
                 "content": {
+                    "type": "string"
+                },
+                "createdBy": {
                     "type": "string"
                 },
                 "elementType": {
@@ -58,8 +104,7 @@
             "required": [
                 "content",
                 "elementType",
-                "id",
-                "properties"
+                "id"
             ],
             "type": "object"
         },
@@ -133,6 +178,21 @@
             },
             "required": [
                 "message"
+            ],
+            "type": "object"
+        },
+        "Workspace": {
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "name"
             ],
             "type": "object"
         },

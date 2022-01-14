@@ -1,6 +1,7 @@
 import { GenericObjectType, GenericType } from './interfaces/Generics';
-import { NodeDetail, NodeChildData, NodeData } from './interfaces/Node';
+import { NodeDetail, NodeChildData, NodeData, Block } from './interfaces/Node';
 import { WDErrorType } from './interfaces/WDError';
+import { Namespace, Workspace } from './interfaces/WorkSpace';
 import { errorCodes } from './libs/errorCodes';
 import { statusCodes } from './libs/statusCodes';
 
@@ -17,4 +18,7 @@ export default class Interfaces implements Definitions {
   statusCodes: statusCodes;
   GenericType: GenericType;
   GenericObjectType: GenericObjectType;
+  Block: Block;
+  Workspace: Workspace;
+  Namespace: Namespace;
 }
