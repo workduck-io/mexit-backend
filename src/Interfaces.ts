@@ -1,3 +1,4 @@
+import { AuthorizeRefreshTokenType, AuthorizeType } from './interfaces/Auth';
 import { GenericObjectType, GenericType } from './interfaces/Generics';
 import { NodeDetail, NodeChildData, NodeData, Block } from './interfaces/Node';
 import { WDErrorType } from './interfaces/WDError';
@@ -21,4 +22,6 @@ export default class Interfaces implements Definitions {
   Block: Block;
   Workspace: Workspace;
   Namespace: Namespace;
+  AuthorizeType: AuthorizeType;
+  AuthorizeRefreshTokenType: AuthorizeRefreshTokenType;
 }
