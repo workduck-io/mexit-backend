@@ -38,14 +38,9 @@ class App {
   }
 }
 
-const application = new App([
+export const application = new App([
   new AuthController(),
   new NodeController(),
   new WorkspaceController(),
 ]);
 application.build();
-application._app.listen(application._port, () => {
-  return console.log(
-    `Express is listening at http://localhost:${application._port}`
-  );
-});
