@@ -4,6 +4,9 @@ import cors from 'cors';
 import NodeController from './controllers/NodeController';
 import WorkspaceController from './controllers/WorkspaceController';
 import AuthController from './controllers/AuthController';
+import container from './inversify.config';
+import { DbService } from './services/DbService';
+import HighlightNodeController from './controllers/HighlightNodeController';
 
 class App {
   public _app: express.Application;
@@ -42,8 +45,11 @@ const application = new App([
   new AuthController(),
   new NodeController(),
   new WorkspaceController(),
+  new HighlightNodeController(),
 ]);
 application.build();
+
+container.get<DbService>(DbService).connect();
 application._app.listen(application._port, () => {
   return console.log(
     `Express is listening at http://localhost:${application._port}`

@@ -110,10 +110,9 @@ class NodeController {
     response: Response
   ): Promise<void> => {
     try {
-      const requestDetail = new RequestClass(request);
       const result = await this._nodeManager.getAllArchivedNodes(
         request.params.nodeId,
-        requestDetail.authToken
+        request.headers.authorization
       );
       response.status(result.status).send(result.data);
     } catch (error) {

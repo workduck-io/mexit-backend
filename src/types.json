@@ -76,6 +76,21 @@
                 }
             ]
         },
+        "HighlightNodeDetail": {
+            "properties": {
+                "pageUrl": {
+                    "type": "string"
+                },
+                "range": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "pageUrl",
+                "range"
+            ],
+            "type": "object"
+        },
         "Namespace": {
             "properties": {
                 "id": {
