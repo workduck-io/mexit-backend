@@ -49,6 +49,14 @@ class NodeController {
       `${this._commentUrlPath}/node/:nodeId/block/:blockId/comment/:commentId`,
       this.deleteComment
     );
+    this._router.patch(
+      `${this._urlPath}/node/makePublic/:nodeId`,
+      this.makePublic
+    );
+    this._router.patch(
+      `${this._urlPath}/node/makePrivate/:nodeId`,
+      this.makePrivate
+    );
     return;
   }
 
@@ -234,6 +242,30 @@ class NodeController {
         request.params.nodeId,
         request.params.blockId,
         request.params.commentId,
+        requestDetail.authToken
+      );
+      response.status(result.status).send(result.data);
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+    }
+  }
+  async makePublic(request: Request, response: Response): Promise<void> {
+    try {
+      const requestDetail = new RequestClass(request);
+      const result = await this._nodeManager.makePublic(
+        request.params.nodeId,
+        requestDetail.authToken
+      );
+      response.status(result.status).send(result.data);
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+    }
+  }
+  async makePrivate(request: Request, response: Response): Promise<void> {
+    try {
+      const requestDetail = new RequestClass(request);
+      const result = await this._nodeManager.makePrivate(
+        request.params.nodeId,
         requestDetail.authToken
       );
       response.status(result.status).send(result.data);
