@@ -1,6 +1,13 @@
 import { AuthorizeRefreshTokenType, AuthorizeType } from './interfaces/Auth';
 import { GenericObjectType, GenericType } from './interfaces/Generics';
-import { NodeDetail, NodeChildData, NodeData, Block } from './interfaces/Node';
+import {
+  NodeDetail,
+  NodeChildData,
+  NodeData,
+  Block,
+  CommentDetail,
+  CommentBodyType,
+} from './interfaces/Node';
 import { WDErrorType } from './interfaces/WDError';
 import { Namespace, Workspace } from './interfaces/WorkSpace';
 import { errorCodes } from './libs/errorCodes';
@@ -24,4 +31,6 @@ export default class Interfaces implements Definitions {
   Namespace: Namespace;
   AuthorizeType: AuthorizeType;
   AuthorizeRefreshTokenType: AuthorizeRefreshTokenType;
+  CommentDetail: CommentDetail;
+  CommentBodyType: CommentBodyType;
 }

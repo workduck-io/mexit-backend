@@ -50,6 +50,56 @@
             ],
             "type": "object"
         },
+        "CommentBodyType": {
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "elementType": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "content",
+                "elementType",
+                "id"
+            ],
+            "type": "object"
+        },
+        "CommentDetail": {
+            "properties": {
+                "blockID": {
+                    "type": "string"
+                },
+                "commentBody": {
+                    "$ref": "types#/definitions/CommentBodyType"
+                },
+                "commentID": {
+                    "type": "string"
+                },
+                "commentedBy": {
+                    "type": "string"
+                },
+                "nodeID": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "blockID",
+                "commentBody",
+                "commentID",
+                "commentedBy",
+                "nodeID",
+                "type"
+            ],
+            "type": "object"
+        },
         "GenericObjectType": {
             "additionalProperties": {
                 "$ref": "types#/definitions/GenericType"

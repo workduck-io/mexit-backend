@@ -6,6 +6,7 @@ import { statusCodes } from '../libs/statusCodes';
 
 class NodeController {
   public _urlPath = '/node';
+  public _commentUrlPath = '/comment';
   public _router = express.Router();
   public _nodeManager: NodeManager = container.get<NodeManager>(NodeManager);
 
@@ -29,6 +30,24 @@ class NodeController {
     this._router.put(
       `${this._urlPath}/unarchive/:nodeId`,
       this.unArchivingNode
+    );
+    this._router.post(this._commentUrlPath, this.createComment);
+    this._router.patch(this._commentUrlPath, this.updateComment);
+    this._router.get(
+      `${this._commentUrlPath}/node/:nodeId/block/:blockId/comment/:commentId`,
+      this.getComment
+    );
+    this._router.get(
+      `${this._commentUrlPath}/node/:nodeId`,
+      this.getAllCommentsForNode
+    );
+    this._router.get(
+      `${this._commentUrlPath}/node/:nodeId/block/:blockId`,
+      this.getAllCommentsForBlock
+    );
+    this._router.delete(
+      `${this._commentUrlPath}/node/:nodeId/block/:blockId/comment/:commentId`,
+      this.deleteComment
     );
     return;
   }
@@ -135,6 +154,93 @@ class NodeController {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
   };
+  createComment = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      const requestDetail = new RequestClass(request, 'CommentDetail');
+      const result = await this._nodeManager.createComment(
+        requestDetail.data,
+        requestDetail.authToken
+      );
+      response.status(result.status).send(result.data);
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+    }
+  };
+
+  async updateComment(request: Request, response: Response): Promise<void> {
+    try {
+      const requestDetail = new RequestClass(request, 'CommentDetail');
+      const result = await this._nodeManager.updateComment(
+        requestDetail.data,
+        requestDetail.authToken
+      );
+      response.status(result.status).send(result.data);
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+    }
+  }
+  async getComment(request: Request, response: Response): Promise<void> {
+    try {
+      const requestDetail = new RequestClass(request);
+      const result = await this._nodeManager.getComment(
+        request.params.nodeId,
+        request.params.blockId,
+        request.params.commentId,
+        requestDetail.authToken
+      );
+      response.status(result.status).send(result.data);
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+    }
+  }
+  async getAllCommentsForNode(
+    request: Request,
+    response: Response
+  ): Promise<void> {
+    try {
+      const requestDetail = new RequestClass(request);
+      const result = await this._nodeManager.getAllCommentsForNode(
+        request.params.nodeId,
+        requestDetail.authToken
+      );
+      response.status(result.status).send(result.data);
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+    }
+  }
+  async getAllCommentsForBlock(
+    request: Request,
+    response: Response
+  ): Promise<void> {
+    try {
+      const requestDetail = new RequestClass(request);
+      const result = await this._nodeManager.getAllCommentsForBlock(
+        request.params.nodeId,
+        request.params.blockId,
+        requestDetail.authToken
+      );
+      response.status(result.status).send(result.data);
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+    }
+  }
+  async deleteComment(request: Request, response: Response): Promise<void> {
+    try {
+      const requestDetail = new RequestClass(request);
+      const result = await this._nodeManager.deleteComment(
+        request.params.nodeId,
+        request.params.blockId,
+        request.params.commentId,
+        requestDetail.authToken
+      );
+      response.status(result.status).send(result.data);
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+    }
+  }
 }
 
 export default NodeController;
