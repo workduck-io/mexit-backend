@@ -25,3 +25,18 @@ export interface Block {
   type: string;
   elements: NodeChildData[];
 }
+
+export interface CommentDetail {
+  type: string;
+  nodeID: string;
+  blockID: string;
+  commentID: string;
+  commentedBy: string;
+  commentBody: CommentBodyType;
+}
+
+export interface CommentBodyType {
+  id: string;
+  elementType: string;
+  content: string;
+}
