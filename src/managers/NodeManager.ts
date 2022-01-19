@@ -337,4 +337,46 @@ export class NodeManager {
       });
     }
   }
+  async makePublic(nodeId: string, authToken: string): Promise<AxiosResponse> {
+    try {
+      const response = await axios.patch(
+        `${ConfigService.MEX_BACKEND_URL}${this._urlPath}/makePublic/${nodeId}`,
+        {
+          headers: {
+            Authorization: authToken,
+          },
+        }
+      );
+      return response;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+  async makePrivate(nodeId: string, authToken: string): Promise<AxiosResponse> {
+    try {
+      const response = await axios.patch(
+        `${ConfigService.MEX_BACKEND_URL}${this._urlPath}/makePrivate/${nodeId}`,
+        {
+          headers: {
+            Authorization: authToken,
+          },
+        }
+      );
+      return response;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
 }
