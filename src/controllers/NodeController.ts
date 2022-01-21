@@ -3,6 +3,7 @@ import container from '../inversify.config';
 import { NodeManager } from '../managers/NodeManager';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
+import { AuthRequest } from '../middlewares/authrequest';
 
 class NodeController {
   public _urlPath = '/node';
@@ -14,20 +15,36 @@ class NodeController {
   }
 
   public initializeRoutes(): void {
-    this._router.post(this._urlPath, this.createNode);
-    this._router.post(`${this._urlPath}/:nodeId/append`, this.appendNode);
+    this._router.post(this._urlPath, [AuthRequest], this.createNode);
+    this._router.post(
+      `${this._urlPath}/:nodeId/append`,
+      [AuthRequest],
+      this.appendNode
+    );
     this._router.post(
       `${this._urlPath}/:nodeId/blockUpdate`,
+      [AuthRequest],
       this.editBlockInNode
     );
-    this._router.delete(`${this._urlPath}/archive/:nodeId`, this.archivingNode);
-    this._router.put(`${this._urlPath}/:nodeId`, this.deleteNode);
+    this._router.delete(
+      `${this._urlPath}/archive/:nodeId`,
+      [AuthRequest],
+      this.archivingNode
+    );
+    this._router.put(
+      `${this._urlPath}/:nodeId`,
+      [AuthRequest],
+      this.deleteNode
+    );
     this._router.get(
       `${this._urlPath}/archive/:nodeId`,
+      [AuthRequest],
+
       this.getAllArchivedNodes
     );
     this._router.put(
       `${this._urlPath}/unarchive/:nodeId`,
+      [AuthRequest],
       this.unArchivingNode
     );
     return;
