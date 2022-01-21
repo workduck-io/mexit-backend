@@ -76,25 +76,6 @@
                 }
             ]
         },
-        "Namespace": {
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "workspaceIdentifier": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "id",
-                "name",
-                "workspaceIdentifier"
-            ],
-            "type": "object"
-        },
         "NodeChildData": {
             "properties": {
                 "children": {
@@ -208,21 +189,6 @@
             },
             "required": [
                 "message"
-            ],
-            "type": "object"
-        },
-        "Workspace": {
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "id",
-                "name"
             ],
             "type": "object"
         },
