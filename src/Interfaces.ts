@@ -1,5 +1,6 @@
 import { AuthorizeRefreshTokenType, AuthorizeType } from './interfaces/Auth';
 import { GenericObjectType, GenericType } from './interfaces/Generics';
+import { GotResponse, GotClientType } from './interfaces/GotClient';
 import { NodeDetail, NodeChildData, NodeData, Block } from './interfaces/Node';
 import { WDErrorType } from './interfaces/WDError';
 import { errorCodes } from './libs/errorCodes';
@@ -21,4 +22,6 @@ export default class Interfaces implements Definitions {
   Block: Block;
   AuthorizeType: AuthorizeType;
   AuthorizeRefreshTokenType: AuthorizeRefreshTokenType;
+  GotResponse: GotResponse;
+  GotClientType: GotClientType;
 }

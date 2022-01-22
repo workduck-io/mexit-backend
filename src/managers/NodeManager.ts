@@ -1,31 +1,29 @@
 import { injectable } from 'inversify';
 import { Block, NodeDetail } from '../interfaces/Node';
 import { ConfigService } from '../services/ConfigService';
-import axios, { AxiosResponse } from 'axios';
 import { errorlib } from '../libs/errorlib';
 import { errorCodes } from '../libs/errorCodes';
 import { statusCodes } from '../libs/statusCodes';
+import { GotClient } from '../libs/GotClientClass';
+import container from '../inversify.config';
+import { GotResponse } from '../interfaces/GotClient';
 
 @injectable()
 export class NodeManager {
   private _urlPath = '/node';
+  public _gotClient: GotClient = container.get<GotClient>(GotClient);
   async createNode(
     nodeDetail: NodeDetail,
     authToken: string
-  ): Promise<AxiosResponse> {
+  ): Promise<GotResponse> {
     try {
-      const response = await axios.post(
+      const result = await this._gotClient.post<NodeDetail>(
         `${ConfigService.MEX_BACKEND_URL}${this._urlPath}`,
         nodeDetail,
-        {
-          headers: {
-            Authorization: authToken,
-          },
-        }
+        authToken
       );
-      return response;
+      return result;
     } catch (error) {
-      console.log({ error });
       errorlib({
         message: error.message,
         errorCode: errorCodes.UNKNOWN,
@@ -40,16 +38,12 @@ export class NodeManager {
     nodeId: string,
     block: Block,
     authToken: string
-  ): Promise<AxiosResponse> {
+  ): Promise<GotResponse> {
     try {
-      const response = await axios.post(
+      const response = await this._gotClient.post<Block>(
         `${ConfigService.MEX_BACKEND_URL}${this._urlPath}/${nodeId}/append`,
         block,
-        {
-          headers: {
-            Authorization: authToken,
-          },
-        }
+        authToken
       );
       return response;
     } catch (error) {
@@ -67,16 +61,12 @@ export class NodeManager {
     nodeId: string,
     block: Block,
     authToken: string
-  ): Promise<AxiosResponse> {
+  ): Promise<GotResponse> {
     try {
-      const response = await axios.post(
+      const response = await this._gotClient.post<Block>(
         `${ConfigService.MEX_BACKEND_URL}${this._urlPath}/${nodeId}/blockUpdate`,
         block,
-        {
-          headers: {
-            Authorization: authToken,
-          },
-        }
+        authToken
       );
       return response;
     } catch (error) {
@@ -89,18 +79,11 @@ export class NodeManager {
       });
     }
   }
-  async archivingNode(
-    nodeId: string,
-    authToken: string
-  ): Promise<AxiosResponse> {
+  async archivingNode(nodeId: string, authToken: string): Promise<GotResponse> {
     try {
-      const response = await axios.delete(
+      const response = await this._gotClient.delete(
         `${ConfigService.MEX_BACKEND_URL}${this._urlPath}/archive/${nodeId}`,
-        {
-          headers: {
-            Authorization: authToken,
-          },
-        }
+        authToken
       );
       return response;
     } catch (error) {
@@ -113,15 +96,11 @@ export class NodeManager {
       });
     }
   }
-  async deleteNode(nodeId: string, authToken: string): Promise<AxiosResponse> {
+  async deleteNode(nodeId: string, authToken: string): Promise<GotResponse> {
     try {
-      const response = await axios.put(
+      const response = await this._gotClient.put(
         `${ConfigService.MEX_BACKEND_URL}${this._urlPath}/${nodeId}`,
-        {
-          headers: {
-            Authorization: authToken,
-          },
-        }
+        authToken
       );
       return response;
     } catch (error) {
@@ -137,15 +116,11 @@ export class NodeManager {
   async getAllArchivedNodes(
     nodeId: string,
     authToken: string
-  ): Promise<AxiosResponse> {
+  ): Promise<GotResponse> {
     try {
-      const response = await axios.get(
+      const response = await this._gotClient.get(
         `${ConfigService.MEX_BACKEND_URL}${this._urlPath}/archive/${nodeId}`,
-        {
-          headers: {
-            Authorization: authToken,
-          },
-        }
+        authToken
       );
       return response;
     } catch (error) {
@@ -161,15 +136,11 @@ export class NodeManager {
   async unArchivingNode(
     nodeId: string,
     authToken: string
-  ): Promise<AxiosResponse> {
+  ): Promise<GotResponse> {
     try {
-      const response = await axios.put(
+      const response = await this._gotClient.put(
         `${ConfigService.MEX_BACKEND_URL}${this._urlPath}/unarchive/${nodeId}`,
-        {
-          headers: {
-            Authorization: authToken,
-          },
-        }
+        authToken
       );
       return response;
     } catch (error) {
