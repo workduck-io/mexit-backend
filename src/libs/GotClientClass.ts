@@ -1,120 +1,85 @@
-import got from 'got';
+import got, { OptionsOfTextResponseBody } from 'got';
 import { injectable } from 'inversify';
 import { GotResponse, GotClientType } from 'src/interfaces/GotClient';
 
 @injectable()
 export class GotClient implements GotClientType {
-  private requestTimeout = 15000;
+  private _requestTimeout = 15000;
+  private _gotResponse: GotResponse = { data: null, status: null };
+
+  private _gotConfig: OptionsOfTextResponseBody = {
+    hooks: {
+      afterResponse: [
+        (response, _) => {
+          this._gotResponse.status = response.statusCode;
+          return response;
+        },
+      ],
+    },
+    retry: {
+      calculateDelay: ({ computedValue }) => {
+        return computedValue / 10;
+      },
+    },
+    timeout: {
+      request: this._requestTimeout,
+    },
+    cache: new Map(),
+  };
 
   async post<T>(
     url: string,
     payload: T,
     authToken: string
   ): Promise<GotResponse> {
-    const result: GotResponse = {
-      data: null,
-      status: null,
-    };
-    result.data = await got
+    this._gotResponse.data = await got
       .post(url, {
         json: payload,
         headers: {
           Authorization: authToken,
         },
-        hooks: {
-          afterResponse: [
-            (response, retryWithMergedOptions) => {
-              result.status = response.statusCode;
-              return response;
-            },
-          ],
-        },
-        timeout: {
-          request: this.requestTimeout,
-        },
+        ...this._gotConfig,
       })
       .json();
 
-    return result;
+    return this._gotResponse;
   }
 
   async delete(url: string, authToken: string): Promise<GotResponse> {
-    const result: GotResponse = {
-      data: null,
-      status: null,
-    };
-    result.data = await got
+    this._gotResponse.data = await got
       .delete(url, {
         headers: {
           Authorization: authToken,
         },
-        hooks: {
-          afterResponse: [
-            (response, retryWithMergedOptions) => {
-              result.status = response.statusCode;
-              return response;
-            },
-          ],
-        },
-        timeout: {
-          request: this.requestTimeout,
-        },
+        ...this._gotConfig,
       })
       .json();
 
-    return result;
+    return this._gotResponse;
   }
   async put(url: string, authToken: string): Promise<GotResponse> {
-    const result: GotResponse = {
-      data: null,
-      status: null,
-    };
-    result.data = await got
+    this._gotResponse.data = await got
       .put(url, {
         headers: {
           Authorization: authToken,
         },
-        hooks: {
-          afterResponse: [
-            (response, retryWithMergedOptions) => {
-              result.status = response.statusCode;
-              return response;
-            },
-          ],
-        },
-        timeout: {
-          request: this.requestTimeout,
-        },
+        ...this._gotConfig,
       })
       .json();
 
-    return result;
+    return this._gotResponse;
   }
 
   async get(url: string, authToken: string): Promise<GotResponse> {
-    const result: GotResponse = {
-      data: null,
-      status: null,
-    };
-    result.data = await got
+    this._gotResponse.data = await got
       .get(url, {
         headers: {
           Authorization: authToken,
         },
-        hooks: {
-          afterResponse: [
-            (response, retryWithMergedOptions) => {
-              result.status = response.statusCode;
-              return response;
-            },
-          ],
-        },
-        timeout: {
-          request: this.requestTimeout,
-        },
+        ...this._gotConfig,
       })
       .json();
 
-    return result;
+    return this._gotResponse;
   }
 }
