@@ -17,7 +17,7 @@ async function AuthRequest(
     const result = await TokenHandler({ token });
     if (result.isValid) {
       next();
-    } else throw new Error('Invalid Token.');
+    } else throw new Error(result.error.message);
   } catch (error) {
     res.status(statusCodes.FORBIDDEN).send({
       message: error.message,

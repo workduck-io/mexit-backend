@@ -3,9 +3,6 @@ import * as Axios from 'axios';
 import * as jsonwebtoken from 'jsonwebtoken';
 import jwkToPem from 'jwk-to-pem';
 import config from '../config';
-import { errorlib } from './errorlib';
-import { errorCodes } from './errorCodes';
-import { statusCodes } from './statusCodes';
 
 export interface ClaimVerifyRequest {
   readonly token?: string;
