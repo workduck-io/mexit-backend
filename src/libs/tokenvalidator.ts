@@ -1,8 +1,8 @@
 import { promisify } from 'util';
-import * as Axios from 'axios';
 import * as jsonwebtoken from 'jsonwebtoken';
 import jwkToPem from 'jwk-to-pem';
 import config from '../config';
+import got from 'got';
 
 export interface ClaimVerifyRequest {
   readonly token?: string;
@@ -60,8 +60,8 @@ let cacheKeys: MapOfKidToPublicKey | undefined;
 const getPublicKeys = async (): Promise<MapOfKidToPublicKey> => {
   if (!cacheKeys) {
     const url = `${cognitoIssuer}/.well-known/jwks.json`;
-    const publicKeys = await Axios.default.get<PublicKeys>(url);
-    cacheKeys = publicKeys.data.keys.reduce((agg, current) => {
+    const publicKeys = await got.get(url).json<PublicKeys>();
+    cacheKeys = publicKeys.keys.reduce((agg, current) => {
       const pem = jwkToPem(current);
       agg[current.kid] = { instance: current, pem };
       return agg;
@@ -110,7 +110,12 @@ const TokenHandler = async (
       isValid: true,
     };
   } catch (error) {
-    result = { userName: '', eventId: '', error, isValid: false };
+    result = {
+      userName: '',
+      eventId: '',
+      error: 'Invalid Token',
+      isValid: false,
+    };
   }
   return result;
 };
