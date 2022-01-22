@@ -76,6 +76,22 @@
                 }
             ]
         },
+        "GotClientType": {
+            "type": "object"
+        },
+        "GotResponse": {
+            "properties": {
+                "data": {},
+                "status": {
+                    "type": "number"
+                }
+            },
+            "required": [
+                "data",
+                "status"
+            ],
+            "type": "object"
+        },
         "NodeChildData": {
             "properties": {
                 "children": {
@@ -194,6 +210,7 @@
         },
         "errorCodes": {
             "enum": [
+                "AUTH_ERROR",
                 "INPUT_ERROR",
                 "NO_CONTENT",
                 "UNKNOWN"
