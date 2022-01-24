@@ -27,7 +27,6 @@ export class GotClient implements GotClientType {
     timeout: {
       request: this._requestTimeout,
     },
-    cache: new Map(),
   };
 
   async post<T>(
