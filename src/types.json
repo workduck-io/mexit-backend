@@ -92,6 +92,184 @@
             ],
             "type": "object"
         },
+        "LinkNode": {
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "long": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "properties": {
+                        "metaTags": {
+                            "items": {
+                                "$ref": "types#/definitions/MetaTag"
+                            },
+                            "type": "array"
+                        },
+                        "userTags": {
+                            "items": {
+                                "$ref": "types#/definitions/UserTag"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "required": [
+                        "metaTags",
+                        "userTags"
+                    ],
+                    "type": "object"
+                },
+                "short": {
+                    "type": "string"
+                },
+                "shortenedURL": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "long",
+                "metadata",
+                "short",
+                "shortenedURL"
+            ],
+            "type": "object"
+        },
+        "LinkNodeRequest": {
+            "properties": {
+                "createdBy": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "long": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "properties": {
+                        "metaTags": {
+                            "items": {
+                                "$ref": "types#/definitions/MetaTag"
+                            },
+                            "type": "array"
+                        },
+                        "userTags": {
+                            "items": {
+                                "$ref": "types#/definitions/UserTag"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "required": [
+                        "metaTags",
+                        "userTags"
+                    ],
+                    "type": "object"
+                },
+                "short": {
+                    "type": "string"
+                },
+                "shortenedURL": {
+                    "type": "string"
+                },
+                "workspace": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "createdBy",
+                "id",
+                "long",
+                "metadata",
+                "short",
+                "shortenedURL",
+                "workspace"
+            ],
+            "type": "object"
+        },
+        "LinkResponse": {
+            "properties": {
+                "createdAt": {
+                    "type": "number"
+                },
+                "createdBy": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "long": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "properties": {
+                        "metaTags": {
+                            "items": {
+                                "$ref": "types#/definitions/MetaTag"
+                            },
+                            "type": "array"
+                        },
+                        "userTags": {
+                            "items": {
+                                "$ref": "types#/definitions/UserTag"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "required": [
+                        "metaTags",
+                        "userTags"
+                    ],
+                    "type": "object"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "short": {
+                    "type": "string"
+                },
+                "shortenedURL": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "number"
+                },
+                "workspace": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "createdAt",
+                "createdBy",
+                "id",
+                "long",
+                "metadata",
+                "namespace",
+                "short",
+                "shortenedURL",
+                "updatedAt",
+                "workspace"
+            ],
+            "type": "object"
+        },
+        "MetaTag": {
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name",
+                "value"
+            ],
+            "type": "object"
+        },
         "NodeChildData": {
             "properties": {
                 "children": {
@@ -143,6 +321,9 @@
                     },
                     "type": "array"
                 },
+                "content": {
+                    "type": "string"
+                },
                 "elementType": {
                     "type": "string"
                 },
@@ -151,9 +332,57 @@
                 }
             },
             "required": [
-                "children",
                 "elementType",
                 "id"
+            ],
+            "type": "object"
+        },
+        "NodeDataResponse": {
+            "properties": {
+                "children": {
+                    "items": {
+                        "$ref": "types#/definitions/NodeDataResponse"
+                    },
+                    "type": "array"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "number"
+                },
+                "createdBy": {
+                    "type": "string"
+                },
+                "elementType": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "lastEditedBy": {
+                    "type": "string"
+                },
+                "parentID": {
+                    "type": "string"
+                },
+                "properties": {
+                    "type": "null"
+                },
+                "updatedAt": {
+                    "type": "number"
+                }
+            },
+            "required": [
+                "content",
+                "createdAt",
+                "createdBy",
+                "elementType",
+                "id",
+                "lastEditedBy",
+                "parentID",
+                "properties",
+                "updatedAt"
             ],
             "type": "object"
         },
@@ -174,6 +403,9 @@
                 "namespaceIdentifier": {
                     "type": "string"
                 },
+                "type": {
+                    "type": "string"
+                },
                 "workspaceIdentifier": {
                     "type": "string"
                 }
@@ -183,7 +415,77 @@
                 "id",
                 "lastEditedBy",
                 "namespaceIdentifier",
+                "type",
                 "workspaceIdentifier"
+            ],
+            "type": "object"
+        },
+        "NodeResponse": {
+            "properties": {
+                "bookmarked": {
+                    "type": "boolean"
+                },
+                "createdAt": {
+                    "type": "number"
+                },
+                "createdBy": {
+                    "type": "string"
+                },
+                "data": {
+                    "items": {
+                        "$ref": "types#/definitions/NodeDataResponse"
+                    },
+                    "type": "array"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "itemType": {
+                    "type": "string"
+                },
+                "lastEditedBy": {
+                    "type": "string"
+                },
+                "namespaceID": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "number"
+                },
+                "version": {
+                    "type": "number"
+                },
+                "workspaceID": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "bookmarked",
+                "createdAt",
+                "createdBy",
+                "data",
+                "id",
+                "itemType",
+                "lastEditedBy",
+                "namespaceID",
+                "updatedAt",
+                "version",
+                "workspaceID"
+            ],
+            "type": "object"
+        },
+        "UserTag": {
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "text"
             ],
             "type": "object"
         },
