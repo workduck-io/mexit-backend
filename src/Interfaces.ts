@@ -1,7 +1,21 @@
 import { AuthorizeRefreshTokenType, AuthorizeType } from './interfaces/Auth';
 import { GenericObjectType, GenericType } from './interfaces/Generics';
 import { GotResponse, GotClientType } from './interfaces/GotClient';
-import { NodeDetail, NodeChildData, NodeData, Block } from './interfaces/Node';
+import {
+  NodeDetail,
+  NodeChildData,
+  NodeData,
+  Block,
+  LinkNode,
+  MetaTag,
+  UserTag,
+} from './interfaces/Node';
+import { LinkNodeRequest } from './interfaces/Request';
+import {
+  NodeResponse,
+  NodeDataResponse,
+  LinkResponse,
+} from './interfaces/Response';
 import { WDErrorType } from './interfaces/WDError';
 import { errorCodes } from './libs/errorCodes';
 import { statusCodes } from './libs/statusCodes';
@@ -24,4 +38,11 @@ export default class Interfaces implements Definitions {
   AuthorizeRefreshTokenType: AuthorizeRefreshTokenType;
   GotResponse: GotResponse;
   GotClientType: GotClientType;
+  LinkNode: LinkNode;
+  MetaTag: MetaTag;
+  UserTag: UserTag;
+  LinkNodeRequest: LinkNodeRequest;
+  NodeResponse: NodeResponse;
+  NodeDataResponse: NodeDataResponse;
+  LinkResponse: LinkResponse;
 }

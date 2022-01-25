@@ -1,4 +1,5 @@
 export interface NodeDetail {
+  type: string;
   id: string;
   namespaceIdentifier: string;
   workspaceIdentifier: string;
@@ -9,7 +10,8 @@ export interface NodeDetail {
 export interface NodeData {
   id: string;
   elementType: string;
-  children: NodeChildData[];
+  content?: string;
+  children?: NodeChildData[];
 }
 
 export interface NodeChildData {
@@ -24,4 +26,25 @@ export interface NodeChildData {
 export interface Block {
   type: string;
   elements: NodeChildData[];
+}
+
+export interface LinkNode {
+  id: string;
+  long: string;
+  short: string;
+  metadata: {
+    metaTags: MetaTag[];
+    userTags: UserTag[];
+  };
+  shortenedURL: string;
+}
+
+export interface MetaTag {
+  name: string;
+  value: string;
+}
+
+export interface UserTag {
+  id: string;
+  text: string;
 }
