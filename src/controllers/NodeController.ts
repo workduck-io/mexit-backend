@@ -4,11 +4,14 @@ import { NodeManager } from '../managers/NodeManager';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { AuthRequest } from '../middlewares/authrequest';
+import { Transformer } from '../libs/TransformerClass';
+import { NodeResponse } from '../interfaces/Response';
 
 class NodeController {
   public _urlPath = '/node';
   public _router = express.Router();
   public _nodeManager: NodeManager = container.get<NodeManager>(NodeManager);
+  public _transformer: Transformer = container.get<Transformer>(Transformer);
 
   constructor() {
     this.initializeRoutes();
@@ -46,6 +49,11 @@ class NodeController {
       `${this._urlPath}/unarchive/:nodeId`,
       [AuthRequest],
       this.unArchivingNode
+    );
+    this._router.post(
+      `${this._urlPath}/link`,
+      [AuthRequest],
+      this.createLinkNode
     );
     return;
   }
@@ -148,6 +156,29 @@ class NodeController {
         requestDetail.authToken
       );
       response.status(result.status).send(result.data);
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+    }
+  };
+
+  createLinkNode = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      const requestDetail = new RequestClass(request, 'LinkNodeRequest');
+      const nodeDetail = this._transformer.convertLinkToNodeFormat(
+        requestDetail.data
+      );
+      const resultNodeDetail = await this._nodeManager.createNode(
+        nodeDetail,
+        requestDetail.authToken
+      );
+      const resultLinkNodeDetail =
+        await this._transformer.convertNodeToLinkFormat(
+          resultNodeDetail.data as NodeResponse
+        );
+      response.status(resultNodeDetail.status).send(resultLinkNodeDetail);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
