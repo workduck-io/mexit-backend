@@ -60,6 +60,16 @@ class NodeController {
       [AuthRequest],
       this.createContentNode
     );
+    this._router.get(
+      `${this._urlPath}/all/:userId`,
+      [AuthRequest],
+      this.getAllNodes
+    );
+    this._router.get(
+      `${this._urlPath}/clearcache`,
+      [AuthRequest],
+      this.clearCache
+    );
     return;
   }
 
@@ -140,10 +150,9 @@ class NodeController {
     response: Response
   ): Promise<void> => {
     try {
-      const requestDetail = new RequestClass(request);
       const result = await this._nodeManager.getAllArchivedNodes(
         request.params.nodeId,
-        requestDetail.authToken
+        request.headers.authorization.toString()
       );
       response.status(result.status).send(result.data);
     } catch (error) {
@@ -204,6 +213,25 @@ class NodeController {
         resultNodeDetail.data as NodeResponse
       );
       response.status(resultNodeDetail.status).send(resultLinkNodeDetail);
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+    }
+  };
+
+  getAllNodes = async (request: Request, response: Response): Promise<void> => {
+    try {
+      const result = await this._nodeManager.getAllNodes(
+        request.params.userId,
+        request.headers.authorization.toString()
+      );
+      response.status(result.status).send(result.data);
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+    }
+  };
+  clearCache = (response: Response): void => {
+    try {
+      this._nodeManager.clearCache();
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
