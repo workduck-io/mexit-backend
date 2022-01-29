@@ -55,6 +55,11 @@ class NodeController {
       [AuthRequest],
       this.createLinkNode
     );
+    this._router.post(
+      `${this._urlPath}/content`,
+      [AuthRequest],
+      this.createContentNode
+    );
     return;
   }
 
@@ -174,10 +179,30 @@ class NodeController {
         nodeDetail,
         requestDetail.authToken
       );
-      const resultLinkNodeDetail =
-        await this._transformer.convertNodeToLinkFormat(
-          resultNodeDetail.data as NodeResponse
-        );
+      const resultLinkNodeDetail = this._transformer.convertNodeToLinkFormat(
+        resultNodeDetail.data as NodeResponse
+      );
+      response.status(resultNodeDetail.status).send(resultLinkNodeDetail);
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+    }
+  };
+  createContentNode = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      const requestDetail = new RequestClass(request, 'ContentNodeRequest');
+      const nodeDetail = this._transformer.convertContentToNodeFormat(
+        requestDetail.data
+      );
+      const resultNodeDetail = await this._nodeManager.createNode(
+        nodeDetail,
+        requestDetail.authToken
+      );
+      const resultLinkNodeDetail = this._transformer.convertNodeToContentFormat(
+        resultNodeDetail.data as NodeResponse
+      );
       response.status(resultNodeDetail.status).send(resultLinkNodeDetail);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
