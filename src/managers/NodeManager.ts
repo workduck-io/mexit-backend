@@ -8,23 +8,28 @@ import { GotClient } from '../libs/GotClientClass';
 import container from '../inversify.config';
 import { GotResponse } from '../interfaces/GotClient';
 import { Cache } from '../libs/CacheClass';
-
+import Lambda from '../libs/InvokeLambda';
 @injectable()
 export class NodeManager {
   private _urlPath = '/node';
   public _gotClient: GotClient = container.get<GotClient>(GotClient);
   public _cache: Cache = container.get<Cache>(Cache);
-  async createNode(
-    nodeDetail: NodeDetail,
-    authToken: string
-  ): Promise<GotResponse> {
+  async createNode(nodeDetail: NodeDetail): Promise<string> {
     try {
-      const result = await this._gotClient.post<NodeDetail>(
-        `${ConfigService.MEX_BACKEND_URL}${this._urlPath}`,
-        nodeDetail,
-        authToken
+      const result = JSON.parse(
+        (
+          await Lambda.invokeLambdaClient({
+            FunctionName: `mex-backend-test-Node`,
+            Payload: JSON.stringify({
+              body: JSON.stringify(nodeDetail),
+              routeKey: 'POST /node',
+            }),
+            InvocationType: 'RequestResponse',
+          })
+        ).Payload as string
       );
-      return result;
+
+      return result.body;
     } catch (error) {
       errorlib({
         message: error.message,

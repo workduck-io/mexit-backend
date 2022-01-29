@@ -26,7 +26,7 @@ const configurations: Configurations = {
     MEX_BACKEND_URL: 'https://qp5qf0k5sg.execute-api.us-east-1.amazonaws.com',
   },
   prod: {
-    MEX_BACKEND_URL: 'http://localhost:4000',
+    MEX_BACKEND_URL: 'https://qp5qf0k5sg.execute-api.us-east-1.amazonaws.com',
   },
 };
 
