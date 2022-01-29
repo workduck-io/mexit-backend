@@ -1,7 +1,11 @@
 import { injectable } from 'inversify';
 import { NodeData, NodeDetail } from '../interfaces/Node';
-import { LinkNodeRequest } from '../interfaces/Request';
-import { LinkResponse, NodeResponse } from '../interfaces/Response.js';
+import { ContentNodeRequest, LinkNodeRequest } from '../interfaces/Request';
+import {
+  ContentResponse,
+  LinkResponse,
+  NodeResponse,
+} from '../interfaces/Response';
 
 @injectable()
 export class Transformer {
@@ -26,6 +30,25 @@ export class Transformer {
 
     return nodeDetail;
   };
+  convertContentToNodeFormat = (
+    contentNodeRequest: ContentNodeRequest
+  ): NodeDetail => {
+    const nodeData: NodeData = {
+      id: contentNodeRequest.id,
+      elementType: this.BLOCK_ELEMENT_TYPE,
+      content: JSON.stringify(contentNodeRequest),
+    };
+    const nodeDetail: NodeDetail = {
+      type: this.NODE_ELEMENT_TYPE,
+      id: contentNodeRequest.id,
+      workspaceIdentifier: contentNodeRequest.workspace,
+      namespaceIdentifier: this.NAMESPACE_ID,
+      data: [nodeData],
+      lastEditedBy: contentNodeRequest.createdBy,
+    };
+
+    return nodeDetail;
+  };
 
   convertNodeToLinkFormat = (nodeResponse: NodeResponse): LinkResponse => {
     const linkNodeRequest: LinkNodeRequest = JSON.parse(
@@ -45,5 +68,26 @@ export class Transformer {
     };
 
     return linkResponse;
+  };
+  convertNodeToContentFormat = (
+    nodeResponse: NodeResponse
+  ): ContentResponse => {
+    const contentNodeRequest: ContentNodeRequest = JSON.parse(
+      nodeResponse.data[0].content
+    );
+    const contentResponse: ContentResponse = {
+      id: nodeResponse.id,
+      createdAt: nodeResponse.createdAt,
+      updatedAt: nodeResponse.updatedAt,
+      createdBy: nodeResponse.createdBy,
+      workspace: nodeResponse.workspaceID,
+      namespace: nodeResponse.namespaceID,
+      long: contentNodeRequest.long,
+      metadata: contentNodeRequest.metadata,
+      content: contentNodeRequest.content,
+      range: contentNodeRequest.range,
+    };
+
+    return contentResponse;
   };
 }
