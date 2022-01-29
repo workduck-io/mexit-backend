@@ -3,4 +3,5 @@ export enum errorCodes {
   NO_CONTENT = 'NO_CONTENT',
   INPUT_ERROR = 'INPUT_ERROR',
   AUTH_ERROR = 'AUTH_ERROR',
+  NOT_FOUND = 'NOT_FOUND',
 }

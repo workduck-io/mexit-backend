@@ -3,6 +3,7 @@ import { jsonErrorHandler } from './middlewares/jsonerrorhandler';
 import cors from 'cors';
 import NodeController from './controllers/NodeController';
 import AuthController from './controllers/AuthController';
+import { errorCodes } from './libs/errorCodes';
 
 class App {
   public _app: express.Application;
@@ -33,6 +34,15 @@ class App {
   private initializeControllers(controllers) {
     controllers.forEach(controller => {
       this._app.use('/api/v1/', controller._router);
+    });
+    this._app.use((req, res, next) => {
+      res.status(404);
+      res.json({
+        statusCode: 404,
+        message: 'Route not found',
+        errorCode: errorCodes.NOT_FOUND,
+      });
+      next();
     });
   }
 }
