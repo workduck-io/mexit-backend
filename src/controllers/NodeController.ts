@@ -229,6 +229,7 @@ class NodeController {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
   };
+  //TODO: ClearCache not working have to fix this
   clearCache = (response: Response): void => {
     try {
       this._nodeManager.clearCache();
