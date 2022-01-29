@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface NodeDetail {
   type: string;
   id: string;
@@ -47,4 +48,27 @@ export interface MetaTag {
 export interface UserTag {
   id: string;
   text: string;
+}
+
+export interface ContentNode {
+  id: string;
+  long: string;
+  content?: any[];
+  range?: {
+    startMeta: {
+      parentTagName: string;
+      parentIndex: number;
+      textOffset: number;
+    };
+    endMeta: {
+      parentTagName: string;
+      parentIndex: number;
+      textOffset: number;
+    };
+    text: string;
+  };
+  metadata?: {
+    metaTags: MetaTag[];
+    userTags: UserTag[];
+  };
 }

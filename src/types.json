@@ -50,6 +50,307 @@
             ],
             "type": "object"
         },
+        "ContentNode": {
+            "properties": {
+                "content": {
+                    "items": {},
+                    "type": "array"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "long": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "properties": {
+                        "metaTags": {
+                            "items": {
+                                "$ref": "types#/definitions/MetaTag"
+                            },
+                            "type": "array"
+                        },
+                        "userTags": {
+                            "items": {
+                                "$ref": "types#/definitions/UserTag"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "required": [
+                        "metaTags",
+                        "userTags"
+                    ],
+                    "type": "object"
+                },
+                "range": {
+                    "properties": {
+                        "endMeta": {
+                            "properties": {
+                                "parentIndex": {
+                                    "type": "number"
+                                },
+                                "parentTagName": {
+                                    "type": "string"
+                                },
+                                "textOffset": {
+                                    "type": "number"
+                                }
+                            },
+                            "required": [
+                                "parentIndex",
+                                "parentTagName",
+                                "textOffset"
+                            ],
+                            "type": "object"
+                        },
+                        "startMeta": {
+                            "properties": {
+                                "parentIndex": {
+                                    "type": "number"
+                                },
+                                "parentTagName": {
+                                    "type": "string"
+                                },
+                                "textOffset": {
+                                    "type": "number"
+                                }
+                            },
+                            "required": [
+                                "parentIndex",
+                                "parentTagName",
+                                "textOffset"
+                            ],
+                            "type": "object"
+                        },
+                        "text": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "endMeta",
+                        "startMeta",
+                        "text"
+                    ],
+                    "type": "object"
+                }
+            },
+            "required": [
+                "id",
+                "long"
+            ],
+            "type": "object"
+        },
+        "ContentNodeRequest": {
+            "properties": {
+                "content": {
+                    "items": {},
+                    "type": "array"
+                },
+                "createdBy": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "long": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "properties": {
+                        "metaTags": {
+                            "items": {
+                                "$ref": "types#/definitions/MetaTag"
+                            },
+                            "type": "array"
+                        },
+                        "userTags": {
+                            "items": {
+                                "$ref": "types#/definitions/UserTag"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "required": [
+                        "metaTags",
+                        "userTags"
+                    ],
+                    "type": "object"
+                },
+                "range": {
+                    "properties": {
+                        "endMeta": {
+                            "properties": {
+                                "parentIndex": {
+                                    "type": "number"
+                                },
+                                "parentTagName": {
+                                    "type": "string"
+                                },
+                                "textOffset": {
+                                    "type": "number"
+                                }
+                            },
+                            "required": [
+                                "parentIndex",
+                                "parentTagName",
+                                "textOffset"
+                            ],
+                            "type": "object"
+                        },
+                        "startMeta": {
+                            "properties": {
+                                "parentIndex": {
+                                    "type": "number"
+                                },
+                                "parentTagName": {
+                                    "type": "string"
+                                },
+                                "textOffset": {
+                                    "type": "number"
+                                }
+                            },
+                            "required": [
+                                "parentIndex",
+                                "parentTagName",
+                                "textOffset"
+                            ],
+                            "type": "object"
+                        },
+                        "text": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "endMeta",
+                        "startMeta",
+                        "text"
+                    ],
+                    "type": "object"
+                },
+                "workspace": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "createdBy",
+                "id",
+                "long",
+                "workspace"
+            ],
+            "type": "object"
+        },
+        "ContentResponse": {
+            "properties": {
+                "content": {
+                    "items": {},
+                    "type": "array"
+                },
+                "createdAt": {
+                    "type": "number"
+                },
+                "createdBy": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "long": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "properties": {
+                        "metaTags": {
+                            "items": {
+                                "$ref": "types#/definitions/MetaTag"
+                            },
+                            "type": "array"
+                        },
+                        "userTags": {
+                            "items": {
+                                "$ref": "types#/definitions/UserTag"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "required": [
+                        "metaTags",
+                        "userTags"
+                    ],
+                    "type": "object"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "range": {
+                    "properties": {
+                        "endMeta": {
+                            "properties": {
+                                "parentIndex": {
+                                    "type": "number"
+                                },
+                                "parentTagName": {
+                                    "type": "string"
+                                },
+                                "textOffset": {
+                                    "type": "number"
+                                }
+                            },
+                            "required": [
+                                "parentIndex",
+                                "parentTagName",
+                                "textOffset"
+                            ],
+                            "type": "object"
+                        },
+                        "startMeta": {
+                            "properties": {
+                                "parentIndex": {
+                                    "type": "number"
+                                },
+                                "parentTagName": {
+                                    "type": "string"
+                                },
+                                "textOffset": {
+                                    "type": "number"
+                                }
+                            },
+                            "required": [
+                                "parentIndex",
+                                "parentTagName",
+                                "textOffset"
+                            ],
+                            "type": "object"
+                        },
+                        "text": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "endMeta",
+                        "startMeta",
+                        "text"
+                    ],
+                    "type": "object"
+                },
+                "updatedAt": {
+                    "type": "number"
+                },
+                "workspace": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "createdAt",
+                "createdBy",
+                "id",
+                "long",
+                "namespace",
+                "updatedAt",
+                "workspace"
+            ],
+            "type": "object"
+        },
         "GenericObjectType": {
             "additionalProperties": {
                 "$ref": "types#/definitions/GenericType"
@@ -514,6 +815,7 @@
             "enum": [
                 "AUTH_ERROR",
                 "INPUT_ERROR",
+                "NOT_FOUND",
                 "NO_CONTENT",
                 "UNKNOWN"
             ],
