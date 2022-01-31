@@ -63,12 +63,6 @@ class NodeController {
       [AuthRequest],
       this.getAllNodes
     );
-
-    this._router.get(
-      `${this._urlPath}/clearcache`,
-      [AuthRequest],
-      this.clearCache
-    );
     return;
   }
 
@@ -342,14 +336,6 @@ class NodeController {
         .contentType('application/json')
         .status(statusCodes.OK)
         .send(convertedResponse);
-    } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
-    }
-  };
-  //TODO: ClearCache not working have to fix this
-  clearCache = (response: Response): void => {
-    try {
-      this._nodeManager.clearCache();
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }

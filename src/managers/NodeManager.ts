@@ -132,18 +132,4 @@ export class NodeManager {
       });
     }
   }
-
-  clearCache(): void {
-    try {
-      this.cache.flush();
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: errorCodes.UNKNOWN,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
-  }
 }
