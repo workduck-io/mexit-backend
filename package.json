@@ -5,6 +5,9 @@
   "repository": "git@github.com:workduck-io/mex-browser-extension-backend.git",
   "author": "Workduck <humans@workduck.io>",
   "license": "MIT",
+  "engines": {
+    "node": ">=14.13.1 <=16.13.2"
+  },
   "scripts": {
     "lint": "eslint . --ext .js,.ts,.tsx",
     "lint-fix": "eslint . --ext .js,.ts,.tsx --fix",
