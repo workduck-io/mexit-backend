@@ -11,11 +11,9 @@
   "scripts": {
     "lint": "eslint . --ext .js,.ts,.tsx",
     "lint-fix": "eslint . --ext .js,.ts,.tsx --fix",
-    "start": "export NODE_ENV=prod && ts-node src/app.ts",
+    "start": "ts-node src/app.ts",
     "build": "tsc",
-    "dev": "export NODE_ENV=dev && nodemon src/app.ts",
-    "staging": "export NODE_ENV=staging && nodemon src/app.ts",
-    "local": "export NODE_ENV=local && nodemon src/app.ts",
+    "dev": "nodemon src/app.ts",
     "debug": "export DEBUG=* && npm run start",
     "test": "echo \"Error: no test specified\" && exit 1",
     "types": "typescript-json-schema \"src/interfaces/*.ts\" \"*\" -o src/types.json --id \"types\" --required"
