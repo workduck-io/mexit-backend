@@ -56,7 +56,10 @@ class NodeController {
     try {
       const requestDetail = new RequestClass(request, 'NodeDetail');
       const result = await this._nodeManager.createNode(requestDetail.data);
-      response.status(statusCodes.OK).send(JSON.parse(result));
+      response
+        .contentType('application/json')
+        .status(statusCodes.OK)
+        .send(result);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
@@ -69,7 +72,10 @@ class NodeController {
         request.params.nodeId,
         requestDetail.data
       );
-      response.status(statusCodes.OK).send(result);
+      response
+        .contentType('application/json')
+        .status(statusCodes.OK)
+        .send(result);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
@@ -85,7 +91,10 @@ class NodeController {
         request.params.nodeId,
         requestDetail.data
       );
-      response.status(statusCodes.OK).send(result);
+      response
+        .contentType('application/json')
+        .status(statusCodes.OK)
+        .send(result);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
@@ -104,7 +113,10 @@ class NodeController {
       const resultLinkNodeDetail = this._transformer.convertNodeToLinkFormat(
         JSON.parse(resultNodeDetail) as NodeResponse
       );
-      response.status(statusCodes.OK).send(resultLinkNodeDetail);
+      response
+        .contentType('application/json')
+        .status(statusCodes.OK)
+        .send(resultLinkNodeDetail);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
@@ -122,7 +134,10 @@ class NodeController {
       const resultLinkNodeDetail = this._transformer.convertNodeToContentFormat(
         JSON.parse(resultNodeDetail) as NodeResponse
       );
-      response.status(statusCodes.OK).send(resultLinkNodeDetail);
+      response
+        .contentType('application/json')
+        .status(statusCodes.OK)
+        .send(resultLinkNodeDetail);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
@@ -131,7 +146,10 @@ class NodeController {
   getAllNodes = async (request: Request, response: Response): Promise<void> => {
     try {
       const result = await this._nodeManager.getAllNodes(request.params.userId);
-      response.status(statusCodes.OK).send(result);
+      response
+        .contentType('application/json')
+        .status(statusCodes.OK)
+        .send(result);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }

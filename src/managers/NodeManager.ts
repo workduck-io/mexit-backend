@@ -1,10 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { injectable } from 'inversify';
 import { Block, NodeDetail } from '../interfaces/Node';
 import { errorlib } from '../libs/errorlib';
 import { errorCodes } from '../libs/errorCodes';
 import { statusCodes } from '../libs/statusCodes';
 import container from '../inversify.config';
-import { GotResponse } from '../interfaces/GotClient';
 import { Cache } from '../libs/CacheClass';
 import { Lambda, InvocationType } from '../libs/LambdaClass';
 import { RouteKeys } from '../libs/routeKeys';
@@ -40,7 +40,7 @@ export class NodeManager {
     }
   }
 
-  async appendNode(nodeId: string, block: Block): Promise<GotResponse> {
+  async appendNode(nodeId: string, block: Block): Promise<string> {
     try {
       const response = await this._lambda.invoke(
         this._nodeLambdaFunctionName,
@@ -52,7 +52,7 @@ export class NodeManager {
         }
       );
 
-      return response;
+      return response.body;
     } catch (error) {
       errorlib({
         message: error.message,
@@ -64,7 +64,7 @@ export class NodeManager {
     }
   }
 
-  async editBlock(nodeId: string, block: Block): Promise<GotResponse> {
+  async editBlock(nodeId: string, block: Block): Promise<string> {
     try {
       const response = await this._lambda.invoke(
         this._nodeLambdaFunctionName,
@@ -76,7 +76,7 @@ export class NodeManager {
         }
       );
 
-      return response;
+      return response.body;
     } catch (error) {
       errorlib({
         message: error.message,
@@ -87,7 +87,7 @@ export class NodeManager {
       });
     }
   }
-  async getAllNodes(userId: string): Promise<void> {
+  async getAllNodes(userId: string): Promise<string[]> {
     try {
       const response = await this.cache.get(userId, () =>
         this._lambda.invoke(
