@@ -1,30 +1,34 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { injectable } from 'inversify';
 import { Block, NodeDetail } from '../interfaces/Node';
-import { ConfigService } from '../services/ConfigService';
 import { errorlib } from '../libs/errorlib';
 import { errorCodes } from '../libs/errorCodes';
 import { statusCodes } from '../libs/statusCodes';
-import { GotClient } from '../libs/GotClientClass';
 import container from '../inversify.config';
-import { GotResponse } from '../interfaces/GotClient';
 import { Cache } from '../libs/CacheClass';
+import { Lambda, InvocationType } from '../libs/LambdaClass';
+import { RouteKeys } from '../libs/routeKeys';
 
 @injectable()
 export class NodeManager {
-  private _urlPath = '/node';
-  public _gotClient: GotClient = container.get<GotClient>(GotClient);
-  public _cache: Cache = container.get<Cache>(Cache);
-  async createNode(
-    nodeDetail: NodeDetail,
-    authToken: string
-  ): Promise<GotResponse> {
+  private _lambdaInvocationType: InvocationType = 'RequestResponse';
+  private _nodeLambdaFunctionName = 'mex-backend-test-Node';
+
+  private _lambda: Lambda = container.get<Lambda>(Lambda);
+  private cache: Cache = container.get<Cache>(Cache);
+
+  async createNode(nodeDetail: NodeDetail): Promise<string> {
     try {
-      const result = await this._gotClient.post<NodeDetail>(
-        `${ConfigService.MEX_BACKEND_URL}${this._urlPath}`,
-        nodeDetail,
-        authToken
+      const result = await this._lambda.invoke(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.createNode,
+          payload: nodeDetail,
+        }
       );
-      return result;
+
+      return result.body;
     } catch (error) {
       errorlib({
         message: error.message,
@@ -36,18 +40,19 @@ export class NodeManager {
     }
   }
 
-  async appendNode(
-    nodeId: string,
-    block: Block,
-    authToken: string
-  ): Promise<GotResponse> {
+  async appendNode(nodeId: string, block: Block): Promise<string> {
     try {
-      const response = await this._gotClient.post<Block>(
-        `${ConfigService.MEX_BACKEND_URL}${this._urlPath}/${nodeId}/append`,
-        block,
-        authToken
+      const response = await this._lambda.invoke(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.appendNode,
+          payload: block,
+          pathParameters: { id: nodeId },
+        }
       );
-      return response;
+
+      return response.body;
     } catch (error) {
       errorlib({
         message: error.message,
@@ -59,18 +64,19 @@ export class NodeManager {
     }
   }
 
-  async editBlock(
-    nodeId: string,
-    block: Block,
-    authToken: string
-  ): Promise<GotResponse> {
+  async editBlock(nodeId: string, block: Block): Promise<string> {
     try {
-      const response = await this._gotClient.post<Block>(
-        `${ConfigService.MEX_BACKEND_URL}${this._urlPath}/${nodeId}/blockUpdate`,
-        block,
-        authToken
+      const response = await this._lambda.invoke(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.editBlock,
+          payload: block,
+          pathParameters: { id: nodeId },
+        }
       );
-      return response;
+
+      return response.body;
     } catch (error) {
       errorlib({
         message: error.message,
@@ -81,89 +87,16 @@ export class NodeManager {
       });
     }
   }
-  async archivingNode(nodeId: string, authToken: string): Promise<GotResponse> {
+  async getAllNodes(userId: string): Promise<string[]> {
     try {
-      const response = await this._gotClient.delete(
-        `${ConfigService.MEX_BACKEND_URL}${this._urlPath}/archive/${nodeId}`,
-        authToken
-      );
-      return response;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: errorCodes.UNKNOWN,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
-  }
-  async deleteNode(nodeId: string, authToken: string): Promise<GotResponse> {
-    try {
-      const response = await this._gotClient.put(
-        `${ConfigService.MEX_BACKEND_URL}${this._urlPath}/${nodeId}`,
-        authToken
-      );
-      return response;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: errorCodes.UNKNOWN,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
-  }
-  async getAllArchivedNodes(
-    nodeId: string,
-    authToken: string
-  ): Promise<GotResponse> {
-    try {
-      const response = await this._gotClient.get(
-        `${ConfigService.MEX_BACKEND_URL}${this._urlPath}/archive/${nodeId}`,
-        authToken
-      );
-      return response;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: errorCodes.UNKNOWN,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
-  }
-  async unArchivingNode(
-    nodeId: string,
-    authToken: string
-  ): Promise<GotResponse> {
-    try {
-      const response = await this._gotClient.put(
-        `${ConfigService.MEX_BACKEND_URL}${this._urlPath}/unarchive/${nodeId}`,
-        authToken
-      );
-      return response;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: errorCodes.UNKNOWN,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
-  }
-  async getAllNodes(userId: string, authToken: string): Promise<GotResponse> {
-    try {
-      const response = await this._cache.get(userId, () =>
-        this._gotClient.get(
-          `${ConfigService.MEX_BACKEND_URL}${this._urlPath}/all/${userId}`,
-          authToken
+      const response = await this.cache.get(userId, () =>
+        this._lambda.invoke(
+          this._nodeLambdaFunctionName,
+          this._lambdaInvocationType,
+          { routeKey: RouteKeys.getAllNodes, pathParameters: { id: userId } }
         )
       );
-      return response;
+      return response.body;
     } catch (error) {
       errorlib({
         message: error.message,
@@ -177,7 +110,7 @@ export class NodeManager {
 
   clearCache(): void {
     try {
-      this._cache.flush();
+      this.cache.flush();
     } catch (error) {
       errorlib({
         message: error.message,

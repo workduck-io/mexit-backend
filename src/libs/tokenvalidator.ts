@@ -1,7 +1,6 @@
 import { promisify } from 'util';
 import * as jsonwebtoken from 'jsonwebtoken';
 import jwkToPem from 'jwk-to-pem';
-import config from '../config';
 import got from 'got';
 
 export interface ClaimVerifyRequest {
@@ -50,7 +49,7 @@ interface Claim {
   event_id: string;
 }
 
-const cognitoPoolId = config.cognito.USER_POOL_ID || '';
+const cognitoPoolId = 'us-east-1_Zu7FAh7hj';
 if (!cognitoPoolId) {
   throw new Error('env var required for cognito pool');
 }

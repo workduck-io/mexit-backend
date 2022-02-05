@@ -29,27 +29,6 @@ class NodeController {
       [AuthRequest],
       this.editBlockInNode
     );
-    this._router.delete(
-      `${this._urlPath}/archive/:nodeId`,
-      [AuthRequest],
-      this.archivingNode
-    );
-    this._router.put(
-      `${this._urlPath}/:nodeId`,
-      [AuthRequest],
-      this.deleteNode
-    );
-    this._router.get(
-      `${this._urlPath}/archive/:nodeId`,
-      [AuthRequest],
-
-      this.getAllArchivedNodes
-    );
-    this._router.put(
-      `${this._urlPath}/unarchive/:nodeId`,
-      [AuthRequest],
-      this.unArchivingNode
-    );
     this._router.post(
       `${this._urlPath}/link`,
       [AuthRequest],
@@ -76,11 +55,11 @@ class NodeController {
   createNode = async (request: Request, response: Response): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'NodeDetail');
-      const result = await this._nodeManager.createNode(
-        requestDetail.data,
-        requestDetail.authToken
-      );
-      response.status(result.status).send(result.data);
+      const result = await this._nodeManager.createNode(requestDetail.data);
+      response
+        .contentType('application/json')
+        .status(statusCodes.OK)
+        .send(result);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
@@ -91,10 +70,12 @@ class NodeController {
       const requestDetail = new RequestClass(request, 'Block');
       const result = await this._nodeManager.appendNode(
         request.params.nodeId,
-        requestDetail.data,
-        requestDetail.authToken
+        requestDetail.data
       );
-      response.status(result.status).send(result.data);
+      response
+        .contentType('application/json')
+        .status(statusCodes.OK)
+        .send(result);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
@@ -108,68 +89,12 @@ class NodeController {
       const requestDetail = new RequestClass(request, 'Block');
       const result = await this._nodeManager.editBlock(
         request.params.nodeId,
-        requestDetail.data,
-        requestDetail.authToken
+        requestDetail.data
       );
-      response.status(result.status).send(result.data);
-    } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
-    }
-  };
-
-  archivingNode = async (
-    request: Request,
-    response: Response
-  ): Promise<void> => {
-    try {
-      const requestDetail = new RequestClass(request);
-      const result = await this._nodeManager.archivingNode(
-        request.params.nodeId,
-        requestDetail.authToken
-      );
-      response.status(result.status).send(result.data);
-    } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
-    }
-  };
-
-  deleteNode = async (request: Request, response: Response): Promise<void> => {
-    try {
-      const requestDetail = new RequestClass(request);
-      const result = await this._nodeManager.deleteNode(
-        request.params.nodeId,
-        requestDetail.authToken
-      );
-      response.status(result.status).send(result.data);
-    } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
-    }
-  };
-  getAllArchivedNodes = async (
-    request: Request,
-    response: Response
-  ): Promise<void> => {
-    try {
-      const result = await this._nodeManager.getAllArchivedNodes(
-        request.params.nodeId,
-        request.headers.authorization.toString()
-      );
-      response.status(result.status).send(result.data);
-    } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
-    }
-  };
-  unArchivingNode = async (
-    request: Request,
-    response: Response
-  ): Promise<void> => {
-    try {
-      const requestDetail = new RequestClass(request);
-      const result = await this._nodeManager.unArchivingNode(
-        request.params.nodeId,
-        requestDetail.authToken
-      );
-      response.status(result.status).send(result.data);
+      response
+        .contentType('application/json')
+        .status(statusCodes.OK)
+        .send(result);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
@@ -184,14 +109,14 @@ class NodeController {
       const nodeDetail = this._transformer.convertLinkToNodeFormat(
         requestDetail.data
       );
-      const resultNodeDetail = await this._nodeManager.createNode(
-        nodeDetail,
-        requestDetail.authToken
-      );
+      const resultNodeDetail = await this._nodeManager.createNode(nodeDetail);
       const resultLinkNodeDetail = this._transformer.convertNodeToLinkFormat(
-        resultNodeDetail.data as NodeResponse
+        JSON.parse(resultNodeDetail) as NodeResponse
       );
-      response.status(resultNodeDetail.status).send(resultLinkNodeDetail);
+      response
+        .contentType('application/json')
+        .status(statusCodes.OK)
+        .send(resultLinkNodeDetail);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
@@ -205,14 +130,14 @@ class NodeController {
       const nodeDetail = this._transformer.convertContentToNodeFormat(
         requestDetail.data
       );
-      const resultNodeDetail = await this._nodeManager.createNode(
-        nodeDetail,
-        requestDetail.authToken
-      );
+      const resultNodeDetail = await this._nodeManager.createNode(nodeDetail);
       const resultLinkNodeDetail = this._transformer.convertNodeToContentFormat(
-        resultNodeDetail.data as NodeResponse
+        JSON.parse(resultNodeDetail) as NodeResponse
       );
-      response.status(resultNodeDetail.status).send(resultLinkNodeDetail);
+      response
+        .contentType('application/json')
+        .status(statusCodes.OK)
+        .send(resultLinkNodeDetail);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
@@ -220,11 +145,11 @@ class NodeController {
 
   getAllNodes = async (request: Request, response: Response): Promise<void> => {
     try {
-      const result = await this._nodeManager.getAllNodes(
-        request.params.userId,
-        request.headers.authorization.toString()
-      );
-      response.status(result.status).send(result.data);
+      const result = await this._nodeManager.getAllNodes(request.params.userId);
+      response
+        .contentType('application/json')
+        .status(statusCodes.OK)
+        .send(result);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
