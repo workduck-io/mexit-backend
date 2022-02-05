@@ -54,8 +54,16 @@ class NodeController {
 
   createNode = async (request: Request, response: Response): Promise<void> => {
     try {
-      const requestDetail = new RequestClass(request, 'NodeDetail');
-      const result = await this._nodeManager.createNode(requestDetail.data);
+      const requestDetail = new RequestClass(request, 'ClientNode');
+      const nodeDetail = this._transformer.convertClientNodeToNodeFormat(
+        requestDetail.data
+      );
+
+      const nodeResult = await this._nodeManager.createNode(nodeDetail);
+
+      const result = this._transformer.convertNodeToClientNodeFormat(
+        JSON.parse(nodeResult) as NodeResponse
+      );
       response
         .contentType('application/json')
         .status(statusCodes.OK)

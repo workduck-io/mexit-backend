@@ -10,6 +10,9 @@ import {
   MetaTag,
   UserTag,
   ContentNode,
+  ClientNodeContentChildren,
+  ClientNodeContent,
+  ClientNode,
 } from './interfaces/Node';
 import { ContentNodeRequest, LinkNodeRequest } from './interfaces/Request';
 import {
@@ -17,6 +20,7 @@ import {
   NodeDataResponse,
   LinkResponse,
   ContentResponse,
+  ClientNodeResponse,
 } from './interfaces/Response';
 import { WDErrorType } from './interfaces/WDError';
 import { errorCodes } from './libs/errorCodes';
@@ -50,4 +54,8 @@ export default class Interfaces implements Definitions {
   ContentNode: ContentNode;
   ContentNodeRequest: ContentNodeRequest;
   ContentResponse: ContentResponse;
+  ClientNode: ClientNode;
+  ClientNodeContent: ClientNodeContent;
+  ClientNodeContentChildren: ClientNodeContentChildren;
+  ClientNodeResponse: ClientNodeResponse;
 }

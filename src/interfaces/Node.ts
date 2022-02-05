@@ -10,15 +10,16 @@ export interface NodeDetail {
 
 export interface NodeData {
   id: string;
-  elementType: string;
+  elementType?: string;
+  parentID?: string;
   content?: string;
   children?: NodeChildData[];
 }
 
 export interface NodeChildData {
   id: string;
-  content: string;
-  elementType: string;
+  content?: string;
+  elementType?: string;
   properties?: { bold: boolean; italic: boolean };
   createdBy?: string;
   children?: NodeChildData[];
@@ -71,4 +72,26 @@ export interface ContentNode {
     metaTags: MetaTag[];
     userTags: UserTag[];
   };
+}
+
+export interface ClientNode {
+  id: string;
+  content?: ClientNodeContent[];
+  workspace: string;
+  createdBy: string;
+}
+
+export interface ClientNodeContent {
+  type?: string;
+  id: string;
+  nodeUID: string;
+  children?: ClientNodeContentChildren[];
+}
+
+export interface ClientNodeContentChildren {
+  type?: string;
+  id: string;
+  text: string;
+  italic?: boolean;
+  bold?: boolean;
 }

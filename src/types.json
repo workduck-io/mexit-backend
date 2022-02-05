@@ -50,6 +50,116 @@
             ],
             "type": "object"
         },
+        "ClientNode": {
+            "properties": {
+                "content": {
+                    "items": {
+                        "$ref": "types#/definitions/ClientNodeContent"
+                    },
+                    "type": "array"
+                },
+                "createdBy": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "workspace": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "createdBy",
+                "id",
+                "workspace"
+            ],
+            "type": "object"
+        },
+        "ClientNodeContent": {
+            "properties": {
+                "children": {
+                    "items": {
+                        "$ref": "types#/definitions/ClientNodeContentChildren"
+                    },
+                    "type": "array"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "nodeUID": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "nodeUID"
+            ],
+            "type": "object"
+        },
+        "ClientNodeContentChildren": {
+            "properties": {
+                "bold": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "italic": {
+                    "type": "boolean"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "text"
+            ],
+            "type": "object"
+        },
+        "ClientNodeResponse": {
+            "properties": {
+                "content": {
+                    "items": {
+                        "$ref": "types#/definitions/ClientNodeContent"
+                    },
+                    "type": "array"
+                },
+                "createdAt": {
+                    "type": "number"
+                },
+                "createdBy": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "number"
+                },
+                "workspace": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "createdAt",
+                "createdBy",
+                "id",
+                "namespace",
+                "updatedAt",
+                "workspace"
+            ],
+            "type": "object"
+        },
         "ContentNode": {
             "properties": {
                 "content": {
@@ -608,8 +718,6 @@
                 }
             },
             "required": [
-                "content",
-                "elementType",
                 "id"
             ],
             "type": "object"
@@ -630,10 +738,12 @@
                 },
                 "id": {
                     "type": "string"
+                },
+                "parentID": {
+                    "type": "string"
                 }
             },
             "required": [
-                "elementType",
                 "id"
             ],
             "type": "object"
@@ -668,7 +778,15 @@
                     "type": "string"
                 },
                 "properties": {
-                    "type": "null"
+                    "properties": {
+                        "bold": {
+                            "type": "boolean"
+                        },
+                        "italic": {
+                            "type": "boolean"
+                        }
+                    },
+                    "type": "object"
                 },
                 "updatedAt": {
                     "type": "number"
@@ -682,7 +800,6 @@
                 "id",
                 "lastEditedBy",
                 "parentID",
-                "properties",
                 "updatedAt"
             ],
             "type": "object"
