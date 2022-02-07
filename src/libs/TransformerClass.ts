@@ -1,5 +1,12 @@
 import { injectable } from 'inversify';
-import { NodeData, NodeDetail } from '../interfaces/Node';
+import {
+  ClientNode,
+  ClientNodeContent,
+  ClientNodeContentChildren,
+  NodeChildData,
+  NodeData,
+  NodeDetail,
+} from '../interfaces/Node';
 import { ContentNodeRequest, LinkNodeRequest } from '../interfaces/Request';
 import {
   ContentResponse,
@@ -12,6 +19,82 @@ export class Transformer {
   private BLOCK_ELEMENT_TYPE = 'hyperlink';
   private NODE_ELEMENT_TYPE = 'NodeRequest';
   private NAMESPACE_ID = '#mex-it';
+  private DEFAULT_ELEMENT_TYPE = 'p';
+
+  convertClientNodeToNodeFormat = (clientNode: ClientNode) => {
+    const nodeData: NodeData[] = [];
+    for (const content of clientNode.content) {
+      const nodeChildData: NodeChildData[] = [];
+      for (const children of content.children) {
+        nodeChildData.push({
+          id: children.id,
+          elementType: children.type ?? this.DEFAULT_ELEMENT_TYPE,
+          content: children.text,
+          createdBy: clientNode.createdBy,
+          properties: {
+            ...(children.italic && {
+              italic: children.italic,
+            }),
+            ...(children.bold && {
+              bold: children.bold,
+            }),
+          },
+        });
+      }
+      nodeData.push({
+        id: content.id,
+        parentID: content.nodeUID,
+        elementType: content.type ?? this.DEFAULT_ELEMENT_TYPE,
+        children: nodeChildData,
+      });
+    }
+
+    const nodeDetail: NodeDetail = {
+      type: this.NODE_ELEMENT_TYPE,
+      id: clientNode.id,
+      workspaceIdentifier: clientNode.workspace,
+      namespaceIdentifier: this.NAMESPACE_ID,
+      data: nodeData,
+      lastEditedBy: clientNode.createdBy,
+    };
+
+    return nodeDetail;
+  };
+
+  convertNodeToClientNodeFormat = (nodeResponse: NodeResponse): ClientNode => {
+    const clientNodeContent: ClientNodeContent[] = [];
+    for (const nodeDataChildren of nodeResponse.data) {
+      const clientNodeContentChildren: ClientNodeContentChildren[] = [];
+      for (const nodeBlockChildren of nodeDataChildren.children) {
+        clientNodeContentChildren.push({
+          id: nodeBlockChildren.id,
+          text: nodeBlockChildren.content,
+          ...(nodeBlockChildren.properties.bold && {
+            bold: nodeBlockChildren.properties.bold,
+          }),
+          ...(nodeBlockChildren.properties.italic && {
+            italic: nodeBlockChildren.properties.italic,
+          }),
+          type: nodeBlockChildren.elementType,
+        });
+      }
+      clientNodeContent.push({
+        id: nodeDataChildren.id,
+        nodeUID: nodeDataChildren.parentID,
+        children: clientNodeContentChildren,
+        type: nodeDataChildren.elementType,
+      });
+    }
+
+    const clientNodeDetail: ClientNode = {
+      id: nodeResponse.id,
+      createdBy: nodeResponse.createdBy,
+      workspace: nodeResponse.workspaceID,
+      content: clientNodeContent,
+    };
+
+    return clientNodeDetail;
+  };
 
   convertLinkToNodeFormat = (linkNodeRequest: LinkNodeRequest): NodeDetail => {
     const nodeData: NodeData = {

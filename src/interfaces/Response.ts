@@ -1,4 +1,4 @@
-import { ContentNode, LinkNode } from './Node';
+import { ClientNode, ContentNode, LinkNode } from './Node';
 
 export interface NodeResponse {
   id: string;
@@ -20,7 +20,10 @@ export interface NodeDataResponse {
   content: string;
   children?: NodeDataResponse[];
   elementType: string;
-  properties: null;
+  properties?: {
+    bold?: boolean;
+    italic?: boolean;
+  };
   createdBy: string;
   lastEditedBy: string;
   createdAt: number;
@@ -36,6 +39,14 @@ export interface LinkResponse extends LinkNode {
 }
 
 export interface ContentResponse extends ContentNode {
+  createdAt: number;
+  updatedAt: number;
+  namespace: string;
+  workspace: string;
+  createdBy: string;
+}
+
+export interface ClientNodeResponse extends ClientNode {
   createdAt: number;
   updatedAt: number;
   namespace: string;
