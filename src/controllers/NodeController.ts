@@ -166,10 +166,13 @@ class NodeController {
   getNode = async (request: Request, response: Response): Promise<void> => {
     try {
       const result = await this._nodeManager.getNode(request.params.nodeId);
+      const nodeResponse = JSON.parse(result) as NodeResponse;
+      const convertedResponse =
+        this._transformer.genericNodeConverter(nodeResponse);
       response
         .contentType('application/json')
         .status(statusCodes.OK)
-        .send(result);
+        .send(convertedResponse);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
