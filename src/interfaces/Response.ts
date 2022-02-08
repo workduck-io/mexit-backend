@@ -36,6 +36,23 @@ export interface LinkResponse extends LinkNode {
   namespace: string;
   workspace: string;
   createdBy: string;
+  content: LinkResponseContent[];
+}
+
+export interface LinkResponseContent {
+  id?: string;
+  type: string;
+  children: TextType[] | LinkChildrenType[];
+}
+
+export interface LinkChildrenType {
+  type: string;
+  url: string;
+  children: TextType[];
+}
+
+export interface TextType {
+  text: string;
 }
 
 export interface ContentResponse extends ContentNode {
