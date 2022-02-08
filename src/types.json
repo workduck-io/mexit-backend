@@ -491,6 +491,28 @@
             ],
             "type": "object"
         },
+        "LinkChildrenType": {
+            "properties": {
+                "children": {
+                    "items": {
+                        "$ref": "types#/definitions/TextType"
+                    },
+                    "type": "array"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "children",
+                "type",
+                "url"
+            ],
+            "type": "object"
+        },
         "LinkNode": {
             "properties": {
                 "id": {
@@ -591,6 +613,12 @@
         },
         "LinkResponse": {
             "properties": {
+                "content": {
+                    "items": {
+                        "$ref": "types#/definitions/LinkResponseContent"
+                    },
+                    "type": "array"
+                },
                 "createdAt": {
                     "type": "number"
                 },
@@ -641,6 +669,7 @@
                 }
             },
             "required": [
+                "content",
                 "createdAt",
                 "createdBy",
                 "id",
@@ -651,6 +680,37 @@
                 "shortenedURL",
                 "updatedAt",
                 "workspace"
+            ],
+            "type": "object"
+        },
+        "LinkResponseContent": {
+            "properties": {
+                "children": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "$ref": "types#/definitions/TextType"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "items": {
+                                "$ref": "types#/definitions/LinkChildrenType"
+                            },
+                            "type": "array"
+                        }
+                    ]
+                },
+                "id": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "children",
+                "type"
             ],
             "type": "object"
         },
@@ -877,6 +937,17 @@
                 "updatedAt",
                 "version",
                 "workspaceID"
+            ],
+            "type": "object"
+        },
+        "TextType": {
+            "properties": {
+                "text": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "text"
             ],
             "type": "object"
         },
