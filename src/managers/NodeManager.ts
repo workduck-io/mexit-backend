@@ -40,6 +40,31 @@ export class NodeManager {
     }
   }
 
+  async getNode(nodeId: string): Promise<string> {
+    try {
+      const result = await this.cache.get(nodeId, 'NODE', () =>
+        this._lambda.invoke(
+          this._nodeLambdaFunctionName,
+          this._lambdaInvocationType,
+          {
+            routeKey: RouteKeys.getNode,
+            pathParameters: { id: nodeId },
+          }
+        )
+      );
+
+      return result.body;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+
   async appendNode(nodeId: string, block: Block): Promise<string> {
     try {
       const response = await this._lambda.invoke(
@@ -89,7 +114,7 @@ export class NodeManager {
   }
   async getAllNodes(userId: string): Promise<string[]> {
     try {
-      const response = await this.cache.get(userId, () =>
+      const response = await this.cache.get(userId, 'ALLNODES', () =>
         this._lambda.invoke(
           this._nodeLambdaFunctionName,
           this._lambdaInvocationType,
