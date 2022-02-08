@@ -165,7 +165,6 @@ export class Transformer {
       createdBy: nodeResponse.createdBy,
       workspace: nodeResponse.workspaceID,
       namespace: nodeResponse.namespaceID,
-      long: contentNodeRequest.long,
       metadata: contentNodeRequest.metadata,
       content: contentNodeRequest.content,
       range: contentNodeRequest.range,

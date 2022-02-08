@@ -53,7 +53,6 @@ export interface UserTag {
 
 export interface ContentNode {
   id: string;
-  long: string;
   content?: any[];
   range?: {
     startMeta: {
