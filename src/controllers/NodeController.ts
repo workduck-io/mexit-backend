@@ -39,6 +39,7 @@ class NodeController {
       [AuthRequest],
       this.createContentNode
     );
+    this._router.get(`${this._urlPath}/:nodeId`, [AuthRequest], this.getNode);
     this._router.get(
       `${this._urlPath}/all/:userId`,
       [AuthRequest],
@@ -154,6 +155,17 @@ class NodeController {
   getAllNodes = async (request: Request, response: Response): Promise<void> => {
     try {
       const result = await this._nodeManager.getAllNodes(request.params.userId);
+      response
+        .contentType('application/json')
+        .status(statusCodes.OK)
+        .send(result);
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+    }
+  };
+  getNode = async (request: Request, response: Response): Promise<void> => {
+    try {
+      const result = await this._nodeManager.getNode(request.params.nodeId);
       response
         .contentType('application/json')
         .status(statusCodes.OK)

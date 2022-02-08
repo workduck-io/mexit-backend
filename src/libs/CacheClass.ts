@@ -1,10 +1,13 @@
 import { injectable } from 'inversify';
 import NodeCache from 'node-cache';
+import container from '../inversify.config';
+import { Transformer } from './TransformerClass';
 
 @injectable()
 export class Cache {
   private TTL = 1200;
   private _cache;
+  private _transformer: Transformer = container.get<Transformer>(Transformer);
 
   constructor() {
     this._cache = new NodeCache({
@@ -13,14 +16,16 @@ export class Cache {
       useClones: false,
     });
   }
-  get(key, storeFunction) {
-    const value = this._cache.get(key);
+  get(key, entity: string, storeFunction) {
+    const value = this._cache.get(
+      this._transformer.encodeCacheKey(entity, key)
+    );
     if (value) {
       return Promise.resolve(value);
     }
 
     return storeFunction().then(result => {
-      this._cache.set(key, result);
+      this._cache.set(this._transformer.encodeCacheKey(entity, key), result);
       return result;
     });
   }
