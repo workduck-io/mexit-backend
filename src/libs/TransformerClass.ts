@@ -11,8 +11,10 @@ import { ContentNodeRequest, LinkNodeRequest } from '../interfaces/Request';
 import {
   ContentResponse,
   LinkResponse,
+  LinkResponseContent,
   NodeResponse,
 } from '../interfaces/Response';
+import { nanoid } from 'nanoid';
 
 @injectable()
 export class Transformer {
@@ -161,6 +163,33 @@ export class Transformer {
     const linkNodeRequest: LinkNodeRequest = JSON.parse(
       nodeResponse.data[0].content
     );
+
+    const linkContentResponse: LinkResponseContent[] = [];
+
+    linkContentResponse.push({
+      id: `BLOCK_${nanoid()}`,
+      type: 'h1',
+      children: [
+        {
+          text: linkNodeRequest.short,
+        },
+      ],
+    });
+    linkContentResponse.push({
+      id: `BLOCK_${nanoid()}`,
+      type: this.DEFAULT_ELEMENT_TYPE,
+      children: [
+        {
+          type: 'a',
+          children: [
+            {
+              text: linkNodeRequest.long,
+            },
+          ],
+          url: linkNodeRequest.long,
+        },
+      ],
+    });
     const linkResponse: LinkResponse = {
       id: nodeResponse.id,
       createdAt: nodeResponse.createdAt,
@@ -172,6 +201,7 @@ export class Transformer {
       metadata: linkNodeRequest.metadata,
       short: linkNodeRequest.short,
       shortenedURL: linkNodeRequest.shortenedURL,
+      content: linkContentResponse,
     };
 
     return linkResponse;
