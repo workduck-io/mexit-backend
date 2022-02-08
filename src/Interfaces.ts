@@ -1,3 +1,4 @@
+import { TextType } from 'aws-sdk/clients/polly';
 import { AuthorizeRefreshTokenType, AuthorizeType } from './interfaces/Auth';
 import { GenericObjectType, GenericType } from './interfaces/Generics';
 import { GotResponse, GotClientType } from './interfaces/GotClient';
@@ -21,6 +22,8 @@ import {
   LinkResponse,
   ContentResponse,
   ClientNodeResponse,
+  LinkResponseContent,
+  LinkChildrenType,
 } from './interfaces/Response';
 import { WDErrorType } from './interfaces/WDError';
 import { errorCodes } from './libs/errorCodes';
@@ -58,4 +61,7 @@ export default class Interfaces implements Definitions {
   ClientNodeContent: ClientNodeContent;
   ClientNodeContentChildren: ClientNodeContentChildren;
   ClientNodeResponse: ClientNodeResponse;
+  LinkResponseContent: LinkResponseContent;
+  LinkChildrenType: LinkChildrenType;
+  TextType: TextType;
 }

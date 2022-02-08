@@ -11,8 +11,10 @@ import { ContentNodeRequest, LinkNodeRequest } from '../interfaces/Request';
 import {
   ContentResponse,
   LinkResponse,
+  LinkResponseContent,
   NodeResponse,
 } from '../interfaces/Response';
+import { nanoid } from 'nanoid';
 
 @injectable()
 export class Transformer {
@@ -21,6 +23,10 @@ export class Transformer {
   private NAMESPACE_ID = '#mex-it';
   private DEFAULT_ELEMENT_TYPE = 'p';
   private CACHE_KEY_DELIMITER = '+';
+  private CAPTURES = {
+    CONTENT: 'CONTENT',
+    LINK: 'LINK',
+  };
 
   encodeCacheKey = (...keys: string[]) => {
     let result = '';
@@ -32,6 +38,13 @@ export class Transformer {
 
   decodeCacheKey = (encodedCacheKey: string) => {
     return encodedCacheKey.split(this.CACHE_KEY_DELIMITER).slice(0, -1);
+  };
+
+  genericNodeConverter = (nodeResponse: NodeResponse) => {
+    if (nodeResponse.id.startsWith(this.CAPTURES.CONTENT))
+      return this.convertNodeToContentFormat(nodeResponse);
+    else if (nodeResponse.id.startsWith(this.CAPTURES.LINK))
+      return this.convertNodeToLinkFormat(nodeResponse);
   };
 
   convertClientNodeToNodeFormat = (clientNode: ClientNode) => {
@@ -150,6 +163,33 @@ export class Transformer {
     const linkNodeRequest: LinkNodeRequest = JSON.parse(
       nodeResponse.data[0].content
     );
+
+    const linkContentResponse: LinkResponseContent[] = [];
+
+    linkContentResponse.push({
+      id: `BLOCK_${nanoid()}`,
+      type: 'h1',
+      children: [
+        {
+          text: linkNodeRequest.short,
+        },
+      ],
+    });
+    linkContentResponse.push({
+      id: `BLOCK_${nanoid()}`,
+      type: this.DEFAULT_ELEMENT_TYPE,
+      children: [
+        {
+          type: 'a',
+          children: [
+            {
+              text: linkNodeRequest.long,
+            },
+          ],
+          url: linkNodeRequest.long,
+        },
+      ],
+    });
     const linkResponse: LinkResponse = {
       id: nodeResponse.id,
       createdAt: nodeResponse.createdAt,
@@ -161,6 +201,7 @@ export class Transformer {
       metadata: linkNodeRequest.metadata,
       short: linkNodeRequest.short,
       shortenedURL: linkNodeRequest.shortenedURL,
+      content: linkContentResponse,
     };
 
     return linkResponse;
