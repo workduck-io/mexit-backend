@@ -169,9 +169,6 @@
                 "id": {
                     "type": "string"
                 },
-                "long": {
-                    "type": "string"
-                },
                 "metadata": {
                     "properties": {
                         "metaTags": {
@@ -246,8 +243,7 @@
                 }
             },
             "required": [
-                "id",
-                "long"
+                "id"
             ],
             "type": "object"
         },
@@ -261,9 +257,6 @@
                     "type": "string"
                 },
                 "id": {
-                    "type": "string"
-                },
-                "long": {
                     "type": "string"
                 },
                 "metadata": {
@@ -345,7 +338,6 @@
             "required": [
                 "createdBy",
                 "id",
-                "long",
                 "workspace"
             ],
             "type": "object"
@@ -363,9 +355,6 @@
                     "type": "string"
                 },
                 "id": {
-                    "type": "string"
-                },
-                "long": {
                     "type": "string"
                 },
                 "metadata": {
@@ -454,7 +443,6 @@
                 "createdAt",
                 "createdBy",
                 "id",
-                "long",
                 "namespace",
                 "updatedAt",
                 "workspace"
