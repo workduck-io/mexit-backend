@@ -20,6 +20,19 @@ export class Transformer {
   private NODE_ELEMENT_TYPE = 'NodeRequest';
   private NAMESPACE_ID = '#mex-it';
   private DEFAULT_ELEMENT_TYPE = 'p';
+  private CACHE_KEY_DELIMITER = '+';
+
+  encodeCacheKey = (...keys: string[]) => {
+    let result = '';
+    keys.map(key => {
+      result += key + this.CACHE_KEY_DELIMITER;
+    });
+    return result;
+  };
+
+  decodeCacheKey = (encodedCacheKey: string) => {
+    return encodedCacheKey.split(this.CACHE_KEY_DELIMITER).slice(0, -1);
+  };
 
   convertClientNodeToNodeFormat = (clientNode: ClientNode) => {
     const nodeData: NodeData[] = [];
