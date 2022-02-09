@@ -16,6 +16,7 @@ async function AuthRequest(
 
     const result = await TokenHandler({ token });
     if (result.isValid) {
+      res.locals.userEmail = result.userEmail;
       next();
     } else throw new Error(result.error);
   } catch (error) {
