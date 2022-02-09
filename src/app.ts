@@ -4,6 +4,7 @@ import cors from 'cors';
 import NodeController from './controllers/NodeController';
 import SearchController from './controllers/SearchController';
 import { errorCodes } from './libs/errorCodes';
+import 'dotenv/config';
 
 class App {
   public _app: express.Application;
