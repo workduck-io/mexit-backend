@@ -297,8 +297,6 @@ class NodeController {
         requestDetail.data
       );
 
-      console.log('Node Detail: ', nodeDetail);
-
       const resultNodeDetail = await this._nodeManager.createNode(nodeDetail);
       const resultLinkNodeDetail = this._transformer.convertNodeToContentFormat(
         JSON.parse(resultNodeDetail) as NodeResponse
@@ -308,7 +306,6 @@ class NodeController {
         .status(statusCodes.OK)
         .send(resultLinkNodeDetail);
     } catch (error) {
-      console.log('Error: ', error);
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
   };

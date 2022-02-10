@@ -30,7 +30,6 @@ export class NodeManager {
 
       return result.body;
     } catch (error) {
-      console.log('Error: ', error);
       errorlib({
         message: error.message,
         errorCode: errorCodes.UNKNOWN,
