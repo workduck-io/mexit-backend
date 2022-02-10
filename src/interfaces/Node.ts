@@ -2,6 +2,7 @@
 export interface NodeDetail {
   type: string;
   id: string;
+  path?: string;
   namespaceIdentifier: string;
   workspaceIdentifier: string;
   data: NodeData[];
@@ -71,19 +72,22 @@ export interface ContentNode {
     metaTags: MetaTag[];
     userTags: UserTag[];
   };
+  type?: string;
+  nodePath?: string;
+  appendNodeUID?: string;
 }
 
 export interface ClientNode {
   id: string;
   content?: ClientNodeContent[];
-  workspace: string;
+  workspaceIdentifier: string;
   createdBy: string;
 }
 
 export interface ClientNodeContent {
   type?: string;
   id: string;
-  nodeUID: string;
+  nodeUID?: string;
   children?: ClientNodeContentChildren[];
 }
 
@@ -93,4 +97,14 @@ export interface ClientNodeContentChildren {
   text: string;
   italic?: boolean;
   bold?: boolean;
+}
+
+export interface NodeMetadata {
+  createdBy?: string;
+  createdAt?: number;
+  lastEditedBy?: string;
+  updatedAt?: number;
+
+  userTags: any[];
+  pageMetaTags: any[];
 }
