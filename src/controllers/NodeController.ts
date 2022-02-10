@@ -160,13 +160,7 @@ class NodeController {
 
       const nodeResult = await this._nodeManager.createNode(nodeDetail);
 
-      // const result = this._transformer.convertNodeToClientNodeFormat(
-      //   JSON.parse(nodeResult) as NodeResponse
-      // );
       response.json(nodeResult);
-      // .contentType('application/json')
-      // .status(statusCodes.OK)
-      // .send(nodeResult);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
@@ -174,15 +168,21 @@ class NodeController {
 
   appendNode = async (request: Request, response: Response): Promise<void> => {
     try {
-      const requestDetail = new RequestClass(request, 'Block');
+      const requestDetail = new RequestClass(request, 'ContentNodeRequest');
+      const appendDetail = {
+        type: 'ElementRequest',
+        elements: serializeContent(requestDetail.data.content),
+      };
+
+      appendDetail.elements.forEach(e => {
+        e.createdBy = response.locals.userEmail;
+      });
+
       const result = await this._nodeManager.appendNode(
-        request.params.nodeId,
-        requestDetail.data
+        requestDetail.data.appendNodeUID,
+        appendDetail
       );
-      response
-        .contentType('application/json')
-        .status(statusCodes.OK)
-        .send(result);
+      response.json(JSON.parse(result));
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
@@ -228,6 +228,7 @@ class NodeController {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
   };
+
   createContentNode = async (
     request: Request,
     response: Response

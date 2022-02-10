@@ -52,6 +52,10 @@ export interface UserTag {
   text: string;
 }
 
+export interface ContentBlock {
+  id: string;
+}
+
 export interface ContentNode {
   id: string;
   content?: any[];
@@ -75,7 +79,7 @@ export interface ContentNode {
   type?: string;
   nodePath?: string;
   appendNodeUID?: string;
-  createNodeUID?: string
+  createNodeUID?: string;
 }
 
 export interface ClientNode {
