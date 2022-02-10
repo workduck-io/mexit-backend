@@ -64,14 +64,14 @@
                 "id": {
                     "type": "string"
                 },
-                "workspace": {
+                "workspaceIdentifier": {
                     "type": "string"
                 }
             },
             "required": [
                 "createdBy",
                 "id",
-                "workspace"
+                "workspaceIdentifier"
             ],
             "type": "object"
         },
@@ -94,8 +94,7 @@
                 }
             },
             "required": [
-                "id",
-                "nodeUID"
+                "id"
             ],
             "type": "object"
         },
@@ -140,13 +139,13 @@
                 "id": {
                     "type": "string"
                 },
-                "namespace": {
+                "namespaceIdentifier": {
                     "type": "string"
                 },
                 "updatedAt": {
                     "type": "number"
                 },
-                "workspace": {
+                "workspaceIdentifier": {
                     "type": "string"
                 }
             },
@@ -154,9 +153,9 @@
                 "createdAt",
                 "createdBy",
                 "id",
-                "namespace",
+                "namespaceIdentifier",
                 "updatedAt",
-                "workspace"
+                "workspaceIdentifier"
             ],
             "type": "object"
         },
@@ -331,14 +330,14 @@
                     ],
                     "type": "object"
                 },
-                "workspace": {
+                "workspaceIdentifier": {
                     "type": "string"
                 }
             },
             "required": [
                 "createdBy",
                 "id",
-                "workspace"
+                "workspaceIdentifier"
             ],
             "type": "object"
         },
@@ -378,7 +377,7 @@
                     ],
                     "type": "object"
                 },
-                "namespace": {
+                "namespaceIdentifier": {
                     "type": "string"
                 },
                 "range": {
@@ -435,7 +434,7 @@
                 "updatedAt": {
                     "type": "number"
                 },
-                "workspace": {
+                "workspaceIdentifier": {
                     "type": "string"
                 }
             },
@@ -443,9 +442,9 @@
                 "createdAt",
                 "createdBy",
                 "id",
-                "namespace",
+                "namespaceIdentifier",
                 "updatedAt",
-                "workspace"
+                "workspaceIdentifier"
             ],
             "type": "object"
         },
@@ -596,7 +595,7 @@
                 "shortenedURL": {
                     "type": "string"
                 },
-                "workspace": {
+                "workspaceIdentifier": {
                     "type": "string"
                 }
             },
@@ -607,7 +606,7 @@
                 "metadata",
                 "short",
                 "shortenedURL",
-                "workspace"
+                "workspaceIdentifier"
             ],
             "type": "object"
         },
@@ -652,7 +651,7 @@
                     ],
                     "type": "object"
                 },
-                "namespace": {
+                "namespaceIdentifier": {
                     "type": "string"
                 },
                 "short": {
@@ -664,7 +663,7 @@
                 "updatedAt": {
                     "type": "number"
                 },
-                "workspace": {
+                "workspaceIdentifier": {
                     "type": "string"
                 }
             },
@@ -675,11 +674,11 @@
                 "id",
                 "long",
                 "metadata",
-                "namespace",
+                "namespaceIdentifier",
                 "short",
                 "shortenedURL",
                 "updatedAt",
-                "workspace"
+                "workspaceIdentifier"
             ],
             "type": "object"
         },
@@ -912,7 +911,7 @@
                 "lastEditedBy": {
                     "type": "string"
                 },
-                "namespaceID": {
+                "namespaceIdentifier": {
                     "type": "string"
                 },
                 "updatedAt": {
@@ -933,7 +932,7 @@
                 "id",
                 "itemType",
                 "lastEditedBy",
-                "namespaceID",
+                "namespaceIdentifier",
                 "updatedAt",
                 "version",
                 "workspaceID"
@@ -1016,4 +1015,3 @@
         }
     }
 }
-

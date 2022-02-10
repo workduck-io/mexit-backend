@@ -1,3 +1,4 @@
+import { MeiliSearch, Index } from 'meilisearch';
 import express, { Request, Response } from 'express';
 import container from '../inversify.config';
 import { NodeManager } from '../managers/NodeManager';
@@ -6,15 +7,30 @@ import { statusCodes } from '../libs/statusCodes';
 import { AuthRequest } from '../middlewares/authrequest';
 import { Transformer } from '../libs/TransformerClass';
 import { NodeResponse } from '../interfaces/Response';
+import { serializeContent } from '../libs/serialize';
 
 class NodeController {
   public _urlPath = '/node';
   public _router = express.Router();
   public _nodeManager: NodeManager = container.get<NodeManager>(NodeManager);
   public _transformer: Transformer = container.get<Transformer>(Transformer);
+  private _client: MeiliSearch;
 
   constructor() {
     this.initializeRoutes();
+    this._client = this._initMeilisearchIndex();
+  }
+
+  private _initMeilisearchIndex() {
+    if (!process.env.MEILISEARCH_API_KEY)
+      throw new Error('Meilisearch API Key Not Provided');
+
+    const client = new MeiliSearch({
+      host: process.env.MEILISEARCH_HOST ?? 'http://localhost:7700',
+      apiKey: process.env.MEILISEARCH_API_KEY,
+    });
+
+    return client;
   }
 
   public initializeRoutes(): void {
@@ -24,6 +40,9 @@ class NodeController {
       [AuthRequest],
       this.appendNode
     );
+
+    this._router.post(`${this._urlPath}/new`, [AuthRequest], this.newCapture);
+
     this._router.post(
       `${this._urlPath}/:nodeId/blockUpdate`,
       [AuthRequest],
@@ -53,22 +72,76 @@ class NodeController {
     return;
   }
 
+  // newCapture = async (request: Request, response: Response): Promise<void> => {
+  //   try {
+  //     const reqBody = new RequestClass(request, 'ContentNodeRequest').data;
+  //     const type = reqBody.type;
+
+  //     // Adding to Activity Node
+  //     const activityNodeUID = reqBody.id;
+
+  //     // Add `appendNodeUID` check here to append instead of creating if node already exists
+  //     if (type === 'HIERARCHY') {
+  //       if (!reqBody.appendNodeUID) {
+  //         const nodeDetail =
+  //           this._transformer.convertContentToNodeFormat(reqBody);
+
+  //         const resultNodeDetail = await this._nodeManager.createNode(
+  //           nodeDetail
+  //         );
+  //         const resultLinkNodeDetail =
+  //           this._transformer.convertNodeToContentFormat(
+  //             JSON.parse(resultNodeDetail) as NodeResponse
+  //           );
+  //         response.json(resultLinkNodeDetail);
+  //       } else {
+  //         const appendDetail =
+  //           this._transformer.convertContentToBlockFormat(reqBody);
+
+  //         console.log('Append Detail: ', appendDetail);
+
+  //         const result = await this._nodeManager.appendNode(
+  //           reqBody.appendNodeUID,
+  //           appendDetail
+  //         );
+
+  //         console.log('Result: ', result);
+
+  //         response.json(result);
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error('Error: ', error);
+  //     response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+  //   }
+  // };
+
   createNode = async (request: Request, response: Response): Promise<void> => {
     try {
-      const requestDetail = new RequestClass(request, 'ClientNode');
-      const nodeDetail = this._transformer.convertClientNodeToNodeFormat(
-        requestDetail.data
-      );
+      const reqBody = new RequestClass(request, 'ClientNode').data;
+
+      const nodeDetail = {
+        id: reqBody.id,
+        type: 'NodeRequest',
+        lastEditedBy: response.locals.userEmail,
+        namespaceIdentifier: 'NAMESPACE1',
+        workspaceIdentifier: reqBody.workspaceIdentifier,
+        data: serializeContent(reqBody.content),
+      };
+
+      // const nodeDetail = this._transformer.convertClientNodeToNodeFormat(
+      //   requestDetail.data
+      // );
 
       const nodeResult = await this._nodeManager.createNode(nodeDetail);
 
-      const result = this._transformer.convertNodeToClientNodeFormat(
-        JSON.parse(nodeResult) as NodeResponse
-      );
-      response
-        .contentType('application/json')
-        .status(statusCodes.OK)
-        .send(result);
+      // const result = this._transformer.convertNodeToClientNodeFormat(
+      //   JSON.parse(nodeResult) as NodeResponse
+      // );
+      response.json(nodeResult);
+      // .contentType('application/json')
+      // .status(statusCodes.OK)
+      // .send(nodeResult);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
@@ -139,6 +212,9 @@ class NodeController {
       const nodeDetail = this._transformer.convertContentToNodeFormat(
         requestDetail.data
       );
+
+      console.log('Node Detail: ', nodeDetail);
+
       const resultNodeDetail = await this._nodeManager.createNode(nodeDetail);
       const resultLinkNodeDetail = this._transformer.convertNodeToContentFormat(
         JSON.parse(resultNodeDetail) as NodeResponse
@@ -148,6 +224,7 @@ class NodeController {
         .status(statusCodes.OK)
         .send(resultLinkNodeDetail);
     } catch (error) {
+      console.log('Error: ', error);
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
   };
