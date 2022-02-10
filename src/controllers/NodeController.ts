@@ -41,7 +41,11 @@ class NodeController {
       this.appendNode
     );
 
-    this._router.post(`${this._urlPath}/new`, [AuthRequest], this.newCapture);
+    this._router.post(
+      `${this._urlPath}/capture`,
+      [AuthRequest],
+      this.newCapture
+    );
 
     this._router.post(
       `${this._urlPath}/:nodeId/blockUpdate`,
@@ -72,49 +76,70 @@ class NodeController {
     return;
   }
 
-  // newCapture = async (request: Request, response: Response): Promise<void> => {
-  //   try {
-  //     const reqBody = new RequestClass(request, 'ContentNodeRequest').data;
-  //     const type = reqBody.type;
+  newCapture = async (request: Request, response: Response): Promise<void> => {
+    try {
+      const reqBody = new RequestClass(request, 'ContentNodeRequest').data;
+      const type = reqBody.type;
 
-  //     // Adding to Activity Node
-  //     const activityNodeUID = reqBody.id;
+      // Adding to Activity Node
+      const activityNodeUID = reqBody.id;
 
-  //     // Add `appendNodeUID` check here to append instead of creating if node already exists
-  //     if (type === 'HIERARCHY') {
-  //       if (!reqBody.appendNodeUID) {
-  //         const nodeDetail =
-  //           this._transformer.convertContentToNodeFormat(reqBody);
+      const activityNodeDetail = {
+        type: 'ElementRequest',
+        elements: serializeContent(reqBody.content),
+      };
 
-  //         const resultNodeDetail = await this._nodeManager.createNode(
-  //           nodeDetail
-  //         );
-  //         const resultLinkNodeDetail =
-  //           this._transformer.convertNodeToContentFormat(
-  //             JSON.parse(resultNodeDetail) as NodeResponse
-  //           );
-  //         response.json(resultLinkNodeDetail);
-  //       } else {
-  //         const appendDetail =
-  //           this._transformer.convertContentToBlockFormat(reqBody);
+      activityNodeDetail.elements.forEach(e => {
+        e.createdBy = response.locals.userEmail;
+      });
 
-  //         console.log('Append Detail: ', appendDetail);
+      console.log('Activity Node Detail: ', JSON.stringify(activityNodeDetail));
 
-  //         const result = await this._nodeManager.appendNode(
-  //           reqBody.appendNodeUID,
-  //           appendDetail
-  //         );
+      const result = await this._nodeManager.appendNode(
+        activityNodeUID,
+        activityNodeDetail
+      );
 
-  //         console.log('Result: ', result);
+      // Add `appendNodeUID` check here to append instead of creating if node already exists
+      if (type === 'HIERARCHY') {
+        if (reqBody.createNodeUID) {
+          const nodeDetail = {
+            id: reqBody.createNodeUID,
+            // nodePath: reqBody.nodePath,
+            type: 'NodeRequest',
+            lastEditedBy: response.locals.userEmail,
+            namespaceIdentifier: 'NAMESPACE1',
+            workspaceIdentifier: reqBody.workspaceIdentifier,
+            data: serializeContent(reqBody.content),
+            metadata: reqBody.metadata,
+          };
 
-  //         response.json(result);
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error('Error: ', error);
-  //     response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
-  //   }
-  // };
+          const nodeResult = await this._nodeManager.createNode(nodeDetail);
+          response.json(JSON.parse(nodeResult));
+        } else if (reqBody.appendNodeUID) {
+          const appendDetail = {
+            type: 'ElementRequest',
+            elements: serializeContent(reqBody.content),
+          };
+
+          appendDetail.elements.forEach(e => {
+            e.createdBy = response.locals.userEmail;
+          });
+
+          const result = await this._nodeManager.appendNode(
+            reqBody.appendNodeUID,
+            appendDetail
+          );
+
+          response.json(JSON.parse(result));
+        }
+      } else if (type === 'DRAFT') {
+        response.json(JSON.parse(result));
+      }
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+    }
+  };
 
   createNode = async (request: Request, response: Response): Promise<void> => {
     try {
