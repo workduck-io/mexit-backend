@@ -75,6 +75,7 @@ export interface ContentNode {
   type?: string;
   nodePath?: string;
   appendNodeUID?: string;
+  createNodeUID?: string
 }
 
 export interface ClientNode {

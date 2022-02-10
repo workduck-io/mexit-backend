@@ -30,6 +30,7 @@ export class NodeManager {
 
       return result.body;
     } catch (error) {
+      console.log('Error: ', error);
       errorlib({
         message: error.message,
         errorCode: errorCodes.UNKNOWN,
@@ -67,8 +68,6 @@ export class NodeManager {
 
   async appendNode(nodeId: string, block: any): Promise<string> {
     try {
-      console.log('Block: ', block);
-
       const response = await this._lambda.invoke(
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
