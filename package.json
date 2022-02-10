@@ -1,8 +1,8 @@
 {
-  "name": "mex-browser-extension-backend",
+  "name": "mexit-backend",
   "version": "1.0.0",
   "main": "app.js",
-  "repository": "git@github.com:workduck-io/mex-browser-extension-backend.git",
+  "repository": "git@github.com:workduck-io/mexit-backend.git",
   "author": "Workduck <humans@workduck.io>",
   "license": "MIT",
   "engines": {

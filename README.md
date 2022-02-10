@@ -1,1 +1,1 @@
-# mex-browser-extension-backend
+# mexit-backend
