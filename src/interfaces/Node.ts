@@ -84,6 +84,7 @@ export interface ContentNode {
 
 export interface ClientNode {
   id: string;
+  nodePath?: string;
   content?: ClientNodeContent[];
   workspaceIdentifier: string;
   createdBy: string;

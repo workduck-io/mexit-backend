@@ -1,6 +1,6 @@
 export interface Document {
   id: string;
-  path: string;
+  nodePath: string;
 }
 
 export interface SearchHit extends Document {
