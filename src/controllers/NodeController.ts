@@ -1,5 +1,7 @@
 import { MeiliSearch, Index } from 'meilisearch';
 import express, { Request, Response } from 'express';
+import crypto from 'crypto';
+
 import container from '../inversify.config';
 import { NodeManager } from '../managers/NodeManager';
 import { RequestClass } from '../libs/RequestClass';
@@ -8,6 +10,7 @@ import { AuthRequest } from '../middlewares/authrequest';
 import { Transformer } from '../libs/TransformerClass';
 import { NodeResponse } from '../interfaces/Response';
 import { serializeContent } from '../libs/serialize';
+import { Document } from '../interfaces/Search';
 
 class NodeController {
   public _urlPath = '/node';
@@ -32,6 +35,47 @@ class NodeController {
 
     return client;
   }
+
+  private _newMeilisearchIndex = async (
+    client: MeiliSearch,
+    userID: string
+  ) => {
+    const task = await client.createIndex(userID);
+    const resp = await client.waitForTask(task.uid);
+
+    if (resp.error) {
+      throw new Error(resp.error.message);
+    }
+
+    return resp;
+  };
+
+  private _addOrReplaceIndex = async (
+    userEmail: string,
+    document: Document
+  ) => {
+    const userHash = crypto.createHash('md5').update(userEmail).digest('hex');
+    let index: Index;
+    try {
+      index = await this._client.getIndex(userHash);
+    } catch (err) {
+      try {
+        await this._newMeilisearchIndex(this._client, userHash);
+        index = await this._client.getIndex(userHash);
+      } catch (error) {
+        return err;
+      }
+    }
+
+    const task = await index.addDocuments([document]);
+    // const status = await this._client.waitForTask(task.uid);
+
+    // if (status.error) {
+    //   return status.error.message;
+    // }
+
+    return;
+  };
 
   public initializeRoutes(): void {
     this._router.post(this._urlPath, [AuthRequest], this.createNode);
@@ -93,8 +137,6 @@ class NodeController {
         e.createdBy = response.locals.userEmail;
       });
 
-      console.log('Activity Node Detail: ', JSON.stringify(activityNodeDetail));
-
       const result = await this._nodeManager.appendNode(
         activityNodeUID,
         activityNodeDetail
@@ -115,6 +157,16 @@ class NodeController {
           };
 
           const nodeResult = await this._nodeManager.createNode(nodeDetail);
+
+          try {
+            await this._addOrReplaceIndex(response.locals.userEmail, {
+              id: reqBody.createNodeUID,
+              nodePath: reqBody.nodePath,
+            });
+          } catch (err) {
+            console.error('Error while indexing: ', err);
+          }
+
           response.json(JSON.parse(nodeResult));
         } else if (reqBody.appendNodeUID) {
           const appendDetail = {
@@ -143,20 +195,25 @@ class NodeController {
 
   createNode = async (request: Request, response: Response): Promise<void> => {
     try {
-      const reqBody = new RequestClass(request, 'ClientNode').data;
+      const requestDetail = new RequestClass(request, 'ClientNode');
 
       const nodeDetail = {
-        id: reqBody.id,
+        id: requestDetail.data.id,
         type: 'NodeRequest',
         lastEditedBy: response.locals.userEmail,
         namespaceIdentifier: 'NAMESPACE1',
-        workspaceIdentifier: reqBody.workspaceIdentifier,
-        data: serializeContent(reqBody.content),
+        workspaceIdentifier: requestDetail.data.workspaceIdentifier,
+        data: serializeContent(requestDetail.data.content),
       };
 
-      // const nodeDetail = this._transformer.convertClientNodeToNodeFormat(
-      //   requestDetail.data
-      // );
+      try {
+        await this._addOrReplaceIndex(response.locals.userEmail, {
+          id: requestDetail.data.id,
+          nodePath: requestDetail.data.nodePath,
+        });
+      } catch (err) {
+        console.error('Error while indexing: ', err);
+      }
 
       const nodeResult = await this._nodeManager.createNode(nodeDetail);
 
@@ -182,6 +239,7 @@ class NodeController {
         requestDetail.data.appendNodeUID,
         appendDetail
       );
+
       response.json(JSON.parse(result));
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
