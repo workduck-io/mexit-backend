@@ -6,6 +6,7 @@ import {
   NodeChildData,
   NodeData,
   NodeDetail,
+  Block,
 } from '../interfaces/Node';
 import { ContentNodeRequest, LinkNodeRequest } from '../interfaces/Request';
 import {
@@ -20,6 +21,7 @@ import { nanoid } from 'nanoid';
 export class Transformer {
   private BLOCK_ELEMENT_TYPE = 'hyperlink';
   private NODE_ELEMENT_TYPE = 'NodeRequest';
+  private BLOCK_REQUEST_TYPE = 'ElementRequest';
   private NAMESPACE_ID = '#mex-it';
   private DEFAULT_ELEMENT_TYPE = 'p';
   private CACHE_KEY_DELIMITER = '+';
@@ -78,7 +80,7 @@ export class Transformer {
     const nodeDetail: NodeDetail = {
       type: this.NODE_ELEMENT_TYPE,
       id: clientNode.id,
-      workspaceIdentifier: clientNode.workspace,
+      workspaceIdentifier: clientNode.workspaceIdentifier,
       namespaceIdentifier: this.NAMESPACE_ID,
       data: nodeData,
       lastEditedBy: clientNode.createdBy,
@@ -115,7 +117,7 @@ export class Transformer {
     const clientNodeDetail: ClientNode = {
       id: nodeResponse.id,
       createdBy: nodeResponse.createdBy,
-      workspace: nodeResponse.workspaceID,
+      workspaceIdentifier: nodeResponse.workspaceIdentifier,
       content: clientNodeContent,
     };
 
@@ -131,7 +133,7 @@ export class Transformer {
     const nodeDetail: NodeDetail = {
       type: this.NODE_ELEMENT_TYPE,
       id: linkNodeRequest.id,
-      workspaceIdentifier: linkNodeRequest.workspace,
+      workspaceIdentifier: linkNodeRequest.workspaceIdentifier,
       namespaceIdentifier: this.NAMESPACE_ID,
       data: [nodeData],
       lastEditedBy: linkNodeRequest.createdBy,
@@ -150,7 +152,8 @@ export class Transformer {
     const nodeDetail: NodeDetail = {
       type: this.NODE_ELEMENT_TYPE,
       id: contentNodeRequest.id,
-      workspaceIdentifier: contentNodeRequest.workspace,
+      path: contentNodeRequest.nodePath,
+      workspaceIdentifier: contentNodeRequest.workspaceIdentifier,
       namespaceIdentifier: this.NAMESPACE_ID,
       data: [nodeData],
       lastEditedBy: contentNodeRequest.createdBy,
@@ -195,8 +198,8 @@ export class Transformer {
       createdAt: nodeResponse.createdAt,
       updatedAt: nodeResponse.updatedAt,
       createdBy: nodeResponse.createdBy,
-      workspace: nodeResponse.workspaceID,
-      namespace: nodeResponse.namespaceID,
+      workspaceIdentifier: nodeResponse.workspaceIdentifier,
+      namespaceIdentifier: nodeResponse.namespaceID,
       long: linkNodeRequest.long,
       metadata: linkNodeRequest.metadata,
       short: linkNodeRequest.short,
@@ -217,13 +220,20 @@ export class Transformer {
       createdAt: nodeResponse.createdAt,
       updatedAt: nodeResponse.updatedAt,
       createdBy: nodeResponse.createdBy,
-      workspace: nodeResponse.workspaceID,
-      namespace: nodeResponse.namespaceID,
+      workspaceIdentifier: nodeResponse.workspaceIdentifier,
+      namespaceIdentifier: nodeResponse.namespaceID,
       metadata: contentNodeRequest.metadata,
       content: contentNodeRequest.content,
       range: contentNodeRequest.range,
     };
 
     return contentResponse;
+  };
+  convertContentToBlockFormat = (contentNodeRequest: ContentNodeRequest) => {
+    const blockDetail = {
+      type: this.BLOCK_REQUEST_TYPE,
+      elements: [contentNodeRequest],
+    };
+    return blockDetail;
   };
 }
