@@ -2,7 +2,9 @@ import express from 'express';
 import { jsonErrorHandler } from './middlewares/jsonerrorhandler';
 import cors from 'cors';
 import NodeController from './controllers/NodeController';
+import SearchController from './controllers/SearchController';
 import { errorCodes } from './libs/errorCodes';
+import 'dotenv/config';
 
 class App {
   public _app: express.Application;
@@ -46,7 +48,7 @@ class App {
   }
 }
 
-const application = new App([new NodeController()]);
+const application = new App([new NodeController(), new SearchController()]);
 application.build();
 application._app.listen(application._port, () => {
   return console.log(

@@ -8,7 +8,7 @@ export interface ClaimVerifyRequest {
 }
 
 export interface ClaimVerifyResult {
-  readonly userName: string;
+  readonly userEmail: string;
   readonly eventId: string;
   readonly isValid: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -47,6 +47,7 @@ interface Claim {
   exp: number;
   email: string;
   event_id: string;
+  username: string;
 }
 
 const cognitoPoolId = 'us-east-1_Zu7FAh7hj';
@@ -103,14 +104,15 @@ const TokenHandler = async (
     if (claim.token_use !== 'access') {
       throw new Error('claim use is not id');
     }
+
     result = {
-      userName: claim.email,
+      userEmail: claim.username,
       eventId: claim.event_id,
       isValid: true,
     };
   } catch (error) {
     result = {
-      userName: '',
+      userEmail: '',
       eventId: '',
       error: 'Invalid Token',
       isValid: false,

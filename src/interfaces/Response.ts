@@ -10,7 +10,7 @@ export interface NodeResponse {
   itemType: string;
   version: number;
   namespaceID: string;
-  workspaceID: string;
+  workspaceIdentifier: string;
   bookmarked: boolean | null;
 }
 
@@ -33,8 +33,8 @@ export interface NodeDataResponse {
 export interface LinkResponse extends LinkNode {
   createdAt: number;
   updatedAt: number;
-  namespace: string;
-  workspace: string;
+  namespaceIdentifier: string;
+  workspaceIdentifier: string;
   createdBy: string;
   content: LinkResponseContent[];
 }
@@ -58,15 +58,15 @@ export interface TextType {
 export interface ContentResponse extends ContentNode {
   createdAt: number;
   updatedAt: number;
-  namespace: string;
-  workspace: string;
+  namespaceIdentifier: string;
+  workspaceIdentifier: string;
   createdBy: string;
 }
 
 export interface ClientNodeResponse extends ClientNode {
   createdAt: number;
   updatedAt: number;
-  namespace: string;
-  workspace: string;
+  namespaceIdentifier: string;
+  workspaceIdentifier: string;
   createdBy: string;
 }

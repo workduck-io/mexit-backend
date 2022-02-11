@@ -65,7 +65,7 @@ export class NodeManager {
     }
   }
 
-  async appendNode(nodeId: string, block: Block): Promise<string> {
+  async appendNode(nodeId: string, block: any): Promise<string> {
     try {
       const response = await this._lambda.invoke(
         this._nodeLambdaFunctionName,
