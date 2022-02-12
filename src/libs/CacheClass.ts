@@ -17,7 +17,17 @@ export class Cache {
       useClones: false,
     });
   }
-  get(key, entity: string, storeFunction) {
+
+  set(key, entity: string, payload: any) {
+    this._cache.set(this._transformer.encodeCacheKey(entity, key), payload);
+  }
+
+  get(key, entity: string) {
+    return Promise.resolve(
+      this._cache.get(this._transformer.encodeCacheKey(entity, key))
+    );
+  }
+  getAndSet(key, entity: string, storeFunction) {
     const value = this._cache.get(
       this._transformer.encodeCacheKey(entity, key)
     );
@@ -31,8 +41,8 @@ export class Cache {
     });
   }
 
-  del(keys) {
-    this._cache.del(keys);
+  del(key, entity: string) {
+    this._cache.del(this._transformer.encodeCacheKey(entity, key));
   }
 
   flush() {

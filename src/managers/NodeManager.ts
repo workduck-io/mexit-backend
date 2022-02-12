@@ -13,6 +13,8 @@ import { RouteKeys } from '../libs/routeKeys';
 export class NodeManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
   private _nodeLambdaFunctionName = 'mex-backend-test-Node';
+  private _nodeEntityLabel = 'NODE';
+  private _allNodesEntityLabel = 'ALLNODES';
 
   private _lambda: Lambda = container.get<Lambda>(Lambda);
   private cache: Cache = container.get<Cache>(Cache);
@@ -42,17 +44,14 @@ export class NodeManager {
 
   async getNode(nodeId: string): Promise<string> {
     try {
-      const result = await this.cache.get(nodeId, 'NODE', () =>
-        this._lambda.invoke(
-          this._nodeLambdaFunctionName,
-          this._lambdaInvocationType,
-          {
-            routeKey: RouteKeys.getNode,
-            pathParameters: { id: nodeId },
-          }
-        )
+      const result = await this._lambda.invoke(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.getNode,
+          pathParameters: { id: nodeId },
+        }
       );
-
       return result.body;
     } catch (error) {
       errorlib({
@@ -114,12 +113,10 @@ export class NodeManager {
   }
   async getAllNodes(userId: string): Promise<string[]> {
     try {
-      const response = await this.cache.get(userId, 'ALLNODES', () =>
-        this._lambda.invoke(
-          this._nodeLambdaFunctionName,
-          this._lambdaInvocationType,
-          { routeKey: RouteKeys.getAllNodes, pathParameters: { id: userId } }
-        )
+      const response = await this._lambda.invoke(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        { routeKey: RouteKeys.getAllNodes, pathParameters: { id: userId } }
       );
       return response.body;
     } catch (error) {
