@@ -7,7 +7,6 @@ import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { AuthRequest } from '../middlewares/authrequest';
 import { Transformer } from '../libs/TransformerClass';
-import { NodeResponse } from '../interfaces/Response';
 import { serializeContent } from '../libs/serialize';
 import { ShortenerManager } from '../managers/ShortenerManager';
 
@@ -18,6 +17,10 @@ class NodeController {
   public _shortenerManager: ShortenerManager =
     container.get<ShortenerManager>(ShortenerManager);
   public _transformer: Transformer = container.get<Transformer>(Transformer);
+  private _client: MeiliSearch;
+  private cache: Cache = container.get<Cache>(Cache);
+  private _nodeEntityLabel = 'NODE';
+  private _allNodesEntityLabel = 'ALLNODES';
 
   constructor() {
     this.initializeRoutes();
@@ -297,18 +300,27 @@ class NodeController {
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'ContentNodeRequest');
+      if (await this.cache.get(requestDetail.data.id, this._nodeEntityLabel))
+        this.cache.del(requestDetail.data.id, this._nodeEntityLabel);
       const nodeDetail = this._transformer.convertContentToNodeFormat(
         requestDetail.data
       );
 
       const resultNodeDetail = await this._nodeManager.createNode(nodeDetail);
-      const resultLinkNodeDetail = this._transformer.convertNodeToContentFormat(
-        JSON.parse(resultNodeDetail) as NodeResponse
+      const resultContentNodeDetail =
+        this._transformer.convertNodeToContentFormat(
+          JSON.parse(resultNodeDetail) as NodeResponse
+        );
+
+      this.cache.set(
+        resultContentNodeDetail.id,
+        this._nodeEntityLabel,
+        resultContentNodeDetail
       );
       response
         .contentType('application/json')
         .status(statusCodes.OK)
-        .send(resultLinkNodeDetail);
+        .send(resultContentNodeDetail);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
@@ -316,7 +328,11 @@ class NodeController {
 
   getAllNodes = async (request: Request, response: Response): Promise<void> => {
     try {
-      const result = await this._nodeManager.getAllNodes(request.params.userId);
+      const result = await this.cache.getAndSet(
+        request.params.userId,
+        this._allNodesEntityLabel,
+        () => this._nodeManager.getAllNodes(request.params.userId)
+      );
       response
         .contentType('application/json')
         .status(statusCodes.OK)
