@@ -5,15 +5,16 @@ import { Transformer } from './TransformerClass';
 
 @injectable()
 export class Cache {
-  private TTL = 30;
+  private TTL = 60;
+  private refreshPeriod = 120;
   private _cache;
   private _transformer: Transformer = container.get<Transformer>(Transformer);
 
   constructor() {
     this._cache = new NodeCache({
       stdTTL: this.TTL,
-      checkperiod: this.TTL * 0.2,
-      maxKeys: 1000,
+      checkperiod: this.refreshPeriod,
+      maxKeys: 10000,
       useClones: false,
     });
   }

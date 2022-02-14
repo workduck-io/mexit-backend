@@ -18,8 +18,7 @@ class NodeController {
     container.get<ShortenerManager>(ShortenerManager);
   public _transformer: Transformer = container.get<Transformer>(Transformer);
   private _client: MeiliSearch;
-  private cache: Cache = container.get<Cache>(Cache);
-  private _nodeEntityLabel = 'NODE';
+  private _cache: Cache = container.get<Cache>(Cache);
   private _allNodesEntityLabel = 'ALLNODES';
 
   constructor() {
@@ -300,8 +299,6 @@ class NodeController {
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'ContentNodeRequest');
-      if (await this.cache.get(requestDetail.data.id, this._nodeEntityLabel))
-        this.cache.del(requestDetail.data.id, this._nodeEntityLabel);
       const nodeDetail = this._transformer.convertContentToNodeFormat(
         requestDetail.data
       );
@@ -312,11 +309,6 @@ class NodeController {
           JSON.parse(resultNodeDetail) as NodeResponse
         );
 
-      this.cache.set(
-        resultContentNodeDetail.id,
-        this._nodeEntityLabel,
-        resultContentNodeDetail
-      );
       response
         .contentType('application/json')
         .status(statusCodes.OK)
@@ -328,7 +320,7 @@ class NodeController {
 
   getAllNodes = async (request: Request, response: Response): Promise<void> => {
     try {
-      const result = await this.cache.getAndSet(
+      const result = await this._cache.getAndSet(
         request.params.userId,
         this._allNodesEntityLabel,
         () => this._nodeManager.getAllNodes(request.params.userId)
