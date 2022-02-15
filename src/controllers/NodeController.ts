@@ -17,7 +17,6 @@ class NodeController {
   public _shortenerManager: ShortenerManager =
     container.get<ShortenerManager>(ShortenerManager);
   public _transformer: Transformer = container.get<Transformer>(Transformer);
-  private _client: MeiliSearch;
   private _cache: Cache = container.get<Cache>(Cache);
   private _allNodesEntityLabel = 'ALLNODES';
 
