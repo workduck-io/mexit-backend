@@ -114,3 +114,13 @@ export interface NodeMetadata {
   userTags: any[];
   pageMetaTags: any[];
 }
+
+export interface LinkCapture {
+  id: string; // Activity Node UID to append to
+  long: string;
+  short: string;
+  metadata?: {
+    metaTags?: MetaTag[];
+    userTags?: UserTag[];
+  };
+}

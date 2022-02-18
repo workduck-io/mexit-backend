@@ -7,7 +7,7 @@ import { statusCodes } from '../libs/statusCodes';
 import container from '../inversify.config';
 import { Lambda, InvocationType } from '../libs/LambdaClass';
 import { RouteKeys } from '../libs/routeKeys';
-import { LinkNode } from '../interfaces/Node';
+import { LinkCapture } from '../interfaces/Node';
 @injectable()
 export class ShortenerManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
@@ -38,7 +38,7 @@ export class ShortenerManager {
     }
   }
 
-  async createNewShort(data: LinkNode): Promise<any> {
+  async createNewShort(data: LinkCapture): Promise<any> {
     try {
       const result = await this._lambda.invoke(
         this._createShortLambdaFunctionName,
