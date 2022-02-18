@@ -73,8 +73,8 @@ export interface ContentNode {
     text: string;
   };
   metadata?: {
-    metaTags: MetaTag[];
-    userTags: UserTag[];
+    metaTags?: MetaTag[];
+    userTags?: UserTag[];
   };
   type?: string;
   nodePath?: string;
@@ -111,8 +111,8 @@ export interface NodeMetadata {
   lastEditedBy?: string;
   updatedAt?: number;
 
-  userTags: any[];
-  pageMetaTags: any[];
+  userTags?: any[];
+  pageMetaTags?: any[];
 }
 
 export interface LinkCapture {

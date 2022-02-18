@@ -328,6 +328,7 @@ class NodeController {
       const nodeResponse = JSON.parse(result) as NodeResponse;
       const convertedResponse =
         this._transformer.genericNodeConverter(nodeResponse);
+
       response
         .contentType('application/json')
         .status(statusCodes.OK)
