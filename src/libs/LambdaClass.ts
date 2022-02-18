@@ -13,7 +13,8 @@ export class Lambda {
   async invoke(
     functionName: string,
     invocationType: InvocationType,
-    options: LambdaOptions
+    options: LambdaOptions,
+    sendRawBody = false
   ) {
     return JSON.parse(
       (
@@ -24,7 +25,9 @@ export class Lambda {
               pathParameters: options.pathParameters,
             }),
             ...(options.payload && {
-              body: JSON.stringify(options.payload),
+              body: sendRawBody
+                ? options.payload
+                : JSON.stringify(options.payload),
             }),
             routeKey: options.routeKey,
           }),

@@ -1,4 +1,6 @@
+import { nanoid } from 'nanoid';
 import { injectable } from 'inversify';
+
 import {
   ClientNode,
   ClientNodeContent,
@@ -7,6 +9,7 @@ import {
   NodeData,
   NodeDetail,
   Block,
+  ContentNode,
 } from '../interfaces/Node';
 import { ContentNodeRequest, LinkNodeRequest } from '../interfaces/Request';
 import {
@@ -15,7 +18,8 @@ import {
   LinkResponseContent,
   NodeResponse,
 } from '../interfaces/Response';
-import { nanoid } from 'nanoid';
+import { NodeMetadata } from '../interfaces/Node';
+import { deserializeContent } from './serialize';
 
 @injectable()
 export class Transformer {
@@ -28,6 +32,7 @@ export class Transformer {
   private CAPTURES = {
     CONTENT: 'CONTENT',
     LINK: 'LINK',
+    NODE: 'NODE',
   };
 
   encodeCacheKey = (...keys: string[]) => {
@@ -43,10 +48,8 @@ export class Transformer {
   };
 
   genericNodeConverter = (nodeResponse: NodeResponse) => {
-    if (nodeResponse.id.startsWith(this.CAPTURES.CONTENT))
+    if (nodeResponse.id.startsWith(this.CAPTURES.NODE))
       return this.convertNodeToContentFormat(nodeResponse);
-    else if (nodeResponse.id.startsWith(this.CAPTURES.LINK))
-      return this.convertNodeToLinkFormat(nodeResponse);
   };
 
   convertClientNodeToNodeFormat = (clientNode: ClientNode) => {
@@ -209,22 +212,20 @@ export class Transformer {
 
     return linkResponse;
   };
-  convertNodeToContentFormat = (
-    nodeResponse: NodeResponse
-  ): ContentResponse => {
-    const contentNodeRequest: ContentNodeRequest = JSON.parse(
-      nodeResponse.data[0].content
-    );
-    const contentResponse: ContentResponse = {
-      id: nodeResponse.id,
+  convertNodeToContentFormat = (nodeResponse: NodeResponse): ContentNode => {
+    const content = deserializeContent(nodeResponse.data);
+    const metadata: NodeMetadata = {
       createdAt: nodeResponse.createdAt,
-      updatedAt: nodeResponse.updatedAt,
       createdBy: nodeResponse.createdBy,
-      workspaceIdentifier: nodeResponse.workspaceIdentifier,
-      namespaceIdentifier: nodeResponse.namespaceID,
-      metadata: contentNodeRequest.metadata,
-      content: contentNodeRequest.content,
-      range: contentNodeRequest.range,
+      lastEditedBy: nodeResponse.lastEditedBy,
+      userTags: [],
+      pageMetaTags: [],
+    };
+
+    const contentResponse = {
+      id: nodeResponse.id,
+      content: content,
+      metadata: metadata,
     };
 
     return contentResponse;
