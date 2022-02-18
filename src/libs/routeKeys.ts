@@ -4,4 +4,5 @@ export const RouteKeys = {
   getNode: 'GET /node/{id}',
   appendNode: 'POST /node/{id}/append',
   editBlock: 'POST /node/{id}/blockUpdate',
+  getShorts: 'GET /{namespace}/stats',
 };
