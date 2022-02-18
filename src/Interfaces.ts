@@ -14,6 +14,7 @@ import {
   ClientNodeContentChildren,
   ClientNodeContent,
   ClientNode,
+  LinkCapture,
 } from './interfaces/Node';
 import { ContentNodeRequest, LinkNodeRequest } from './interfaces/Request';
 import {
@@ -50,6 +51,7 @@ export default class Interfaces implements Definitions {
   LinkNode: LinkNode;
   MetaTag: MetaTag;
   UserTag: UserTag;
+  LinkCapture: LinkCapture;
   LinkNodeRequest: LinkNodeRequest;
   NodeResponse: NodeResponse;
   NodeDataResponse: NodeDataResponse;

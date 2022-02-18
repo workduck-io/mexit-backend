@@ -610,6 +610,43 @@
             ],
             "type": "object"
         },
+        "LinkCapture": {
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "long": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "properties": {
+                        "metaTags": {
+                            "items": {
+                                "$ref": "types#/definitions/MetaTag"
+                            },
+                            "type": "array"
+                        },
+                        "userTags": {
+                            "items": {
+                                "$ref": "types#/definitions/UserTag"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "type": "object"
+                },
+                "short": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "long",
+                "metadata",
+                "short"
+            ],
+            "type": "object"
+        },
         "LinkResponse": {
             "properties": {
                 "content": {

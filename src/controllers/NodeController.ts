@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import { nanoid } from 'nanoid';
 
 import container from '../inversify.config';
 import { NodeManager } from '../managers/NodeManager';
@@ -8,11 +9,14 @@ import { AuthRequest } from '../middlewares/authrequest';
 import { Transformer } from '../libs/TransformerClass';
 import { NodeResponse } from '../interfaces/Response';
 import { serializeContent } from '../libs/serialize';
+import { ShortenerManager } from '../managers/ShortenerManager';
 
 class NodeController {
   public _urlPath = '/node';
   public _router = express.Router();
   public _nodeManager: NodeManager = container.get<NodeManager>(NodeManager);
+  public _shortenerManager: ShortenerManager =
+    container.get<ShortenerManager>(ShortenerManager);
   public _transformer: Transformer = container.get<Transformer>(Transformer);
 
   constructor() {
@@ -21,6 +25,7 @@ class NodeController {
 
   public initializeRoutes(): void {
     this._router.post(this._urlPath, [AuthRequest], this.createNode);
+
     this._router.post(
       `${this._urlPath}/:nodeId/append`,
       [AuthRequest],
@@ -34,26 +39,31 @@ class NodeController {
     );
 
     this._router.post(
+      `${this._urlPath}/capture/link`,
+      [AuthRequest],
+      this.createLinkCapture
+    );
+
+    this._router.post(
       `${this._urlPath}/:nodeId/blockUpdate`,
       [AuthRequest],
       this.editBlockInNode
     );
-    this._router.post(
-      `${this._urlPath}/link`,
-      [AuthRequest],
-      this.createLinkNode
-    );
+
     this._router.post(
       `${this._urlPath}/content`,
       [AuthRequest],
       this.createContentNode
     );
+
     this._router.get(`${this._urlPath}/:nodeId`, [AuthRequest], this.getNode);
+
     this._router.get(
       `${this._urlPath}/all/:userId`,
       [AuthRequest],
       this.getAllNodes
     );
+
     this._router.get(
       `${this._urlPath}/clearcache`,
       [AuthRequest],
@@ -154,6 +164,67 @@ class NodeController {
     }
   };
 
+  createLinkCapture = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      const reqBody = new RequestClass(request, 'LinkCapture').data;
+      const activityNodeUID = reqBody.id;
+
+      delete reqBody.id;
+      const shortenerResp = await this._shortenerManager.createNewShort(
+        reqBody
+      );
+      const shortenedURL = JSON.parse(shortenerResp).message;
+
+      if (shortenedURL === 'URL already exists') {
+        response.status(statusCodes.BAD_REQUEST).json({
+          message: 'Alias Already Exists',
+        });
+        return;
+      }
+
+      const activityNodeDetail = {
+        type: 'ElementRequest',
+        elements: [
+          {
+            id: `BLOCK_${nanoid()}`,
+            elementType: 'h1',
+            children: [{ id: `TEMP_${nanoid()}`, content: shortenedURL }],
+            createdBy: response.locals.userEmail,
+          },
+          {
+            id: `BLOCK_${nanoid()}`,
+            elementType: 'p',
+            children: [
+              {
+                id: `TEMP_${nanoid()}`,
+                elementType: 'a',
+                properties: { url: reqBody.long },
+                children: [
+                  {
+                    id: `TEMP_${nanoid()}`,
+                    content: reqBody.long,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+
+      const result = await this._nodeManager.appendNode(
+        activityNodeUID,
+        activityNodeDetail
+      );
+
+      response.json(JSON.parse(result));
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+    }
+  };
+
   createNode = async (request: Request, response: Response): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'ClientNode');
@@ -212,28 +283,6 @@ class NodeController {
         .contentType('application/json')
         .status(statusCodes.OK)
         .send(result);
-    } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
-    }
-  };
-
-  createLinkNode = async (
-    request: Request,
-    response: Response
-  ): Promise<void> => {
-    try {
-      const requestDetail = new RequestClass(request, 'LinkNodeRequest');
-      const nodeDetail = this._transformer.convertLinkToNodeFormat(
-        requestDetail.data
-      );
-      const resultNodeDetail = await this._nodeManager.createNode(nodeDetail);
-      const resultLinkNodeDetail = this._transformer.convertNodeToLinkFormat(
-        JSON.parse(resultNodeDetail) as NodeResponse
-      );
-      response
-        .contentType('application/json')
-        .status(statusCodes.OK)
-        .send(resultLinkNodeDetail);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
