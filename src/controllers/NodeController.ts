@@ -191,17 +191,24 @@ class NodeController {
           {
             id: `BLOCK_${nanoid()}`,
             elementType: 'h1',
-            children: [{ id: `TEMP_${nanoid()}`, content: shortenedURL }],
             createdBy: response.locals.userEmail,
+            children: [{ id: `TEMP_${nanoid()}`, content: shortenedURL }],
           },
           {
             id: `BLOCK_${nanoid()}`,
             elementType: 'p',
+            createdBy: response.locals.userEmail,
             children: [
               {
                 id: `TEMP_${nanoid()}`,
+                content: '',
+              },
+              {
+                id: `TEMP_${nanoid()}`,
                 elementType: 'a',
-                properties: { url: reqBody.long },
+                properties: {
+                  url: reqBody.long,
+                },
                 children: [
                   {
                     id: `TEMP_${nanoid()}`,
@@ -219,7 +226,9 @@ class NodeController {
         activityNodeDetail
       );
 
-      response.json(JSON.parse(result));
+      const resp = JSON.parse(result);
+      resp.shortenedURL = shortenedURL;
+      response.json(resp);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
