@@ -4,6 +4,7 @@ import container from '../inversify.config';
 import { AuthRequest } from '../middlewares/authrequest';
 import { statusCodes } from '../libs/statusCodes';
 import { ShortenerManager } from '../managers/ShortenerManager';
+import { LinkNode } from '../interfaces/Node';
 
 class ShortenerController {
   public _urlPath = '/shortener';
@@ -17,6 +18,7 @@ class ShortenerController {
   }
 
   public initializeRoutes(): void {
+    this._router.post(this._urlPath, [AuthRequest], this.createNewShort);
     this._router.get(
       `${this._urlPath}/:workspaceId`,
       [AuthRequest],
@@ -34,6 +36,20 @@ class ShortenerController {
       const result = await this._shortenerManager.getShortsByWorkspace(
         workspaceId
       );
+      response.send(result);
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+    }
+  };
+
+  createNewShort = async (
+    request: Request,
+    response: Response
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<any> => {
+    const body: LinkNode = request.body;
+    try {
+      const result = await this._shortenerManager.createNewShort(body);
       response.send(result);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
