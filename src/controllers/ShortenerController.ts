@@ -32,7 +32,7 @@ class ShortenerController {
   ): Promise<any> => {
     const workspaceId = request.params.workspaceId;
     try {
-      const result = await this._shortenerManager.getShortsByWorkspace(
+      const result = await this._shortenerManager.getStatsByWorkspace(
         workspaceId
       );
       response.send(result);
