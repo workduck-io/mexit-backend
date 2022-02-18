@@ -3,6 +3,7 @@ import { jsonErrorHandler } from './middlewares/jsonerrorhandler';
 import cors from 'cors';
 import NodeController from './controllers/NodeController';
 import SearchController from './controllers/SearchController';
+import ShortenerController from './controllers/ShortenerController';
 import { errorCodes } from './libs/errorCodes';
 import 'dotenv/config';
 
@@ -48,7 +49,11 @@ class App {
   }
 }
 
-const application = new App([new NodeController(), new SearchController()]);
+const application = new App([
+  new NodeController(),
+  new SearchController(),
+  new ShortenerController(),
+]);
 application.build();
 application._app.listen(application._port, () => {
   return console.log(
