@@ -67,59 +67,87 @@ class NodeController {
       const reqBody = new RequestClass(request, 'ContentNodeRequest').data;
       const type = reqBody.type;
 
-      // Adding to Activity Node
-      const activityNodeUID = reqBody.id;
+      switch (type) {
+        case 'DRAFT': {
+          const activityNodeUID = reqBody.id;
 
-      const activityNodeDetail = {
-        type: 'ElementRequest',
-        elements: serializeContent(reqBody.content),
-      };
-
-      activityNodeDetail.elements.forEach(e => {
-        e.createdBy = response.locals.userEmail;
-      });
-
-      const result = await this._nodeManager.appendNode(
-        activityNodeUID,
-        activityNodeDetail
-      );
-
-      // Add `appendNodeUID` check here to append instead of creating if node already exists
-      if (type === 'HIERARCHY') {
-        if (reqBody.createNodeUID) {
-          const nodeDetail = {
-            id: reqBody.createNodeUID,
-            // nodePath: reqBody.nodePath,
-            type: 'NodeRequest',
-            lastEditedBy: response.locals.userEmail,
-            namespaceIdentifier: 'NAMESPACE1',
-            workspaceIdentifier: reqBody.workspaceIdentifier,
-            data: serializeContent(reqBody.content),
-            metadata: reqBody.metadata,
-          };
-
-          const nodeResult = await this._nodeManager.createNode(nodeDetail);
-
-          response.json(JSON.parse(nodeResult));
-        } else if (reqBody.appendNodeUID) {
-          const appendDetail = {
+          const activityNodeDetail = {
             type: 'ElementRequest',
             elements: serializeContent(reqBody.content),
           };
 
-          appendDetail.elements.forEach(e => {
+          activityNodeDetail.elements.forEach(e => {
             e.createdBy = response.locals.userEmail;
           });
 
           const result = await this._nodeManager.appendNode(
-            reqBody.appendNodeUID,
-            appendDetail
+            activityNodeUID,
+            activityNodeDetail
+          );
+          response.json(JSON.parse(result));
+          break;
+        }
+
+        case 'HIERARCHY': {
+          const activityNodeUID = reqBody.id;
+
+          const activityNodeDetail = {
+            type: 'ElementRequest',
+            elements: serializeContent(reqBody.content),
+          };
+
+          activityNodeDetail.elements.forEach(e => {
+            e.createdBy = response.locals.userEmail;
+          });
+
+          const activityPromise = this._nodeManager.appendNode(
+            activityNodeUID,
+            activityNodeDetail
           );
 
-          response.json(JSON.parse(result));
+          let hierarchyPromise: Promise<string>;
+
+          if (reqBody.createNodeUID) {
+            const nodeDetail = {
+              id: reqBody.createNodeUID,
+              // nodePath: reqBody.nodePath,
+              type: 'NodeRequest',
+              lastEditedBy: response.locals.userEmail,
+              namespaceIdentifier: 'NAMESPACE1',
+              workspaceIdentifier: reqBody.workspaceIdentifier,
+              data: serializeContent(reqBody.content),
+              metadata: reqBody.metadata,
+            };
+
+            hierarchyPromise = this._nodeManager.createNode(nodeDetail);
+          } else if (reqBody.appendNodeUID) {
+            const appendDetail = {
+              type: 'ElementRequest',
+              elements: serializeContent(reqBody.content),
+            };
+
+            appendDetail.elements.forEach(e => {
+              e.createdBy = response.locals.userEmail;
+            });
+
+            hierarchyPromise = this._nodeManager.appendNode(
+              reqBody.appendNodeUID,
+              appendDetail
+            );
+          }
+
+          const rawResults = await Promise.all([
+            activityPromise,
+            hierarchyPromise,
+          ]);
+
+          const resp = rawResults.map(resp => {
+            return resp ? JSON.parse(resp) : {};
+          });
+
+          response.json(resp);
+          break;
         }
-      } else if (type === 'DRAFT') {
-        response.json(JSON.parse(result));
       }
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
