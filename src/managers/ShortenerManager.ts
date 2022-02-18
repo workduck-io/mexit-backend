@@ -16,7 +16,7 @@ export class ShortenerManager {
 
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
-  async getShortsByWorkspace(namespace: string): Promise<any> {
+  async getStatsByWorkspace(namespace: string): Promise<any> {
     try {
       const result = await this._lambda.invoke(
         this._getShortsLambdaFunctionName,
