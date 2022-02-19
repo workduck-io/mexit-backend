@@ -11,10 +11,7 @@ import { RouteKeys } from '../libs/routeKeys';
 @injectable()
 export class NodeManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
-  private _nodeLambdaFunctionName = 'mex-backend-local-Node';
-  private _nodeEntityLabel = 'NODE';
-  private _allNodesEntityLabel = 'ALLNODES';
-
+  private _nodeLambdaFunctionName = 'mex-backend-dev-Node';
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
   async createNode(
