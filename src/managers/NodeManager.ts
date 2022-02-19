@@ -1,25 +1,25 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { injectable } from 'inversify';
-import { Block, NodeDetail } from '../interfaces/Node';
+import { ActivityNodeDetail, Block, NodeDetail } from '../interfaces/Node';
 import { errorlib } from '../libs/errorlib';
 import { errorCodes } from '../libs/errorCodes';
 import { statusCodes } from '../libs/statusCodes';
 import container from '../inversify.config';
-import { Cache } from '../libs/CacheClass';
 import { Lambda, InvocationType } from '../libs/LambdaClass';
 import { RouteKeys } from '../libs/routeKeys';
 
 @injectable()
 export class NodeManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
-  private _nodeLambdaFunctionName = 'mex-backend-test-Node';
+  private _nodeLambdaFunctionName = 'mex-backend-local-Node';
   private _nodeEntityLabel = 'NODE';
   private _allNodesEntityLabel = 'ALLNODES';
 
   private _lambda: Lambda = container.get<Lambda>(Lambda);
-  private cache: Cache = container.get<Cache>(Cache);
 
-  async createNode(nodeDetail: NodeDetail): Promise<string> {
+  async createNode(
+    nodeDetail: NodeDetail | ActivityNodeDetail
+  ): Promise<string> {
     try {
       const result = await this._lambda.invoke(
         this._nodeLambdaFunctionName,
@@ -42,7 +42,7 @@ export class NodeManager {
     }
   }
 
-  async getNode(nodeId: string): Promise<string> {
+  async getNode(nodeId: string, queryParams?: string): Promise<string> {
     try {
       const result = await this._lambda.invoke(
         this._nodeLambdaFunctionName,
@@ -50,6 +50,7 @@ export class NodeManager {
         {
           routeKey: RouteKeys.getNode,
           pathParameters: { id: nodeId },
+          ...(queryParams && { queryStringParameters: queryParams }),
         }
       );
       return result.body;
@@ -64,7 +65,7 @@ export class NodeManager {
     }
   }
 
-  async appendNode(nodeId: string, block: any): Promise<string> {
+  async appendNode(nodeId: string, block: Block): Promise<string> {
     try {
       const response = await this._lambda.invoke(
         this._nodeLambdaFunctionName,
