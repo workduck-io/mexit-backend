@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import express, { Request, Response } from 'express';
 import { nanoid } from 'nanoid';
 
@@ -7,8 +8,15 @@ import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { AuthRequest } from '../middlewares/authrequest';
 import { Transformer } from '../libs/TransformerClass';
-import { serializeContent } from '../libs/serialize';
 import { ShortenerManager } from '../managers/ShortenerManager';
+import { deserializeContent, serializeContent } from '../libs/serialize';
+import { NodeDataResponse, NodeResponse } from '../interfaces/Response';
+import { Cache } from '../libs/CacheClass';
+import {
+  ActivityNodeDetail,
+  Block,
+  QueryStringParameters,
+} from '../interfaces/Node';
 
 class NodeController {
   public _urlPath = '/node';
@@ -19,6 +27,8 @@ class NodeController {
   public _transformer: Transformer = container.get<Transformer>(Transformer);
   private _cache: Cache = container.get<Cache>(Cache);
   private _allNodesEntityLabel = 'ALLNODES';
+  private _activityNodeLabel = 'ACTIVITYNODE';
+  private _defaultActivityBlockSize = 10;
 
   constructor() {
     this.initializeRoutes();
@@ -56,20 +66,183 @@ class NodeController {
       [AuthRequest],
       this.createContentNode
     );
-
-    this._router.get(`${this._urlPath}/:nodeId`, [AuthRequest], this.getNode);
-
+    this._router.get(
+      `${this._urlPath}/getactivityblocks`,
+      [AuthRequest],
+      this.getLastNActivityBlocks
+    );
+    this._router.get(`${this._urlPath}/:nodeId/`, [AuthRequest], this.getNode);
     this._router.get(
       `${this._urlPath}/all/:userId`,
       [AuthRequest],
       this.getAllNodes
     );
+    this._router.post(
+      `${this._urlPath}/activitynode`,
+      [AuthRequest],
+      this.createActivityNodeForUser
+    );
+
     return;
   }
 
+  /**
+   *
+   * @param request
+   * @param response
+   * Get the last n blocks of the activity blocks from the mex backend
+   */
+  getLastNActivityBlocks = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      if (!request.query.blocks) throw new Error('block query param missing');
+      if (!request.headers.userid) throw new Error('userid header missing');
+
+      const defaultQueryStringParameters: QueryStringParameters = {
+        blockSize: this._defaultActivityBlockSize,
+        getMetaDataOfNode: true,
+        getReverseOrder: true,
+      };
+
+      if (
+        this._cache.has(
+          request.headers.userid.toString(),
+          this._activityNodeLabel
+        )
+      ) {
+        const cachedResult: any[] = await this._cache.get(
+          request.headers.userid.toString(),
+          this._activityNodeLabel
+        );
+
+        // If only partial blocks are available in the cache then fetch the
+        if (cachedResult.length < parseInt(request.query.blocks.toString())) {
+          //Invalidate the outdated cache
+          this._cache.del(
+            request.headers.userid.toString(),
+            this._activityNodeLabel
+          );
+
+          // calculate the params for querying the remaining blocks
+          const noOfActivityBlocks =
+            parseInt(request.query.blocks.toString()) - cachedResult.length;
+          //cursor consists of the nodeId$blockId
+          const cursor = `${request.headers.userid.toString()}$${
+            cachedResult[cachedResult.length - 1].id
+          }`;
+
+          //Query the backend for the remaining activity node blocks.
+          const remainingActivityBlocks: any[] = JSON.parse(
+            await this._nodeManager.getNode(
+              request.headers.userid.toString(),
+              JSON.stringify({
+                ...defaultQueryStringParameters,
+                blockSize: noOfActivityBlocks,
+                startCursor: cursor,
+              })
+            )
+          );
+
+          // Append with the cached blocks from the last
+          cachedResult.push(...remainingActivityBlocks);
+          //update the cache
+          this._cache.set(
+            request.headers.userid.toString(),
+            this._activityNodeLabel,
+            cachedResult
+          );
+
+          response
+            .contentType('application/json')
+            .status(statusCodes.OK)
+            .send(cachedResult);
+        }
+
+        // If the requested number of blocks are already in the cache just return it
+        const result = await this._cache.get(
+          request.headers.userid.toString(),
+          this._activityNodeLabel
+        );
+        response
+          .contentType('application/json')
+          .status(statusCodes.OK)
+          .send(result);
+      } else {
+        // If the blocks are not in the cache then query the backend and
+        // set the cache and return
+        const result = this._cache.getAndSet(
+          request.headers.userid.toString(),
+          this._activityNodeLabel,
+          () =>
+            this._nodeManager.getNode(
+              request.headers.userid.toString(),
+              JSON.stringify({
+                ...defaultQueryStringParameters,
+              })
+            )
+        );
+        response
+          .contentType('application/json')
+          .status(statusCodes.OK)
+          .send(result);
+      }
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error.message);
+    }
+  };
+
+  /**
+   *
+   * @param request
+   * @param response
+   *
+   * mex-backend, so this endpoint will not work for the time being
+   * Currently the activitynode changes are not deployed to the test stage of the
+   */
+  createActivityNodeForUser = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      if (!request.headers.userid) throw new Error('userid header missing');
+      if (!request.headers.workspaceidentifier)
+        throw new Error('workspace identifier header missing');
+      // Cognito userId will be the activityNodeid
+      const userId = request.headers.userid.toString();
+      const workspaceIdentifier =
+        request.headers.workspaceidentifier.toString();
+      const activityNodeDetail: ActivityNodeDetail = {
+        nodeschemaIdentifier: 'ActivityNode',
+        id: userId,
+        workspaceIdentifier,
+        namespaceIdentifier: 'NAMESPACE1',
+        data: [],
+        lastEditedBy: response.locals.userEmail,
+        type: 'NodeRequest',
+      };
+
+      const result = JSON.parse(
+        await this._nodeManager.createNode(activityNodeDetail)
+      ) as NodeResponse;
+
+      this._cache.replaceAndSet(userId, this._activityNodeLabel, result.data);
+
+      response
+        .contentType('application/json')
+        .status(statusCodes.OK)
+        .send(result);
+    } catch (error) {
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send(JSON.stringify(error));
+    }
+  };
+
   newCapture = async (request: Request, response: Response): Promise<void> => {
     try {
-      const reqBody = new RequestClass(request, 'ContentNodeRequest').data;
+      const reqBody = request.body;
       const type = reqBody.type;
 
       switch (type) {
@@ -231,7 +404,7 @@ class NodeController {
 
   createNode = async (request: Request, response: Response): Promise<void> => {
     try {
-      const requestDetail = new RequestClass(request, 'ClientNode');
+      const requestDetail = new RequestClass(request, 'ContentNodeRequest');
 
       const nodeDetail = {
         id: requestDetail.data.id,
