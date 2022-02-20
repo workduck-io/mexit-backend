@@ -11,7 +11,7 @@ import { RouteKeys } from '../libs/routeKeys';
 @injectable()
 export class NodeManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
-  private _nodeLambdaFunctionName = 'mex-backend-dev-Node';
+  private _nodeLambdaFunctionName = 'mex-backend-test-Node';
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
   async createNode(
@@ -39,7 +39,7 @@ export class NodeManager {
     }
   }
 
-  async getNode(nodeId: string, queryParams?: string): Promise<string> {
+  async getNode(nodeId: string, queryParams?: any): Promise<string> {
     try {
       const result = await this._lambda.invoke(
         this._nodeLambdaFunctionName,

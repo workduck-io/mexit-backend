@@ -31,7 +31,7 @@ export class Cache {
       this._cache.get(this._transformer.encodeCacheKey(entity, key))
     );
   }
-  async getAndSet(key: string, entity: string, storeFunction) {
+  async getOrSet(key: string, entity: string, storeFunction) {
     const value = await this._cache.get(
       this._transformer.encodeCacheKey(entity, key)
     );
