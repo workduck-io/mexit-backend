@@ -15,6 +15,7 @@ import { Cache } from '../libs/CacheClass';
 import {
   ActivityNodeDetail,
   Block,
+  NodeDetail,
   QueryStringParameters,
 } from '../interfaces/Node';
 
@@ -97,11 +98,12 @@ class NodeController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.query.blocks) throw new Error('block query param missing');
+      if (!request.query.blockSize)
+        throw new Error('blockSize query param missing');
       if (!request.headers.userid) throw new Error('userid header missing');
 
       const defaultQueryStringParameters: QueryStringParameters = {
-        blockSize: this._defaultActivityBlockSize,
+        blockSize: parseInt(request.query.blockSize.toString()),
         getMetaDataOfNode: true,
         getReverseOrder: true,
       };
@@ -112,13 +114,18 @@ class NodeController {
           this._activityNodeLabel
         )
       ) {
-        const cachedResult: any[] = await this._cache.get(
+        const cachedResult: any = await this._cache.get(
           request.headers.userid.toString(),
           this._activityNodeLabel
         );
 
         // If only partial blocks are available in the cache then fetch the
-        if (cachedResult.length < parseInt(request.query.blocks.toString())) {
+        if (
+          cachedResult.data &&
+          cachedResult.data?.length <
+            parseInt(request.query.blockSize.toString()) &&
+          cachedResult.endCursor
+        ) {
           //Invalidate the outdated cache
           this._cache.del(
             request.headers.userid.toString(),
@@ -127,26 +134,31 @@ class NodeController {
 
           // calculate the params for querying the remaining blocks
           const noOfActivityBlocks =
-            parseInt(request.query.blocks.toString()) - cachedResult.length;
-          //cursor consists of the nodeId$blockId
-          const cursor = `${request.headers.userid.toString()}$${
-            cachedResult[cachedResult.length - 1].id
-          }`;
+            parseInt(request.query.blockSize.toString()) -
+            cachedResult.data.length;
+          console.log({ noOfActivityBlocks });
+
+          //cursor consists of the nodeId$blockId replace the '#' delimiter to '$'
+          const cursor = cachedResult.endCursor
+            ? cachedResult.endCursor.replace(/#/g, '$')
+            : null;
 
           //Query the backend for the remaining activity node blocks.
-          const remainingActivityBlocks: any[] = JSON.parse(
-            await this._nodeManager.getNode(
-              request.headers.userid.toString(),
-              JSON.stringify({
-                ...defaultQueryStringParameters,
-                blockSize: noOfActivityBlocks,
-                startCursor: cursor,
-              })
-            )
+          const remainingActivityBlocks: any = JSON.parse(
+            await this._nodeManager.getNode(request.headers.userid.toString(), {
+              ...defaultQueryStringParameters,
+              blockSize: noOfActivityBlocks,
+              ...(cursor && { startCursor: cursor }),
+            })
           );
 
           // Append with the cached blocks from the last
-          cachedResult.push(...remainingActivityBlocks);
+          cachedResult.data.push(...remainingActivityBlocks.data);
+
+          if (remainingActivityBlocks.endCursor)
+            cachedResult.endCursor = remainingActivityBlocks.endCursor;
+          else delete cachedResult.endCursor;
+
           //update the cache
           this._cache.set(
             request.headers.userid.toString(),
@@ -158,35 +170,34 @@ class NodeController {
             .contentType('application/json')
             .status(statusCodes.OK)
             .send(cachedResult);
+        } else {
+          // If the requested number of blocks are already in the cache just return it
+          const result = await this._cache.get(
+            request.headers.userid.toString(),
+            this._activityNodeLabel
+          );
+          response
+            .contentType('application/json')
+            .status(statusCodes.OK)
+            .send(result);
         }
-
-        // If the requested number of blocks are already in the cache just return it
-        const result = await this._cache.get(
-          request.headers.userid.toString(),
-          this._activityNodeLabel
-        );
-        response
-          .contentType('application/json')
-          .status(statusCodes.OK)
-          .send(result);
       } else {
         // If the blocks are not in the cache then query the backend and
         // set the cache and return
-        const result = this._cache.getAndSet(
+        const result = await this._nodeManager.getNode(
+          request.headers.userid.toString(),
+          defaultQueryStringParameters
+        );
+        this._cache.set(
           request.headers.userid.toString(),
           this._activityNodeLabel,
-          () =>
-            this._nodeManager.getNode(
-              request.headers.userid.toString(),
-              JSON.stringify({
-                ...defaultQueryStringParameters,
-              })
-            )
+          JSON.parse(result)
         );
+
         response
           .contentType('application/json')
           .status(statusCodes.OK)
-          .send(result);
+          .send(JSON.parse(result));
       }
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error.message);
@@ -213,8 +224,7 @@ class NodeController {
       const userId = request.headers.userid.toString();
       const workspaceIdentifier =
         request.headers.workspaceidentifier.toString();
-      const activityNodeDetail: ActivityNodeDetail = {
-        nodeschemaIdentifier: 'ActivityNode',
+      const activityNodeDetail: NodeDetail = {
         id: userId,
         workspaceIdentifier,
         namespaceIdentifier: 'NAMESPACE1',
@@ -234,6 +244,8 @@ class NodeController {
         .status(statusCodes.OK)
         .send(result);
     } catch (error) {
+      console.log(error);
+
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
         .send(JSON.stringify(error));
@@ -492,7 +504,7 @@ class NodeController {
 
   getAllNodes = async (request: Request, response: Response): Promise<void> => {
     try {
-      const result = await this._cache.getAndSet(
+      const result = await this._cache.getOrSet(
         request.params.userId,
         this._allNodesEntityLabel,
         () => this._nodeManager.getAllNodes(request.params.userId)
