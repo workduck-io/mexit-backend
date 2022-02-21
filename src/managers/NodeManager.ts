@@ -1,11 +1,11 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { injectable } from 'inversify';
-import { Block, NodeDetail } from '../interfaces/Node';
+import { ActivityNodeDetail, Block, NodeDetail } from '../interfaces/Node';
 import { errorlib } from '../libs/errorlib';
 import { errorCodes } from '../libs/errorCodes';
 import { statusCodes } from '../libs/statusCodes';
 import container from '../inversify.config';
-import { Cache } from '../libs/CacheClass';
 import { Lambda, InvocationType } from '../libs/LambdaClass';
 import { RouteKeys } from '../libs/routeKeys';
 
@@ -13,11 +13,11 @@ import { RouteKeys } from '../libs/routeKeys';
 export class NodeManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
   private _nodeLambdaFunctionName = 'mex-backend-test-Node';
-
   private _lambda: Lambda = container.get<Lambda>(Lambda);
-  private cache: Cache = container.get<Cache>(Cache);
 
-  async createNode(nodeDetail: NodeDetail): Promise<string> {
+  async createNode(
+    nodeDetail: NodeDetail | ActivityNodeDetail
+  ): Promise<string> {
     try {
       const result = await this._lambda.invoke(
         this._nodeLambdaFunctionName,
@@ -40,19 +40,17 @@ export class NodeManager {
     }
   }
 
-  async getNode(nodeId: string): Promise<string> {
+  async getNode(nodeId: string, queryParams?: any): Promise<string> {
     try {
-      const result = await this.cache.get(nodeId, 'NODE', () =>
-        this._lambda.invoke(
-          this._nodeLambdaFunctionName,
-          this._lambdaInvocationType,
-          {
-            routeKey: RouteKeys.getNode,
-            pathParameters: { id: nodeId },
-          }
-        )
+      const result = await this._lambda.invoke(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.getNode,
+          pathParameters: { id: nodeId },
+          ...(queryParams && { queryStringParameters: queryParams }),
+        }
       );
-
       return result.body;
     } catch (error) {
       errorlib({
@@ -114,28 +112,12 @@ export class NodeManager {
   }
   async getAllNodes(userId: string): Promise<string[]> {
     try {
-      const response = await this.cache.get(userId, 'ALLNODES', () =>
-        this._lambda.invoke(
-          this._nodeLambdaFunctionName,
-          this._lambdaInvocationType,
-          { routeKey: RouteKeys.getAllNodes, pathParameters: { id: userId } }
-        )
+      const response = await this._lambda.invoke(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        { routeKey: RouteKeys.getAllNodes, pathParameters: { id: userId } }
       );
       return response.body;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: errorCodes.UNKNOWN,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
-  }
-
-  clearCache(): void {
-    try {
-      this.cache.flush();
     } catch (error) {
       errorlib({
         message: error.message,

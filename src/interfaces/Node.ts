@@ -9,6 +9,9 @@ export interface NodeDetail {
   lastEditedBy: string;
 }
 
+export interface ActivityNodeDetail extends NodeDetail {
+  nodeschemaIdentifier: 'ActivityNode';
+}
 export interface NodeData {
   id: string;
   elementType?: string;
@@ -123,4 +126,11 @@ export interface LinkCapture {
     metaTags?: MetaTag[];
     userTags?: UserTag[];
   };
+}
+
+export interface QueryStringParameters {
+  getReverseOrder: boolean;
+  blockSize: number;
+  getMetaDataOfNode: boolean;
+  startCursor?: string;
 }
