@@ -134,3 +134,11 @@ export interface QueryStringParameters {
   getMetaDataOfNode: boolean;
   startCursor?: string;
 }
+
+export interface CopyOrMoveBlock {
+  type: 'BlockMovementRequest';
+  blockID: string;
+  sourceNodeID: string;
+  destinationNodeID: string;
+  action: 'move';
+}

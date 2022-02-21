@@ -10,7 +10,7 @@ import { AuthRequest } from '../middlewares/authrequest';
 import { Transformer } from '../libs/TransformerClass';
 import { ShortenerManager } from '../managers/ShortenerManager';
 import { serializeContent } from '../libs/serialize';
-import { NodeDataResponse, NodeResponse } from '../interfaces/Response';
+import { NodeResponse } from '../interfaces/Response';
 import { Cache } from '../libs/CacheClass';
 import _ from 'lodash';
 import { NodeDetail, QueryStringParameters } from '../interfaces/Node';
@@ -79,7 +79,11 @@ class NodeController {
       [AuthRequest],
       this.createActivityNodeForUser
     );
-
+    this._router.post(
+      `${this._urlPath}/block/movement`,
+      [AuthRequest],
+      this.copyOrMoveBlock
+    );
     return;
   }
 
@@ -566,6 +570,23 @@ class NodeController {
         .contentType('application/json')
         .status(statusCodes.OK)
         .send(convertedResponse);
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+    }
+  };
+  copyOrMoveBlock = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      const requestDetail = new RequestClass(request, 'CopyOrMoveBlockRequest');
+      await this._nodeManager.moveBlocks(
+        requestDetail.data.blockId,
+        requestDetail.data.sourceNodeId,
+        requestDetail.data.destinationNodeId
+      );
+
+      response.contentType('application/json').status(statusCodes.NO_CONTENT);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }

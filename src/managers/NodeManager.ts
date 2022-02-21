@@ -1,7 +1,12 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { injectable } from 'inversify';
-import { ActivityNodeDetail, Block, NodeDetail } from '../interfaces/Node';
+import {
+  ActivityNodeDetail,
+  Block,
+  CopyOrMoveBlock,
+  NodeDetail,
+} from '../interfaces/Node';
 import { errorlib } from '../libs/errorlib';
 import { errorCodes } from '../libs/errorCodes';
 import { statusCodes } from '../libs/statusCodes';
@@ -116,6 +121,35 @@ export class NodeManager {
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
         { routeKey: RouteKeys.getAllNodes, pathParameters: { id: userId } }
+      );
+      return response.body;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+  async moveBlocks(
+    blockId: string,
+    sourceNodeId: string,
+    destinationNodeId: string
+  ): Promise<void> {
+    try {
+      const payload: CopyOrMoveBlock = {
+        action: 'move',
+        type: 'BlockMovementRequest',
+        blockID: blockId,
+        destinationNodeID: destinationNodeId,
+        sourceNodeID: sourceNodeId,
+      };
+      const response = await this._lambda.invoke(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        { routeKey: RouteKeys.copyOrMoveBlock, payload: payload }
       );
       return response.body;
     } catch (error) {
