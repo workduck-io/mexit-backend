@@ -1,7 +1,6 @@
 import { injectable } from 'inversify';
 import NodeCache from 'node-cache';
-import { Block } from '../interfaces/Node';
-import { ActivityNodeResponse, NodeDataResponse } from '../interfaces/Response';
+import { NodeDataResponse, NodeResponse } from '../interfaces/Response';
 import container from '../inversify.config';
 import { Transformer } from './TransformerClass';
 
@@ -59,6 +58,7 @@ export class Cache {
   appendActivityNode(
     userId: string,
     activityNodeLabel: string,
+    activityNode: NodeResponse,
     activityBlock: NodeDataResponse
   ) {
     //push the latest capture always at the zeroth index
@@ -71,19 +71,27 @@ export class Cache {
 
     if (hasKey) {
       //take out from the cache
-      const cachedActivityNode: any[] = this._cache.take(
+      const cachedActivityNode: any = this._cache.take(
         this._transformer.encodeCacheKey(activityNodeLabel, userId)
       );
 
-      if (cachedActivityNode && cachedActivityNode.length > 0)
-        cachedActivityNode.pop();
+      if (cachedActivityNode.data && cachedActivityNode.data.length > 0) {
+        const poppedBlock = cachedActivityNode.data.pop();
+        // update the endCursor with the popped block
+        cachedActivityNode.endCursor = `${cachedActivityNode.id}$${poppedBlock.id}`;
+      }
       //update the activitynode
-      cachedActivityNode.splice(insertIndex, deleteCount, activityBlock);
+      cachedActivityNode.data.splice(insertIndex, deleteCount, activityBlock);
 
       //set the updated block again in the cache
       this._cache.set(
         this._transformer.encodeCacheKey(activityNodeLabel, userId),
         cachedActivityNode
+      );
+    } else {
+      this._cache.set(
+        this._transformer.encodeCacheKey(activityNodeLabel, userId),
+        activityNode
       );
     }
   }

@@ -13,12 +13,7 @@ import { deserializeContent, serializeContent } from '../libs/serialize';
 import { NodeDataResponse, NodeResponse } from '../interfaces/Response';
 import { Cache } from '../libs/CacheClass';
 import _ from 'lodash';
-import {
-  ActivityNodeDetail,
-  Block,
-  NodeDetail,
-  QueryStringParameters,
-} from '../interfaces/Node';
+import { Block, NodeDetail, QueryStringParameters } from '../interfaces/Node';
 
 class NodeController {
   public _urlPath = '/node';
@@ -106,7 +101,7 @@ class NodeController {
       const defaultQueryStringParameters: QueryStringParameters = {
         blockSize: parseInt(request.query.blockSize.toString()),
         getMetaDataOfNode: true,
-        getReverseOrder: true,
+        getReverseOrder: false,
       };
 
       if (
@@ -229,7 +224,7 @@ class NodeController {
       const activityNodeDetail: NodeDetail = {
         id: userId,
         workspaceIdentifier,
-        namespaceIdentifier: 'NAMESPACE1',
+        namespaceIdentifier: '#mex-it',
         data: [],
         lastEditedBy: response.locals.userEmail,
         type: 'NodeRequest',
@@ -276,10 +271,13 @@ class NodeController {
             activityNodeDetail
           )) as any;
 
+          // append the latest capture into the cache if not already present
+          // set the newly created capture
           this._cache.appendActivityNode(
             request.headers.userid.toString(),
             this._activityNodeLabel,
-            result.data[result.data.length - 1] as NodeDataResponse
+            result as NodeResponse,
+            result.data[0] as NodeDataResponse
           );
 
           response.json(JSON.parse(result));
