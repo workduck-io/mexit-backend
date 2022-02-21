@@ -55,7 +55,7 @@ export class Cache {
     return this._cache.has(this._transformer.encodeCacheKey(entity, key));
   }
 
-  appendActivityNode(
+  appendOrCreateActivityNode(
     userId: string,
     activityNodeLabel: string,
     activityNode: NodeResponse,
@@ -88,11 +88,13 @@ export class Cache {
         this._transformer.encodeCacheKey(activityNodeLabel, userId),
         cachedActivityNode
       );
+      return cachedActivityNode;
     } else {
       this._cache.set(
         this._transformer.encodeCacheKey(activityNodeLabel, userId),
         activityNode
       );
+      return activityNode;
     }
   }
 
