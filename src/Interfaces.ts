@@ -19,8 +19,13 @@ import {
   ContentBlock,
   ActivityNodeDetail,
   QueryStringParameters,
+  CopyOrMoveBlock,
 } from './interfaces/Node';
-import { ContentNodeRequest, LinkNodeRequest } from './interfaces/Request';
+import {
+  ContentNodeRequest,
+  CopyOrMoveBlockRequest,
+  LinkNodeRequest,
+} from './interfaces/Request';
 import {
   NodeResponse,
   NodeDataResponse,
@@ -80,4 +85,6 @@ export default class Interfaces implements Definitions {
   ActivityNodeDetail: ActivityNodeDetail;
   ActivityNodeResponse: ActivityNodeResponse;
   QueryStringParameters: QueryStringParameters;
+  CopyOrMoveBlockRequest: CopyOrMoveBlockRequest;
+  CopyOrMoveBlock: CopyOrMoveBlock;
 }
