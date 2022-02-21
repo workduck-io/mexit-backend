@@ -12,6 +12,7 @@ import { ShortenerManager } from '../managers/ShortenerManager';
 import { deserializeContent, serializeContent } from '../libs/serialize';
 import { NodeDataResponse, NodeResponse } from '../interfaces/Response';
 import { Cache } from '../libs/CacheClass';
+import _ from 'lodash';
 import {
   ActivityNodeDetail,
   Block,
@@ -29,7 +30,7 @@ class NodeController {
   private _cache: Cache = container.get<Cache>(Cache);
   private _allNodesEntityLabel = 'ALLNODES';
   private _activityNodeLabel = 'ACTIVITYNODE';
-  private _defaultActivityBlockSize = 10;
+  private _defaultActivityBlockCacheSize = 1;
 
   constructor() {
     this.initializeRoutes();
@@ -118,25 +119,19 @@ class NodeController {
           request.headers.userid.toString(),
           this._activityNodeLabel
         );
-
-        // If only partial blocks are available in the cache then fetch the
+        // If only partial blocks are available in the cache then fetch them
         if (
           cachedResult.data &&
           cachedResult.data?.length <
             parseInt(request.query.blockSize.toString()) &&
           cachedResult.endCursor
         ) {
-          //Invalidate the outdated cache
-          this._cache.del(
-            request.headers.userid.toString(),
-            this._activityNodeLabel
-          );
+          console.log('hit');
 
           // calculate the params for querying the remaining blocks
           const noOfActivityBlocks =
             parseInt(request.query.blockSize.toString()) -
             cachedResult.data.length;
-          console.log({ noOfActivityBlocks });
 
           //cursor consists of the nodeId$blockId replace the '#' delimiter to '$'
           const cursor = cachedResult.endCursor
@@ -153,51 +148,58 @@ class NodeController {
           );
 
           // Append with the cached blocks from the last
-          cachedResult.data.push(...remainingActivityBlocks.data);
-
-          if (remainingActivityBlocks.endCursor)
-            cachedResult.endCursor = remainingActivityBlocks.endCursor;
-          else delete cachedResult.endCursor;
-
-          //update the cache
-          this._cache.set(
-            request.headers.userid.toString(),
-            this._activityNodeLabel,
-            cachedResult
-          );
+          // used cloneDeep from lodash to clone the object or else it
+          // creates a reference to the cache
+          const tempCacheStore: any = _.cloneDeep(cachedResult);
+          tempCacheStore.data.push(...remainingActivityBlocks.data);
+          tempCacheStore.endCursor = remainingActivityBlocks.endCursor
+            ? remainingActivityBlocks.endCursor.replace(/#/g, '$')
+            : null;
 
           response
             .contentType('application/json')
             .status(statusCodes.OK)
-            .send(cachedResult);
-        } else {
-          // If the requested number of blocks are already in the cache just return it
-          const result = await this._cache.get(
-            request.headers.userid.toString(),
-            this._activityNodeLabel
-          );
-          response
-            .contentType('application/json')
-            .status(statusCodes.OK)
-            .send(result);
+            .send(tempCacheStore);
+          return;
         }
+        // return the unmodified cache value
+        response
+          .contentType('application/json')
+          .status(statusCodes.OK)
+          .send(cachedResult);
       } else {
         // If the blocks are not in the cache then query the backend and
         // set the cache and return
-        const result = await this._nodeManager.getNode(
-          request.headers.userid.toString(),
-          defaultQueryStringParameters
+        const result = JSON.parse(
+          await this._nodeManager.getNode(
+            request.headers.userid.toString(),
+            defaultQueryStringParameters
+          )
         );
+
+        const cachePayload = _.cloneDeep(result);
+
+        cachePayload.data = result.data.filter((data, index) =>
+          index < this._defaultActivityBlockCacheSize ? data : null
+        );
+
+        if (result.data.length === this._defaultActivityBlockCacheSize)
+          cachePayload.endCursor = result.endCursor;
+        else
+          cachePayload.endCursor = result.endCursor
+            ? `${result.id}$${result.data[cachePayload.data.length].id}`
+            : null;
+
         this._cache.set(
           request.headers.userid.toString(),
           this._activityNodeLabel,
-          JSON.parse(result)
+          cachePayload
         );
 
         response
           .contentType('application/json')
           .status(statusCodes.OK)
-          .send(JSON.parse(result));
+          .send(result);
       }
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error.message);
@@ -269,11 +271,17 @@ class NodeController {
           activityNodeDetail.elements.forEach(e => {
             e.createdBy = response.locals.userEmail;
           });
-
-          const result = await this._nodeManager.appendNode(
+          const result = (await this._nodeManager.appendNode(
             activityNodeUID,
             activityNodeDetail
+          )) as any;
+
+          this._cache.appendActivityNode(
+            request.headers.userid.toString(),
+            this._activityNodeLabel,
+            result.data[result.data.length - 1] as NodeDataResponse
           );
+
           response.json(JSON.parse(result));
           break;
         }

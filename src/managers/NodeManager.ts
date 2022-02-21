@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { injectable } from 'inversify';
 import { ActivityNodeDetail, Block, NodeDetail } from '../interfaces/Node';
