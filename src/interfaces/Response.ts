@@ -14,6 +14,10 @@ export interface NodeResponse {
   bookmarked: boolean | null;
 }
 
+export interface ActivityNodeResponse extends NodeResponse {
+  nodeschemaIdentifier: 'ActivityNode';
+}
+
 export interface NodeDataResponse {
   id: string;
   parentID: string | null;

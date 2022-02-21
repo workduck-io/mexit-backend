@@ -15,6 +15,10 @@ import {
   ClientNodeContent,
   ClientNode,
   LinkCapture,
+  NodeMetadata,
+  ContentBlock,
+  ActivityNodeDetail,
+  QueryStringParameters,
 } from './interfaces/Node';
 import { ContentNodeRequest, LinkNodeRequest } from './interfaces/Request';
 import {
@@ -25,7 +29,9 @@ import {
   ClientNodeResponse,
   LinkResponseContent,
   LinkChildrenType,
+  ActivityNodeResponse,
 } from './interfaces/Response';
+import { Document, SearchHit, SearchResults } from './interfaces/Search';
 import { WDErrorType } from './interfaces/WDError';
 import { errorCodes } from './libs/errorCodes';
 import { statusCodes } from './libs/statusCodes';
@@ -66,4 +72,12 @@ export default class Interfaces implements Definitions {
   LinkResponseContent: LinkResponseContent;
   LinkChildrenType: LinkChildrenType;
   TextType: TextType;
+  Document: Document;
+  SearchHit: SearchHit;
+  SearchResults: SearchResults;
+  NodeMetadata: NodeMetadata;
+  ContentBlock: ContentBlock;
+  ActivityNodeDetail: ActivityNodeDetail;
+  ActivityNodeResponse: ActivityNodeResponse;
+  QueryStringParameters: QueryStringParameters;
 }
