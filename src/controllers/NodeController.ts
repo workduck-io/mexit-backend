@@ -9,11 +9,11 @@ import { statusCodes } from '../libs/statusCodes';
 import { AuthRequest } from '../middlewares/authrequest';
 import { Transformer } from '../libs/TransformerClass';
 import { ShortenerManager } from '../managers/ShortenerManager';
-import { deserializeContent, serializeContent } from '../libs/serialize';
+import { serializeContent } from '../libs/serialize';
 import { NodeDataResponse, NodeResponse } from '../interfaces/Response';
 import { Cache } from '../libs/CacheClass';
 import _ from 'lodash';
-import { Block, NodeDetail, QueryStringParameters } from '../interfaces/Node';
+import { NodeDetail, QueryStringParameters } from '../interfaces/Node';
 
 class NodeController {
   public _urlPath = '/node';
@@ -25,7 +25,7 @@ class NodeController {
   private _cache: Cache = container.get<Cache>(Cache);
   private _allNodesEntityLabel = 'ALLNODES';
   private _activityNodeLabel = 'ACTIVITYNODE';
-  private _defaultActivityBlockCacheSize = 1;
+  private _defaultActivityBlockCacheSize = 2;
 
   constructor() {
     this.initializeRoutes();
@@ -121,8 +121,6 @@ class NodeController {
             parseInt(request.query.blockSize.toString()) &&
           cachedResult.endCursor
         ) {
-          console.log('hit');
-
           // calculate the params for querying the remaining blocks
           const noOfActivityBlocks =
             parseInt(request.query.blockSize.toString()) -
@@ -218,7 +216,7 @@ class NodeController {
       if (!request.headers.workspaceidentifier)
         throw new Error('workspace identifier header missing');
       // Cognito userId will be the activityNodeid
-      const userId = request.headers.userid.toString();
+      const userId = `NODE_${request.headers.userid.toString()}`;
       const workspaceIdentifier =
         request.headers.workspaceidentifier.toString();
       const activityNodeDetail: NodeDetail = {
@@ -241,8 +239,6 @@ class NodeController {
         .status(statusCodes.OK)
         .send(result);
     } catch (error) {
-      console.log(error);
-
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
         .send(JSON.stringify(error));
@@ -253,6 +249,11 @@ class NodeController {
     try {
       const reqBody = request.body;
       const type = reqBody.type;
+      const defaultQueryStringParameters: QueryStringParameters = {
+        blockSize: this._defaultActivityBlockCacheSize,
+        getMetaDataOfNode: true,
+        getReverseOrder: true,
+      };
 
       switch (type) {
         case 'DRAFT': {
@@ -266,21 +267,32 @@ class NodeController {
           activityNodeDetail.elements.forEach(e => {
             e.createdBy = response.locals.userEmail;
           });
-          const result = (await this._nodeManager.appendNode(
+
+          // append the blocks to the activity node
+          await this._nodeManager.appendNode(
             activityNodeUID,
             activityNodeDetail
-          )) as any;
+          );
+
+          const updatedNode = JSON.parse(
+            await this._nodeManager.getNode(
+              activityNodeUID,
+              defaultQueryStringParameters
+            )
+          );
 
           // append the latest capture into the cache if not already present
           // set the newly created capture
-          this._cache.appendActivityNode(
-            request.headers.userid.toString(),
+          const updatedCacheNode = this._cache.appendOrCreateActivityNode(
+            activityNodeUID,
             this._activityNodeLabel,
-            result as NodeResponse,
-            result.data[0] as NodeDataResponse
+            updatedNode as NodeResponse,
+            updatedNode.data.filter((data, index) =>
+              index < activityNodeDetail.elements.length ? data : null
+            )[0]
           );
 
-          response.json(JSON.parse(result));
+          response.json(updatedCacheNode).status(statusCodes.OK);
           break;
         }
 
@@ -337,11 +349,31 @@ class NodeController {
             hierarchyPromise,
           ]);
 
+          const updatedNode = JSON.parse(
+            await this._nodeManager.getNode(
+              activityNodeUID,
+              defaultQueryStringParameters
+            )
+          );
+
+          // append the latest capture into the cache if not already present
+          // set the newly created capture
+          const updatedCacheNode = this._cache.appendOrCreateActivityNode(
+            activityNodeUID,
+            this._activityNodeLabel,
+            updatedNode as NodeResponse,
+            updatedNode.data.filter((data, index) =>
+              index < activityNodeDetail.elements.length ? data : null
+            )[0]
+          );
+
+          //updating the results
+          rawResults[0] = JSON.stringify(updatedCacheNode);
           const resp = rawResults.map(resp => {
             return resp ? JSON.parse(resp) : {};
           });
 
-          response.json(resp);
+          response.json(resp).status(statusCodes.OK);
           break;
         }
       }
