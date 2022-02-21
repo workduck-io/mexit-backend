@@ -25,7 +25,7 @@ class NodeController {
   private _cache: Cache = container.get<Cache>(Cache);
   private _allNodesEntityLabel = 'ALLNODES';
   private _activityNodeLabel = 'ACTIVITYNODE';
-  private _defaultActivityBlockCacheSize = 2;
+  private _defaultActivityBlockCacheSize = 5;
 
   constructor() {
     this.initializeRoutes();
