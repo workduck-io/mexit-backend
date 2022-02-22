@@ -7,4 +7,5 @@ export const RouteKeys = {
   shorten: 'POST /shorten',
   getShorts: 'GET /{namespace}/stats',
   copyOrMoveBlock: 'PATCH /node/block/movement',
+  updateUserPreference: 'POST /user/update',
 };
