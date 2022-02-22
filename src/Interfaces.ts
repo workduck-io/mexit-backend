@@ -37,6 +37,7 @@ import {
   ActivityNodeResponse,
 } from './interfaces/Response';
 import { Document, SearchHit, SearchResults } from './interfaces/Search';
+import { UserPreference } from './interfaces/User';
 import { WDErrorType } from './interfaces/WDError';
 import { errorCodes } from './libs/errorCodes';
 import { statusCodes } from './libs/statusCodes';
@@ -87,4 +88,5 @@ export default class Interfaces implements Definitions {
   QueryStringParameters: QueryStringParameters;
   CopyOrMoveBlockRequest: CopyOrMoveBlockRequest;
   CopyOrMoveBlock: CopyOrMoveBlock;
+  UserPreference: UserPreference;
 }

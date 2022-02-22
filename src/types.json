@@ -1287,6 +1287,27 @@
             ],
             "type": "object"
         },
+        "UserPreference": {
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "properties": {},
+                "tag": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "name",
+                "properties",
+                "tag"
+            ],
+            "type": "object"
+        },
         "UserTag": {
             "properties": {
                 "id": {
