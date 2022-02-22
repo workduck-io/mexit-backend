@@ -137,7 +137,7 @@ export class NodeManager {
     blockId: string,
     sourceNodeId: string,
     destinationNodeId: string
-  ): Promise<void> {
+  ): Promise<string> {
     try {
       const payload: CopyOrMoveBlock = {
         action: 'move',
