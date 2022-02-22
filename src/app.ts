@@ -6,6 +6,7 @@ import SearchController from './controllers/SearchController';
 import ShortenerController from './controllers/ShortenerController';
 import { errorCodes } from './libs/errorCodes';
 import 'dotenv/config';
+import UserController from './controllers/UserController';
 
 class App {
   public _app: express.Application;
@@ -53,6 +54,7 @@ const application = new App([
   new NodeController(),
   new SearchController(),
   new ShortenerController(),
+  new UserController(),
 ]);
 application.build();
 application._app.listen(application._port, () => {
