@@ -16,6 +16,29 @@ export class UserManager {
 
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
+  async createUserPreference(userPreference: UserPreference): Promise<any> {
+    try {
+      const result = await this._lambda.invoke(
+        this._userLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.createUserPreference,
+          payload: userPreference,
+        },
+        true
+      );
+
+      return result.body;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
   async updateUserPreference(userPreference: UserPreference): Promise<any> {
     try {
       const result = await this._lambda.invoke(
@@ -24,12 +47,52 @@ export class UserManager {
         {
           routeKey: RouteKeys.updateUserPreference,
           payload: userPreference,
-          httpMethod: 'POST',
-          resource: '/user/update',
         },
         true
       );
 
+      return result.body;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+  async getByIdAndTag(userId: string, tag: string): Promise<any> {
+    try {
+      const result = await this._lambda.invoke(
+        this._userLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.getByIdAndTag,
+          pathParameters: { id: userId, tag: tag },
+        }
+      );
+      return result.body;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+  async getByGroupIdAndTag(groupId: string, tag: string): Promise<any> {
+    try {
+      const result = await this._lambda.invoke(
+        this._userLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.getByGroupIdAndTag,
+          pathParameters: { groupId: groupId, tag: tag },
+        }
+      );
       return result.body;
     } catch (error) {
       errorlib({

@@ -23,6 +23,17 @@ class UserController {
       [AuthRequest],
       this.updateUser
     );
+    this._router.post(`${this._urlPath}`, [AuthRequest], this.createUser);
+    this._router.get(
+      `${this._urlPath}/:id/:tag`,
+      [AuthRequest],
+      this.getByIdAndTag
+    );
+    this._router.get(
+      `${this._urlPath}/group/:groupId/:tag`,
+      [AuthRequest],
+      this.getByGroupIdAndTag
+    );
   }
 
   updateUser = async (request: Request, response: Response): Promise<any> => {
@@ -30,6 +41,45 @@ class UserController {
     try {
       const result = await this._userManager.updateUserPreference(
         requestDetail.data
+      );
+      response.json(JSON.parse(result));
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+    }
+  };
+  createUser = async (request: Request, response: Response): Promise<any> => {
+    const requestDetail = new RequestClass(request, 'UserPreference');
+    try {
+      const result = await this._userManager.createUserPreference(
+        requestDetail.data
+      );
+      response.json(JSON.parse(result));
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+    }
+  };
+  getByIdAndTag = async (
+    request: Request,
+    response: Response
+  ): Promise<any> => {
+    try {
+      const result = await this._userManager.getByIdAndTag(
+        request.params.id,
+        request.params.tag
+      );
+      response.json(JSON.parse(result));
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+    }
+  };
+  getByGroupIdAndTag = async (
+    request: Request,
+    response: Response
+  ): Promise<any> => {
+    try {
+      const result = await this._userManager.getByGroupIdAndTag(
+        request.params.groupId,
+        request.params.tag
       );
       response.json(JSON.parse(result));
     } catch (error) {

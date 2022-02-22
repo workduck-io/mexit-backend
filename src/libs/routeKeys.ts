@@ -8,4 +8,7 @@ export const RouteKeys = {
   getShorts: 'GET /{namespace}/stats',
   copyOrMoveBlock: 'PATCH /node/block/movement',
   updateUserPreference: 'POST /user/update',
+  createUserPreference: 'POST /user',
+  getByIdAndTag: 'GET /user/{id}/{tag}',
+  getByGroupIdAndTag: 'GET /user/group/{groupId}/{tag}',
 };
