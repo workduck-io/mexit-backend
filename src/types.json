@@ -311,10 +311,6 @@
                             "type": "array"
                         }
                     },
-                    "required": [
-                        "metaTags",
-                        "userTags"
-                    ],
                     "type": "object"
                 },
                 "nodePath": {
@@ -413,10 +409,6 @@
                             "type": "array"
                         }
                     },
-                    "required": [
-                        "metaTags",
-                        "userTags"
-                    ],
                     "type": "object"
                 },
                 "nodePath": {
@@ -523,10 +515,6 @@
                             "type": "array"
                         }
                     },
-                    "required": [
-                        "metaTags",
-                        "userTags"
-                    ],
                     "type": "object"
                 },
                 "namespaceIdentifier": {
@@ -606,6 +594,58 @@
             ],
             "type": "object"
         },
+        "CopyOrMoveBlock": {
+            "properties": {
+                "action": {
+                    "enum": [
+                        "move"
+                    ],
+                    "type": "string"
+                },
+                "blockID": {
+                    "type": "string"
+                },
+                "destinationNodeID": {
+                    "type": "string"
+                },
+                "sourceNodeID": {
+                    "type": "string"
+                },
+                "type": {
+                    "enum": [
+                        "BlockMovementRequest"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "action",
+                "blockID",
+                "destinationNodeID",
+                "sourceNodeID",
+                "type"
+            ],
+            "type": "object"
+        },
+        "CopyOrMoveBlockRequest": {
+            "properties": {
+                "blockId": {
+                    "type": "string"
+                },
+                "destinationNodeId": {
+                    "type": "string"
+                },
+                "sourceNodeId": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "blockId",
+                "destinationNodeId",
+                "sourceNodeId"
+            ],
+            "type": "object"
+        },
         "Document": {
             "properties": {
                 "id": {
@@ -660,6 +700,42 @@
             "required": [
                 "data",
                 "status"
+            ],
+            "type": "object"
+        },
+        "LinkCapture": {
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "long": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "properties": {
+                        "metaTags": {
+                            "items": {
+                                "$ref": "types#/definitions/MetaTag"
+                            },
+                            "type": "array"
+                        },
+                        "userTags": {
+                            "items": {
+                                "$ref": "types#/definitions/UserTag"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "type": "object"
+                },
+                "short": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "long",
+                "short"
             ],
             "type": "object"
         },
@@ -780,43 +856,6 @@
                 "short",
                 "shortenedURL",
                 "workspaceIdentifier"
-            ],
-            "type": "object"
-        },
-        "LinkCapture": {
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "long": {
-                    "type": "string"
-                },
-                "metadata": {
-                    "properties": {
-                        "metaTags": {
-                            "items": {
-                                "$ref": "types#/definitions/MetaTag"
-                            },
-                            "type": "array"
-                        },
-                        "userTags": {
-                            "items": {
-                                "$ref": "types#/definitions/UserTag"
-                            },
-                            "type": "array"
-                        }
-                    },
-                    "type": "object"
-                },
-                "short": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "id",
-                "long",
-                "metadata",
-                "short"
             ],
             "type": "object"
         },
@@ -1121,10 +1160,6 @@
                     "type": "array"
                 }
             },
-            "required": [
-                "pageMetaTags",
-                "userTags"
-            ],
             "type": "object"
         },
         "NodeResponse": {
