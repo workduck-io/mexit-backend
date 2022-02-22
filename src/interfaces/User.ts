@@ -3,5 +3,7 @@ export interface UserPreference {
   id: string;
   name: string;
   tag: string;
-  properties: any;
+  group?: string;
+  properties?: any;
+  metadata?: any;
 }
