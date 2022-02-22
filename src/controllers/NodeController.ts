@@ -580,15 +580,18 @@ class NodeController {
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'CopyOrMoveBlockRequest');
-      await this._nodeManager.moveBlocks(
+      const result = await this._nodeManager.moveBlocks(
         requestDetail.data.blockId,
         requestDetail.data.sourceNodeId,
         requestDetail.data.destinationNodeId
       );
 
+      if (result) {
+        throw new Error(result);
+      }
       response.contentType('application/json').status(statusCodes.NO_CONTENT);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error.message);
     }
   };
 }
