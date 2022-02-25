@@ -98,37 +98,36 @@ class NodeController {
     response: Response
   ): Promise<void> => {
     try {
+      const minBlockSizeRequested = 5;
       if (!request.query.blockSize)
         throw new Error('blockSize query param missing');
       if (!request.headers.userid) throw new Error('userid header missing');
 
+      const blockSize =
+        parseInt(request.query.blockSize.toString()) < minBlockSizeRequested
+          ? minBlockSizeRequested
+          : parseInt(request.query.blockSize.toString());
+      const userId = request.headers.userid.toString();
+
       const defaultQueryStringParameters: QueryStringParameters = {
-        blockSize: parseInt(request.query.blockSize.toString()),
+        blockSize: blockSize,
         getMetaDataOfNode: true,
         getReverseOrder: false,
       };
 
-      if (
-        this._cache.has(
-          request.headers.userid.toString(),
-          this._activityNodeLabel
-        )
-      ) {
+      if (this._cache.has(userId, this._activityNodeLabel)) {
         const cachedResult: any = await this._cache.get(
-          request.headers.userid.toString(),
+          userId,
           this._activityNodeLabel
         );
         // If only partial blocks are available in the cache then fetch them
         if (
           cachedResult.data &&
-          cachedResult.data?.length <
-            parseInt(request.query.blockSize.toString()) &&
+          cachedResult.data?.length < blockSize &&
           cachedResult.endCursor
         ) {
           // calculate the params for querying the remaining blocks
-          const noOfActivityBlocks =
-            parseInt(request.query.blockSize.toString()) -
-            cachedResult.data.length;
+          const noOfActivityBlocks = blockSize - cachedResult.data.length;
 
           //cursor consists of the nodeId$blockId replace the '#' delimiter to '$'
           const cursor = cachedResult.endCursor
@@ -137,7 +136,7 @@ class NodeController {
 
           //Query the backend for the remaining activity node blocks.
           const remainingActivityBlocks: any = JSON.parse(
-            await this._nodeManager.getNode(request.headers.userid.toString(), {
+            await this._nodeManager.getNode(userId, {
               ...defaultQueryStringParameters,
               blockSize: noOfActivityBlocks,
               ...(cursor && { startCursor: cursor }),
@@ -153,25 +152,30 @@ class NodeController {
             ? remainingActivityBlocks.endCursor.replace(/#/g, '$')
             : null;
 
+          const deserialisedContent =
+            this._transformer.genericNodeConverter(tempCacheStore);
+
           response
             .contentType('application/json')
             .status(statusCodes.OK)
-            .send(tempCacheStore);
+            .send(deserialisedContent);
           return;
         }
+
+        const deserialisedContent = this._transformer.genericNodeConverter(
+          _.cloneDeep(cachedResult)
+        );
+
         // return the unmodified cache value
         response
           .contentType('application/json')
           .status(statusCodes.OK)
-          .send(cachedResult);
+          .send(deserialisedContent);
       } else {
         // If the blocks are not in the cache then query the backend and
         // set the cache and return
         const result = JSON.parse(
-          await this._nodeManager.getNode(
-            request.headers.userid.toString(),
-            defaultQueryStringParameters
-          )
+          await this._nodeManager.getNode(userId, defaultQueryStringParameters)
         );
 
         const cachePayload = _.cloneDeep(result);
@@ -187,16 +191,15 @@ class NodeController {
             ? `${result.id}$${result.data[cachePayload.data.length].id}`
             : null;
 
-        this._cache.set(
-          request.headers.userid.toString(),
-          this._activityNodeLabel,
-          cachePayload
-        );
+        this._cache.set(userId, this._activityNodeLabel, cachePayload);
+
+        const deserialisedContent =
+          this._transformer.genericNodeConverter(result);
 
         response
           .contentType('application/json')
           .status(statusCodes.OK)
-          .send(result);
+          .send(deserialisedContent);
       }
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error.message);
@@ -251,6 +254,7 @@ class NodeController {
 
   newCapture = async (request: Request, response: Response): Promise<void> => {
     try {
+      if (!request.headers.userid) throw new Error('userid header missing');
       const reqBody = request.body;
       const type = reqBody.type;
       const defaultQueryStringParameters: QueryStringParameters = {
@@ -296,7 +300,11 @@ class NodeController {
             )[0]
           );
 
-          response.json(updatedCacheNode).status(statusCodes.OK);
+          const deserialisedContent = this._transformer.genericNodeConverter(
+            _.cloneDeep(updatedCacheNode)
+          );
+
+          response.json(deserialisedContent).status(statusCodes.OK);
           break;
         }
 
@@ -353,6 +361,31 @@ class NodeController {
             hierarchyPromise,
           ]);
 
+          const newNode: NodeResponse = JSON.parse(rawResults[1]);
+
+          if (newNode) {
+            if (
+              this._cache.has(
+                request.headers.userid.toString(),
+                this._allNodesEntityLabel
+              )
+            ) {
+              //update the cache for the get all nodes
+              const allNodes: any[] = JSON.parse(
+                await this._cache.get(
+                  request.headers.userid.toString(),
+                  this._allNodesEntityLabel
+                )
+              );
+              allNodes.push(newNode.id);
+              this._cache.set(
+                request.headers.userid.toString(),
+                this._allNodesEntityLabel,
+                allNodes
+              );
+            }
+          }
+
           const updatedNode = JSON.parse(
             await this._nodeManager.getNode(
               activityNodeUID,
@@ -373,8 +406,14 @@ class NodeController {
 
           //updating the results
           rawResults[0] = JSON.stringify(updatedCacheNode);
+
+          // deserialise the node results
           const resp = rawResults.map(resp => {
-            return resp ? JSON.parse(resp) : {};
+            if (resp) {
+              const deserialisedContent =
+                this._transformer.genericNodeConverter(JSON.parse(resp));
+              return deserialisedContent;
+            } else return {};
           });
 
           response.json(resp).status(statusCodes.OK);
@@ -471,7 +510,10 @@ class NodeController {
 
       const nodeResult = await this._nodeManager.createNode(nodeDetail);
 
-      response.json(nodeResult);
+      const deserialisedContent = this._transformer.genericNodeConverter(
+        JSON.parse(nodeResult)
+      );
+      response.json(deserialisedContent);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
@@ -494,7 +536,7 @@ class NodeController {
         appendDetail
       );
 
-      response.json(JSON.parse(result));
+      response.json(result);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
