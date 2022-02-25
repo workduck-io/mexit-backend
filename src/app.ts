@@ -7,6 +7,8 @@ import ShortenerController from './controllers/ShortenerController';
 import { errorCodes } from './libs/errorCodes';
 import 'dotenv/config';
 import UserController from './controllers/UserController';
+import { LogRequest } from './middlewares/logrequest';
+import logger from './libs/logger';
 
 class App {
   public _app: express.Application;
@@ -28,6 +30,7 @@ class App {
   private initializeMiddlewares() {
     this._app.use(cors());
     this._app.use(express.json());
+    this._app.use(LogRequest);
   }
 
   private initializeErrorHandlers() {
@@ -40,6 +43,7 @@ class App {
     });
     this._app.use((req, res, next) => {
       res.status(404);
+      logger.error('Route not found');
       res.json({
         statusCode: 404,
         message: 'Route not found',
