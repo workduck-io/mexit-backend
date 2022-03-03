@@ -83,7 +83,6 @@ export class Transformer {
     const nodeDetail: NodeDetail = {
       type: this.NODE_ELEMENT_TYPE,
       id: clientNode.id,
-      workspaceIdentifier: clientNode.workspaceIdentifier,
       namespaceIdentifier: this.NAMESPACE_ID,
       data: nodeData,
       lastEditedBy: clientNode.createdBy,
@@ -120,7 +119,6 @@ export class Transformer {
     const clientNodeDetail: ClientNode = {
       id: nodeResponse.id,
       createdBy: nodeResponse.createdBy,
-      workspaceIdentifier: nodeResponse.workspaceIdentifier,
       content: clientNodeContent,
     };
 
@@ -136,7 +134,6 @@ export class Transformer {
     const nodeDetail: NodeDetail = {
       type: this.NODE_ELEMENT_TYPE,
       id: linkNodeRequest.id,
-      workspaceIdentifier: linkNodeRequest.workspaceIdentifier,
       namespaceIdentifier: this.NAMESPACE_ID,
       data: [nodeData],
       lastEditedBy: linkNodeRequest.createdBy,
@@ -156,7 +153,6 @@ export class Transformer {
       type: this.NODE_ELEMENT_TYPE,
       id: contentNodeRequest.id,
       path: contentNodeRequest.nodePath,
-      workspaceIdentifier: contentNodeRequest.workspaceIdentifier,
       namespaceIdentifier: this.NAMESPACE_ID,
       data: [nodeData],
       lastEditedBy: contentNodeRequest.createdBy,

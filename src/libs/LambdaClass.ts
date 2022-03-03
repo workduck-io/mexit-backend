@@ -7,6 +7,7 @@ interface LambdaOptions {
   pathParameters?: any;
   routeKey: string;
   queryStringParameters?: string;
+  headers?: any;
 }
 
 @injectable()
@@ -33,6 +34,9 @@ export class Lambda {
             routeKey: options.routeKey,
             ...(options.queryStringParameters && {
               queryStringParameters: options.queryStringParameters,
+            }),
+            ...(options.headers && {
+              headers: options.headers,
             }),
           }),
           InvocationType: invocationType,
