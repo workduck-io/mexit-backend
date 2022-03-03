@@ -11,7 +11,7 @@
   "scripts": {
     "lint": "eslint . --ext .js,.ts,.tsx",
     "lint-fix": "eslint . --ext .js,.ts,.tsx --fix",
-    "start": "ts-node src/app.ts",
+    "start": "tsc && node dist/app.js",
     "build": "tsc",
     "dev": "nodemon src/app.ts",
     "debug": "export DEBUG=* && npm run start",
