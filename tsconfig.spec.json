@@ -1,4 +1,5 @@
 {
+  "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "src",
@@ -15,8 +16,9 @@
     "declaration": true,
     "lib": ["es5", "es6"],
     "target": "es6",
-    "types": ["reflect-metadata"],
+    "types": ["reflect-metadata", "jest", "node"],
     "skipLibCheck": true
   },
-  "exclude": ["./node_modules/*", "./dist", "**/*.test.ts"]
+  "exclude": ["./node_modules/*", "./dist"],
+  "include": ["**/*.test.ts"]
 }
