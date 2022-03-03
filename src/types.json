@@ -30,9 +30,6 @@
                 },
                 "type": {
                     "type": "string"
-                },
-                "workspaceIdentifier": {
-                    "type": "string"
                 }
             },
             "required": [
@@ -41,8 +38,7 @@
                 "lastEditedBy",
                 "namespaceIdentifier",
                 "nodeschemaIdentifier",
-                "type",
-                "workspaceIdentifier"
+                "type"
             ],
             "type": "object"
         },
@@ -171,15 +167,11 @@
                 },
                 "nodePath": {
                     "type": "string"
-                },
-                "workspaceIdentifier": {
-                    "type": "string"
                 }
             },
             "required": [
                 "createdBy",
-                "id",
-                "workspaceIdentifier"
+                "id"
             ],
             "type": "object"
         },
@@ -467,15 +459,11 @@
                 },
                 "type": {
                     "type": "string"
-                },
-                "workspaceIdentifier": {
-                    "type": "string"
                 }
             },
             "required": [
                 "createdBy",
-                "id",
-                "workspaceIdentifier"
+                "id"
             ],
             "type": "object"
         },
@@ -843,9 +831,6 @@
                 },
                 "shortenedURL": {
                     "type": "string"
-                },
-                "workspaceIdentifier": {
-                    "type": "string"
                 }
             },
             "required": [
@@ -854,8 +839,7 @@
                 "long",
                 "metadata",
                 "short",
-                "shortenedURL",
-                "workspaceIdentifier"
+                "shortenedURL"
             ],
             "type": "object"
         },
@@ -1122,9 +1106,6 @@
                 },
                 "type": {
                     "type": "string"
-                },
-                "workspaceIdentifier": {
-                    "type": "string"
                 }
             },
             "required": [
@@ -1132,8 +1113,7 @@
                 "id",
                 "lastEditedBy",
                 "namespaceIdentifier",
-                "type",
-                "workspaceIdentifier"
+                "type"
             ],
             "type": "object"
         },
@@ -1289,9 +1269,13 @@
         },
         "UserPreference": {
             "properties": {
+                "group": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
+                "metadata": {},
                 "name": {
                     "type": "string"
                 },
@@ -1303,7 +1287,6 @@
             "required": [
                 "id",
                 "name",
-                "properties",
                 "tag"
             ],
             "type": "object"

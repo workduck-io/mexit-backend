@@ -3,7 +3,6 @@
 import { injectable } from 'inversify';
 import {
   ActivityNodeDetail,
-  Block,
   CopyOrMoveBlock,
   NodeDetail,
 } from '../interfaces/Node';
@@ -21,6 +20,7 @@ export class NodeManager {
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
   async createNode(
+    workspaceId: string,
     nodeDetail: NodeDetail | ActivityNodeDetail
   ): Promise<string> {
     try {
@@ -30,6 +30,7 @@ export class NodeManager {
         {
           routeKey: RouteKeys.createNode,
           payload: nodeDetail,
+          headers: { 'workspace-id': workspaceId },
         }
       );
 
@@ -45,7 +46,11 @@ export class NodeManager {
     }
   }
 
-  async getNode(nodeId: string, queryParams?: any): Promise<string> {
+  async getNode(
+    nodeId: string,
+    workspaceId: string,
+    queryParams?: any
+  ): Promise<any> {
     try {
       const result = await this._lambda.invoke(
         this._nodeLambdaFunctionName,
@@ -53,10 +58,16 @@ export class NodeManager {
         {
           routeKey: RouteKeys.getNode,
           pathParameters: { id: nodeId },
+          headers: { 'workspace-id': workspaceId },
           ...(queryParams && { queryStringParameters: queryParams }),
         }
       );
-      return result.body;
+
+      const response: string = result.body;
+
+      if (response.includes('message')) return JSON.parse(response);
+
+      return response;
     } catch (error) {
       errorlib({
         message: error.message,
@@ -68,7 +79,11 @@ export class NodeManager {
     }
   }
 
-  async appendNode(nodeId: string, block: any): Promise<string> {
+  async appendNode(
+    nodeId: string,
+    workspaceId: string,
+    block: any
+  ): Promise<string> {
     try {
       const response = await this._lambda.invoke(
         this._nodeLambdaFunctionName,
@@ -77,6 +92,7 @@ export class NodeManager {
           routeKey: RouteKeys.appendNode,
           payload: block,
           pathParameters: { id: nodeId },
+          headers: { 'workspace-id': workspaceId },
         }
       );
 
@@ -91,38 +107,29 @@ export class NodeManager {
       });
     }
   }
-
-  async editBlock(nodeId: string, block: Block): Promise<string> {
+  async getAllNodes(userId: string, workspaceId: string): Promise<any> {
     try {
       const response = await this._lambda.invoke(
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
         {
-          routeKey: RouteKeys.editBlock,
-          payload: block,
-          pathParameters: { id: nodeId },
+          routeKey: RouteKeys.getAllNodes,
+          pathParameters: { id: userId },
+          headers: { 'workspace-id': workspaceId },
         }
       );
+      const result: string = response.body;
 
-      return response.body;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: errorCodes.UNKNOWN,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
-  }
-  async getAllNodes(userId: string): Promise<string[]> {
-    try {
-      const response = await this._lambda.invoke(
-        this._nodeLambdaFunctionName,
-        this._lambdaInvocationType,
-        { routeKey: RouteKeys.getAllNodes, pathParameters: { id: userId } }
-      );
-      return response.body;
+      if (result.includes('message')) {
+        return JSON.parse(result);
+      } else if (result.length === 2 && result[0] === '[' && result[1] === ']')
+        return [];
+      else {
+        let allNodes = result.replace('[', '');
+        allNodes = allNodes.replace(']', '');
+        allNodes = allNodes.replace(/"/g, '');
+        return allNodes.split(',');
+      }
     } catch (error) {
       errorlib({
         message: error.message,
@@ -136,7 +143,8 @@ export class NodeManager {
   async moveBlocks(
     blockId: string,
     sourceNodeId: string,
-    destinationNodeId: string
+    destinationNodeId: string,
+    workspaceId: string
   ): Promise<string> {
     try {
       const payload: CopyOrMoveBlock = {
@@ -149,7 +157,11 @@ export class NodeManager {
       const response = await this._lambda.invoke(
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
-        { routeKey: RouteKeys.copyOrMoveBlock, payload: payload }
+        {
+          routeKey: RouteKeys.copyOrMoveBlock,
+          payload: payload,
+          headers: { 'workspace-id': workspaceId },
+        }
       );
       return response.body;
     } catch (error) {

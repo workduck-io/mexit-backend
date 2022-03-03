@@ -53,12 +53,6 @@ class NodeController {
     );
 
     this._router.post(
-      `${this._urlPath}/:nodeId/blockUpdate`,
-      [AuthRequest],
-      this.editBlockInNode
-    );
-
-    this._router.post(
       `${this._urlPath}/content`,
       [AuthRequest],
       this.createContentNode
@@ -102,12 +96,15 @@ class NodeController {
       if (!request.query.blockSize)
         throw new Error('blockSize query param missing');
       if (!request.headers.userid) throw new Error('userid header missing');
+      if (!request.headers['workspace-id'])
+        throw new Error('workspace-id header missing');
 
       const blockSize =
         parseInt(request.query.blockSize.toString()) < minBlockSizeRequested
           ? minBlockSizeRequested
           : parseInt(request.query.blockSize.toString());
       const userId = request.headers.userid.toString();
+      const workspaceId = request.headers['workspace-id'].toString();
 
       const defaultQueryStringParameters: QueryStringParameters = {
         blockSize: blockSize,
@@ -136,7 +133,7 @@ class NodeController {
 
           //Query the backend for the remaining activity node blocks.
           const remainingActivityBlocks: any = JSON.parse(
-            await this._nodeManager.getNode(userId, {
+            await this._nodeManager.getNode(userId, workspaceId, {
               ...defaultQueryStringParameters,
               blockSize: noOfActivityBlocks,
               ...(cursor && { startCursor: cursor }),
@@ -175,7 +172,11 @@ class NodeController {
         // If the blocks are not in the cache then query the backend and
         // set the cache and return
         const result = JSON.parse(
-          await this._nodeManager.getNode(userId, defaultQueryStringParameters)
+          await this._nodeManager.getNode(
+            userId,
+            workspaceId,
+            defaultQueryStringParameters
+          )
         );
 
         const cachePayload = _.cloneDeep(result);
@@ -220,15 +221,13 @@ class NodeController {
   ): Promise<void> => {
     try {
       if (!request.headers.userid) throw new Error('userid header missing');
-      if (!request.headers.workspaceidentifier)
-        throw new Error('workspace identifier header missing');
+      if (!request.headers['workspace-id'])
+        throw new Error('workspace-id header missing');
       // Cognito userId will be the activityNodeid
       const userId = `NODE_${request.headers.userid.toString()}`;
-      const workspaceIdentifier =
-        request.headers.workspaceidentifier.toString();
+      const workspaceIdentifier = request.headers['workspace-id'].toString();
       const activityNodeDetail: NodeDetail = {
         id: userId,
-        workspaceIdentifier,
         namespaceIdentifier: '#mex-it',
         data: [],
         lastEditedBy: response.locals.userEmail,
@@ -236,7 +235,10 @@ class NodeController {
       };
 
       const result = JSON.parse(
-        await this._nodeManager.createNode(activityNodeDetail)
+        await this._nodeManager.createNode(
+          workspaceIdentifier,
+          activityNodeDetail
+        )
       ) as NodeResponse;
 
       this._cache.replaceAndSet(userId, this._activityNodeLabel, result.data);
@@ -255,6 +257,8 @@ class NodeController {
   newCapture = async (request: Request, response: Response): Promise<void> => {
     try {
       if (!request.headers.userid) throw new Error('userid header missing');
+      if (!request.headers['workspace-id'])
+        throw new Error('workspace-id header missing');
       const reqBody = request.body;
       const type = reqBody.type;
       const defaultQueryStringParameters: QueryStringParameters = {
@@ -262,7 +266,7 @@ class NodeController {
         getMetaDataOfNode: true,
         getReverseOrder: true,
       };
-
+      const workspaceId = request.headers['workspace-id'].toString();
       switch (type) {
         case 'DRAFT': {
           const activityNodeUID = reqBody.id;
@@ -279,12 +283,14 @@ class NodeController {
           // append the blocks to the activity node
           await this._nodeManager.appendNode(
             activityNodeUID,
+            workspaceId,
             activityNodeDetail
           );
 
           const updatedNode = JSON.parse(
             await this._nodeManager.getNode(
               activityNodeUID,
+              workspaceId,
               defaultQueryStringParameters
             )
           );
@@ -322,6 +328,7 @@ class NodeController {
 
           const activityPromise = this._nodeManager.appendNode(
             activityNodeUID,
+            workspaceId,
             activityNodeDetail
           );
 
@@ -339,7 +346,10 @@ class NodeController {
               metadata: reqBody.metadata,
             };
 
-            hierarchyPromise = this._nodeManager.createNode(nodeDetail);
+            hierarchyPromise = this._nodeManager.createNode(
+              workspaceId,
+              nodeDetail
+            );
           } else if (reqBody.appendNodeUID) {
             const appendDetail = {
               type: 'ElementRequest',
@@ -352,6 +362,7 @@ class NodeController {
 
             hierarchyPromise = this._nodeManager.appendNode(
               reqBody.appendNodeUID,
+              workspaceId,
               appendDetail
             );
           }
@@ -371,12 +382,14 @@ class NodeController {
               )
             ) {
               //update the cache for the get all nodes
-              const allNodes: any[] = JSON.parse(
+              const allNodes: any[] | any = JSON.parse(
                 await this._cache.get(
                   request.headers.userid.toString(),
                   this._allNodesEntityLabel
                 )
               );
+
+              if (allNodes.message) return;
               allNodes.push(newNode.id);
               this._cache.set(
                 request.headers.userid.toString(),
@@ -389,6 +402,7 @@ class NodeController {
           const updatedNode = JSON.parse(
             await this._nodeManager.getNode(
               activityNodeUID,
+              workspaceId,
               defaultQueryStringParameters
             )
           );
@@ -430,9 +444,11 @@ class NodeController {
     response: Response
   ): Promise<void> => {
     try {
+      if (!request.headers['workspace-id'])
+        throw new Error('workspace-id header missing');
       const reqBody = new RequestClass(request, 'LinkCapture').data;
       const activityNodeUID = reqBody.id;
-
+      const workspaceId = request.headers['workspace-id'].toString();
       delete reqBody.id;
       const shortenerResp = await this._shortenerManager.createNewShort(
         reqBody
@@ -484,6 +500,7 @@ class NodeController {
 
       const result = await this._nodeManager.appendNode(
         activityNodeUID,
+        workspaceId,
         activityNodeDetail
       );
 
@@ -498,17 +515,22 @@ class NodeController {
   createNode = async (request: Request, response: Response): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'ContentNodeRequest');
+      if (!request.headers['workspace-id'])
+        throw new Error('workspace-id header missing');
 
+      const workspaceId = request.headers['workspace-id'].toString();
       const nodeDetail = {
         id: requestDetail.data.id,
         type: 'NodeRequest',
         lastEditedBy: response.locals.userEmail,
         namespaceIdentifier: 'NAMESPACE1',
-        workspaceIdentifier: requestDetail.data.workspaceIdentifier,
         data: serializeContent(requestDetail.data.content),
       };
 
-      const nodeResult = await this._nodeManager.createNode(nodeDetail);
+      const nodeResult = await this._nodeManager.createNode(
+        workspaceId,
+        nodeDetail
+      );
 
       const deserialisedContent = this._transformer.genericNodeConverter(
         JSON.parse(nodeResult)
@@ -522,6 +544,10 @@ class NodeController {
   appendNode = async (request: Request, response: Response): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'ContentNodeRequest');
+      if (!request.headers['workspace-id'])
+        throw new Error('workspace-id header missing');
+
+      const workspaceId = request.headers['workspace-id'].toString();
       const appendDetail = {
         type: 'ElementRequest',
         elements: serializeContent(requestDetail.data.content),
@@ -531,31 +557,15 @@ class NodeController {
         e.createdBy = response.locals.userEmail;
       });
 
-      const result = await this._nodeManager.appendNode(
-        requestDetail.data.appendNodeUID,
-        appendDetail
+      const result = JSON.parse(
+        await this._nodeManager.appendNode(
+          requestDetail.data.appendNodeUID,
+          workspaceId,
+          appendDetail
+        )
       );
 
       response.json(result);
-    } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
-    }
-  };
-
-  editBlockInNode = async (
-    request: Request,
-    response: Response
-  ): Promise<void> => {
-    try {
-      const requestDetail = new RequestClass(request, 'Block');
-      const result = await this._nodeManager.editBlock(
-        request.params.nodeId,
-        requestDetail.data
-      );
-      response
-        .contentType('application/json')
-        .status(statusCodes.OK)
-        .send(result);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
@@ -567,11 +577,18 @@ class NodeController {
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'ContentNodeRequest');
+      if (!request.headers['workspace-id'])
+        throw new Error('workspace-id header missing');
+
+      const workspaceId = request.headers['workspace-id'].toString();
       const nodeDetail = this._transformer.convertContentToNodeFormat(
         requestDetail.data
       );
 
-      const resultNodeDetail = await this._nodeManager.createNode(nodeDetail);
+      const resultNodeDetail = await this._nodeManager.createNode(
+        workspaceId,
+        nodeDetail
+      );
       const resultContentNodeDetail =
         this._transformer.convertNodeToContentFormat(
           JSON.parse(resultNodeDetail) as NodeResponse
@@ -588,10 +605,14 @@ class NodeController {
 
   getAllNodes = async (request: Request, response: Response): Promise<void> => {
     try {
+      if (!request.headers['workspace-id'])
+        throw new Error('workspace-id header missing');
+
+      const workspaceId = request.headers['workspace-id'].toString();
       const result = await this._cache.getOrSet(
         request.params.userId,
         this._allNodesEntityLabel,
-        () => this._nodeManager.getAllNodes(request.params.userId)
+        () => this._nodeManager.getAllNodes(request.params.userId, workspaceId)
       );
       response
         .contentType('application/json')
@@ -603,7 +624,14 @@ class NodeController {
   };
   getNode = async (request: Request, response: Response): Promise<void> => {
     try {
-      const result = await this._nodeManager.getNode(request.params.nodeId);
+      if (!request.headers['workspace-id'])
+        throw new Error('workspace-id header missing');
+
+      const workspaceId = request.headers['workspace-id'].toString();
+      const result = await this._nodeManager.getNode(
+        request.params.nodeId,
+        workspaceId
+      );
       const nodeResponse = JSON.parse(result) as NodeResponse;
       const convertedResponse =
         this._transformer.genericNodeConverter(nodeResponse);
@@ -622,10 +650,15 @@ class NodeController {
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'CopyOrMoveBlockRequest');
+      if (!request.headers['workspace-id'])
+        throw new Error('workspace-id header missing');
+
+      const workspaceId = request.headers['workspace-id'].toString();
       const result = await this._nodeManager.moveBlocks(
         requestDetail.data.blockId,
         requestDetail.data.sourceNodeId,
-        requestDetail.data.destinationNodeId
+        requestDetail.data.destinationNodeId,
+        workspaceId
       );
 
       if (result) {
