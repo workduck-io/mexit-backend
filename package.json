@@ -16,9 +16,9 @@
     "dev": "nodemon src/app.ts",
     "debug": "export DEBUG=* && npm run start",
     "test-watch": "jest --watchAll --verbose --coverage",
-    "test:unit": "jest ./__tests__/unit/*",
-    "test:integration": "jest ./__tests__/integration/*",
-    "test": "jest",
+    "test:unit": "jest ./src/__tests__/unit/*",
+    "test:integration": "jest ./src/__tests__/integration/*",
+    "test": "jest ./src/__tests__/*",
     "types": "typescript-json-schema \"src/interfaces/*.ts\" \"*\" -o src/types.json --id \"types\" --required",
     "docs": "rimraf ./docs && typedoc"
   },
