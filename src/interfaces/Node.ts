@@ -4,7 +4,6 @@ export interface NodeDetail {
   id: string;
   path?: string;
   namespaceIdentifier: string;
-  workspaceIdentifier: string;
   data: NodeData[];
   lastEditedBy: string;
 }
@@ -89,7 +88,6 @@ export interface ClientNode {
   id: string;
   nodePath?: string;
   content?: ClientNodeContent[];
-  workspaceIdentifier: string;
   createdBy: string;
 }
 

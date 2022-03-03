@@ -15,7 +15,7 @@
     "declaration": true,
     "lib": ["es5", "es6"],
     "target": "es6",
-    "types": ["reflect-metadata"],
+    "types": ["reflect-metadata", "jest", "node"],
     "skipLibCheck": true
   },
   "exclude": ["./node_modules/*", "./dist"]
