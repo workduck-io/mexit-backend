@@ -1,4 +1,4 @@
-import { nanoid } from 'nanoid';
+import GuidGenerator from '../libs/GuidGenerator';
 
 import { NodeMetadata } from '../interfaces/Node';
 
@@ -60,7 +60,7 @@ export const serializeContent = (content: any[]) => {
     if (el.id) {
       nl.id = el.id;
     } else {
-      nl.id = `TEMP_${nanoid()}`;
+      nl.id = GuidGenerator.generateTempGUID();
     }
 
     if (el.type) {
