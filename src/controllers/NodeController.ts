@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import express, { Request, Response } from 'express';
-import { nanoid } from 'nanoid';
-
 import container from '../inversify.config';
 import { NodeManager } from '../managers/NodeManager';
 import { RequestClass } from '../libs/RequestClass';
@@ -14,6 +12,7 @@ import { NodeResponse } from '../interfaces/Response';
 import { Cache } from '../libs/CacheClass';
 import _ from 'lodash';
 import { NodeDetail, QueryStringParameters } from '../interfaces/Node';
+import GuidGenerator from '../libs/GuidGenerator';
 
 class NodeController {
   public _urlPath = '/node';
@@ -466,29 +465,31 @@ class NodeController {
         type: 'ElementRequest',
         elements: [
           {
-            id: `BLOCK_${nanoid()}`,
+            id: GuidGenerator.generateBlockGUID(),
             elementType: 'h1',
             createdBy: response.locals.userEmail,
-            children: [{ id: `TEMP_${nanoid()}`, content: shortenedURL }],
+            children: [
+              { id: GuidGenerator.generateTempGUID(), content: shortenedURL },
+            ],
           },
           {
-            id: `BLOCK_${nanoid()}`,
+            id: GuidGenerator.generateBlockGUID(),
             elementType: 'p',
             createdBy: response.locals.userEmail,
             children: [
               {
-                id: `TEMP_${nanoid()}`,
+                id: GuidGenerator.generateTempGUID(),
                 content: '',
               },
               {
-                id: `TEMP_${nanoid()}`,
+                id: GuidGenerator.generateTempGUID(),
                 elementType: 'a',
                 properties: {
                   url: reqBody.long,
                 },
                 children: [
                   {
-                    id: `TEMP_${nanoid()}`,
+                    id: GuidGenerator.generateTempGUID(),
                     content: reqBody.long,
                   },
                 ],
