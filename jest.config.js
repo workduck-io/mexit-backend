@@ -7,4 +7,5 @@ module.exports = {
       tsconfig: 'tsconfig.spec.json',
     },
   },
+  modulePathIgnorePatterns: ['./dist/*'],
 };

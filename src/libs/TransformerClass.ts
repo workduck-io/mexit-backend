@@ -1,4 +1,4 @@
-import { nanoid } from 'nanoid';
+import GuidGenerator from '../libs/GuidGenerator';
 import { injectable } from 'inversify';
 
 import {
@@ -169,7 +169,7 @@ export class Transformer {
     const linkContentResponse: LinkResponseContent[] = [];
 
     linkContentResponse.push({
-      id: `BLOCK_${nanoid()}`,
+      id: GuidGenerator.generateBlockGUID(),
       type: 'h1',
       children: [
         {
@@ -178,7 +178,7 @@ export class Transformer {
       ],
     });
     linkContentResponse.push({
-      id: `BLOCK_${nanoid()}`,
+      id: GuidGenerator.generateBlockGUID(),
       type: this.DEFAULT_ELEMENT_TYPE,
       children: [
         {
