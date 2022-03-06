@@ -693,9 +693,6 @@
         },
         "LinkCapture": {
             "properties": {
-                "id": {
-                    "type": "string"
-                },
                 "long": {
                     "type": "string"
                 },
@@ -721,7 +718,6 @@
                 }
             },
             "required": [
-                "id",
                 "long",
                 "short"
             ],

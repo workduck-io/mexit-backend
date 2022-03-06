@@ -219,11 +219,10 @@ class NodeController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers.userid) throw new Error('userid header missing');
       if (!request.headers['workspace-id'])
         throw new Error('workspace-id header missing');
       // Cognito userId will be the activityNodeid
-      const userId = `NODE_${request.headers.userid.toString()}`;
+      const userId = `NODE_${response.locals.userId}`;
       const workspaceIdentifier = request.headers['workspace-id'].toString();
       const activityNodeDetail: NodeDetail = {
         id: userId,
@@ -255,9 +254,9 @@ class NodeController {
 
   newCapture = async (request: Request, response: Response): Promise<void> => {
     try {
-      if (!request.headers.userid) throw new Error('userid header missing');
       if (!request.headers['workspace-id'])
         throw new Error('workspace-id header missing');
+      const userId = response.locals.userId;
       const reqBody = request.body;
       const type = reqBody.type;
       const defaultQueryStringParameters: QueryStringParameters = {
@@ -268,7 +267,7 @@ class NodeController {
       const workspaceId = request.headers['workspace-id'].toString();
       switch (type) {
         case 'DRAFT': {
-          const activityNodeUID = reqBody.id;
+          const activityNodeUID = `NODE_${userId}`;
 
           const activityNodeDetail = {
             type: 'ElementRequest',
@@ -280,11 +279,15 @@ class NodeController {
           });
 
           // append the blocks to the activity node
-          await this._nodeManager.appendNode(
-            activityNodeUID,
-            workspaceId,
-            activityNodeDetail
+          const appendResult = JSON.parse(
+            await this._nodeManager.appendNode(
+              activityNodeUID,
+              workspaceId,
+              activityNodeDetail
+            )
           );
+
+          if (appendResult.message) throw new Error(appendResult.message);
 
           const updatedNode = JSON.parse(
             await this._nodeManager.getNode(
@@ -294,10 +297,11 @@ class NodeController {
             )
           );
 
+          if (updatedNode.message) throw new Error(updatedNode.message);
           // append the latest capture into the cache if not already present
           // set the newly created capture
           const updatedCacheNode = this._cache.appendOrCreateActivityNode(
-            activityNodeUID,
+            userId,
             this._activityNodeLabel,
             updatedNode as NodeResponse,
             updatedNode.data.filter((data, index) =>
@@ -314,7 +318,7 @@ class NodeController {
         }
 
         case 'HIERARCHY': {
-          const activityNodeUID = reqBody.id;
+          const activityNodeUID = `NODE_${userId}`;
 
           const activityNodeDetail = {
             type: 'ElementRequest',
@@ -371,30 +375,23 @@ class NodeController {
             hierarchyPromise,
           ]);
 
+          if (JSON.parse(rawResults[0]).message)
+            throw new Error(JSON.parse(rawResults[0]).message);
+          if (JSON.parse(rawResults[1]).message)
+            throw new Error(JSON.parse(rawResults[1]).message);
+
           const newNode: NodeResponse = JSON.parse(rawResults[1]);
 
           if (newNode) {
-            if (
-              this._cache.has(
-                request.headers.userid.toString(),
-                this._allNodesEntityLabel
-              )
-            ) {
+            if (this._cache.has(userId, this._allNodesEntityLabel)) {
               //update the cache for the get all nodes
               const allNodes: any[] | any = JSON.parse(
-                await this._cache.get(
-                  request.headers.userid.toString(),
-                  this._allNodesEntityLabel
-                )
+                await this._cache.get(userId, this._allNodesEntityLabel)
               );
 
               if (allNodes.message) return;
               allNodes.push(newNode.id);
-              this._cache.set(
-                request.headers.userid.toString(),
-                this._allNodesEntityLabel,
-                allNodes
-              );
+              this._cache.set(userId, this._allNodesEntityLabel, allNodes);
             }
           }
 
@@ -406,10 +403,11 @@ class NodeController {
             )
           );
 
+          if (updatedNode.message) throw new Error(updatedNode.message);
           // append the latest capture into the cache if not already present
           // set the newly created capture
           const updatedCacheNode = this._cache.appendOrCreateActivityNode(
-            activityNodeUID,
+            userId,
             this._activityNodeLabel,
             updatedNode as NodeResponse,
             updatedNode.data.filter((data, index) =>
@@ -446,9 +444,9 @@ class NodeController {
       if (!request.headers['workspace-id'])
         throw new Error('workspace-id header missing');
       const reqBody = new RequestClass(request, 'LinkCapture').data;
-      const activityNodeUID = reqBody.id;
+      const activityNodeUID = `NODE_${response.locals.userId}`;
       const workspaceId = request.headers['workspace-id'].toString();
-      delete reqBody.id;
+
       const shortenerResp = await this._shortenerManager.createNewShort(
         reqBody
       );
@@ -506,6 +504,9 @@ class NodeController {
       );
 
       const resp = JSON.parse(result);
+
+      if (resp.message) throw new Error(resp.message);
+
       resp.shortenedURL = shortenedURL;
       response.json(resp);
     } catch (error) {
@@ -565,6 +566,8 @@ class NodeController {
           appendDetail
         )
       );
+
+      if (result.message) throw new Error(result.message);
 
       response.json(result);
     } catch (error) {
@@ -633,6 +636,10 @@ class NodeController {
         request.params.nodeId,
         workspaceId
       );
+
+      if (JSON.parse(result).message)
+        throw new Error(JSON.parse(result).message);
+
       const nodeResponse = JSON.parse(result) as NodeResponse;
       const convertedResponse =
         this._transformer.genericNodeConverter(nodeResponse);
