@@ -117,7 +117,6 @@ export interface NodeMetadata {
 }
 
 export interface LinkCapture {
-  id: string; // Activity Node UID to append to
   long: string;
   short: string;
   metadata?: {
