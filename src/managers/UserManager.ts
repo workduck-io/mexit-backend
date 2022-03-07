@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { injectable } from 'inversify';
 
 import { errorlib } from '../libs/errorlib';
@@ -16,6 +15,7 @@ export class UserManager {
 
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async createUserPreference(userPreference: UserPreference): Promise<any> {
     try {
       const result = await this._lambda.invoke(
@@ -39,6 +39,7 @@ export class UserManager {
       });
     }
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async updateUserPreference(userPreference: UserPreference): Promise<any> {
     try {
       const result = await this._lambda.invoke(
@@ -62,6 +63,7 @@ export class UserManager {
       });
     }
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async getByIdAndTag(userId: string, tag: string): Promise<any> {
     try {
       const result = await this._lambda.invoke(
@@ -83,6 +85,7 @@ export class UserManager {
       });
     }
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async getByGroupIdAndTag(groupId: string, tag: string): Promise<any> {
     try {
       const result = await this._lambda.invoke(

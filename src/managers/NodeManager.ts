@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { injectable } from 'inversify';
 import {
   ActivityNodeDetail,
@@ -49,7 +48,9 @@ export class NodeManager {
   async getNode(
     nodeId: string,
     workspaceId: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     queryParams?: any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     try {
       const result = await this._lambda.invoke(
@@ -82,6 +83,7 @@ export class NodeManager {
   async appendNode(
     nodeId: string,
     workspaceId: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     block: any
   ): Promise<string> {
     try {
@@ -107,6 +109,7 @@ export class NodeManager {
       });
     }
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async getAllNodes(userId: string, workspaceId: string): Promise<any> {
     try {
       const response = await this._lambda.invoke(
