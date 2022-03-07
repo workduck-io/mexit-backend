@@ -17,7 +17,7 @@ async function AuthRequest(
     const result = await TokenHandler({ token });
     if (result.isValid) {
       res.locals.userEmail = result.userEmail;
-      res.locals.userId = result.userId;
+      res.locals.userId = result.userId.replace(/-/g, '');
       next();
     } else throw new Error(result.error);
   } catch (error) {
