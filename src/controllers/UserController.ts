@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import express, { Request, Response } from 'express';
 import container from '../inversify.config';
 
@@ -36,6 +35,7 @@ class UserController {
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   updateUser = async (request: Request, response: Response): Promise<any> => {
     const requestDetail = new RequestClass(request, 'UserPreference');
     try {
@@ -47,6 +47,7 @@ class UserController {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
     }
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   createUser = async (request: Request, response: Response): Promise<any> => {
     const requestDetail = new RequestClass(request, 'UserPreference');
     try {
@@ -61,6 +62,7 @@ class UserController {
   getByIdAndTag = async (
     request: Request,
     response: Response
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> => {
     try {
       const result = await this._userManager.getByIdAndTag(
@@ -75,6 +77,7 @@ class UserController {
   getByGroupIdAndTag = async (
     request: Request,
     response: Response
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> => {
     try {
       const result = await this._userManager.getByGroupIdAndTag(

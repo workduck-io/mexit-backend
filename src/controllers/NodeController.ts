@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import express, { Request, Response } from 'express';
 import container from '../inversify.config';
 import { NodeManager } from '../managers/NodeManager';
@@ -111,7 +110,7 @@ class NodeController {
       };
 
       if (this._cache.has(userId, this._activityNodeLabel)) {
-        const cachedResult: any = await this._cache.get(
+        const cachedResult = await this._cache.get(
           userId,
           this._activityNodeLabel
         );
@@ -130,7 +129,7 @@ class NodeController {
             : null;
 
           //Query the backend for the remaining activity node blocks.
-          const remainingActivityBlocks: any = JSON.parse(
+          const remainingActivityBlocks = JSON.parse(
             await this._nodeManager.getNode(userId, workspaceId, {
               ...defaultQueryStringParameters,
               blockSize: noOfActivityBlocks,
@@ -141,7 +140,7 @@ class NodeController {
           // Append with the cached blocks from the last
           // used cloneDeep from lodash to clone the object or else it
           // creates a reference to the cache
-          const tempCacheStore: any = _.cloneDeep(cachedResult);
+          const tempCacheStore = _.cloneDeep(cachedResult);
           tempCacheStore.data.push(...remainingActivityBlocks.data);
           tempCacheStore.endCursor = remainingActivityBlocks.endCursor
             ? remainingActivityBlocks.endCursor.replace(/#/g, '$')
@@ -384,7 +383,7 @@ class NodeController {
           if (newNode) {
             if (this._cache.has(userId, this._allNodesEntityLabel)) {
               //update the cache for the get all nodes
-              const allNodes: any[] | any = JSON.parse(
+              const allNodes = JSON.parse(
                 await this._cache.get(userId, this._allNodesEntityLabel)
               );
 
