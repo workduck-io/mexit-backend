@@ -94,7 +94,6 @@ class NodeController {
       const minBlockSizeRequested = 5;
       if (!request.query.blockSize)
         throw new Error('blockSize query param missing');
-      if (!request.headers.userid) throw new Error('userid header missing');
       if (!request.headers['workspace-id'])
         throw new Error('workspace-id header missing');
 
@@ -102,7 +101,7 @@ class NodeController {
         parseInt(request.query.blockSize.toString()) < minBlockSizeRequested
           ? minBlockSizeRequested
           : parseInt(request.query.blockSize.toString());
-      const userId = request.headers.userid.toString();
+      const userId = response.locals.userId;
       const workspaceId = request.headers['workspace-id'].toString();
 
       const defaultQueryStringParameters: QueryStringParameters = {
