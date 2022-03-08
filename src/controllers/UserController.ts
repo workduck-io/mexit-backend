@@ -44,7 +44,7 @@ class UserController {
       );
       response.json(JSON.parse(result));
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -56,7 +56,7 @@ class UserController {
       );
       response.json(JSON.parse(result));
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
   getByIdAndTag = async (
@@ -71,7 +71,7 @@ class UserController {
       );
       response.json(JSON.parse(result));
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
   getByGroupIdAndTag = async (
@@ -86,7 +86,7 @@ class UserController {
       );
       response.json(JSON.parse(result));
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
 }

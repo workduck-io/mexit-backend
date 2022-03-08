@@ -52,18 +52,19 @@ class SearchController {
 
     try {
       index = await this._client.getIndex(userHash);
+
+      const searchResults = await index.search(query, {
+        matches: true,
+      });
+
+      response.json(this._convertSearchResults(searchResults));
     } catch (err) {
       response
         .status(statusCodes.BAD_REQUEST)
-        .send({ ...err, message: 'USER_NOT_FOUND' });
+        .send({ ...err, message: 'USER_NOT_FOUND' })
+        .json();
       return;
     }
-
-    const searchResults = await index.search(query, {
-      matches: true,
-    });
-
-    response.json(this._convertSearchResults(searchResults));
   };
 }
 

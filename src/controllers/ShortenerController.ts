@@ -36,7 +36,7 @@ class ShortenerController {
       );
       response.send(result);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
 }

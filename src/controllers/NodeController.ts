@@ -200,7 +200,10 @@ class NodeController {
           .send(deserialisedContent);
       }
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error.message);
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send(error.message)
+        .json();
     }
   };
 
@@ -246,7 +249,8 @@ class NodeController {
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send(JSON.stringify(error));
+        .send(JSON.stringify(error))
+        .json();
     }
   };
 
@@ -430,7 +434,7 @@ class NodeController {
         }
       }
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
 
@@ -508,7 +512,7 @@ class NodeController {
       resp.shortenedURL = shortenedURL;
       response.json(resp);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
 
@@ -537,7 +541,7 @@ class NodeController {
       );
       response.json(deserialisedContent);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
 
@@ -569,7 +573,7 @@ class NodeController {
 
       response.json(result);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
 
@@ -601,7 +605,7 @@ class NodeController {
         .status(statusCodes.OK)
         .send(resultContentNodeDetail);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
 
@@ -621,7 +625,7 @@ class NodeController {
         .status(statusCodes.OK)
         .send(result);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
   getNode = async (request: Request, response: Response): Promise<void> => {
@@ -647,7 +651,7 @@ class NodeController {
         .status(statusCodes.OK)
         .send(convertedResponse);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
   copyOrMoveBlock = async (
@@ -672,7 +676,10 @@ class NodeController {
       }
       response.contentType('application/json').status(statusCodes.NO_CONTENT);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error.message);
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send(error.message)
+        .json();
     }
   };
 }
