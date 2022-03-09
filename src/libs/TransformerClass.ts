@@ -10,6 +10,7 @@ import {
   NodeDetail,
   Block,
   ContentNode,
+  ILink,
 } from '../interfaces/Node';
 import { ContentNodeRequest, LinkNodeRequest } from '../interfaces/Request';
 import {
@@ -29,10 +30,45 @@ export class Transformer {
   private NAMESPACE_ID = '#mex-it';
   private DEFAULT_ELEMENT_TYPE = 'p';
   private CACHE_KEY_DELIMITER = '+';
+  private LINK_HIERARCHY_DELIMITER = '#';
   private CAPTURES = {
     CONTENT: 'CONTENT',
     LINK: 'LINK',
     NODE: 'NODE',
+  };
+
+  decodeLinkHierarchy = (linkDatas: string[]): Promise<ILink[]> => {
+    return new Promise((resolve, reject) => {
+      const iLinks: ILink[] = [];
+
+      linkDatas.map((data, _) => {
+        const delimitedStrings = data
+          .split(this.LINK_HIERARCHY_DELIMITER)
+          .filter(element => element);
+
+        if (delimitedStrings.length % 2 !== 0)
+          reject(new Error('Invalid linkdata input'));
+
+        let cumulativePath: string;
+        for (let index = 0; index < delimitedStrings.length; ) {
+          if (!cumulativePath) cumulativePath = delimitedStrings[index];
+          else
+            cumulativePath = cumulativePath.concat(
+              '.'.concat(delimitedStrings[index])
+            );
+
+          iLinks.push({
+            nodeId: delimitedStrings[index + 1],
+            path: cumulativePath,
+          });
+
+          if (index <= delimitedStrings.length) index = index + 2;
+          else break;
+        }
+      });
+
+      resolve(iLinks);
+    });
   };
 
   encodeCacheKey = (...keys: string[]) => {
