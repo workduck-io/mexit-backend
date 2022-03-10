@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import express, { Request, Response } from 'express';
 import container from '../inversify.config';
 import { NodeManager } from '../managers/NodeManager';
@@ -94,7 +93,6 @@ class NodeController {
       const minBlockSizeRequested = 5;
       if (!request.query.blockSize)
         throw new Error('blockSize query param missing');
-      if (!request.headers.userid) throw new Error('userid header missing');
       if (!request.headers['workspace-id'])
         throw new Error('workspace-id header missing');
 
@@ -102,7 +100,7 @@ class NodeController {
         parseInt(request.query.blockSize.toString()) < minBlockSizeRequested
           ? minBlockSizeRequested
           : parseInt(request.query.blockSize.toString());
-      const userId = request.headers.userid.toString();
+      const userId = response.locals.userId;
       const workspaceId = request.headers['workspace-id'].toString();
 
       const defaultQueryStringParameters: QueryStringParameters = {
@@ -112,7 +110,7 @@ class NodeController {
       };
 
       if (this._cache.has(userId, this._activityNodeLabel)) {
-        const cachedResult: any = await this._cache.get(
+        const cachedResult = await this._cache.get(
           userId,
           this._activityNodeLabel
         );
@@ -131,7 +129,7 @@ class NodeController {
             : null;
 
           //Query the backend for the remaining activity node blocks.
-          const remainingActivityBlocks: any = JSON.parse(
+          const remainingActivityBlocks = JSON.parse(
             await this._nodeManager.getNode(userId, workspaceId, {
               ...defaultQueryStringParameters,
               blockSize: noOfActivityBlocks,
@@ -142,7 +140,7 @@ class NodeController {
           // Append with the cached blocks from the last
           // used cloneDeep from lodash to clone the object or else it
           // creates a reference to the cache
-          const tempCacheStore: any = _.cloneDeep(cachedResult);
+          const tempCacheStore = _.cloneDeep(cachedResult);
           tempCacheStore.data.push(...remainingActivityBlocks.data);
           tempCacheStore.endCursor = remainingActivityBlocks.endCursor
             ? remainingActivityBlocks.endCursor.replace(/#/g, '$')
@@ -202,7 +200,10 @@ class NodeController {
           .send(deserialisedContent);
       }
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error.message);
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send(error.message)
+        .json();
     }
   };
 
@@ -219,11 +220,10 @@ class NodeController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers.userid) throw new Error('userid header missing');
       if (!request.headers['workspace-id'])
         throw new Error('workspace-id header missing');
       // Cognito userId will be the activityNodeid
-      const userId = `NODE_${request.headers.userid.toString()}`;
+      const userId = `NODE_${response.locals.userId}`;
       const workspaceIdentifier = request.headers['workspace-id'].toString();
       const activityNodeDetail: NodeDetail = {
         id: userId,
@@ -249,15 +249,16 @@ class NodeController {
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send(JSON.stringify(error));
+        .send(JSON.stringify(error))
+        .json();
     }
   };
 
   newCapture = async (request: Request, response: Response): Promise<void> => {
     try {
-      if (!request.headers.userid) throw new Error('userid header missing');
       if (!request.headers['workspace-id'])
         throw new Error('workspace-id header missing');
+      const userId = response.locals.userId;
       const reqBody = request.body;
       const type = reqBody.type;
       const defaultQueryStringParameters: QueryStringParameters = {
@@ -268,7 +269,7 @@ class NodeController {
       const workspaceId = request.headers['workspace-id'].toString();
       switch (type) {
         case 'DRAFT': {
-          const activityNodeUID = reqBody.id;
+          const activityNodeUID = `NODE_${userId}`;
 
           const activityNodeDetail = {
             type: 'ElementRequest',
@@ -280,11 +281,15 @@ class NodeController {
           });
 
           // append the blocks to the activity node
-          await this._nodeManager.appendNode(
-            activityNodeUID,
-            workspaceId,
-            activityNodeDetail
+          const appendResult = JSON.parse(
+            await this._nodeManager.appendNode(
+              activityNodeUID,
+              workspaceId,
+              activityNodeDetail
+            )
           );
+
+          if (appendResult.message) throw new Error(appendResult.message);
 
           const updatedNode = JSON.parse(
             await this._nodeManager.getNode(
@@ -294,10 +299,11 @@ class NodeController {
             )
           );
 
+          if (updatedNode.message) throw new Error(updatedNode.message);
           // append the latest capture into the cache if not already present
           // set the newly created capture
           const updatedCacheNode = this._cache.appendOrCreateActivityNode(
-            activityNodeUID,
+            userId,
             this._activityNodeLabel,
             updatedNode as NodeResponse,
             updatedNode.data.filter((data, index) =>
@@ -314,7 +320,7 @@ class NodeController {
         }
 
         case 'HIERARCHY': {
-          const activityNodeUID = reqBody.id;
+          const activityNodeUID = `NODE_${userId}`;
 
           const activityNodeDetail = {
             type: 'ElementRequest',
@@ -371,30 +377,23 @@ class NodeController {
             hierarchyPromise,
           ]);
 
+          if (JSON.parse(rawResults[0]).message)
+            throw new Error(JSON.parse(rawResults[0]).message);
+          if (JSON.parse(rawResults[1]).message)
+            throw new Error(JSON.parse(rawResults[1]).message);
+
           const newNode: NodeResponse = JSON.parse(rawResults[1]);
 
           if (newNode) {
-            if (
-              this._cache.has(
-                request.headers.userid.toString(),
-                this._allNodesEntityLabel
-              )
-            ) {
+            if (this._cache.has(userId, this._allNodesEntityLabel)) {
               //update the cache for the get all nodes
-              const allNodes: any[] | any = JSON.parse(
-                await this._cache.get(
-                  request.headers.userid.toString(),
-                  this._allNodesEntityLabel
-                )
+              const allNodes = JSON.parse(
+                await this._cache.get(userId, this._allNodesEntityLabel)
               );
 
               if (allNodes.message) return;
               allNodes.push(newNode.id);
-              this._cache.set(
-                request.headers.userid.toString(),
-                this._allNodesEntityLabel,
-                allNodes
-              );
+              this._cache.set(userId, this._allNodesEntityLabel, allNodes);
             }
           }
 
@@ -406,10 +405,11 @@ class NodeController {
             )
           );
 
+          if (updatedNode.message) throw new Error(updatedNode.message);
           // append the latest capture into the cache if not already present
           // set the newly created capture
           const updatedCacheNode = this._cache.appendOrCreateActivityNode(
-            activityNodeUID,
+            userId,
             this._activityNodeLabel,
             updatedNode as NodeResponse,
             updatedNode.data.filter((data, index) =>
@@ -434,7 +434,7 @@ class NodeController {
         }
       }
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
 
@@ -446,9 +446,9 @@ class NodeController {
       if (!request.headers['workspace-id'])
         throw new Error('workspace-id header missing');
       const reqBody = new RequestClass(request, 'LinkCapture').data;
-      const activityNodeUID = reqBody.id;
+      const activityNodeUID = `NODE_${response.locals.userId}`;
       const workspaceId = request.headers['workspace-id'].toString();
-      delete reqBody.id;
+
       const shortenerResp = await this._shortenerManager.createNewShort(
         reqBody
       );
@@ -506,10 +506,13 @@ class NodeController {
       );
 
       const resp = JSON.parse(result);
+
+      if (resp.message) throw new Error(resp.message);
+
       resp.shortenedURL = shortenedURL;
       response.json(resp);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
 
@@ -538,7 +541,7 @@ class NodeController {
       );
       response.json(deserialisedContent);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
 
@@ -566,9 +569,11 @@ class NodeController {
         )
       );
 
+      if (result.message) throw new Error(result.message);
+
       response.json(result);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
 
@@ -600,7 +605,7 @@ class NodeController {
         .status(statusCodes.OK)
         .send(resultContentNodeDetail);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
 
@@ -620,7 +625,7 @@ class NodeController {
         .status(statusCodes.OK)
         .send(result);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
   getNode = async (request: Request, response: Response): Promise<void> => {
@@ -633,6 +638,10 @@ class NodeController {
         request.params.nodeId,
         workspaceId
       );
+
+      if (JSON.parse(result).message)
+        throw new Error(JSON.parse(result).message);
+
       const nodeResponse = JSON.parse(result) as NodeResponse;
       const convertedResponse =
         this._transformer.genericNodeConverter(nodeResponse);
@@ -642,7 +651,7 @@ class NodeController {
         .status(statusCodes.OK)
         .send(convertedResponse);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
   copyOrMoveBlock = async (
@@ -667,7 +676,10 @@ class NodeController {
       }
       response.contentType('application/json').status(statusCodes.NO_CONTENT);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error.message);
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send(error.message)
+        .json();
     }
   };
 }
