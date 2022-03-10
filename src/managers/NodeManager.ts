@@ -177,4 +177,52 @@ export class NodeManager {
       });
     }
   }
+  async makeNodePublic(nodeId: string, workspaceId: string): Promise<string> {
+    const response = await this._lambda.invoke(
+      this._nodeLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.makeNodePublic,
+        pathParameters: { id: nodeId },
+        headers: { 'workspace-id': workspaceId },
+      }
+    );
+    return response;
+  }
+  async makeNodePrivate(nodeId: string, workspaceId: string): Promise<string> {
+    const response = await this._lambda.invoke(
+      this._nodeLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.makeNodePrivate,
+        pathParameters: { id: nodeId },
+        headers: { 'workspace-id': workspaceId },
+      }
+    );
+    return response;
+  }
+  async getPublicNode(nodeId: string, workspaceId: string): Promise<string> {
+    try {
+      const result = await this._lambda.invoke(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.getPublicNode,
+          pathParameters: { id: nodeId },
+          headers: { 'workspace-id': workspaceId },
+        }
+      );
+
+      const response: string = result.body;
+      return response;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
 }
