@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import express, { Request, Response } from 'express';
 import container from '../inversify.config';
 
@@ -28,6 +27,7 @@ class ShortenerController {
   getShortsByWorkspace = async (
     request: Request,
     response: Response
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> => {
     const workspaceId = request.params.workspaceId;
     try {
@@ -36,7 +36,7 @@ class ShortenerController {
       );
       response.send(result);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error);
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
 }

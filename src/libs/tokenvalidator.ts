@@ -9,6 +9,7 @@ export interface ClaimVerifyRequest {
 
 export interface ClaimVerifyResult {
   readonly userEmail: string;
+  readonly userId: string;
   readonly eventId: string;
   readonly isValid: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -41,6 +42,7 @@ interface MapOfKidToPublicKey {
 }
 
 interface Claim {
+  sub: string;
   token_use: string;
   auth_time: number;
   iss: string;
@@ -107,12 +109,14 @@ const TokenHandler = async (
 
     result = {
       userEmail: claim.username,
+      userId: claim.sub,
       eventId: claim.event_id,
       isValid: true,
     };
   } catch (error) {
     result = {
       userEmail: '',
+      userId: '',
       eventId: '',
       error: 'Invalid Token',
       isValid: false,
