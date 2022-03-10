@@ -166,4 +166,35 @@ describe('Node Manager', () => {
       expect(appendNodeResult.message).not.toBeUndefined();
     });
   });
+  describe('Make Node Public by UID', () => {
+    it('make the node by given UID public', async () => {
+      const nodeId = 'NODE_test-user-id';
+      const node = await nodeManager.makeNodePublic(nodeId, 'test-workspace');
+      expect(JSON.parse(node.body)).toBe(nodeId);
+    });
+  });
+  describe('Get public node by UID', () => {
+    it('should return the corresponding public node for the given node id', async () => {
+      const nodeId = 'NODE_test-user-id';
+      const node = await nodeManager.getPublicNode(nodeId, 'test-workspace');
+
+      expect(JSON.parse(node).id).toBe(nodeId);
+      expect(JSON.parse(node).data.length).toBeGreaterThan(0);
+    });
+  });
+  describe('Make Node Private by UID', () => {
+    it('make the node by given UID private', async () => {
+      const nodeId = 'NODE_test-user-id';
+      const node = await nodeManager.makeNodePrivate(nodeId, 'test-workspace');
+      expect(JSON.parse(node.body)).toBe(nodeId);
+    });
+  });
+  describe('Get node by UID - Fail Case', () => {
+    it('should fail since the given node UID was made private', async () => {
+      const nodeId = 'NODE_FAILPUBLICNODE';
+      const node = await nodeManager.getPublicNode(nodeId, 'test-workspace');
+
+      expect(JSON.parse(node).message).toBe('Node not available');
+    });
+  });
 });
