@@ -130,7 +130,7 @@ class NodeController {
 
           //Query the backend for the remaining activity node blocks.
           const remainingActivityBlocks = JSON.parse(
-            await this._nodeManager.getNode(userId, workspaceId, {
+            await this._nodeManager.getNode(`NODE_${userId}`, workspaceId, {
               ...defaultQueryStringParameters,
               blockSize: noOfActivityBlocks,
               ...(cursor && { startCursor: cursor }),
@@ -170,7 +170,7 @@ class NodeController {
         // set the cache and return
         const result = JSON.parse(
           await this._nodeManager.getNode(
-            userId,
+            `NODE_${userId}`,
             workspaceId,
             defaultQueryStringParameters
           )
