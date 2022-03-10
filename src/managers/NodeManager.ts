@@ -177,7 +177,7 @@ export class NodeManager {
       });
     }
   }
-  async makeNodePublic(nodeId: string, workspaceId: string): Promise<string> {
+  async makeNodePublic(nodeId: string, workspaceId: string): Promise<any> {
     const response = await this._lambda.invoke(
       this._nodeLambdaFunctionName,
       this._lambdaInvocationType,
@@ -189,7 +189,7 @@ export class NodeManager {
     );
     return response;
   }
-  async makeNodePrivate(nodeId: string, workspaceId: string): Promise<string> {
+  async makeNodePrivate(nodeId: string, workspaceId: string): Promise<any> {
     const response = await this._lambda.invoke(
       this._nodeLambdaFunctionName,
       this._lambdaInvocationType,
