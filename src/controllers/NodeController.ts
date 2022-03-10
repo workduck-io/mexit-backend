@@ -77,12 +77,12 @@ class NodeController {
       this.copyOrMoveBlock
     );
     this._router.patch(
-      `${this._urlPath}/:nodeid/makePublic`,
+      `${this._urlPath}/:id/makePublic`,
       [AuthRequest],
       this.makeNodePublic
     );
     this._router.patch(
-      `${this._urlPath}/:nodeid/makePrivate`,
+      `${this._urlPath}/:id/makePrivate`,
       [AuthRequest],
       this.makeNodePrivate
     );
@@ -702,7 +702,7 @@ class NodeController {
       if (!request.headers['workspace-id'])
         throw new Error('workspace-id header missing');
 
-      const nodeId = request.params.nodeId;
+      const nodeId = request.params.id;
       const workspaceId = request.headers['workspace-id'].toString();
 
       const result = await this._nodeManager.makeNodePublic(
@@ -710,8 +710,12 @@ class NodeController {
         workspaceId
       );
 
-      console.log('Result: ', result);
-      response.send(result);
+      const resp = {
+        status: statusCodes.OK,
+        nodeUID: JSON.parse(result.body),
+      };
+
+      response.json(resp);
     } catch (error) {
       console.error(error);
       response.status(statusCodes.INTERNAL_SERVER_ERROR).json(error);
@@ -725,7 +729,7 @@ class NodeController {
       if (!request.headers['workspace-id'])
         throw new Error('workspace-id header missing');
 
-      const nodeId = request.params.nodeId;
+      const nodeId = request.params.id;
       const workspaceId = request.headers['workspace-id'].toString();
 
       const result = await this._nodeManager.makeNodePrivate(
@@ -733,8 +737,12 @@ class NodeController {
         workspaceId
       );
 
-      console.log('Result: ', result);
-      response.send(result);
+      const resp = {
+        status: statusCodes.OK,
+        nodeUID: JSON.parse(result.body),
+      };
+
+      response.json(resp);
     } catch (error) {
       console.error(error);
       response.status(statusCodes.INTERNAL_SERVER_ERROR).json(error);
