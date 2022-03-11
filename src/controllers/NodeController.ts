@@ -76,6 +76,18 @@ class NodeController {
       [AuthRequest],
       this.copyOrMoveBlock
     );
+    this._router.patch(
+      `${this._urlPath}/:id/makePublic`,
+      [AuthRequest],
+      this.makeNodePublic
+    );
+    this._router.patch(
+      `${this._urlPath}/:id/makePrivate`,
+      [AuthRequest],
+      this.makeNodePrivate
+    );
+    this._router.get(`${this._urlPath}/public/:nodeId`, [], this.getPublicNode);
+
     return;
   }
 
@@ -680,6 +692,92 @@ class NodeController {
         .status(statusCodes.INTERNAL_SERVER_ERROR)
         .send(error.message)
         .json();
+    }
+  };
+  makeNodePublic = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      if (!request.headers['workspace-id'])
+        throw new Error('workspace-id header missing');
+
+      const nodeId = request.params.id;
+      const workspaceId = request.headers['workspace-id'].toString();
+
+      const result = await this._nodeManager.makeNodePublic(
+        nodeId,
+        workspaceId
+      );
+
+      const resp = {
+        status: statusCodes.OK,
+        nodeUID: JSON.parse(result.body),
+      };
+
+      response.json(resp);
+    } catch (error) {
+      console.error(error);
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).json(error);
+    }
+  };
+  makeNodePrivate = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      if (!request.headers['workspace-id'])
+        throw new Error('workspace-id header missing');
+
+      const nodeId = request.params.id;
+      const workspaceId = request.headers['workspace-id'].toString();
+
+      const result = await this._nodeManager.makeNodePrivate(
+        nodeId,
+        workspaceId
+      );
+
+      const resp = {
+        status: statusCodes.OK,
+        nodeUID: JSON.parse(result.body),
+      };
+
+      response.json(resp);
+    } catch (error) {
+      console.error(error);
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).json(error);
+    }
+  };
+  getPublicNode = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      if (!request.headers['workspace-id'])
+        throw new Error('workspace-id header missing');
+
+      const nodeId = request.params.nodeId;
+      const workspaceId = request.headers['workspace-id'].toString();
+
+      const result = await this._nodeManager.getPublicNode(nodeId, workspaceId);
+
+      if (JSON.parse(result).message) {
+        throw new Error(JSON.parse(result).message);
+      }
+
+      const nodeResponse = JSON.parse(result) as NodeResponse;
+      const convertedResponse =
+        this._transformer.genericNodeConverter(nodeResponse);
+
+      response
+        .contentType('application/json')
+        .status(statusCodes.OK)
+        .send(convertedResponse);
+    } catch (error) {
+      const resp = {
+        message: error.message,
+      };
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).json(resp);
     }
   };
 }
