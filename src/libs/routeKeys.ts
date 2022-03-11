@@ -11,4 +11,7 @@ export const RouteKeys = {
   createUserPreference: 'POST /user',
   getByIdAndTag: 'GET /user/{id}/{tag}',
   getByGroupIdAndTag: 'GET /user/group/{groupId}/{tag}',
+  makeNodePublic: 'PATCH /node/makePublic/{id}',
+  makeNodePrivate: 'PATCH /node/makePrivate/{id}',
+  getPublicNode: 'GET /node/public/{id}',
 };
