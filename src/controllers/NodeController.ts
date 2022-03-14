@@ -49,12 +49,6 @@ class NodeController {
       [AuthRequest],
       this.createLinkCapture
     );
-
-    this._router.post(
-      `${this._urlPath}/content`,
-      [AuthRequest],
-      this.createContentNode
-    );
     this._router.get(
       `${this._urlPath}/getactivityblocks`,
       [AuthRequest],
@@ -237,6 +231,15 @@ class NodeController {
       // Cognito userId will be the activityNodeid
       const userId = `NODE_${response.locals.userId}`;
       const workspaceIdentifier = request.headers['workspace-id'].toString();
+
+      const existingActivityNode = await this._nodeManager.getNode(
+        userId,
+        workspaceIdentifier
+      );
+
+      if (!existingActivityNode.message)
+        throw new Error('Activity Node exists already');
+
       const activityNodeDetail: NodeDetail = {
         id: userId,
         namespaceIdentifier: '#mex-it',
@@ -261,7 +264,7 @@ class NodeController {
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send(JSON.stringify(error))
+        .send({ message: error.toString() })
         .json();
     }
   };
@@ -352,13 +355,15 @@ class NodeController {
           let hierarchyPromise: Promise<string>;
 
           if (reqBody.createNodeUID) {
+            if (reqBody.createNodeUID === `NODE_${userId}`)
+              throw new Error('Cannot create a node using activity node id');
+
             const nodeDetail = {
               id: reqBody.createNodeUID,
               // nodePath: reqBody.nodePath,
               type: 'NodeRequest',
               lastEditedBy: response.locals.userEmail,
               namespaceIdentifier: 'NAMESPACE1',
-              workspaceIdentifier: reqBody.workspaceIdentifier,
               data: serializeContent(reqBody.content),
               metadata: reqBody.metadata,
             };
@@ -368,6 +373,8 @@ class NodeController {
               nodeDetail
             );
           } else if (reqBody.appendNodeUID) {
+            if (reqBody.appendNodeUID === `NODE_${userId}`)
+              throw new Error('Cannot append to the activity node');
             const appendDetail = {
               type: 'ElementRequest',
               elements: serializeContent(reqBody.content),
@@ -446,7 +453,10 @@ class NodeController {
         }
       }
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ message: error.toString() })
+        .json();
     }
   };
 
@@ -524,7 +534,10 @@ class NodeController {
       resp.shortenedURL = shortenedURL;
       response.json(resp);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ message: error.toString() })
+        .json();
     }
   };
 
@@ -535,6 +548,10 @@ class NodeController {
         throw new Error('workspace-id header missing');
 
       const workspaceId = request.headers['workspace-id'].toString();
+
+      if (requestDetail.data.id === `NODE_${response.locals.userId}`)
+        throw new Error('Cannot create a node using activitynode id.');
+
       const nodeDetail = {
         id: requestDetail.data.id,
         type: 'NodeRequest',
@@ -553,7 +570,10 @@ class NodeController {
       );
       response.json(deserialisedContent);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ message: error.toString() })
+        .json();
     }
   };
 
@@ -564,6 +584,9 @@ class NodeController {
         throw new Error('workspace-id header missing');
 
       const workspaceId = request.headers['workspace-id'].toString();
+      if (requestDetail.data.appendNodeUID === `NODE_${response.locals.userId}`)
+        throw new Error('Cannot explicitly append to the activitynode.');
+
       const appendDetail = {
         type: 'ElementRequest',
         elements: serializeContent(requestDetail.data.content),
@@ -585,39 +608,10 @@ class NodeController {
 
       response.json(result);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
-    }
-  };
-
-  createContentNode = async (
-    request: Request,
-    response: Response
-  ): Promise<void> => {
-    try {
-      const requestDetail = new RequestClass(request, 'ContentNodeRequest');
-      if (!request.headers['workspace-id'])
-        throw new Error('workspace-id header missing');
-
-      const workspaceId = request.headers['workspace-id'].toString();
-      const nodeDetail = this._transformer.convertContentToNodeFormat(
-        requestDetail.data
-      );
-
-      const resultNodeDetail = await this._nodeManager.createNode(
-        workspaceId,
-        nodeDetail
-      );
-      const resultContentNodeDetail =
-        this._transformer.convertNodeToContentFormat(
-          JSON.parse(resultNodeDetail) as NodeResponse
-        );
-
       response
-        .contentType('application/json')
-        .status(statusCodes.OK)
-        .send(resultContentNodeDetail);
-    } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ message: error.toString() })
+        .json();
     }
   };
 
@@ -637,7 +631,10 @@ class NodeController {
         .status(statusCodes.OK)
         .send(result);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ message: error.toString() })
+        .json();
     }
   };
   getNode = async (request: Request, response: Response): Promise<void> => {
@@ -663,7 +660,10 @@ class NodeController {
         .status(statusCodes.OK)
         .send(convertedResponse);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ message: error.toString() })
+        .json();
     }
   };
   copyOrMoveBlock = async (
@@ -690,7 +690,7 @@ class NodeController {
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send(error.message)
+        .send({ message: error.toString() })
         .json();
     }
   };
