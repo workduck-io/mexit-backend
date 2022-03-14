@@ -237,7 +237,8 @@ class NodeController {
         workspaceIdentifier
       );
 
-      if (existingActivityNode) throw new Error('Activity Node exists already');
+      if (!existingActivityNode.message)
+        throw new Error('Activity Node exists already');
 
       const activityNodeDetail: NodeDetail = {
         id: userId,
@@ -363,7 +364,6 @@ class NodeController {
               type: 'NodeRequest',
               lastEditedBy: response.locals.userEmail,
               namespaceIdentifier: 'NAMESPACE1',
-              workspaceIdentifier: reqBody.workspaceIdentifier,
               data: serializeContent(reqBody.content),
               metadata: reqBody.metadata,
             };
