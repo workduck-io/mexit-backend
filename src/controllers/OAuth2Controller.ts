@@ -9,7 +9,7 @@ class OAuth2Controller {
   private _router = express.Router();
 
   private static readonly redirectUri = IS_DEV
-    ? 'http://localhost:5002/api/v1/oauth2/google'
+    ? 'http://localhost:5000/api/v1/oauth2/google'
     : '';
 
   constructor() {
@@ -48,7 +48,7 @@ class OAuth2Controller {
         .set('Content-Type', 'text/html')
         .send(
           Buffer.from(
-            '<html lang="en"><head><meta charset="UTF-8"><title>Auth Success</title> <script>window.close()</script></head></html>'
+            '<html lang="en"><head><meta charset="UTF-8"><title>Auth Success</title> <script>window.close()</script></head><body><p>Please return to the mex app...</p></body></html>'
           )
         )
         .status(200);
