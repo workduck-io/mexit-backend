@@ -9,6 +9,7 @@ import 'dotenv/config';
 import UserController from './controllers/UserController';
 import { LogRequest } from './middlewares/logrequest';
 import logger from './libs/logger';
+import OAuth2Controller from './controllers/OAuth2Controller';
 
 class App {
   public _app: express.Application;
@@ -16,7 +17,7 @@ class App {
   private readonly _controllers: unknown;
 
   constructor(controllers) {
-    this._port = parseInt(process.env.PORT) || 3000;
+    this._port = parseInt(process.env.PORT) || 5000;
     this._controllers = controllers;
   }
 
@@ -55,6 +56,7 @@ class App {
 }
 
 const application = new App([
+  new OAuth2Controller(),
   new NodeController(),
   new SearchController(),
   new ShortenerController(),
