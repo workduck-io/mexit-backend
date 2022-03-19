@@ -16,7 +16,7 @@ class App {
   private readonly _controllers: unknown;
 
   constructor(controllers) {
-    this._port = parseInt(process.env.PORT) || 3000;
+    this._port = parseInt(process.env.PORT) || 5000;
     this._controllers = controllers;
   }
 
