@@ -99,15 +99,15 @@ class NodeController {
       const minBlockSizeRequested = 5;
       if (!request.query.blockSize)
         throw new Error('blockSize query param missing');
-      if (!request.headers['workspace-id'])
-        throw new Error('workspace-id header missing');
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
 
       const blockSize =
         parseInt(request.query.blockSize.toString()) < minBlockSizeRequested
           ? minBlockSizeRequested
           : parseInt(request.query.blockSize.toString());
       const userId = response.locals.userId;
-      const workspaceId = request.headers['workspace-id'].toString();
+      const workspaceId = request.headers['mex-workspace-id'].toString();
 
       const defaultQueryStringParameters: QueryStringParameters = {
         blockSize: blockSize,
@@ -226,11 +226,12 @@ class NodeController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers['workspace-id'])
-        throw new Error('workspace-id header missing');
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
       // Cognito userId will be the activityNodeid
       const userId = `NODE_${response.locals.userId}`;
-      const workspaceIdentifier = request.headers['workspace-id'].toString();
+      const workspaceIdentifier =
+        request.headers['mex-workspace-id'].toString();
 
       const existingActivityNode = await this._nodeManager.getNode(
         userId,
@@ -271,8 +272,8 @@ class NodeController {
 
   newCapture = async (request: Request, response: Response): Promise<void> => {
     try {
-      if (!request.headers['workspace-id'])
-        throw new Error('workspace-id header missing');
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
       const userId = response.locals.userId;
       const reqBody = request.body;
       const type = reqBody.type;
@@ -281,7 +282,7 @@ class NodeController {
         getMetaDataOfNode: true,
         getReverseOrder: true,
       };
-      const workspaceId = request.headers['workspace-id'].toString();
+      const workspaceId = request.headers['mex-workspace-id'].toString();
       switch (type) {
         case 'DRAFT': {
           const activityNodeUID = `NODE_${userId}`;
@@ -465,11 +466,11 @@ class NodeController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers['workspace-id'])
-        throw new Error('workspace-id header missing');
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
       const reqBody = new RequestClass(request, 'LinkCapture').data;
       const activityNodeUID = `NODE_${response.locals.userId}`;
-      const workspaceId = request.headers['workspace-id'].toString();
+      const workspaceId = request.headers['mex-workspace-id'].toString();
 
       const shortenerResp = await this._shortenerManager.createNewShort(
         reqBody
@@ -544,10 +545,10 @@ class NodeController {
   createNode = async (request: Request, response: Response): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'ContentNodeRequest');
-      if (!request.headers['workspace-id'])
-        throw new Error('workspace-id header missing');
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
 
-      const workspaceId = request.headers['workspace-id'].toString();
+      const workspaceId = request.headers['mex-workspace-id'].toString();
 
       if (requestDetail.data.id === `NODE_${response.locals.userId}`)
         throw new Error('Cannot create a node using activitynode id.');
@@ -580,10 +581,10 @@ class NodeController {
   appendNode = async (request: Request, response: Response): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'ContentNodeRequest');
-      if (!request.headers['workspace-id'])
-        throw new Error('workspace-id header missing');
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
 
-      const workspaceId = request.headers['workspace-id'].toString();
+      const workspaceId = request.headers['mex-workspace-id'].toString();
       if (requestDetail.data.appendNodeUID === `NODE_${response.locals.userId}`)
         throw new Error('Cannot explicitly append to the activitynode.');
 
@@ -617,10 +618,10 @@ class NodeController {
 
   getAllNodes = async (request: Request, response: Response): Promise<void> => {
     try {
-      if (!request.headers['workspace-id'])
-        throw new Error('workspace-id header missing');
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
 
-      const workspaceId = request.headers['workspace-id'].toString();
+      const workspaceId = request.headers['mex-workspace-id'].toString();
       const result = await this._cache.getOrSet(
         request.params.userId,
         this._allNodesEntityLabel,
@@ -639,10 +640,10 @@ class NodeController {
   };
   getNode = async (request: Request, response: Response): Promise<void> => {
     try {
-      if (!request.headers['workspace-id'])
-        throw new Error('workspace-id header missing');
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
 
-      const workspaceId = request.headers['workspace-id'].toString();
+      const workspaceId = request.headers['mex-workspace-id'].toString();
       const result = await this._nodeManager.getNode(
         request.params.nodeId,
         workspaceId
@@ -672,10 +673,10 @@ class NodeController {
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'CopyOrMoveBlockRequest');
-      if (!request.headers['workspace-id'])
-        throw new Error('workspace-id header missing');
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
 
-      const workspaceId = request.headers['workspace-id'].toString();
+      const workspaceId = request.headers['mex-workspace-id'].toString();
       const result = await this._nodeManager.moveBlocks(
         requestDetail.data.blockId,
         requestDetail.data.sourceNodeId,
@@ -699,11 +700,11 @@ class NodeController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers['workspace-id'])
-        throw new Error('workspace-id header missing');
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
 
       const nodeId = request.params.id;
-      const workspaceId = request.headers['workspace-id'].toString();
+      const workspaceId = request.headers['mex-workspace-id'].toString();
 
       const result = await this._nodeManager.makeNodePublic(
         nodeId,
@@ -726,11 +727,11 @@ class NodeController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers['workspace-id'])
-        throw new Error('workspace-id header missing');
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
 
       const nodeId = request.params.id;
-      const workspaceId = request.headers['workspace-id'].toString();
+      const workspaceId = request.headers['mex-workspace-id'].toString();
 
       const result = await this._nodeManager.makeNodePrivate(
         nodeId,
@@ -753,11 +754,11 @@ class NodeController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers['workspace-id'])
-        throw new Error('workspace-id header missing');
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
 
       const nodeId = request.params.nodeId;
-      const workspaceId = request.headers['workspace-id'].toString();
+      const workspaceId = request.headers['mex-workspace-id'].toString();
 
       const result = await this._nodeManager.getPublicNode(nodeId, workspaceId);
 
