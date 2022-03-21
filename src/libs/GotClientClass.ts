@@ -32,7 +32,8 @@ export class GotClient implements GotClientType {
   async post<T>(
     url: string,
     payload: T,
-    authToken: string
+    authToken: string,
+    searchParams?: any
   ): Promise<GotResponse> {
     this._gotResponse.data = await this._memGot
       .post(url, {
@@ -40,6 +41,7 @@ export class GotClient implements GotClientType {
         headers: {
           Authorization: authToken,
         },
+        ...(searchParams && { searchParams }),
         ...this._gotConfig,
       })
       .json();
@@ -47,24 +49,36 @@ export class GotClient implements GotClientType {
     return this._gotResponse;
   }
 
-  async delete(url: string, authToken: string): Promise<GotResponse> {
+  async delete(
+    url: string,
+    authToken: string,
+    searchParams?: any
+  ): Promise<GotResponse> {
     this._gotResponse.data = await this._memGot
       .delete(url, {
         headers: {
           Authorization: authToken,
         },
+        ...(searchParams && { searchParams }),
         ...this._gotConfig,
       })
       .json();
 
     return this._gotResponse;
   }
-  async put(url: string, authToken: string): Promise<GotResponse> {
+  async put<T>(
+    url: string,
+    payload: T,
+    authToken: string,
+    searchParams?: any
+  ): Promise<GotResponse> {
     this._gotResponse.data = await this._memGot
       .put(url, {
+        json: payload,
         headers: {
           Authorization: authToken,
         },
+        ...(searchParams && { searchParams }),
         ...this._gotConfig,
       })
       .json();
