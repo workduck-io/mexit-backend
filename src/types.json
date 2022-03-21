@@ -103,6 +103,41 @@
             ],
             "type": "object"
         },
+        "Attendees": {
+            "properties": {
+                "additionalGuests": {
+                    "type": "number"
+                },
+                "comment": {
+                    "type": "string"
+                },
+                "displayName": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "optional": {
+                    "type": "boolean"
+                },
+                "resource": {
+                    "type": "boolean"
+                },
+                "responseStatus": {
+                    "enum": [
+                        "accepted",
+                        "declined",
+                        "needsAction",
+                        "tentative"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "email"
+            ],
+            "type": "object"
+        },
         "AuthorizeRefreshTokenType": {
             "properties": {
                 "email": {
@@ -148,6 +183,274 @@
             "required": [
                 "elements",
                 "type"
+            ],
+            "type": "object"
+        },
+        "CalendarEventPayload": {
+            "properties": {
+                "anyoneCanAddSelf": {
+                    "type": "boolean"
+                },
+                "attachments": {
+                    "items": {
+                        "properties": {
+                            "fileUrl": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "fileUrl"
+                        ],
+                        "type": "object"
+                    },
+                    "type": "array"
+                },
+                "attendees": {
+                    "items": {
+                        "$ref": "types#/definitions/Attendees"
+                    },
+                    "type": "array"
+                },
+                "colorId": {
+                    "type": "string"
+                },
+                "conferenceData": {},
+                "description": {
+                    "type": "string"
+                },
+                "end": {
+                    "$ref": "types#/definitions/DateTimeType"
+                },
+                "extendedProperties": {
+                    "items": {
+                        "properties": {
+                            "private": {},
+                            "shared": {}
+                        },
+                        "type": "object"
+                    },
+                    "type": "array"
+                },
+                "gadget": {
+                    "items": {
+                        "$ref": "types#/definitions/Gadget"
+                    },
+                    "type": "array"
+                },
+                "guestsCanInviteOthers": {
+                    "type": "boolean"
+                },
+                "guestsCanModify": {
+                    "type": "boolean"
+                },
+                "guestsCanSeeOtherGuests": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "originalStartTime": {
+                    "items": {
+                        "$ref": "types#/definitions/DateTimeType"
+                    },
+                    "type": "array"
+                },
+                "recurrence": {
+                    "items": {},
+                    "type": "array"
+                },
+                "reminders": {
+                    "$ref": "types#/definitions/Reminders"
+                },
+                "sequence": {
+                    "type": "number"
+                },
+                "source": {
+                    "properties": {
+                        "title": {
+                            "type": "string"
+                        },
+                        "url": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "title",
+                        "url"
+                    ],
+                    "type": "object"
+                },
+                "start": {
+                    "$ref": "types#/definitions/DateTimeType"
+                },
+                "status": {
+                    "enum": [
+                        "cancelled",
+                        "confirmed",
+                        "tentative"
+                    ],
+                    "type": "string"
+                },
+                "summary": {
+                    "type": "string"
+                },
+                "transparency": {
+                    "enum": [
+                        "opaque",
+                        "transparent"
+                    ],
+                    "type": "string"
+                },
+                "visibility": {
+                    "enum": [
+                        "confidential",
+                        "default",
+                        "private",
+                        "public"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "end",
+                "start"
+            ],
+            "type": "object"
+        },
+        "CalendarEventUpdatePayload": {
+            "properties": {
+                "anyoneCanAddSelf": {
+                    "type": "boolean"
+                },
+                "attachments": {
+                    "items": {
+                        "properties": {
+                            "fileUrl": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "fileUrl"
+                        ],
+                        "type": "object"
+                    },
+                    "type": "array"
+                },
+                "attendees": {
+                    "items": {
+                        "$ref": "types#/definitions/Attendees"
+                    },
+                    "type": "array"
+                },
+                "attendeesOmitted": {
+                    "type": "boolean"
+                },
+                "colorId": {
+                    "type": "string"
+                },
+                "conferenceData": {},
+                "description": {
+                    "type": "string"
+                },
+                "end": {
+                    "$ref": "types#/definitions/DateTimeType"
+                },
+                "extendedProperties": {
+                    "items": {
+                        "properties": {
+                            "private": {},
+                            "shared": {}
+                        },
+                        "type": "object"
+                    },
+                    "type": "array"
+                },
+                "gadget": {
+                    "items": {
+                        "$ref": "types#/definitions/Gadget"
+                    },
+                    "type": "array"
+                },
+                "guestsCanInviteOthers": {
+                    "type": "boolean"
+                },
+                "guestsCanModify": {
+                    "type": "boolean"
+                },
+                "guestsCanSeeOtherGuests": {
+                    "type": "boolean"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "originalStartTime": {
+                    "items": {
+                        "$ref": "types#/definitions/DateTimeType"
+                    },
+                    "type": "array"
+                },
+                "recurrence": {
+                    "items": {},
+                    "type": "array"
+                },
+                "reminders": {
+                    "$ref": "types#/definitions/UpdateReminders"
+                },
+                "sequence": {
+                    "type": "number"
+                },
+                "source": {
+                    "properties": {
+                        "title": {
+                            "type": "string"
+                        },
+                        "url": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "title",
+                        "url"
+                    ],
+                    "type": "object"
+                },
+                "start": {
+                    "$ref": "types#/definitions/DateTimeType"
+                },
+                "status": {
+                    "enum": [
+                        "cancelled",
+                        "confirmed",
+                        "tentative"
+                    ],
+                    "type": "string"
+                },
+                "summary": {
+                    "type": "string"
+                },
+                "transparency": {
+                    "enum": [
+                        "opaque",
+                        "transparent"
+                    ],
+                    "type": "string"
+                },
+                "visibility": {
+                    "enum": [
+                        "confidential",
+                        "default",
+                        "private",
+                        "public"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "end",
+                "start"
             ],
             "type": "object"
         },
@@ -634,6 +937,20 @@
             ],
             "type": "object"
         },
+        "DateTimeType": {
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "dateTime": {
+                    "type": "string"
+                },
+                "timeZone": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "Document": {
             "properties": {
                 "id": {
@@ -646,6 +963,45 @@
             "required": [
                 "id",
                 "nodePath"
+            ],
+            "type": "object"
+        },
+        "Gadget": {
+            "properties": {
+                "display": {
+                    "enum": [
+                        "chip",
+                        "icon"
+                    ],
+                    "type": "string"
+                },
+                "height": {
+                    "type": "number"
+                },
+                "iconLink": {
+                    "type": "string"
+                },
+                "link": {
+                    "type": "string"
+                },
+                "preferences": {},
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "width": {
+                    "type": "number"
+                }
+            },
+            "required": [
+                "display",
+                "iconLink",
+                "link",
+                "preferences",
+                "title",
+                "type"
             ],
             "type": "object"
         },
@@ -1214,6 +1570,32 @@
             ],
             "type": "object"
         },
+        "Reminders": {
+            "properties": {
+                "overrides": {
+                    "items": {
+                        "properties": {
+                            "minutes": {
+                                "type": "number"
+                            }
+                        },
+                        "required": [
+                            "minutes"
+                        ],
+                        "type": "object"
+                    },
+                    "type": "array"
+                },
+                "useDefault": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "overrides",
+                "useDefault"
+            ],
+            "type": "object"
+        },
         "SearchHit": {
             "properties": {
                 "_matchesInfo": {},
@@ -1260,6 +1642,40 @@
             },
             "required": [
                 "text"
+            ],
+            "type": "object"
+        },
+        "UpdateReminders": {
+            "properties": {
+                "overrides": {
+                    "items": {
+                        "properties": {
+                            "method": {
+                                "enum": [
+                                    "email",
+                                    "popup"
+                                ],
+                                "type": "string"
+                            },
+                            "minutes": {
+                                "type": "number"
+                            }
+                        },
+                        "required": [
+                            "method",
+                            "minutes"
+                        ],
+                        "type": "object"
+                    },
+                    "type": "array"
+                },
+                "useDefault": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "overrides",
+                "useDefault"
             ],
             "type": "object"
         },
