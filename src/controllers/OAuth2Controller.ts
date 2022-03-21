@@ -43,7 +43,7 @@ class OAuth2Controller {
     try {
       const { tokens } = await oauth2Client.getToken(code.toString());
       // TODO: store this refresh token into the auth service
-      console.log(tokens.refresh_token);
+      console.log(tokens);
       response
         .set('Content-Type', 'text/html')
         .send(
@@ -64,9 +64,12 @@ class OAuth2Controller {
   ): Promise<any> => {
     try {
       const scopes = [
+        'email',
         'https://www.googleapis.com/auth/calendar',
         'https://www.googleapis.com/auth/calendar.readonly',
         'https://www.googleapis.com/auth/calendar.events',
+        'https://www.googleapis.com/auth/userinfo.profile',
+        'https://www.googleapis.com/auth/plus.login',
       ];
       const googleAuthUrl = await OAuth2Controller.getGoogleAuthUrl(scopes);
       response.send(googleAuthUrl).status(200);

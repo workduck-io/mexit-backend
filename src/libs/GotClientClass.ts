@@ -72,12 +72,17 @@ export class GotClient implements GotClientType {
     return this._gotResponse;
   }
 
-  async get(url: string, authToken: string): Promise<GotResponse> {
+  async get(
+    url: string,
+    authToken: string,
+    searchParams?: any
+  ): Promise<GotResponse> {
     this._gotResponse.data = await this._memGot
       .get(url, {
         headers: {
           Authorization: authToken,
         },
+        ...(searchParams && { searchParams }),
         ...this._gotConfig,
       })
       .json();
