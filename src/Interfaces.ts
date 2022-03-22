@@ -8,6 +8,7 @@ import {
   Reminders,
   CalendarEventUpdatePayload,
   UpdateReminders,
+  GoogleAuthRefreshToken,
 } from './interfaces/GoogleService';
 import { GenericObjectType, GenericType } from './interfaces/Generics';
 import { GotResponse, GotClientType } from './interfaces/GotClient';
@@ -105,4 +106,5 @@ export default class Interfaces implements Definitions {
   Reminders: Reminders;
   CalendarEventUpdatePayload: CalendarEventUpdatePayload;
   UpdateReminders: UpdateReminders;
+  GoogleAuthRefreshToken: GoogleAuthRefreshToken;
 }

@@ -1,3 +1,6 @@
+export interface GoogleAuthRefreshToken {
+  refreshToken: string;
+}
 export interface CalendarEventPayload {
   end: DateTimeType;
   start: DateTimeType;

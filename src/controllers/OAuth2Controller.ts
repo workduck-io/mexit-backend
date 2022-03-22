@@ -3,20 +3,50 @@ import { AuthRequest } from '../middlewares/authrequest';
 import { statusCodes } from '../libs/statusCodes';
 import { google } from 'googleapis';
 import { IS_DEV } from '../env';
+import { GotClient } from '../libs/GotClientClass';
+import container from '../inversify.config';
+import { RequestClass } from '../libs/RequestClass';
+// eslint-disable-next-line node/no-extraneous-import
+import { OAuth2Client } from 'google-auth-library';
 
 class OAuth2Controller {
   private _urlPath = '/oauth2';
   private _router = express.Router();
 
+  private _gotClient: GotClient = container.get<GotClient>(GotClient);
+  private _oauth2Client: OAuth2Client;
+
   private static readonly redirectUri = IS_DEV
     ? 'http://localhost:5000/api/v1/oauth2/google'
     : '';
+  private static readonly googleOAuthTokenUrl =
+    'https://www.googleapis.com/oauth2/v4/token';
 
   constructor() {
     this.initializeRoutes();
+    this.initializeGoogleOAuthClient();
   }
 
-  public initializeRoutes(): void {
+  initializeGoogleOAuthClient(): void {
+    if (!process.env.client_id) throw new Error('Client Id Not Provided');
+    if (!process.env.client_secret)
+      throw new Error('Client Secret Not Provided');
+
+    this._oauth2Client = new google.auth.OAuth2({
+      clientId: process.env.client_id,
+      clientSecret: process.env.client_secret,
+      redirectUri: OAuth2Controller.redirectUri,
+    });
+
+    google.options({ auth: this._oauth2Client });
+  }
+
+  initializeRoutes(): void {
+    this._router.post(
+      `${this._urlPath}/getGoogleAccessToken`,
+      [AuthRequest],
+      this.getNewAccessToken
+    );
     this._router.get(
       `${this._urlPath}/getGoogleAuthUrl`,
       [AuthRequest],
@@ -25,23 +55,36 @@ class OAuth2Controller {
     this._router.get(`${this._urlPath}/google`, [], this.extractTokenFromCode);
   }
 
+  getNewAccessToken = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      const requestDetail = new RequestClass(request, 'GoogleAuthRefreshToken');
+      const payload = {
+        client_id: process.env.client_id,
+        client_secret: process.env.client_secret,
+        refresh_token: requestDetail.data.refreshToken,
+        grant_type: 'refresh_token',
+      };
+      const result = await this._gotClient.post(
+        OAuth2Controller.googleOAuthTokenUrl,
+        payload,
+        ''
+      );
+      response.status(statusCodes.OK).send(result).json();
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
+    }
+  };
+
   extractTokenFromCode = async (
     request: Request,
     response: Response
   ): Promise<void> => {
-    const oauth2Client = new google.auth.OAuth2({
-      clientId: process.env.client_id,
-      clientSecret: process.env.client_secret,
-      redirectUri: OAuth2Controller.redirectUri,
-    });
-
-    google.options({ auth: oauth2Client });
-
-    console.log(request.query.code);
-
     const code = request.query.code;
     try {
-      const { tokens } = await oauth2Client.getToken(code.toString());
+      const { tokens } = await this._oauth2Client.getToken(code.toString());
       // TODO: store this refresh token into the auth service
       console.log(tokens);
       response
@@ -71,24 +114,17 @@ class OAuth2Controller {
         'https://www.googleapis.com/auth/userinfo.profile',
         'https://www.googleapis.com/auth/plus.login',
       ];
-      const googleAuthUrl = await OAuth2Controller.getGoogleAuthUrl(scopes);
+      const googleAuthUrl = await this.getGoogleAuthUrl(scopes);
       response.send(googleAuthUrl).status(200);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
 
-  private static getGoogleAuthUrl(scopes: string[]) {
-    const oauth2Client = new google.auth.OAuth2({
-      clientId: process.env.client_id,
-      clientSecret: process.env.client_secret,
-      redirectUri: OAuth2Controller.redirectUri,
-    });
-
-    google.options({ auth: oauth2Client });
+  private getGoogleAuthUrl(scopes: string[]) {
     return new Promise((resolve, reject) => {
       try {
-        const authorizeUrl = oauth2Client.generateAuthUrl({
+        const authorizeUrl = this._oauth2Client.generateAuthUrl({
           access_type: 'offline',
           scope: scopes.join(' '),
         });
