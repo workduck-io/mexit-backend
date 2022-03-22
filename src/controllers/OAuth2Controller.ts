@@ -48,7 +48,7 @@ class OAuth2Controller {
         .set('Content-Type', 'text/html')
         .send(
           Buffer.from(
-            '<html lang="en"><head><meta charset="UTF-8"><title>Auth Success</title> <script>window.close()</script></head><body><p>Please return to the mex app...</p></body></html>'
+            `<html lang="en"><head><meta charset="UTF-8"><title>Auth Success</title> <script>window.location.href="mex://localhost:3333?access_token=${tokens.access_token}&id_token=${tokens.id_token}&type=calendar_google"; window.close()</script></head><body><p>Please return to the mex app...</p></body></html>`
           )
         )
         .status(200);
