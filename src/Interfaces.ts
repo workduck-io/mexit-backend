@@ -1,15 +1,6 @@
 import { TextType } from 'aws-sdk/clients/polly';
 import { AuthorizeRefreshTokenType, AuthorizeType } from './interfaces/Auth';
-import {
-  Attendees,
-  CalendarEventPayload,
-  DateTimeType,
-  Gadget,
-  Reminders,
-  CalendarEventUpdatePayload,
-  UpdateReminders,
-  GoogleAuthRefreshToken,
-} from './interfaces/GoogleService';
+import { GoogleAuthRefreshToken } from './interfaces/GoogleService';
 import { GenericObjectType, GenericType } from './interfaces/Generics';
 import { GotResponse, GotClientType } from './interfaces/GotClient';
 import {
@@ -99,12 +90,5 @@ export default class Interfaces implements Definitions {
   CopyOrMoveBlockRequest: CopyOrMoveBlockRequest;
   CopyOrMoveBlock: CopyOrMoveBlock;
   UserPreference: UserPreference;
-  Attendees: Attendees;
-  CalendarEventPayload: CalendarEventPayload;
-  DateTimeType: DateTimeType;
-  Gadget: Gadget;
-  Reminders: Reminders;
-  CalendarEventUpdatePayload: CalendarEventUpdatePayload;
-  UpdateReminders: UpdateReminders;
   GoogleAuthRefreshToken: GoogleAuthRefreshToken;
 }

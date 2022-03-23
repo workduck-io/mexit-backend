@@ -10,7 +10,6 @@ import UserController from './controllers/UserController';
 import { LogRequest } from './middlewares/logrequest';
 import logger from './libs/logger';
 import OAuth2Controller from './controllers/OAuth2Controller';
-import GoogleServicesController from './controllers/GoogleServicesController';
 
 class App {
   public _app: express.Application;
@@ -62,7 +61,6 @@ const application = new App([
   new SearchController(),
   new ShortenerController(),
   new UserController(),
-  new GoogleServicesController(),
 ]);
 application.build();
 application._app.listen(application._port, () => {
