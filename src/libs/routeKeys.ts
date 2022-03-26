@@ -14,4 +14,5 @@ export const RouteKeys = {
   makeNodePublic: 'PATCH /node/makePublic/{id}',
   makeNodePrivate: 'PATCH /node/makePrivate/{id}',
   getPublicNode: 'GET /node/public/{id}',
+  getUserByLinkedin: 'POST /user/linkedin',
 };

@@ -18,6 +18,7 @@ async function AuthRequest(
     if (result.isValid) {
       res.locals.userEmail = result.userEmail;
       res.locals.userId = result.userId.replace(/-/g, '');
+      res.locals.userIdRaw = result.userId;
       next();
     } else throw new Error(result.error);
   } catch (error) {
