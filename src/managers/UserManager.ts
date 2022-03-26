@@ -11,7 +11,7 @@ import { UserPreference } from '../interfaces/User';
 @injectable()
 export class UserManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
-  private _userLambdaFunctionName = 'workduck-user-service-local-user';
+  private _userLambdaFunctionName = 'workduck-user-service-dev-user';
 
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
@@ -96,6 +96,29 @@ export class UserManager {
           pathParameters: { groupId: groupId, tag: tag },
         }
       );
+      return result.body;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+  async getUserByLinkedin(payload: any): Promise<any> {
+    try {
+      const result = await this._lambda.invoke(
+        this._userLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.getUserByLinkedin,
+          payload: payload,
+        },
+        true
+      );
+
       return result.body;
     } catch (error) {
       errorlib({

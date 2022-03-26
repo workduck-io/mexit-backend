@@ -1271,6 +1271,9 @@
                 "id": {
                     "type": "string"
                 },
+                "linkedinURL": {
+                    "type": "string"
+                },
                 "metadata": {},
                 "name": {
                     "type": "string"
@@ -1280,11 +1283,6 @@
                     "type": "string"
                 }
             },
-            "required": [
-                "id",
-                "name",
-                "tag"
-            ],
             "type": "object"
         },
         "UserTag": {
