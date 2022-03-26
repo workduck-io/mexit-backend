@@ -111,6 +111,7 @@ class UserController {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> => {
     try {
+      request.body.linkedinURL = request.body.linkedinURL.replace(/\/+$/, '');
       const result = JSON.parse(
         await this._userManager.getUserByLinkedin(request.body)
       );
