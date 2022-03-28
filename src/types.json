@@ -675,6 +675,17 @@
                 }
             ]
         },
+        "GoogleAuthRefreshToken": {
+            "properties": {
+                "refreshToken": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "refreshToken"
+            ],
+            "type": "object"
+        },
         "GotClientType": {
             "type": "object"
         },
