@@ -29,7 +29,7 @@ export class NodeManager {
         {
           routeKey: RouteKeys.createNode,
           payload: nodeDetail,
-          headers: { 'workspace-id': workspaceId },
+          headers: { 'mex-workspace-id': workspaceId },
         }
       );
 
@@ -59,7 +59,7 @@ export class NodeManager {
         {
           routeKey: RouteKeys.getNode,
           pathParameters: { id: nodeId },
-          headers: { 'workspace-id': workspaceId },
+          headers: { 'mex-workspace-id': workspaceId },
           ...(queryParams && { queryStringParameters: queryParams }),
         }
       );
@@ -94,7 +94,7 @@ export class NodeManager {
           routeKey: RouteKeys.appendNode,
           payload: block,
           pathParameters: { id: nodeId },
-          headers: { 'workspace-id': workspaceId },
+          headers: { 'mex-workspace-id': workspaceId },
         }
       );
 
@@ -118,7 +118,7 @@ export class NodeManager {
         {
           routeKey: RouteKeys.getAllNodes,
           pathParameters: { id: userId },
-          headers: { 'workspace-id': workspaceId },
+          headers: { 'mex-workspace-id': workspaceId },
         }
       );
       const result: string = response.body;
@@ -163,7 +163,7 @@ export class NodeManager {
         {
           routeKey: RouteKeys.copyOrMoveBlock,
           payload: payload,
-          headers: { 'workspace-id': workspaceId },
+          headers: { 'mex-workspace-id': workspaceId },
         }
       );
       return response.body;
@@ -184,7 +184,7 @@ export class NodeManager {
       {
         routeKey: RouteKeys.makeNodePublic,
         pathParameters: { id: nodeId },
-        headers: { 'workspace-id': workspaceId },
+        headers: { 'mex-workspace-id': workspaceId },
       }
     );
     return response;
@@ -196,7 +196,7 @@ export class NodeManager {
       {
         routeKey: RouteKeys.makeNodePrivate,
         pathParameters: { id: nodeId },
-        headers: { 'workspace-id': workspaceId },
+        headers: { 'mex-workspace-id': workspaceId },
       }
     );
     return response;
@@ -209,7 +209,7 @@ export class NodeManager {
         {
           routeKey: RouteKeys.getPublicNode,
           pathParameters: { id: nodeId },
-          headers: { 'workspace-id': workspaceId },
+          headers: { 'mex-workspace-id': workspaceId },
         }
       );
 
