@@ -20,6 +20,7 @@ export class NodeManager {
 
   async createNode(
     workspaceId: string,
+    idToken: string,
     nodeDetail: NodeDetail | ActivityNodeDetail
   ): Promise<string> {
     try {
@@ -29,7 +30,7 @@ export class NodeManager {
         {
           routeKey: RouteKeys.createNode,
           payload: nodeDetail,
-          headers: { 'mex-workspace-id': workspaceId },
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
 
@@ -48,6 +49,7 @@ export class NodeManager {
   async getNode(
     nodeId: string,
     workspaceId: string,
+    idToken: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     queryParams?: any
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -59,7 +61,7 @@ export class NodeManager {
         {
           routeKey: RouteKeys.getNode,
           pathParameters: { id: nodeId },
-          headers: { 'mex-workspace-id': workspaceId },
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
           ...(queryParams && { queryStringParameters: queryParams }),
         }
       );
@@ -83,6 +85,7 @@ export class NodeManager {
   async appendNode(
     nodeId: string,
     workspaceId: string,
+    idToken: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     block: any
   ): Promise<string> {
@@ -94,7 +97,7 @@ export class NodeManager {
           routeKey: RouteKeys.appendNode,
           payload: block,
           pathParameters: { id: nodeId },
-          headers: { 'mex-workspace-id': workspaceId },
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
 
@@ -110,7 +113,11 @@ export class NodeManager {
     }
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async getAllNodes(userId: string, workspaceId: string): Promise<any> {
+  async getAllNodes(
+    userId: string,
+    workspaceId: string,
+    idToken: string
+  ): Promise<any> {
     try {
       const response = await this._lambda.invoke(
         this._nodeLambdaFunctionName,
@@ -118,7 +125,7 @@ export class NodeManager {
         {
           routeKey: RouteKeys.getAllNodes,
           pathParameters: { id: userId },
-          headers: { 'mex-workspace-id': workspaceId },
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
       const result: string = response.body;
@@ -147,7 +154,8 @@ export class NodeManager {
     blockId: string,
     sourceNodeId: string,
     destinationNodeId: string,
-    workspaceId: string
+    workspaceId: string,
+    idToken: string
   ): Promise<string> {
     try {
       const payload: CopyOrMoveBlock = {
@@ -163,7 +171,7 @@ export class NodeManager {
         {
           routeKey: RouteKeys.copyOrMoveBlock,
           payload: payload,
-          headers: { 'mex-workspace-id': workspaceId },
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
       return response.body;
@@ -177,31 +185,43 @@ export class NodeManager {
       });
     }
   }
-  async makeNodePublic(nodeId: string, workspaceId: string): Promise<any> {
+  async makeNodePublic(
+    nodeId: string,
+    workspaceId: string,
+    idToken: string
+  ): Promise<any> {
     const response = await this._lambda.invoke(
       this._nodeLambdaFunctionName,
       this._lambdaInvocationType,
       {
         routeKey: RouteKeys.makeNodePublic,
         pathParameters: { id: nodeId },
-        headers: { 'mex-workspace-id': workspaceId },
+        headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
       }
     );
     return response;
   }
-  async makeNodePrivate(nodeId: string, workspaceId: string): Promise<any> {
+  async makeNodePrivate(
+    nodeId: string,
+    workspaceId: string,
+    idToken: string
+  ): Promise<any> {
     const response = await this._lambda.invoke(
       this._nodeLambdaFunctionName,
       this._lambdaInvocationType,
       {
         routeKey: RouteKeys.makeNodePrivate,
         pathParameters: { id: nodeId },
-        headers: { 'mex-workspace-id': workspaceId },
+        headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
       }
     );
     return response;
   }
-  async getPublicNode(nodeId: string, workspaceId: string): Promise<string> {
+  async getPublicNode(
+    nodeId: string,
+    workspaceId: string,
+    idToken: string
+  ): Promise<string> {
     try {
       const result = await this._lambda.invoke(
         this._nodeLambdaFunctionName,
@@ -209,7 +229,7 @@ export class NodeManager {
         {
           routeKey: RouteKeys.getPublicNode,
           pathParameters: { id: nodeId },
-          headers: { 'mex-workspace-id': workspaceId },
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
 

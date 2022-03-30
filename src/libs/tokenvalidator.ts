@@ -103,7 +103,7 @@ const TokenHandler = async (
       throw new Error('claim issuer is invalid');
     }
 
-    if (claim.token_use !== 'access') {
+    if (claim.token_use !== 'id') {
       throw new Error('claim use is not id');
     }
 
