@@ -136,11 +136,16 @@ class NodeController {
 
           //Query the backend for the remaining activity node blocks.
           const remainingActivityBlocks = JSON.parse(
-            await this._nodeManager.getNode(`NODE_${userId}`, workspaceId, {
-              ...defaultQueryStringParameters,
-              blockSize: noOfActivityBlocks,
-              ...(cursor && { startCursor: cursor }),
-            })
+            await this._nodeManager.getNode(
+              `NODE_${userId}`,
+              workspaceId,
+              response.locals.idToken,
+              {
+                ...defaultQueryStringParameters,
+                blockSize: noOfActivityBlocks,
+                ...(cursor && { startCursor: cursor }),
+              }
+            )
           );
 
           // Append with the cached blocks from the last
@@ -178,6 +183,7 @@ class NodeController {
           await this._nodeManager.getNode(
             `NODE_${userId}`,
             workspaceId,
+            response.locals.idToken,
             defaultQueryStringParameters
           )
         );
@@ -235,7 +241,8 @@ class NodeController {
 
       const existingActivityNode = await this._nodeManager.getNode(
         userId,
-        workspaceIdentifier
+        workspaceIdentifier,
+        response.locals.idToken
       );
 
       if (!existingActivityNode.message)
@@ -252,6 +259,7 @@ class NodeController {
       const result = JSON.parse(
         await this._nodeManager.createNode(
           workspaceIdentifier,
+          response.locals.idToken,
           activityNodeDetail
         )
       ) as NodeResponse;
@@ -301,6 +309,7 @@ class NodeController {
             await this._nodeManager.appendNode(
               activityNodeUID,
               workspaceId,
+              response.locals.idToken,
               activityNodeDetail
             )
           );
@@ -311,6 +320,7 @@ class NodeController {
             await this._nodeManager.getNode(
               activityNodeUID,
               workspaceId,
+              response.locals.idToken,
               defaultQueryStringParameters
             )
           );
@@ -350,6 +360,7 @@ class NodeController {
           const activityPromise = this._nodeManager.appendNode(
             activityNodeUID,
             workspaceId,
+            response.locals.idToken,
             activityNodeDetail
           );
 
@@ -371,6 +382,7 @@ class NodeController {
 
             hierarchyPromise = this._nodeManager.createNode(
               workspaceId,
+              response.locals.idToken,
               nodeDetail
             );
           } else if (reqBody.appendNodeUID) {
@@ -388,6 +400,7 @@ class NodeController {
             hierarchyPromise = this._nodeManager.appendNode(
               reqBody.appendNodeUID,
               workspaceId,
+              response.locals.idToken,
               appendDetail
             );
           }
@@ -421,6 +434,7 @@ class NodeController {
             await this._nodeManager.getNode(
               activityNodeUID,
               workspaceId,
+              response.locals.idToken,
               defaultQueryStringParameters
             )
           );
@@ -525,6 +539,7 @@ class NodeController {
       const result = await this._nodeManager.appendNode(
         activityNodeUID,
         workspaceId,
+        response.locals.idToken,
         activityNodeDetail
       );
 
@@ -563,6 +578,7 @@ class NodeController {
 
       const nodeResult = await this._nodeManager.createNode(
         workspaceId,
+        response.locals.idToken,
         nodeDetail
       );
 
@@ -601,6 +617,7 @@ class NodeController {
         await this._nodeManager.appendNode(
           requestDetail.data.appendNodeUID,
           workspaceId,
+          response.locals.idToken,
           appendDetail
         )
       );
@@ -625,7 +642,12 @@ class NodeController {
       const result = await this._cache.getOrSet(
         request.params.userId,
         this._allNodesEntityLabel,
-        () => this._nodeManager.getAllNodes(request.params.userId, workspaceId)
+        () =>
+          this._nodeManager.getAllNodes(
+            request.params.userId,
+            workspaceId,
+            response.locals.idToken
+          )
       );
       response
         .contentType('application/json')
@@ -646,7 +668,8 @@ class NodeController {
       const workspaceId = request.headers['mex-workspace-id'].toString();
       const result = await this._nodeManager.getNode(
         request.params.nodeId,
-        workspaceId
+        workspaceId,
+        response.locals.idToken
       );
 
       if (JSON.parse(result).message)
@@ -681,7 +704,8 @@ class NodeController {
         requestDetail.data.blockId,
         requestDetail.data.sourceNodeId,
         requestDetail.data.destinationNodeId,
-        workspaceId
+        workspaceId,
+        response.locals.idToken
       );
 
       if (result) {
@@ -708,7 +732,8 @@ class NodeController {
 
       const result = await this._nodeManager.makeNodePublic(
         nodeId,
-        workspaceId
+        workspaceId,
+        response.locals.idToken
       );
 
       const resp = {
@@ -735,7 +760,8 @@ class NodeController {
 
       const result = await this._nodeManager.makeNodePrivate(
         nodeId,
-        workspaceId
+        workspaceId,
+        response.locals.idToken
       );
 
       const resp = {
@@ -760,7 +786,11 @@ class NodeController {
       const nodeId = request.params.nodeId;
       const workspaceId = request.headers['mex-workspace-id'].toString();
 
-      const result = await this._nodeManager.getPublicNode(nodeId, workspaceId);
+      const result = await this._nodeManager.getPublicNode(
+        nodeId,
+        workspaceId,
+        response.locals.idToken
+      );
 
       if (JSON.parse(result).message) {
         throw new Error(JSON.parse(result).message);

@@ -19,6 +19,7 @@ async function AuthRequest(
       res.locals.userEmail = result.userEmail;
       res.locals.userId = result.userId.replace(/-/g, '');
       res.locals.userIdRaw = result.userId;
+      res.locals.idToken = req.headers.authorization;
       next();
     } else throw new Error(result.error);
   } catch (error) {
