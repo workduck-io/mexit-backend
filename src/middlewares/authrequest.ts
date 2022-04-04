@@ -23,7 +23,7 @@ async function AuthRequest(
       next();
     } else throw new Error(result.error);
   } catch (error) {
-    res.status(statusCodes.FORBIDDEN).send({
+    res.status(statusCodes.UNAUTHORIZED).send({
       message: error.message,
       statusCode: statusCodes.FORBIDDEN,
       errorCode: errorCodes.AUTH_ERROR,

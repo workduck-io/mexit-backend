@@ -16,9 +16,8 @@ class OAuth2Controller {
   private _gotClient: GotClient = container.get<GotClient>(GotClient);
   private _oauth2Client: OAuth2Client;
 
-  private static readonly redirectUri = IS_DEV
-    ? 'http://localhost:5000/api/v1/oauth2/google'
-    : 'https://mex-webapp-dev.workduck.io/api/v1/oauth2/google';
+  private static readonly redirectUri =
+    'https://mex-webapp-dev.workduck.io/api/v1/oauth2/google';
   private static readonly googleOAuthTokenUrl =
     'https://www.googleapis.com/oauth2/v4/token';
 
