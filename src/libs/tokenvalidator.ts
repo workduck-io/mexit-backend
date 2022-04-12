@@ -108,7 +108,7 @@ const TokenHandler = async (
     }
 
     result = {
-      userEmail: claim.username,
+      userEmail: claim.email,
       userId: claim.sub,
       eventId: claim.event_id,
       isValid: true,
