@@ -139,3 +139,8 @@ export interface CopyOrMoveBlock {
   destinationNodeID: string;
   action: 'move';
 }
+
+export interface ILink {
+  nodeId: string;
+  path: string;
+}

@@ -16,6 +16,7 @@ import { RouteKeys } from '../libs/routeKeys';
 export class NodeManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
   private _nodeLambdaFunctionName = 'mex-backend-test-Node';
+  private _workspaceLambdaFunctionName = 'mex-backend-test-Workspace';
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
   async createNode(
@@ -229,6 +230,32 @@ export class NodeManager {
         {
           routeKey: RouteKeys.getPublicNode,
           pathParameters: { id: nodeId },
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        }
+      );
+
+      const response: string = result.body;
+      return response;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+  async getLinkHierarchy(
+    workspaceId: string,
+    idToken: string
+  ): Promise<string> {
+    try {
+      const result = await this._lambda.invoke(
+        this._workspaceLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.getLinkHierarchy,
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );

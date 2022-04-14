@@ -15,4 +15,5 @@ export const RouteKeys = {
   makeNodePrivate: 'PATCH /node/makePrivate/{id}',
   getPublicNode: 'GET /node/public/{id}',
   getUserByLinkedin: 'POST /user/linkedin',
+  getLinkHierarchy: 'GET /workspace/hierarchy',
 };

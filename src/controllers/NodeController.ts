@@ -12,7 +12,7 @@ import { Cache } from '../libs/CacheClass';
 import _ from 'lodash';
 import { NodeDetail, QueryStringParameters } from '../interfaces/Node';
 import GuidGenerator from '../libs/GuidGenerator';
-
+import linkData from '../linkhierarchy.json';
 class NodeController {
   public _urlPath = '/node';
   public _router = express.Router();
@@ -31,7 +31,11 @@ class NodeController {
 
   public initializeRoutes(): void {
     this._router.post(this._urlPath, [AuthRequest], this.createNode);
-
+    this._router.get(
+      `${this._urlPath}/linkhierarchy`,
+      [AuthRequest],
+      this.getLinkHierarchy
+    );
     this._router.post(
       `${this._urlPath}/:nodeId/append`,
       [AuthRequest],
@@ -809,6 +813,38 @@ class NodeController {
         message: error.message,
       };
       response.status(statusCodes.INTERNAL_SERVER_ERROR).json(resp);
+    }
+  };
+
+  getLinkHierarchy = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('workspace-id header missing');
+      const workspaceId = request.headers['mex-workspace-id'].toString();
+      const linkDataResult = await this._nodeManager.getLinkHierarchy(
+        workspaceId,
+        response.locals.idToken
+      );
+      let allNodes = linkDataResult.replace('[', '');
+      allNodes = allNodes.replace(']', '');
+      allNodes = allNodes.replace(/"/g, '');
+      const linkResponse = allNodes.split(',');
+      console.log({ linkResponse });
+
+      const result = await this._transformer.decodeLinkHierarchy(linkResponse);
+      response
+        .contentType('application/json')
+        .status(statusCodes.OK)
+        .send(result);
+    } catch (error) {
+      console.error(error);
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ errorMsg: error.message })
+        .json();
     }
   };
 }
