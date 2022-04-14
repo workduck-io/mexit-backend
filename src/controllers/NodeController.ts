@@ -821,9 +821,20 @@ class NodeController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers['workspace-id'])
+      if (!request.headers['mex-workspace-id'])
         throw new Error('workspace-id header missing');
-      const result = await this._transformer.decodeLinkHierarchy(linkData);
+      const workspaceId = request.headers['mex-workspace-id'].toString();
+      const linkDataResult = await this._nodeManager.getLinkHierarchy(
+        workspaceId,
+        response.locals.idToken
+      );
+      let allNodes = linkDataResult.replace('[', '');
+      allNodes = allNodes.replace(']', '');
+      allNodes = allNodes.replace(/"/g, '');
+      const linkResponse = allNodes.split(',');
+      console.log({ linkResponse });
+
+      const result = await this._transformer.decodeLinkHierarchy(linkResponse);
       response
         .contentType('application/json')
         .status(statusCodes.OK)
