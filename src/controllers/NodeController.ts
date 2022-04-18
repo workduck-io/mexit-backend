@@ -22,6 +22,7 @@ class NodeController {
   public _transformer: Transformer = container.get<Transformer>(Transformer);
   private _cache: Cache = container.get<Cache>(Cache);
   private _allNodesEntityLabel = 'ALLNODES';
+  private _linkHierarchyLabel = 'LINKHIERARCHY';
   private _activityNodeLabel = 'ACTIVITYNODE';
   private _defaultActivityBlockCacheSize = 5;
 
@@ -824,15 +825,19 @@ class NodeController {
       if (!request.headers['mex-workspace-id'])
         throw new Error('workspace-id header missing');
       const workspaceId = request.headers['mex-workspace-id'].toString();
-      const linkDataResult = await this._nodeManager.getLinkHierarchy(
-        workspaceId,
-        response.locals.idToken
+      const linkDataResult = await this._cache.getOrSet(
+        request.params.userId,
+        this._linkHierarchyLabel,
+        () =>
+          this._nodeManager.getLinkHierarchy(
+            workspaceId,
+            response.locals.idToken
+          )
       );
       let allNodes = linkDataResult.replace('[', '');
       allNodes = allNodes.replace(']', '');
       allNodes = allNodes.replace(/"/g, '');
       const linkResponse = allNodes.split(',');
-      console.log({ linkResponse });
 
       const result = await this._transformer.decodeLinkHierarchy(linkResponse);
       response

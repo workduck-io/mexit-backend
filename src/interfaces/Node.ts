@@ -141,6 +141,6 @@ export interface CopyOrMoveBlock {
 }
 
 export interface ILink {
-  nodeId: string;
+  nodeid: string;
   path: string;
 }
