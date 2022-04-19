@@ -702,6 +702,21 @@
             ],
             "type": "object"
         },
+        "ILink": {
+            "properties": {
+                "nodeid": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "nodeid",
+                "path"
+            ],
+            "type": "object"
+        },
         "LinkCapture": {
             "properties": {
                 "long": {
