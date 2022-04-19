@@ -249,7 +249,7 @@ export class NodeManager {
   async getLinkHierarchy(
     workspaceId: string,
     idToken: string
-  ): Promise<string> {
+  ): Promise<string[]> {
     try {
       const result = await this._lambda.invoke(
         this._workspaceLambdaFunctionName,
@@ -261,7 +261,11 @@ export class NodeManager {
       );
 
       const response: string = result.body;
-      return response;
+      let allNodes = response.replace('[', '');
+      allNodes = allNodes.replace(']', '');
+      allNodes = allNodes.replace(/"/g, '');
+      const linkResponse = allNodes.split(',');
+      return linkResponse;
     } catch (error) {
       errorlib({
         message: error.message,

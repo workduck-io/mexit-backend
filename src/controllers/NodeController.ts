@@ -834,12 +834,10 @@ class NodeController {
             response.locals.idToken
           )
       );
-      let allNodes = linkDataResult.replace('[', '');
-      allNodes = allNodes.replace(']', '');
-      allNodes = allNodes.replace(/"/g, '');
-      const linkResponse = allNodes.split(',');
 
-      const result = await this._transformer.decodeLinkHierarchy(linkResponse);
+      const result = await this._transformer.decodeLinkHierarchy(
+        linkDataResult
+      );
       response
         .contentType('application/json')
         .status(statusCodes.OK)
