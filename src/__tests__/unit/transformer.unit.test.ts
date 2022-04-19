@@ -10,13 +10,13 @@ describe('Transformer Module', () => {
 
       expect(iLinks.length).toEqual(6);
       // Assert the nodeId
-      expect(iLinks[0].nodeId).toEqual('Aid');
-      expect(iLinks[1].nodeId).toEqual('Bid');
-      expect(iLinks[2].nodeId).toEqual('Cid');
-      expect(iLinks[3].nodeId).toEqual('Fid');
-      expect(iLinks[4].nodeId).toEqual('Rid');
-      expect(iLinks[5].nodeId).toEqual('Qid');
-      // Assert the node path
+      expect(iLinks[0].nodeid).toEqual('Aid');
+      expect(iLinks[1].nodeid).toEqual('Bid');
+      expect(iLinks[2].nodeid).toEqual('Cid');
+      expect(iLinks[3].nodeid).toEqual('Fid');
+      expect(iLinks[4].nodeid).toEqual('Rid');
+      expect(iLinks[5].nodeid).toEqual('Qid');
+    // Assert the node path
       expect(iLinks[0].path).toEqual('A');
       expect(iLinks[1].path).toEqual('A.B');
       expect(iLinks[2].path).toEqual('A.B.C');
@@ -27,7 +27,7 @@ describe('Transformer Module', () => {
   });
 
   describe('Decode link hierarchy to ILink format - Fail Case', () => {
-    it('should return the decoded nodeId and the corresponding node path', async () => {
+    it('should return the decoded nodeid and the corresponding node path', async () => {
       const linkHierarchy = ['A#Aid#B#Bid#C#Cid', 'F#Fid', 'R#Rid#Q#Qid', 'C#'];
       expect(
         async () => await transformer.decodeLinkHierarchy(linkHierarchy)
