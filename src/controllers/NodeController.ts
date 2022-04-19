@@ -22,6 +22,7 @@ class NodeController {
   public _transformer: Transformer = container.get<Transformer>(Transformer);
   private _cache: Cache = container.get<Cache>(Cache);
   private _allNodesEntityLabel = 'ALLNODES';
+  private _linkHierarchyLabel = 'LINKHIERARCHY';
   private _activityNodeLabel = 'ACTIVITYNODE';
   private _defaultActivityBlockCacheSize = 5;
 
@@ -471,6 +472,12 @@ class NodeController {
           break;
         }
       }
+      // update the Link hierarchy cache
+      await this.updateILinkCache(
+        request.params.userId,
+        workspaceId,
+        response.locals.idToken
+      );
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
@@ -478,6 +485,20 @@ class NodeController {
         .json();
     }
   };
+
+  async updateILinkCache(
+    userId: string,
+    workspaceId: string,
+    idToken: string
+  ): Promise<void> {
+    if (this._cache.has(userId, this._linkHierarchyLabel)) {
+      const result = await this._nodeManager.getLinkHierarchy(
+        workspaceId,
+        idToken
+      );
+      this._cache.set(userId, this._linkHierarchyLabel, result);
+    }
+  }
 
   createLinkCapture = async (
     request: Request,
@@ -549,6 +570,13 @@ class NodeController {
 
       const resp = JSON.parse(result);
 
+      // update the Link hierarchy cache
+      await this.updateILinkCache(
+        request.params.userId,
+        workspaceId,
+        response.locals.idToken
+      );
+
       if (resp.message) throw new Error(resp.message);
 
       resp.shortenedURL = shortenedURL;
@@ -584,6 +612,13 @@ class NodeController {
         workspaceId,
         response.locals.idToken,
         nodeDetail
+      );
+
+      // update the Link hierarchy cache
+      await this.updateILinkCache(
+        request.params.userId,
+        workspaceId,
+        response.locals.idToken
       );
 
       const deserialisedContent = this._transformer.genericNodeConverter(
@@ -624,6 +659,13 @@ class NodeController {
           response.locals.idToken,
           appendDetail
         )
+      );
+
+      // update the Link hierarchy cache
+      await this.updateILinkCache(
+        request.params.userId,
+        workspaceId,
+        response.locals.idToken
       );
 
       if (result.message) throw new Error(result.message);
@@ -824,17 +866,19 @@ class NodeController {
       if (!request.headers['mex-workspace-id'])
         throw new Error('workspace-id header missing');
       const workspaceId = request.headers['mex-workspace-id'].toString();
-      const linkDataResult = await this._nodeManager.getLinkHierarchy(
-        workspaceId,
-        response.locals.idToken
+      const linkDataResult = await this._cache.getOrSet(
+        request.params.userId,
+        this._linkHierarchyLabel,
+        () =>
+          this._nodeManager.getLinkHierarchy(
+            workspaceId,
+            response.locals.idToken
+          )
       );
-      let allNodes = linkDataResult.replace('[', '');
-      allNodes = allNodes.replace(']', '');
-      allNodes = allNodes.replace(/"/g, '');
-      const linkResponse = allNodes.split(',');
-      console.log({ linkResponse });
 
-      const result = await this._transformer.decodeLinkHierarchy(linkResponse);
+      const result = await this._transformer.decodeLinkHierarchy(
+        linkDataResult
+      );
       response
         .contentType('application/json')
         .status(statusCodes.OK)

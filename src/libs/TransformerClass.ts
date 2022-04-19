@@ -58,7 +58,7 @@ export class Transformer {
             );
 
           iLinks.push({
-            nodeId: delimitedStrings[index + 1],
+            nodeid: delimitedStrings[index + 1],
             path: cumulativePath,
           });
 

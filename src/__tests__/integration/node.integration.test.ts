@@ -1,6 +1,27 @@
 import { NodeDetail } from '../../interfaces/Node';
 import container from '../../inversify.config';
 import { NodeManager } from '../../managers/NodeManager';
+import got from 'got';
+
+const WORKSPACE_ID = process.env.MEXIT_BACKEND_WORKSPACE_ID;
+const REFRESH_TOKEN = process.env.MEXIT_BACKEND_REFRESH_TOKEN;
+const CLIENT_ID = process.env.MEXIT_BACKEND_CLIENT_ID;
+
+const getIdToken = async () => {
+  const URL = 'https://workduck.auth.us-east-1.amazoncognito.com/oauth2/token';
+  const ID_TOKEN = (
+    (await got
+      .post(URL, {
+        form: {
+          grant_type: 'refresh_token',
+          client_id: CLIENT_ID,
+          refresh_token: REFRESH_TOKEN,
+        },
+      })
+      .json()) as any
+  ).id_token;
+  return `Bearer ${ID_TOKEN}`;
+};
 
 // Increased the timeout for the lambda cold start issue
 jest.setTimeout(15000);
@@ -8,6 +29,7 @@ describe('Node Manager', () => {
   const nodeManager: NodeManager = container.get<NodeManager>(NodeManager);
   describe('Create a node function', () => {
     it('should create a node and return it as a response', async () => {
+      const ID_TOKEN = await getIdToken();
       const testNodeDetail: NodeDetail = {
         id: 'NODE_test-user-id',
         namespaceIdentifier: 'test-namespace',
@@ -15,8 +37,10 @@ describe('Node Manager', () => {
         lastEditedBy: 'testuser@testorg.com',
         type: 'NodeRequest',
       };
+
       const testNodeResult = await nodeManager.createNode(
-        'test-workspace',
+        WORKSPACE_ID,
+        ID_TOKEN,
         testNodeDetail
       );
 
@@ -26,16 +50,22 @@ describe('Node Manager', () => {
   });
   describe('Get node function', () => {
     it('should return corresponding the node for the given node id', async () => {
+      const ID_TOKEN = await getIdToken();
       const nodeId = 'NODE_test-user-id';
-      const node = await nodeManager.getNode(nodeId, 'test-workspace');
+      const node = await nodeManager.getNode(nodeId, WORKSPACE_ID, ID_TOKEN);
 
       expect(JSON.parse(node)).toBeTruthy();
     });
   });
   describe('Get all nodes function', () => {
     it('should return all the node ids for the given user', async () => {
+      const ID_TOKEN = await getIdToken();
       const userId = 'WORKSPACE1';
-      const allNodes = await nodeManager.getAllNodes(userId, 'test-workspace');
+      const allNodes = await nodeManager.getAllNodes(
+        userId,
+        WORKSPACE_ID,
+        ID_TOKEN
+      );
 
       expect(allNodes.length).toBeGreaterThan(0);
     });
@@ -43,6 +73,7 @@ describe('Node Manager', () => {
 
   describe('Append node function', () => {
     it('should return no content with status code 204', async () => {
+      const ID_TOKEN = await getIdToken();
       const appendNodeDetail = {
         type: 'ElementRequest',
         elements: [
@@ -65,7 +96,8 @@ describe('Node Manager', () => {
       const appendNodeResult = JSON.parse(
         await nodeManager.appendNode(
           'NODE_test-user-id',
-          'test-workspace',
+          WORKSPACE_ID,
+          ID_TOKEN,
           appendNodeDetail
         )
       );
@@ -75,6 +107,7 @@ describe('Node Manager', () => {
   });
   describe('Move Block function', () => {
     it('should return no content with status code 204', async () => {
+      const ID_TOKEN = await getIdToken();
       const blockId = 'BLOCK_test-block';
       const sourceNodeId = 'NODE_test-user-id';
 
@@ -85,14 +118,15 @@ describe('Node Manager', () => {
         lastEditedBy: 'testuser@testorg.com',
         type: 'NodeRequest',
       };
-      await nodeManager.createNode('test-workspace', testNodeDetail);
+      await nodeManager.createNode(WORKSPACE_ID, ID_TOKEN, testNodeDetail);
       const destinationNodeId = 'NODE_destination-node';
 
       const movedBlocks = await nodeManager.moveBlocks(
         blockId,
         sourceNodeId,
         destinationNodeId,
-        'test-workspace'
+        WORKSPACE_ID,
+        ID_TOKEN
       );
 
       const parsedResult = movedBlocks ? JSON.parse(movedBlocks) : movedBlocks;
@@ -104,6 +138,7 @@ describe('Node Manager', () => {
   // unit tests for the failure cases
   describe('Create a node function - Fail Case', () => {
     it('should return undefined as the type is given invalid for the payload', async () => {
+      const ID_TOKEN = await getIdToken();
       const testNodeDetail: NodeDetail = {
         id: 'NODE_test-user-id',
         namespaceIdentifier: 'test-namespace',
@@ -112,39 +147,57 @@ describe('Node Manager', () => {
         type: 'InvalidTypeRequest',
       };
       const testNodeResult = await nodeManager.createNode(
-        'test-workspace',
+        WORKSPACE_ID,
+        ID_TOKEN,
         testNodeDetail
       );
 
-      expect(JSON.parse(testNodeResult).message).toEqual('Error in Input');
+      expect(JSON.parse(testNodeResult).message).toContain('Error');
     });
   });
   describe('Get node function - Fail Case', () => {
     it('should return undefined for the given node id', async () => {
+      const ID_TOKEN = await getIdToken();
       const nodeId = 'NODE_does-not-exist';
-      const node = await nodeManager.getNode('test-workspace', nodeId);
+      const node = await nodeManager.getNode(
+        nodeId,
+        WORKSPACE_ID,
+        ID_TOKEN,
+        nodeId
+      );
 
-      expect(node.message).toEqual('Error getting node');
+      expect(node.message).toContain('Error');
     });
   });
   describe('Get all nodes function - Fail Case 1', () => {
     it('should return empty array for the given user', async () => {
+      const ID_TOKEN = await getIdToken();
       const userId = 'USER_does-not-exist';
-      const allNodes = await nodeManager.getAllNodes(userId, 'test-workspace');
+      const allNodes = await nodeManager.getAllNodes(
+        userId,
+        WORKSPACE_ID,
+        ID_TOKEN
+      );
 
       expect(allNodes.length).toEqual(0);
     });
   });
   describe('Get all nodes function - Fail Case 2', () => {
     it('should return empty array for the invalid user', async () => {
+      const ID_TOKEN = await getIdToken();
       const userId = 'does-not-exist';
-      const allNodes = await nodeManager.getAllNodes(userId, 'test-workspace');
+      const allNodes = await nodeManager.getAllNodes(
+        userId,
+        WORKSPACE_ID,
+        ID_TOKEN
+      );
 
       expect(allNodes.message).toEqual('Invalid ID');
     });
   });
   describe('Append node function - Fail Case', () => {
     it('should return error message when passing invalid node id and payload for append', async () => {
+      const ID_TOKEN = await getIdToken();
       const appendNodeDetail = {
         type: 'ElementRequest',
         elements: [
@@ -158,7 +211,8 @@ describe('Node Manager', () => {
       const appendNodeResult = JSON.parse(
         await nodeManager.appendNode(
           'NODE_invalid-node-id',
-          'test-workspace',
+          WORKSPACE_ID,
+          ID_TOKEN,
           appendNodeDetail
         )
       );
@@ -168,15 +222,25 @@ describe('Node Manager', () => {
   });
   describe('Make Node Public by UID', () => {
     it('make the node by given UID public', async () => {
+      const ID_TOKEN = await getIdToken();
       const nodeId = 'NODE_test-user-id';
-      const node = await nodeManager.makeNodePublic(nodeId, 'test-workspace');
+      const node = await nodeManager.makeNodePublic(
+        nodeId,
+        WORKSPACE_ID,
+        ID_TOKEN
+      );
       expect(JSON.parse(node.body)).toBe(nodeId);
     });
   });
   describe('Get public node by UID', () => {
     it('should return the corresponding public node for the given node id', async () => {
+      const ID_TOKEN = await getIdToken();
       const nodeId = 'NODE_test-user-id';
-      const node = await nodeManager.getPublicNode(nodeId, 'test-workspace');
+      const node = await nodeManager.getPublicNode(
+        nodeId,
+        WORKSPACE_ID,
+        ID_TOKEN
+      );
 
       expect(JSON.parse(node).id).toBe(nodeId);
       expect(JSON.parse(node).data.length).toBeGreaterThan(0);
@@ -184,15 +248,25 @@ describe('Node Manager', () => {
   });
   describe('Make Node Private by UID', () => {
     it('make the node by given UID private', async () => {
+      const ID_TOKEN = await getIdToken();
       const nodeId = 'NODE_test-user-id';
-      const node = await nodeManager.makeNodePrivate(nodeId, 'test-workspace');
+      const node = await nodeManager.makeNodePrivate(
+        nodeId,
+        WORKSPACE_ID,
+        ID_TOKEN
+      );
       expect(JSON.parse(node.body)).toBe(nodeId);
     });
   });
   describe('Get node by UID - Fail Case', () => {
     it('should fail since the given node UID was made private', async () => {
+      const ID_TOKEN = await getIdToken();
       const nodeId = 'NODE_FAILPUBLICNODE';
-      const node = await nodeManager.getPublicNode(nodeId, 'test-workspace');
+      const node = await nodeManager.getPublicNode(
+        nodeId,
+        WORKSPACE_ID,
+        ID_TOKEN
+      );
 
       expect(JSON.parse(node).message).toBe('Node not available');
     });
