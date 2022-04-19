@@ -825,15 +825,30 @@ class NodeController {
       if (!request.headers['mex-workspace-id'])
         throw new Error('workspace-id header missing');
       const workspaceId = request.headers['mex-workspace-id'].toString();
-      const linkDataResult = await this._cache.getOrSet(
-        request.params.userId,
-        this._linkHierarchyLabel,
-        () =>
-          this._nodeManager.getLinkHierarchy(
-            workspaceId,
-            response.locals.idToken
-          )
-      );
+      const shouldRefresh = request.query.hardRefresh === 'true';
+      let linkDataResult: string[];
+
+      if (shouldRefresh) {
+        linkDataResult = await this._nodeManager.getLinkHierarchy(
+          workspaceId,
+          response.locals.idToken
+        );
+        this._cache.set(
+          request.params.userId,
+          this._linkHierarchyLabel,
+          linkDataResult
+        );
+      } else {
+        linkDataResult = await this._cache.getOrSet(
+          request.params.userId,
+          this._linkHierarchyLabel,
+          () =>
+            this._nodeManager.getLinkHierarchy(
+              workspaceId,
+              response.locals.idToken
+            )
+        );
+      }
 
       const result = await this._transformer.decodeLinkHierarchy(
         linkDataResult
