@@ -496,7 +496,7 @@ class NodeController {
         workspaceId,
         idToken
       );
-      this._cache.set(userId, this._linkHierarchyLabel, result);
+      this._cache.replaceAndSet(userId, this._linkHierarchyLabel, result);
     }
   }
 
