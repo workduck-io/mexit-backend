@@ -28,6 +28,9 @@
                 "path": {
                     "type": "string"
                 },
+                "title": {
+                    "type": "string"
+                },
                 "type": {
                     "type": "string"
                 }
@@ -38,6 +41,7 @@
                 "lastEditedBy",
                 "namespaceIdentifier",
                 "nodeschemaIdentifier",
+                "title",
                 "type"
             ],
             "type": "object"
@@ -359,12 +363,16 @@
                     ],
                     "type": "object"
                 },
+                "title": {
+                    "type": "string"
+                },
                 "type": {
                     "type": "string"
                 }
             },
             "required": [
-                "id"
+                "id",
+                "title"
             ],
             "type": "object"
         },
@@ -457,13 +465,17 @@
                     ],
                     "type": "object"
                 },
+                "title": {
+                    "type": "string"
+                },
                 "type": {
                     "type": "string"
                 }
             },
             "required": [
                 "createdBy",
-                "id"
+                "id",
+                "title"
             ],
             "type": "object"
         },
@@ -562,6 +574,9 @@
                     ],
                     "type": "object"
                 },
+                "title": {
+                    "type": "string"
+                },
                 "type": {
                     "type": "string"
                 },
@@ -577,6 +592,7 @@
                 "createdBy",
                 "id",
                 "namespaceIdentifier",
+                "title",
                 "updatedAt",
                 "workspaceIdentifier"
             ],
@@ -1126,6 +1142,9 @@
                 "path": {
                     "type": "string"
                 },
+                "title": {
+                    "type": "string"
+                },
                 "type": {
                     "type": "string"
                 }
@@ -1135,6 +1154,7 @@
                 "id",
                 "lastEditedBy",
                 "namespaceIdentifier",
+                "title",
                 "type"
             ],
             "type": "object"
