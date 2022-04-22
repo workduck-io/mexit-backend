@@ -2,6 +2,7 @@
 export interface NodeDetail {
   type: string;
   id: string;
+  title: string;
   path?: string;
   namespaceIdentifier: string;
   data: NodeData[];
@@ -60,6 +61,7 @@ export interface ContentBlock {
 
 export interface ContentNode {
   id: string;
+  title: string;
   content?: any[];
   range?: {
     startMeta: {

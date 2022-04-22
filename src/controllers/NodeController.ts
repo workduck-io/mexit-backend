@@ -254,6 +254,7 @@ class NodeController {
         throw new Error('Activity Node exists already');
 
       const activityNodeDetail: NodeDetail = {
+        title: 'activitynode',
         id: userId,
         namespaceIdentifier: '#mex-it',
         data: [],
@@ -378,6 +379,7 @@ class NodeController {
             const nodeDetail = {
               id: reqBody.createNodeUID,
               // nodePath: reqBody.nodePath,
+              title: reqBody.title,
               type: 'NodeRequest',
               lastEditedBy: response.locals.userEmail,
               namespaceIdentifier: 'NAMESPACE1',
@@ -602,6 +604,7 @@ class NodeController {
 
       const nodeDetail = {
         id: requestDetail.data.id,
+        title: requestDetail.data.title,
         type: 'NodeRequest',
         lastEditedBy: response.locals.userEmail,
         namespaceIdentifier: 'NAMESPACE1',

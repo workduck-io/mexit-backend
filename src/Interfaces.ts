@@ -21,6 +21,7 @@ import {
   ActivityNodeDetail,
   QueryStringParameters,
   CopyOrMoveBlock,
+  ILink,
 } from './interfaces/Node';
 import {
   ContentNodeRequest,
@@ -91,4 +92,5 @@ export default class Interfaces implements Definitions {
   CopyOrMoveBlock: CopyOrMoveBlock;
   UserPreference: UserPreference;
   GoogleAuthRefreshToken: GoogleAuthRefreshToken;
+  ILink: ILink;
 }
