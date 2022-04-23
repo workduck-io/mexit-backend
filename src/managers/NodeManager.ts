@@ -22,7 +22,7 @@ export class NodeManager {
   async createNode(
     workspaceId: string,
     idToken: string,
-    nodeDetail: NodeDetail | ActivityNodeDetail
+    nodeDetail: any
   ): Promise<string> {
     try {
       const result = await this._lambda.invoke(

@@ -5,7 +5,7 @@ export interface LinkNodeRequest extends LinkNode {
 }
 
 export interface ContentNodeRequest extends ContentNode {
-  createdBy: string;
+  createdBy?: string;
 }
 
 export interface SnippetUpdateVersionRequest extends ContentNode {

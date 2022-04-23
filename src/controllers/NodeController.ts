@@ -586,19 +586,19 @@ class NodeController {
       if (requestDetail.data.id === `NODE_${response.locals.userId}`)
         throw new Error('Cannot create a node using activitynode id.');
 
-      const nodeDetail = {
-        id: requestDetail.data.id,
-        title: requestDetail.data.title,
-        type: 'NodeRequest',
-        lastEditedBy: response.locals.userEmail,
-        namespaceIdentifier: 'NAMESPACE1',
-        data: serializeContent(requestDetail.data.content),
-      };
+      // const nodeDetail = {
+      //   id: requestDetail.data.id,
+      //   title: requestDetail.data.title,
+      //   type: 'NodeRequest',
+      //   lastEditedBy: response.locals.userEmail,
+      //   namespaceIdentifier: 'NAMESPACE1',
+      //   data: serializeContent(requestDetail.data.content),
+      // };
 
       const nodeResult = await this._nodeManager.createNode(
         workspaceId,
         response.locals.idToken,
-        nodeDetail
+        requestDetail.data
       );
 
       // update the Link hierarchy cache
