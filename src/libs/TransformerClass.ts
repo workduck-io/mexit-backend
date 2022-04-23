@@ -29,7 +29,7 @@ export class Transformer {
           reject(new Error('Invalid linkdata input'));
 
         let cumulativePath: string;
-        for (let index = 0; index < delimitedStrings.length; ) {
+        for (let index = 0; index < delimitedStrings.length;) {
           if (!cumulativePath) cumulativePath = delimitedStrings[index];
           else
             cumulativePath = cumulativePath.concat(
@@ -81,6 +81,7 @@ export class Transformer {
 
     const contentResponse = {
       id: nodeResponse.id,
+      title: nodeResponse.title,
       content: content,
       metadata: metadata,
       title: nodeResponse.title,
