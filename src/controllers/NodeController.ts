@@ -705,9 +705,9 @@ class NodeController {
         throw new Error(JSON.parse(result).message);
 
       const nodeResponse = JSON.parse(result) as NodeResponse;
-      const convertedResponse =
-        this._transformer.genericNodeConverter(nodeResponse);
-
+      // const convertedResponse =
+      //   this._transformer.genericNodeConverter(nodeResponse);
+      const convertedResponse = nodeResponse
       response
         .contentType('application/json')
         .status(statusCodes.OK)
