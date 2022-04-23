@@ -2,6 +2,7 @@ import { ClientNode, ContentNode, LinkNode } from './Node';
 
 export interface NodeResponse {
   id: string;
+  title: string;
   data: NodeDataResponse[];
   lastEditedBy: string;
   createdBy: string;

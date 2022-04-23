@@ -16,4 +16,13 @@ export const RouteKeys = {
   getPublicNode: 'GET /node/public/{id}',
   getUserByLinkedin: 'POST /user/linkedin',
   getLinkHierarchy: 'GET /workspace/hierarchy',
+  getSnippet: 'GET /snippet/{id}',
+  getAllVersionsOfSnippet: 'GET /snippet/{id}/all',
+  createSnippet: 'POST /snippet',
+  updateSnippet: 'PUT /snippet',
+  createNewVersionOfExistingSnippet: 'POST /snippet/newVersion',
+  makeSnippetPublic: 'PATCH /snippet/makePublic/{id}/{version}',
+  makeSnippetPrivate: 'PATCH /snippet/makePrivate/{id}/{version}',
+  getPublicSnippet: 'GET /snippet/public/{id}/{version}',
+  clonePublicSnippet: 'POST /snippet/clone/{id}/{version}',
 };
