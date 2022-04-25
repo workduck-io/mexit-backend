@@ -156,8 +156,6 @@ export class SnippetManager {
     workspaceId: string,
     idToken: string
   ): Promise<any> {
-    console.log({ idToken });
-
     const result = await this._lambda.invoke(
       this._snippetLambdaFunctionName,
       this._lambdaInvocationType,
