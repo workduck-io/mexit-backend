@@ -21,7 +21,6 @@ class NodeController {
     container.get<ShortenerManager>(ShortenerManager);
   public _transformer: Transformer = container.get<Transformer>(Transformer);
   private _cache: Cache = container.get<Cache>(Cache);
-  private _allNodesEntityLabel = 'ALLNODES';
   private _linkHierarchyLabel = 'LINKHIERARCHY';
   private _activityNodeLabel = 'ACTIVITYNODE';
   private _defaultActivityBlockCacheSize = 5;
@@ -422,21 +421,6 @@ class NodeController {
           if (JSON.parse(rawResults[1]).message)
             throw new Error(JSON.parse(rawResults[1]).message);
 
-          const newNode: NodeResponse = JSON.parse(rawResults[1]);
-
-          if (newNode) {
-            if (this._cache.has(userId, this._allNodesEntityLabel)) {
-              //update the cache for the get all nodes
-              const allNodes = JSON.parse(
-                await this._cache.get(userId, this._allNodesEntityLabel)
-              );
-
-              if (allNodes.message) return;
-              allNodes.push(newNode.id);
-              this._cache.set(userId, this._allNodesEntityLabel, allNodes);
-            }
-          }
-
           const updatedNode = JSON.parse(
             await this._nodeManager.getNode(
               activityNodeUID,
@@ -688,16 +672,12 @@ class NodeController {
         throw new Error('mex-workspace-id header missing');
 
       const workspaceId = request.headers['mex-workspace-id'].toString();
-      const result = await this._cache.getOrSet(
+      const result = await this._nodeManager.getAllNodes(
         request.params.userId,
-        this._allNodesEntityLabel,
-        () =>
-          this._nodeManager.getAllNodes(
-            request.params.userId,
-            workspaceId,
-            response.locals.idToken
-          )
+        workspaceId,
+        response.locals.idToken
       );
+
       response
         .contentType('application/json')
         .status(statusCodes.OK)

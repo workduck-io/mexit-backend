@@ -27,6 +27,7 @@ import {
   ContentNodeRequest,
   CopyOrMoveBlockRequest,
   LinkNodeRequest,
+  SnippetUpdateVersionRequest,
 } from './interfaces/Request';
 import {
   NodeResponse,
@@ -93,4 +94,5 @@ export default class Interfaces implements Definitions {
   UserPreference: UserPreference;
   GoogleAuthRefreshToken: GoogleAuthRefreshToken;
   ILink: ILink;
+  SnippetUpdateVersionRequest: SnippetUpdateVersionRequest;
 }
