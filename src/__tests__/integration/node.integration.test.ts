@@ -32,6 +32,7 @@ describe('Node Manager', () => {
       const ID_TOKEN = await getIdToken();
       const testNodeDetail: NodeDetail = {
         id: 'NODE_test-user-id',
+        title: 'test-title',
         namespaceIdentifier: 'test-namespace',
         data: [],
         lastEditedBy: 'testuser@testorg.com',
@@ -113,6 +114,7 @@ describe('Node Manager', () => {
 
       const testNodeDetail: NodeDetail = {
         id: 'NODE_destination-node',
+        title: 'test-title',
         namespaceIdentifier: 'test-namespace',
         data: [],
         lastEditedBy: 'testuser@testorg.com',
@@ -141,6 +143,7 @@ describe('Node Manager', () => {
       const ID_TOKEN = await getIdToken();
       const testNodeDetail: NodeDetail = {
         id: 'NODE_test-user-id',
+        title: 'test-title',
         namespaceIdentifier: 'test-namespace',
         data: [],
         lastEditedBy: 'testuser@testorg.com',
