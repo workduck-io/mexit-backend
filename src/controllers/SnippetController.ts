@@ -8,7 +8,6 @@ import { serializeContent } from '../libs/serialize';
 import { NodeResponse } from '../interfaces/Response';
 import { NodeDetail } from '../interfaces/Node';
 import { SnippetManager } from '../managers/SnippetManager';
-import { SnippetUpdate } from '../interfaces/Snippet';
 class SnippetController {
   public _urlPath = '/snippet';
   public _router = express.Router();
@@ -22,12 +21,6 @@ class SnippetController {
 
   public initializeRoutes(): void {
     this._router.post(this._urlPath, [AuthRequest], this.createSnippet);
-    this._router.post(
-      `${this._urlPath}/newVersion`,
-      [AuthRequest],
-      this.createNewVersionOfExistingSnippet
-    );
-    this._router.put(this._urlPath, [AuthRequest], this.updateSnippetVersion);
     this._router.get(
       `${this._urlPath}/:snippetId`,
       [AuthRequest],
@@ -55,7 +48,7 @@ class SnippetController {
     );
     this._router.get(
       `${this._urlPath}/public/:snippetId/:version`,
-      [],
+      [AuthRequest],
       this.getPublicSnippet
     );
     return;
@@ -81,99 +74,23 @@ class SnippetController {
         data: serializeContent(requestDetail.data.content),
       };
 
+      const createNextVersion = request.query.createNextVersion === 'true';
+
       const nodeResult = await this._snippetManager.createSnippet(
         workspaceId,
         response.locals.idToken,
-        snippetDetail
+        snippetDetail,
+        createNextVersion
       );
+
+      if (JSON.parse(nodeResult).message) {
+        throw new Error(JSON.parse(nodeResult).message);
+      }
 
       const deserialisedContent = this._transformer.genericNodeConverter(
         JSON.parse(nodeResult)
       );
 
-      response.json(deserialisedContent);
-    } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: error.toString() })
-        .json();
-    }
-  };
-
-  createNewVersionOfExistingSnippet = async (
-    request: Request,
-    response: Response
-  ): Promise<void> => {
-    try {
-      const requestDetail = new RequestClass(request, 'ContentNodeRequest');
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
-      const workspaceId = request.headers['mex-workspace-id'].toString();
-
-      const snippetDetail: NodeDetail = {
-        id: requestDetail.data.id,
-        title: requestDetail.data.title,
-        type: 'SnippetRequest',
-        lastEditedBy: response.locals.userEmail,
-        namespaceIdentifier: 'NAMESPACE1',
-        data: serializeContent(requestDetail.data.content),
-      };
-
-      const nodeResult =
-        await this._snippetManager.createNewVersionOfExistingSnippet(
-          workspaceId,
-          response.locals.idToken,
-          snippetDetail
-        );
-
-      const deserialisedContent = this._transformer.genericNodeConverter(
-        JSON.parse(nodeResult)
-      );
-      response.json(deserialisedContent);
-    } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: error.toString() })
-        .json();
-    }
-  };
-
-  updateSnippetVersion = async (
-    request: Request,
-    response: Response
-  ): Promise<void> => {
-    try {
-      const requestDetail = new RequestClass(
-        request,
-        'SnippetUpdateVersionRequest'
-      );
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
-      const workspaceId = request.headers['mex-workspace-id'].toString();
-
-      const snippetUpdate: SnippetUpdate = {
-        id: requestDetail.data.id,
-        title: requestDetail.data.title,
-        type: 'SnippetRequest',
-        lastEditedBy: response.locals.userEmail,
-        namespaceIdentifier: 'NAMESPACE1',
-        version: requestDetail.data.version,
-        data: serializeContent(requestDetail.data.content),
-      };
-
-      const nodeResult = await this._snippetManager.updateSnippetVersion(
-        workspaceId,
-        response.locals.idToken,
-        snippetUpdate
-      );
-
-      console.log({ nodeResult });
-
-      const deserialisedContent = this._transformer.genericNodeConverter(
-        JSON.parse(nodeResult)
-      );
       response.json(deserialisedContent);
     } catch (error) {
       response
@@ -251,19 +168,14 @@ class SnippetController {
       const version = request.params.version;
       const workspaceId = request.headers['mex-workspace-id'].toString();
 
-      const result = await this._snippetManager.makeSnippetPublic(
+      await this._snippetManager.makeSnippetPublic(
         snippetId,
         version,
         workspaceId,
         response.locals.idToken
       );
 
-      const resp = {
-        status: statusCodes.OK,
-        nodeUID: JSON.parse(result.body),
-      };
-
-      response.json(resp);
+      response.send();
     } catch (error) {
       console.error(error);
       response.status(statusCodes.INTERNAL_SERVER_ERROR).json(error);
@@ -281,19 +193,14 @@ class SnippetController {
       const version = request.params.version;
       const workspaceId = request.headers['mex-workspace-id'].toString();
 
-      const result = await this._snippetManager.makeSnippetPrivate(
+      await this._snippetManager.makeSnippetPrivate(
         snippetId,
         version,
         workspaceId,
         response.locals.idToken
       );
 
-      const resp = {
-        status: statusCodes.OK,
-        nodeUID: JSON.parse(result.body),
-      };
-
-      response.json(resp);
+      response.send();
     } catch (error) {
       console.error(error);
       response.status(statusCodes.INTERNAL_SERVER_ERROR).json(error);

@@ -46,7 +46,6 @@ import { errorCodes } from './libs/errorCodes';
 import { statusCodes } from './libs/statusCodes';
 
 import schema from './types.json';
-import { SnippetUpdate } from './interfaces/Snippet';
 
 type SchemaType = typeof schema.definitions;
 type Definitions = { [x in keyof SchemaType]: unknown };
@@ -95,6 +94,5 @@ export default class Interfaces implements Definitions {
   UserPreference: UserPreference;
   GoogleAuthRefreshToken: GoogleAuthRefreshToken;
   ILink: ILink;
-  SnippetUpdate: SnippetUpdate;
   SnippetUpdateVersionRequest: SnippetUpdateVersionRequest;
 }
