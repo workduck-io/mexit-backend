@@ -16,30 +16,6 @@ export class UserManager {
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async createUserPreference(userPreference: UserPreference): Promise<any> {
-    try {
-      const result = await this._lambda.invoke(
-        this._userLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.createUserPreference,
-          payload: userPreference,
-        },
-        true
-      );
-
-      return result.body;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: errorCodes.UNKNOWN,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
-  }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async updateUserPreference(userPreference: UserPreference): Promise<any> {
     try {
       const result = await this._lambda.invoke(
@@ -64,14 +40,14 @@ export class UserManager {
     }
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async getByIdAndTag(userId: string, tag: string): Promise<any> {
+  async get(idToken: string): Promise<any> {
     try {
       const result = await this._lambda.invoke(
         this._userLambdaFunctionName,
         this._lambdaInvocationType,
         {
-          routeKey: RouteKeys.getByIdAndTag,
-          pathParameters: { id: userId, tag: tag },
+          routeKey: RouteKeys.getUser,
+          headers: { authorization: idToken },
         }
       );
       return result.body;
@@ -86,14 +62,36 @@ export class UserManager {
     }
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async getByGroupIdAndTag(groupId: string, tag: string): Promise<any> {
+  async getById(userId: string): Promise<any> {
     try {
       const result = await this._lambda.invoke(
         this._userLambdaFunctionName,
         this._lambdaInvocationType,
         {
-          routeKey: RouteKeys.getByGroupIdAndTag,
-          pathParameters: { groupId: groupId, tag: tag },
+          routeKey: RouteKeys.getById,
+          pathParameters: { userId },
+        }
+      );
+      return result.body;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async getByGroupId(groupId: string): Promise<any> {
+    try {
+      const result = await this._lambda.invoke(
+        this._userLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.getByGroupId,
+          pathParameters: { groupId: groupId },
         }
       );
       return result.body;
