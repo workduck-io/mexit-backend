@@ -7,12 +7,17 @@ import { Transformer } from './libs/TransformerClass';
 import { Cache } from './libs/CacheClass';
 import { Lambda } from './libs/LambdaClass';
 import { UserManager } from './managers/UserManager';
+import { SnippetManager } from './managers/SnippetManager';
 
 const container = new Container();
 
 container.bind<GotClient>(GotClient).to(GotClient).inSingletonScope();
 container.bind<Transformer>(Transformer).to(Transformer).inSingletonScope();
 container.bind<NodeManager>(NodeManager).to(NodeManager).inSingletonScope();
+container
+  .bind<SnippetManager>(SnippetManager)
+  .to(SnippetManager)
+  .inSingletonScope();
 container
   .bind<ShortenerManager>(ShortenerManager)
   .to(ShortenerManager)

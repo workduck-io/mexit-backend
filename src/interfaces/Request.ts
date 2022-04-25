@@ -8,6 +8,10 @@ export interface ContentNodeRequest extends ContentNode {
   createdBy: string;
 }
 
+export interface SnippetUpdateVersionRequest extends ContentNode {
+  version: number;
+}
+
 export interface CopyOrMoveBlockRequest {
   blockId: string;
   sourceNodeId: string;

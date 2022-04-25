@@ -81,6 +81,9 @@
                     ],
                     "type": "string"
                 },
+                "title": {
+                    "type": "string"
+                },
                 "updatedAt": {
                     "type": "number"
                 },
@@ -101,6 +104,7 @@
                 "lastEditedBy",
                 "namespaceID",
                 "nodeschemaIdentifier",
+                "title",
                 "updatedAt",
                 "version",
                 "workspaceIdentifier"
@@ -1213,6 +1217,9 @@
                 "namespaceID": {
                     "type": "string"
                 },
+                "title": {
+                    "type": "string"
+                },
                 "updatedAt": {
                     "type": "number"
                 },
@@ -1232,6 +1239,7 @@
                 "itemType",
                 "lastEditedBy",
                 "namespaceID",
+                "title",
                 "updatedAt",
                 "version",
                 "workspaceIdentifier"
@@ -1295,6 +1303,109 @@
                 "count",
                 "hits",
                 "total"
+            ],
+            "type": "object"
+        },
+        "SnippetUpdateVersionRequest": {
+            "properties": {
+                "appendNodeUID": {
+                    "type": "string"
+                },
+                "content": {
+                    "items": {},
+                    "type": "array"
+                },
+                "createNodeUID": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "properties": {
+                        "metaTags": {
+                            "items": {
+                                "$ref": "types#/definitions/MetaTag"
+                            },
+                            "type": "array"
+                        },
+                        "userTags": {
+                            "items": {
+                                "$ref": "types#/definitions/UserTag"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "type": "object"
+                },
+                "nodePath": {
+                    "type": "string"
+                },
+                "range": {
+                    "properties": {
+                        "endMeta": {
+                            "properties": {
+                                "parentIndex": {
+                                    "type": "number"
+                                },
+                                "parentTagName": {
+                                    "type": "string"
+                                },
+                                "textOffset": {
+                                    "type": "number"
+                                }
+                            },
+                            "required": [
+                                "parentIndex",
+                                "parentTagName",
+                                "textOffset"
+                            ],
+                            "type": "object"
+                        },
+                        "startMeta": {
+                            "properties": {
+                                "parentIndex": {
+                                    "type": "number"
+                                },
+                                "parentTagName": {
+                                    "type": "string"
+                                },
+                                "textOffset": {
+                                    "type": "number"
+                                }
+                            },
+                            "required": [
+                                "parentIndex",
+                                "parentTagName",
+                                "textOffset"
+                            ],
+                            "type": "object"
+                        },
+                        "text": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "endMeta",
+                        "startMeta",
+                        "text"
+                    ],
+                    "type": "object"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "number"
+                }
+            },
+            "required": [
+                "id",
+                "title",
+                "version"
             ],
             "type": "object"
         },
