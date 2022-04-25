@@ -7,7 +7,6 @@ import { statusCodes } from '../libs/statusCodes';
 import container from '../inversify.config';
 import { Lambda, InvocationType } from '../libs/LambdaClass';
 import { RouteKeys } from '../libs/routeKeys';
-import { SnippetUpdate } from '../interfaces/Snippet';
 
 @injectable()
 export class SnippetManager {
@@ -18,7 +17,8 @@ export class SnippetManager {
   async createSnippet(
     workspaceId: string,
     idToken: string,
-    snippetDetail: NodeDetail
+    snippetDetail: NodeDetail,
+    createNextVersion = false
   ): Promise<string> {
     try {
       const result = await this._lambda.invoke(
@@ -28,62 +28,7 @@ export class SnippetManager {
           routeKey: RouteKeys.createSnippet,
           payload: snippetDetail,
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-        }
-      );
-
-      return result.body;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: errorCodes.UNKNOWN,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
-  }
-
-  async createNewVersionOfExistingSnippet(
-    workspaceId: string,
-    idToken: string,
-    snippetDetail: NodeDetail
-  ): Promise<string> {
-    try {
-      const result = await this._lambda.invoke(
-        this._snippetLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.createNewVersionOfExistingSnippet,
-          payload: snippetDetail,
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-        }
-      );
-
-      return result.body;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: errorCodes.UNKNOWN,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
-  }
-
-  async updateSnippetVersion(
-    workspaceId: string,
-    idToken: string,
-    snippetUpdate: SnippetUpdate
-  ): Promise<string> {
-    try {
-      const result = await this._lambda.invoke(
-        this._snippetLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.updateSnippet,
-          payload: snippetUpdate,
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+          queryStringParameters: { createNextVersion },
         }
       );
 
@@ -211,6 +156,8 @@ export class SnippetManager {
     workspaceId: string,
     idToken: string
   ): Promise<any> {
+    console.log({ idToken });
+
     const result = await this._lambda.invoke(
       this._snippetLambdaFunctionName,
       this._lambdaInvocationType,

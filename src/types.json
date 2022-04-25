@@ -1306,47 +1306,6 @@
             ],
             "type": "object"
         },
-        "SnippetUpdate": {
-            "properties": {
-                "data": {
-                    "items": {
-                        "$ref": "types#/definitions/NodeData"
-                    },
-                    "type": "array"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "lastEditedBy": {
-                    "type": "string"
-                },
-                "namespaceIdentifier": {
-                    "type": "string"
-                },
-                "path": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "version": {
-                    "type": "number"
-                }
-            },
-            "required": [
-                "data",
-                "id",
-                "lastEditedBy",
-                "namespaceIdentifier",
-                "title",
-                "type",
-                "version"
-            ],
-            "type": "object"
-        },
         "SnippetUpdateVersionRequest": {
             "properties": {
                 "appendNodeUID": {

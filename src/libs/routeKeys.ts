@@ -19,8 +19,6 @@ export const RouteKeys = {
   getSnippet: 'GET /snippet/{id}',
   getAllVersionsOfSnippet: 'GET /snippet/{id}/all',
   createSnippet: 'POST /snippet',
-  updateSnippet: 'PUT /snippet',
-  createNewVersionOfExistingSnippet: 'POST /snippet/newVersion',
   makeSnippetPublic: 'PATCH /snippet/makePublic/{id}/{version}',
   makeSnippetPrivate: 'PATCH /snippet/makePrivate/{id}/{version}',
   getPublicSnippet: 'GET /snippet/public/{id}/{version}',

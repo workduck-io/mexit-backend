@@ -6,7 +6,7 @@ interface LambdaOptions {
   payload?: any;
   pathParameters?: any;
   routeKey: string;
-  queryStringParameters?: string;
+  queryStringParameters?: any;
   headers?: any;
 }
 
