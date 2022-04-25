@@ -24,4 +24,7 @@ export const RouteKeys = {
   makeSnippetPrivate: 'PATCH /snippet/makePrivate/{id}/{version}',
   getPublicSnippet: 'GET /snippet/public/{id}/{version}',
   clonePublicSnippet: 'POST /snippet/clone/{id}/{version}',
+  createBookmark: 'POST /userBookmark/{userID}/{nodeID}',
+  removeBookmark: 'PATCH /userBookmark/{userID}/{nodeID}',
+  getAllBookmarks: 'GET /userBookmark/{userID}',
 };

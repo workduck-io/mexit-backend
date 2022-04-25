@@ -11,6 +11,7 @@ import { LogRequest } from './middlewares/logrequest';
 import logger from './libs/logger';
 import OAuth2Controller from './controllers/OAuth2Controller';
 import SnippetController from './controllers/SnippetController';
+import BookmarkController from './controllers/BookmarkController';
 
 class App {
   public _app: express.Application;
@@ -63,6 +64,7 @@ const application = new App([
   new ShortenerController(),
   new UserController(),
   new SnippetController(),
+  new BookmarkController(),
 ]);
 application.build();
 application._app.listen(application._port, () => {

@@ -8,6 +8,7 @@ import { Cache } from './libs/CacheClass';
 import { Lambda } from './libs/LambdaClass';
 import { UserManager } from './managers/UserManager';
 import { SnippetManager } from './managers/SnippetManager';
+import { BookmarkManager } from './managers/BookmarkManager';
 
 const container = new Container();
 
@@ -25,4 +26,8 @@ container
 container.bind<UserManager>(UserManager).to(UserManager).inSingletonScope();
 container.bind<Cache>(Cache).to(Cache).inSingletonScope();
 container.bind<Lambda>(Lambda).to(Lambda).inSingletonScope();
+container
+  .bind<BookmarkManager>(BookmarkManager)
+  .to(BookmarkManager)
+  .inSingletonScope();
 export default container;

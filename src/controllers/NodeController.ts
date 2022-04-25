@@ -85,7 +85,6 @@ class NodeController {
       this.makeNodePrivate
     );
     this._router.get(`${this._urlPath}/public/:nodeId`, [], this.getPublicNode);
-
     return;
   }
 
@@ -707,7 +706,7 @@ class NodeController {
       const nodeResponse = JSON.parse(result) as NodeResponse;
       // const convertedResponse =
       //   this._transformer.genericNodeConverter(nodeResponse);
-      const convertedResponse = nodeResponse
+      const convertedResponse = nodeResponse;
       response
         .contentType('application/json')
         .status(statusCodes.OK)
