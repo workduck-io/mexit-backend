@@ -48,6 +48,7 @@ describe('Serializer library module', () => {
     it('should return the deserialized data', () => {
       const dataToBeDeserialized: NodeResponse = {
         id: 'NODE_test-node',
+        title: 'test-title',
         lastEditedBy: 'testuser@testorg.com',
         namespaceID: 'test-namespace',
         workspaceIdentifier: 'test-workspace',
