@@ -22,16 +22,12 @@ class UserController {
       [AuthRequest],
       this.updateUser
     );
-    this._router.post(`${this._urlPath}`, [AuthRequest], this.createUser);
+    this._router.get(`${this._urlPath}`, [AuthRequest], this.get);
+    this._router.get(`${this._urlPath}/:id`, [AuthRequest], this.getById);
     this._router.get(
-      `${this._urlPath}/:id/:tag`,
+      `${this._urlPath}/group/:groupId`,
       [AuthRequest],
-      this.getByIdAndTag
-    );
-    this._router.get(
-      `${this._urlPath}/group/:groupId/:tag`,
-      [AuthRequest],
-      this.getByGroupIdAndTag
+      this.getByGroupId
     );
     this._router.post(
       `${this._urlPath}/linkedin`,
@@ -63,42 +59,38 @@ class UserController {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  createUser = async (request: Request, response: Response): Promise<any> => {
-    const requestDetail = new RequestClass(request, 'UserPreference');
-    try {
-      const result = await this._userManager.createUserPreference(
-        requestDetail.data
-      );
-      response.json(JSON.parse(result));
-    } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
-    }
-  };
-  getByIdAndTag = async (
+  get = async (
     request: Request,
     response: Response
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> => {
     try {
-      const result = await this._userManager.getByIdAndTag(
-        request.params.id,
-        request.params.tag
-      );
+      const result = await this._userManager.get(response.locals.idToken);
       response.json(JSON.parse(result));
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
-  getByGroupIdAndTag = async (
+  getById = async (
     request: Request,
     response: Response
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> => {
     try {
-      const result = await this._userManager.getByGroupIdAndTag(
-        request.params.groupId,
-        request.params.tag
+      const result = await this._userManager.getById(request.params.id);
+      response.json(JSON.parse(result));
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
+    }
+  };
+  getByGroupId = async (
+    request: Request,
+    response: Response
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<any> => {
+    try {
+      const result = await this._userManager.getByGroupId(
+        request.params.groupId
       );
       response.json(JSON.parse(result));
     } catch (error) {

@@ -90,7 +90,6 @@ class SnippetController {
       const deserialisedContent = this._transformer.genericNodeConverter(
         JSON.parse(nodeResult)
       );
-
       response.json(deserialisedContent);
     } catch (error) {
       response
