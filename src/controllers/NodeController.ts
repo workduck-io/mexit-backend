@@ -85,6 +85,16 @@ class NodeController {
       this.makeNodePrivate
     );
     this._router.get(`${this._urlPath}/public/:nodeId`, [], this.getPublicNode);
+    this._router.put(
+      `${this._urlPath}/archive`,
+      [AuthRequest],
+      this.archiveNode
+    );
+    this._router.put(
+      `${this._urlPath}/unarchive`,
+      [AuthRequest],
+      this.unArchiveNode
+    );
     return;
   }
 
@@ -870,6 +880,68 @@ class NodeController {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
         .send({ errorMsg: error.message })
+        .json();
+    }
+  };
+
+  archiveNode = async (request: Request, response: Response): Promise<void> => {
+    try {
+      const requestDetail = new RequestClass(request, 'ArchiveNodeDetail');
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
+
+      const workspaceId = request.headers['mex-workspace-id'].toString();
+
+      const archiveNodeResult = await this._nodeManager.archiveNode(
+        workspaceId,
+        response.locals.idToken,
+        requestDetail.data
+      );
+
+      // update the Link hierarchy cache
+      await this.updateILinkCache(
+        request.params.userId,
+        workspaceId,
+        response.locals.idToken
+      );
+
+      response.json(archiveNodeResult);
+    } catch (error) {
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ message: error.toString() })
+        .json();
+    }
+  };
+  unArchiveNode = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      const requestDetail = new RequestClass(request, 'ArchiveNodeDetail');
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
+
+      const workspaceId = request.headers['mex-workspace-id'].toString();
+
+      const archiveNodeResult = await this._nodeManager.unArchiveNode(
+        workspaceId,
+        response.locals.idToken,
+        requestDetail.data
+      );
+
+      // update the Link hierarchy cache
+      await this.updateILinkCache(
+        request.params.userId,
+        workspaceId,
+        response.locals.idToken
+      );
+
+      response.json(archiveNodeResult);
+    } catch (error) {
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ message: error.toString() })
         .json();
     }
   };
