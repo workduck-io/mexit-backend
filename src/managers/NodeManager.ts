@@ -284,7 +284,7 @@ export class NodeManager {
   ): Promise<string[]> {
     try {
       const result = await this._lambda.invoke(
-        this._workspaceLambdaFunctionName,
+        this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
         {
           routeKey: RouteKeys.archiveNode,
@@ -316,7 +316,7 @@ export class NodeManager {
   ): Promise<string[]> {
     try {
       const result = await this._lambda.invoke(
-        this._workspaceLambdaFunctionName,
+        this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
         {
           routeKey: RouteKeys.unArchiveNode,
@@ -326,6 +326,9 @@ export class NodeManager {
       );
 
       const response: string = result.body;
+
+      if (!response) throw new Error('Something went wrong');
+
       let allNodes = response.replace('[', '');
       allNodes = allNodes.replace(']', '');
       allNodes = allNodes.replace(/"/g, '');
