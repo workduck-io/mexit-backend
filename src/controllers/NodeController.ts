@@ -485,13 +485,14 @@ class NodeController {
     userId: string,
     workspaceId: string,
     idToken: string
-  ): Promise<void> {
+  ): Promise<any> {
     if (this._cache.has(userId, this._linkHierarchyLabel)) {
       const result = await this._nodeManager.getLinkHierarchy(
         workspaceId,
         idToken
       );
       this._cache.replaceAndSet(userId, this._linkHierarchyLabel, result);
+      return this._cache.get(userId, this._linkHierarchyLabel);
     }
   }
 
@@ -611,7 +612,7 @@ class NodeController {
       );
 
       // update the Link hierarchy cache
-      await this.updateILinkCache(
+      const ilinks = await this.updateILinkCache(
         request.params.userId,
         workspaceId,
         response.locals.idToken
@@ -620,7 +621,7 @@ class NodeController {
       const deserialisedContent = this._transformer.genericNodeConverter(
         JSON.parse(nodeResult)
       );
-      response.json(deserialisedContent);
+      response.json({ content: deserialisedContent, ilinks: ilinks });
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
@@ -658,7 +659,7 @@ class NodeController {
       );
 
       // update the Link hierarchy cache
-      await this.updateILinkCache(
+      const ilinks = await this.updateILinkCache(
         request.params.userId,
         workspaceId,
         response.locals.idToken
@@ -666,7 +667,7 @@ class NodeController {
 
       if (result.message) throw new Error(result.message);
 
-      response.json(result);
+      response.json({ content: result, ilinks: ilinks });
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
@@ -899,13 +900,13 @@ class NodeController {
       );
 
       // update the Link hierarchy cache
-      await this.updateILinkCache(
+      const ilinks = await this.updateILinkCache(
         request.params.userId,
         workspaceId,
         response.locals.idToken
       );
 
-      response.json(archiveNodeResult);
+      response.json({ content: archiveNodeResult, ilinks: ilinks });
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
@@ -931,13 +932,13 @@ class NodeController {
       );
 
       // update the Link hierarchy cache
-      await this.updateILinkCache(
+      const ilinks = await this.updateILinkCache(
         request.params.userId,
         workspaceId,
         response.locals.idToken
       );
 
-      response.json(archiveNodeResult);
+      response.json({ content: archiveNodeResult, ilinks: ilinks });
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
