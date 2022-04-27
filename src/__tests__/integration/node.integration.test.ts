@@ -2,10 +2,17 @@ import { NodeDetail } from '../../interfaces/Node';
 import container from '../../inversify.config';
 import { NodeManager } from '../../managers/NodeManager';
 import got from 'got';
+import 'dotenv/config';
+// eslint-disable-next-line
 
 const WORKSPACE_ID = process.env.MEXIT_BACKEND_WORKSPACE_ID;
 const REFRESH_TOKEN = process.env.MEXIT_BACKEND_REFRESH_TOKEN;
 const CLIENT_ID = process.env.MEXIT_BACKEND_CLIENT_ID;
+const USER_ID = process.env.MEXIT_BACKEND_USER_ID;
+
+if (!(WORKSPACE_ID && REFRESH_TOKEN && CLIENT_ID && USER_ID)) {
+  throw new Error('Env Variables not supplied');
+}
 
 const getIdToken = async () => {
   const URL = 'https://workduck.auth.us-east-1.amazoncognito.com/oauth2/token';
@@ -58,20 +65,28 @@ describe('Node Manager', () => {
       expect(JSON.parse(node)).toBeTruthy();
     });
   });
-  describe('Get all nodes function', () => {
-    it('should return all the node ids for the given user', async () => {
+  describe('Get node function - Fail Case', () => {
+    it('should return undefined for the given node id', async () => {
       const ID_TOKEN = await getIdToken();
-      const userId = 'WORKSPACE1';
+      const nodeId = 'NODE_does-not-exist';
+      const node = await nodeManager.getNode(nodeId, WORKSPACE_ID, ID_TOKEN);
+
+      expect(node.message).toContain('Error');
+    });
+  });
+  describe('Get all nodes function - Fail Case 1', () => {
+    it('should return empty array for the given user', async () => {
+      const ID_TOKEN = await getIdToken();
+      const userId = 'USER_does-not-exist';
       const allNodes = await nodeManager.getAllNodes(
         userId,
         WORKSPACE_ID,
         ID_TOKEN
       );
 
-      expect(allNodes.length).toBeGreaterThan(0);
+      expect(allNodes.length).toEqual(0);
     });
   });
-
   describe('Append node function', () => {
     it('should return no content with status code 204', async () => {
       const ID_TOKEN = await getIdToken();
@@ -106,38 +121,6 @@ describe('Node Manager', () => {
       expect(appendNodeResult.appendedElements.length).toBeGreaterThan(0);
     });
   });
-  describe('Move Block function', () => {
-    it('should return no content with status code 204', async () => {
-      const ID_TOKEN = await getIdToken();
-      const blockId = 'BLOCK_test-block';
-      const sourceNodeId = 'NODE_test-user-id';
-
-      const testNodeDetail: NodeDetail = {
-        id: 'NODE_destination-node',
-        title: 'test-title',
-        namespaceIdentifier: 'test-namespace',
-        data: [],
-        lastEditedBy: 'testuser@testorg.com',
-        type: 'NodeRequest',
-      };
-      await nodeManager.createNode(WORKSPACE_ID, ID_TOKEN, testNodeDetail);
-      const destinationNodeId = 'NODE_destination-node';
-
-      const movedBlocks = await nodeManager.moveBlocks(
-        blockId,
-        sourceNodeId,
-        destinationNodeId,
-        WORKSPACE_ID,
-        ID_TOKEN
-      );
-
-      const parsedResult = movedBlocks ? JSON.parse(movedBlocks) : movedBlocks;
-
-      expect(parsedResult).toBeUndefined();
-    });
-  });
-
-  // unit tests for the failure cases
   describe('Create a node function - Fail Case', () => {
     it('should return undefined as the type is given invalid for the payload', async () => {
       const ID_TOKEN = await getIdToken();
@@ -155,49 +138,10 @@ describe('Node Manager', () => {
         testNodeDetail
       );
 
-      expect(JSON.parse(testNodeResult).message).toContain('Error');
+      expect(JSON.parse(testNodeResult).message).toContain('Malformed Request');
     });
   });
-  describe('Get node function - Fail Case', () => {
-    it('should return undefined for the given node id', async () => {
-      const ID_TOKEN = await getIdToken();
-      const nodeId = 'NODE_does-not-exist';
-      const node = await nodeManager.getNode(
-        nodeId,
-        WORKSPACE_ID,
-        ID_TOKEN,
-        nodeId
-      );
 
-      expect(node.message).toContain('Error');
-    });
-  });
-  describe('Get all nodes function - Fail Case 1', () => {
-    it('should return empty array for the given user', async () => {
-      const ID_TOKEN = await getIdToken();
-      const userId = 'USER_does-not-exist';
-      const allNodes = await nodeManager.getAllNodes(
-        userId,
-        WORKSPACE_ID,
-        ID_TOKEN
-      );
-
-      expect(allNodes.length).toEqual(0);
-    });
-  });
-  describe('Get all nodes function - Fail Case 2', () => {
-    it('should return empty array for the invalid user', async () => {
-      const ID_TOKEN = await getIdToken();
-      const userId = 'does-not-exist';
-      const allNodes = await nodeManager.getAllNodes(
-        userId,
-        WORKSPACE_ID,
-        ID_TOKEN
-      );
-
-      expect(allNodes.message).toEqual('Invalid ID');
-    });
-  });
   describe('Append node function - Fail Case', () => {
     it('should return error message when passing invalid node id and payload for append', async () => {
       const ID_TOKEN = await getIdToken();
@@ -271,7 +215,7 @@ describe('Node Manager', () => {
         ID_TOKEN
       );
 
-      expect(JSON.parse(node).message).toBe('Node not available');
+      expect(JSON.parse(node).message).toBe('Requested Resource Not Found');
     });
   });
 });
