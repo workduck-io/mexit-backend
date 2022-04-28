@@ -95,6 +95,22 @@ class NodeController {
       [AuthRequest],
       this.unArchiveNode
     );
+    this._router.post(`${this._urlPath}/shared`, [AuthRequest], this.shareNode);
+    this._router.put(
+      `${this._urlPath}/shared`,
+      [AuthRequest],
+      this.updateAccessTypeForSharedNode
+    );
+    this._router.delete(
+      `${this._urlPath}/shared`,
+      [AuthRequest],
+      this.revokeNodeAccessForUsers
+    );
+    this._router.get(
+      `${this._urlPath}/shared/:nodeId`,
+      [AuthRequest],
+      this.revokeNodeAccessForUsers
+    );
     return;
   }
 
@@ -924,6 +940,105 @@ class NodeController {
         workspaceId,
         response.locals.idToken
       );
+    } catch (error) {
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ message: error.toString() })
+        .json();
+    }
+  };
+
+  shareNode = async (request: Request, response: Response): Promise<void> => {
+    try {
+      const requestDetail = new RequestClass(request, 'ShareNodeDetail');
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
+
+      const workspaceId = request.headers['mex-workspace-id'].toString();
+
+      await this._nodeManager.shareNode(
+        workspaceId,
+        response.locals.idToken,
+        requestDetail.data
+      );
+
+      response.send();
+    } catch (error) {
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ message: error.toString() })
+        .json();
+    }
+  };
+  updateAccessTypeForSharedNode = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      const requestDetail = new RequestClass(request, 'ShareNodeDetail');
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
+
+      const workspaceId = request.headers['mex-workspace-id'].toString();
+
+      await this._nodeManager.updateAccessTypeForSharedNode(
+        workspaceId,
+        response.locals.idToken,
+        requestDetail.data
+      );
+
+      response.send();
+    } catch (error) {
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ message: error.toString() })
+        .json();
+    }
+  };
+
+  revokeNodeAccessForUsers = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      const requestDetail = new RequestClass(request, 'ShareNodeDetail');
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
+
+      const workspaceId = request.headers['mex-workspace-id'].toString();
+
+      await this._nodeManager.revokeNodeAccessForUsers(
+        workspaceId,
+        response.locals.idToken,
+        requestDetail.data
+      );
+
+      response.send();
+    } catch (error) {
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ message: error.toString() })
+        .json();
+    }
+  };
+  getNodeSharedWithUser = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      const nodeId = request.params.nodeId;
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
+
+      const workspaceId = request.headers['mex-workspace-id'].toString();
+
+      const result = await this._nodeManager.getNodeSharedWithUser(
+        workspaceId,
+        response.locals.idToken,
+        nodeId
+      );
+
+      response.json(result);
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)

@@ -1015,6 +1015,13 @@
             ],
             "type": "object"
         },
+        "NodeAccessType": {
+            "enum": [
+                "MANAGE",
+                "READ"
+            ],
+            "type": "string"
+        },
         "NodeChildData": {
             "properties": {
                 "children": {
@@ -1314,6 +1321,35 @@
                 "count",
                 "hits",
                 "total"
+            ],
+            "type": "object"
+        },
+        "ShareNodeDetail": {
+            "properties": {
+                "accessType": {
+                    "$ref": "types#/definitions/NodeAccessType"
+                },
+                "nodeId": {
+                    "type": "string"
+                },
+                "type": {
+                    "enum": [
+                        "SharedNodeRequest"
+                    ],
+                    "type": "string"
+                },
+                "userIds": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "accessType",
+                "nodeId",
+                "type",
+                "userIds"
             ],
             "type": "object"
         },

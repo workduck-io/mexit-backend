@@ -4,6 +4,7 @@ import {
   ActivityNodeDetail,
   CopyOrMoveBlock,
   NodeDetail,
+  ShareNodeDetail,
 } from '../interfaces/Node';
 import { errorlib } from '../libs/errorlib';
 import { errorCodes } from '../libs/errorCodes';
@@ -334,6 +335,122 @@ export class NodeManager {
       allNodes = allNodes.replace(/"/g, '');
       const linkResponse = allNodes.split(',');
       return linkResponse;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+
+  async shareNode(
+    workspaceId: string,
+    idToken: string,
+    shareNodePayload: ShareNodeDetail
+  ): Promise<void> {
+    try {
+      const result = await this._lambda.invoke(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.shareNode,
+          payload: {
+            ...shareNodePayload,
+            nodeID: shareNodePayload.nodeId,
+            userIDs: shareNodePayload.userIds,
+          },
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        }
+      );
+
+      console.log({ result });
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+  async updateAccessTypeForSharedNode(
+    workspaceId: string,
+    idToken: string,
+    shareNodePayload: ShareNodeDetail
+  ): Promise<void> {
+    try {
+      await this._lambda.invoke(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.updateAccessTypeForshareNode,
+          payload: {
+            ...shareNodePayload,
+            nodeID: shareNodePayload.nodeId,
+            userIDs: shareNodePayload.userIds,
+          },
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        }
+      );
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+  async revokeNodeAccessForUsers(
+    workspaceId: string,
+    idToken: string,
+    shareNodePayload: ShareNodeDetail
+  ): Promise<void> {
+    try {
+      await this._lambda.invoke(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.revokeNodeAccessForUsers,
+          payload: {
+            ...shareNodePayload,
+            nodeID: shareNodePayload.nodeId,
+            userIDs: shareNodePayload.userIds,
+          },
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        }
+      );
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+  async getNodeSharedWithUser(
+    workspaceId: string,
+    idToken: string,
+    nodeId: string
+  ): Promise<void> {
+    try {
+      const result = await this._lambda.invoke(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.getNodeSharedWithUser,
+          pathParameters: { nodeID: nodeId },
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        }
+      );
+      return result;
     } catch (error) {
       errorlib({
         message: error.message,

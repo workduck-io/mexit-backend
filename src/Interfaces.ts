@@ -23,6 +23,8 @@ import {
   CopyOrMoveBlock,
   ILink,
   ArchiveNodeDetail,
+  ShareNodeDetail,
+  NodeAccessType,
 } from './interfaces/Node';
 import {
   ContentNodeRequest,
@@ -96,6 +98,9 @@ export default class Interfaces implements Definitions {
   UserPreference: UserPreference;
   GoogleAuthRefreshToken: GoogleAuthRefreshToken;
   ILink: ILink;
+  SnippetUpdate: SnippetUpdate;
   SnippetUpdateVersionRequest: SnippetUpdateVersionRequest;
   ArchiveNodeDetail: ArchiveNodeDetail;
+  ShareNodeDetail: ShareNodeDetail;
+  NodeAccessType: NodeAccessType;
 }
