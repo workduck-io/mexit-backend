@@ -12,7 +12,7 @@ import { Cache } from '../libs/CacheClass';
 import _ from 'lodash';
 import { NodeDetail, QueryStringParameters } from '../interfaces/Node';
 import GuidGenerator from '../libs/GuidGenerator';
-import linkData from '../linkhierarchy.json';
+
 class NodeController {
   public _urlPath = '/node';
   public _router = express.Router();
@@ -485,15 +485,14 @@ class NodeController {
     userId: string,
     workspaceId: string,
     idToken: string
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
-    if (this._cache.has(userId, this._linkHierarchyLabel)) {
-      const result = await this._nodeManager.getLinkHierarchy(
-        workspaceId,
-        idToken
-      );
-      this._cache.replaceAndSet(userId, this._linkHierarchyLabel, result);
-      return this._cache.get(userId, this._linkHierarchyLabel);
-    }
+    const result = await this._nodeManager.getLinkHierarchy(
+      workspaceId,
+      idToken
+    );
+    this._cache.replaceAndSet(userId, this._linkHierarchyLabel, result);
+    return this._cache.get(userId, this._linkHierarchyLabel);
   }
 
   createLinkCapture = async (
@@ -596,32 +595,22 @@ class NodeController {
       if (requestDetail.data.id === `NODE_${response.locals.userId}`)
         throw new Error('Cannot create a node using activitynode id.');
 
-      // const nodeDetail = {
-      //   id: requestDetail.data.id,
-      //   title: requestDetail.data.title,
-      //   type: 'NodeRequest',
-      //   lastEditedBy: response.locals.userEmail,
-      //   namespaceIdentifier: 'NAMESPACE1',
-      //   data: serializeContent(requestDetail.data.content),
-      // };
-
       const nodeResult = await this._nodeManager.createNode(
         workspaceId,
         response.locals.idToken,
         requestDetail.data
       );
 
-      // update the Link hierarchy cache
-      const ilinks = await this.updateILinkCache(
+      const deserialisedContent = this._transformer.genericNodeConverter(
+        JSON.parse(nodeResult)
+      );
+      response.json(deserialisedContent);
+
+      await this.updateILinkCache(
         request.params.userId,
         workspaceId,
         response.locals.idToken
       );
-
-      const deserialisedContent = this._transformer.genericNodeConverter(
-        JSON.parse(nodeResult)
-      );
-      response.json({ content: deserialisedContent, ilinks: ilinks });
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
@@ -658,16 +647,14 @@ class NodeController {
         )
       );
 
-      // update the Link hierarchy cache
-      const ilinks = await this.updateILinkCache(
+      if (result.message) throw new Error(result.message);
+      response.json(result);
+
+      await this.updateILinkCache(
         request.params.userId,
         workspaceId,
         response.locals.idToken
       );
-
-      if (result.message) throw new Error(result.message);
-
-      response.json({ content: result, ilinks: ilinks });
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
@@ -900,13 +887,12 @@ class NodeController {
       );
 
       // update the Link hierarchy cache
-      const ilinks = await this.updateILinkCache(
+      response.json(archiveNodeResult);
+      await this.updateILinkCache(
         request.params.userId,
         workspaceId,
         response.locals.idToken
       );
-
-      response.json({ content: archiveNodeResult, ilinks: ilinks });
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
@@ -932,13 +918,12 @@ class NodeController {
       );
 
       // update the Link hierarchy cache
-      const ilinks = await this.updateILinkCache(
+      response.json(archiveNodeResult);
+      await this.updateILinkCache(
         request.params.userId,
         workspaceId,
         response.locals.idToken
       );
-
-      response.json({ content: archiveNodeResult, ilinks: ilinks });
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
