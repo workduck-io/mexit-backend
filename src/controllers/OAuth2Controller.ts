@@ -1,5 +1,4 @@
 import express, { Request, Response } from 'express';
-import { AuthRequest } from '../middlewares/authrequest';
 import { statusCodes } from '../libs/statusCodes';
 import { google } from 'googleapis';
 import { IS_DEV } from '../env';
@@ -8,10 +7,11 @@ import container from '../inversify.config';
 import { RequestClass } from '../libs/RequestClass';
 // eslint-disable-next-line node/no-extraneous-import
 import { OAuth2Client } from 'google-auth-library';
+import { initializeOAuth2Routes } from '../routes/OAuth2Routes';
 
 class OAuth2Controller {
-  private _urlPath = '/oauth2';
-  private _router = express.Router();
+  public _urlPath = '/oauth2';
+  public _router = express.Router();
 
   private _gotClient: GotClient = container.get<GotClient>(GotClient);
   private _oauth2Client: OAuth2Client;
@@ -23,7 +23,7 @@ class OAuth2Controller {
     'https://www.googleapis.com/oauth2/v4/token';
 
   constructor() {
-    this.initializeRoutes();
+    initializeOAuth2Routes(this);
     this.initializeGoogleOAuthClient();
   }
 
@@ -39,20 +39,6 @@ class OAuth2Controller {
     });
 
     google.options({ auth: this._oauth2Client });
-  }
-
-  initializeRoutes(): void {
-    this._router.post(
-      `${this._urlPath}/getGoogleAccessToken`,
-      [AuthRequest],
-      this.getNewAccessToken
-    );
-    this._router.get(
-      `${this._urlPath}/getGoogleAuthUrl`,
-      [AuthRequest],
-      this.getGoogleCalendarScopeAuth
-    );
-    this._router.get(`${this._urlPath}/google`, [], this.extractTokenFromCode);
   }
 
   getNewAccessToken = async (
