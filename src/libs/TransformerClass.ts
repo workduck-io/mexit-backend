@@ -81,9 +81,9 @@ export class Transformer {
 
     const contentResponse = {
       id: nodeResponse.id,
+      title: nodeResponse.title,
       content: content,
       metadata: metadata,
-      title: nodeResponse.title,
     };
 
     return contentResponse;

@@ -85,7 +85,16 @@ class NodeController {
       this.makeNodePrivate
     );
     this._router.get(`${this._urlPath}/public/:nodeId`, [], this.getPublicNode);
-
+    this._router.put(
+      `${this._urlPath}/archive`,
+      [AuthRequest],
+      this.archiveNode
+    );
+    this._router.put(
+      `${this._urlPath}/unarchive`,
+      [AuthRequest],
+      this.unArchiveNode
+    );
     return;
   }
 
@@ -476,13 +485,14 @@ class NodeController {
     userId: string,
     workspaceId: string,
     idToken: string
-  ): Promise<void> {
+  ): Promise<any> {
     if (this._cache.has(userId, this._linkHierarchyLabel)) {
       const result = await this._nodeManager.getLinkHierarchy(
         workspaceId,
         idToken
       );
       this._cache.replaceAndSet(userId, this._linkHierarchyLabel, result);
+      return this._cache.get(userId, this._linkHierarchyLabel);
     }
   }
 
@@ -586,23 +596,23 @@ class NodeController {
       if (requestDetail.data.id === `NODE_${response.locals.userId}`)
         throw new Error('Cannot create a node using activitynode id.');
 
-      const nodeDetail = {
-        id: requestDetail.data.id,
-        title: requestDetail.data.title,
-        type: 'NodeRequest',
-        lastEditedBy: response.locals.userEmail,
-        namespaceIdentifier: 'NAMESPACE1',
-        data: serializeContent(requestDetail.data.content),
-      };
+      // const nodeDetail = {
+      //   id: requestDetail.data.id,
+      //   title: requestDetail.data.title,
+      //   type: 'NodeRequest',
+      //   lastEditedBy: response.locals.userEmail,
+      //   namespaceIdentifier: 'NAMESPACE1',
+      //   data: serializeContent(requestDetail.data.content),
+      // };
 
       const nodeResult = await this._nodeManager.createNode(
         workspaceId,
         response.locals.idToken,
-        nodeDetail
+        requestDetail.data
       );
 
       // update the Link hierarchy cache
-      await this.updateILinkCache(
+      const ilinks = await this.updateILinkCache(
         request.params.userId,
         workspaceId,
         response.locals.idToken
@@ -611,7 +621,7 @@ class NodeController {
       const deserialisedContent = this._transformer.genericNodeConverter(
         JSON.parse(nodeResult)
       );
-      response.json(deserialisedContent);
+      response.json({ content: deserialisedContent, ilinks: ilinks });
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
@@ -649,7 +659,7 @@ class NodeController {
       );
 
       // update the Link hierarchy cache
-      await this.updateILinkCache(
+      const ilinks = await this.updateILinkCache(
         request.params.userId,
         workspaceId,
         response.locals.idToken
@@ -657,7 +667,7 @@ class NodeController {
 
       if (result.message) throw new Error(result.message);
 
-      response.json(result);
+      response.json({ content: result, ilinks: ilinks });
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
@@ -705,9 +715,9 @@ class NodeController {
         throw new Error(JSON.parse(result).message);
 
       const nodeResponse = JSON.parse(result) as NodeResponse;
-      const convertedResponse =
-        this._transformer.genericNodeConverter(nodeResponse);
-
+      // const convertedResponse =
+      //   this._transformer.genericNodeConverter(nodeResponse);
+      const convertedResponse = nodeResponse;
       response
         .contentType('application/json')
         .status(statusCodes.OK)
@@ -871,6 +881,68 @@ class NodeController {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
         .send({ errorMsg: error.message })
+        .json();
+    }
+  };
+
+  archiveNode = async (request: Request, response: Response): Promise<void> => {
+    try {
+      const requestDetail = new RequestClass(request, 'ArchiveNodeDetail');
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
+
+      const workspaceId = request.headers['mex-workspace-id'].toString();
+
+      const archiveNodeResult = await this._nodeManager.archiveNode(
+        workspaceId,
+        response.locals.idToken,
+        requestDetail.data
+      );
+
+      // update the Link hierarchy cache
+      const ilinks = await this.updateILinkCache(
+        request.params.userId,
+        workspaceId,
+        response.locals.idToken
+      );
+
+      response.json({ content: archiveNodeResult, ilinks: ilinks });
+    } catch (error) {
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ message: error.toString() })
+        .json();
+    }
+  };
+  unArchiveNode = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      const requestDetail = new RequestClass(request, 'ArchiveNodeDetail');
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
+
+      const workspaceId = request.headers['mex-workspace-id'].toString();
+
+      const archiveNodeResult = await this._nodeManager.unArchiveNode(
+        workspaceId,
+        response.locals.idToken,
+        requestDetail.data
+      );
+
+      // update the Link hierarchy cache
+      const ilinks = await this.updateILinkCache(
+        request.params.userId,
+        workspaceId,
+        response.locals.idToken
+      );
+
+      response.json({ content: archiveNodeResult, ilinks: ilinks });
+    } catch (error) {
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ message: error.toString() })
         .json();
     }
   };

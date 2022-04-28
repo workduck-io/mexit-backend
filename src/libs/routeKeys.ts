@@ -3,6 +3,8 @@ export const RouteKeys = {
   getAllNodes: `GET /node/all/{id}`,
   getNode: 'GET /node/{id}',
   appendNode: 'POST /node/{id}/append',
+  archiveNode: 'PUT /node/archive',
+  unArchiveNode: 'PUT /node/unarchive',
   editBlock: 'POST /node/{id}/blockUpdate',
   shorten: 'POST /shorten',
   getShorts: 'GET /{namespace}/stats',
@@ -24,4 +26,7 @@ export const RouteKeys = {
   makeSnippetPrivate: 'PATCH /snippet/makePrivate/{id}/{version}',
   getPublicSnippet: 'GET /snippet/public/{id}/{version}',
   clonePublicSnippet: 'POST /snippet/clone/{id}/{version}',
+  createBookmark: 'POST /userBookmark/{userID}/{nodeID}',
+  removeBookmark: 'PATCH /userBookmark/{userID}/{nodeID}',
+  getAllBookmarks: 'GET /userBookmark/{userID}',
 };

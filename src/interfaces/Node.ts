@@ -12,6 +12,9 @@ export interface NodeDetail {
 export interface ActivityNodeDetail extends NodeDetail {
   nodeschemaIdentifier: 'ActivityNode';
 }
+export interface ArchiveNodeDetail {
+  ids: string[];
+}
 export interface NodeData {
   id: string;
   elementType?: string;
