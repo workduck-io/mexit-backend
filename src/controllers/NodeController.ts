@@ -109,7 +109,17 @@ class NodeController {
     this._router.get(
       `${this._urlPath}/shared/:nodeId`,
       [AuthRequest],
-      this.revokeNodeAccessForUsers
+      this.getNodeSharedWithUser
+    );
+    this._router.get(
+      `${this._urlPath}/tags/all`,
+      [AuthRequest],
+      this.getAllTagsOfWorkspace
+    );
+    this._router.get(
+      `${this._urlPath}/tag/:tagName`,
+      [AuthRequest],
+      this.getNodeWithTag
     );
     return;
   }
@@ -1036,6 +1046,55 @@ class NodeController {
         workspaceId,
         response.locals.idToken,
         nodeId
+      );
+
+      response.json(result);
+    } catch (error) {
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ message: error.toString() })
+        .json();
+    }
+  };
+  getAllTagsOfWorkspace = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
+
+      const workspaceId = request.headers['mex-workspace-id'].toString();
+
+      const result = await this._nodeManager.getAllTagsOfWorkspace(
+        workspaceId,
+        response.locals.idToken
+      );
+
+      response.json(result);
+    } catch (error) {
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ message: error.toString() })
+        .json();
+    }
+  };
+
+  getNodeWithTag = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      const tagName = request.params.tagName;
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
+
+      const workspaceId = request.headers['mex-workspace-id'].toString();
+
+      const result = await this._nodeManager.getNodeWithTag(
+        workspaceId,
+        response.locals.idToken,
+        tagName
       );
 
       response.json(result);
