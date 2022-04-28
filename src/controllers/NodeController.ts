@@ -3,7 +3,6 @@ import container from '../inversify.config';
 import { NodeManager } from '../managers/NodeManager';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
-import { AuthRequest } from '../middlewares/authrequest';
 import { Transformer } from '../libs/TransformerClass';
 import { ShortenerManager } from '../managers/ShortenerManager';
 import { serializeContent } from '../libs/serialize';
@@ -12,6 +11,7 @@ import { Cache } from '../libs/CacheClass';
 import _ from 'lodash';
 import { NodeDetail, QueryStringParameters } from '../interfaces/Node';
 import GuidGenerator from '../libs/GuidGenerator';
+import { initializeNodeRoutes } from '../routes/NodeRoutes';
 
 class NodeController {
   public _urlPath = '/node';
@@ -26,102 +26,7 @@ class NodeController {
   private _defaultActivityBlockCacheSize = 5;
 
   constructor() {
-    this.initializeRoutes();
-  }
-
-  public initializeRoutes(): void {
-    this._router.post(this._urlPath, [AuthRequest], this.createNode);
-    this._router.get(
-      `${this._urlPath}/linkhierarchy`,
-      [AuthRequest],
-      this.getLinkHierarchy
-    );
-    this._router.post(
-      `${this._urlPath}/:nodeId/append`,
-      [AuthRequest],
-      this.appendNode
-    );
-
-    this._router.post(
-      `${this._urlPath}/capture`,
-      [AuthRequest],
-      this.newCapture
-    );
-
-    this._router.post(
-      `${this._urlPath}/capture/link`,
-      [AuthRequest],
-      this.createLinkCapture
-    );
-    this._router.get(
-      `${this._urlPath}/getactivityblocks`,
-      [AuthRequest],
-      this.getLastNActivityBlocks
-    );
-    this._router.get(`${this._urlPath}/:nodeId/`, [AuthRequest], this.getNode);
-    this._router.get(
-      `${this._urlPath}/all/:userId`,
-      [AuthRequest],
-      this.getAllNodes
-    );
-    this._router.post(
-      `${this._urlPath}/activitynode`,
-      [AuthRequest],
-      this.createActivityNodeForUser
-    );
-    this._router.post(
-      `${this._urlPath}/block/movement`,
-      [AuthRequest],
-      this.copyOrMoveBlock
-    );
-    this._router.patch(
-      `${this._urlPath}/:id/makePublic`,
-      [AuthRequest],
-      this.makeNodePublic
-    );
-    this._router.patch(
-      `${this._urlPath}/:id/makePrivate`,
-      [AuthRequest],
-      this.makeNodePrivate
-    );
-    this._router.get(`${this._urlPath}/public/:nodeId`, [], this.getPublicNode);
-    this._router.put(
-      `${this._urlPath}/archive`,
-      [AuthRequest],
-      this.archiveNode
-    );
-    this._router.put(
-      `${this._urlPath}/unarchive`,
-      [AuthRequest],
-      this.unArchiveNode
-    );
-    this._router.post(`${this._urlPath}/shared`, [AuthRequest], this.shareNode);
-    this._router.put(
-      `${this._urlPath}/shared`,
-      [AuthRequest],
-      this.updateAccessTypeForSharedNode
-    );
-    this._router.delete(
-      `${this._urlPath}/shared`,
-      [AuthRequest],
-      this.revokeNodeAccessForUsers
-    );
-    this._router.get(
-      `${this._urlPath}/shared/:nodeId`,
-      [AuthRequest],
-      this.getNodeSharedWithUser
-    );
-    this._router.get(
-      `${this._urlPath}/tags/all`,
-      [AuthRequest],
-      this.getAllTagsOfWorkspace
-    );
-    this._router.get(
-      `${this._urlPath}/tag/:tagName`,
-      [AuthRequest],
-      this.getNodeWithTag
-    );
-    return;
+    initializeNodeRoutes(this);
   }
 
   /**

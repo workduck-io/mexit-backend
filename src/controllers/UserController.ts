@@ -1,10 +1,9 @@
 import express, { Request, Response } from 'express';
 import container from '../inversify.config';
-
-import { AuthRequest } from '../middlewares/authrequest';
 import { statusCodes } from '../libs/statusCodes';
 import { UserManager } from '../managers/UserManager';
 import { RequestClass } from '../libs/RequestClass';
+import { initializeUserRoutes } from '../routes/UserRoutes';
 
 class UserController {
   public _urlPath = '/user';
@@ -13,27 +12,7 @@ class UserController {
   public _userManager: UserManager = container.get<UserManager>(UserManager);
 
   constructor() {
-    this.initializeRoutes();
-  }
-
-  public initializeRoutes(): void {
-    this._router.post(
-      `${this._urlPath}/update`,
-      [AuthRequest],
-      this.updateUser
-    );
-    this._router.get(`${this._urlPath}`, [AuthRequest], this.get);
-    this._router.get(`${this._urlPath}/:id`, [AuthRequest], this.getById);
-    this._router.get(
-      `${this._urlPath}/group/:groupId`,
-      [AuthRequest],
-      this.getByGroupId
-    );
-    this._router.post(
-      `${this._urlPath}/linkedin`,
-      [AuthRequest],
-      this.getUserByLinkedin
-    );
+    initializeUserRoutes(this);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

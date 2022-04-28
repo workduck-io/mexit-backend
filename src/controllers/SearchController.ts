@@ -1,10 +1,9 @@
 import express, { Request, Response } from 'express';
 import crypto from 'crypto';
 import { MeiliSearch, Index, SearchResponse } from 'meilisearch';
-
-import { AuthRequest } from '../middlewares/authrequest';
 import { statusCodes } from '../libs/statusCodes';
 import { SearchResults } from '../interfaces/Search';
+import { initializeSearchRoutes } from '../routes/SearchRoutes';
 
 class SearchController {
   public _urlPath = '/search';
@@ -13,7 +12,7 @@ class SearchController {
   private _client: MeiliSearch;
 
   constructor() {
-    this.initializeRoutes();
+    initializeSearchRoutes(this);
     this._client = this._initMeilisearch();
   }
 
@@ -36,10 +35,6 @@ class SearchController {
       total: data.nbHits,
     };
   };
-
-  public initializeRoutes(): void {
-    this._router.get(this._urlPath, [AuthRequest], this.searchIndex);
-  }
   searchIndex = async (
     request: Request,
     response: Response

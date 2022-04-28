@@ -1,8 +1,8 @@
 import express, { Request, Response } from 'express';
 import { BookmarkManager } from '../managers/BookmarkManager';
-import { AuthRequest } from '../middlewares/authrequest';
 import container from '../inversify.config';
 import { statusCodes } from '../libs/statusCodes';
+import { initializeBookmarkRoutes } from '../routes/BookmarkRoutes';
 
 class BookmarkController {
   public _urlPath = '/bookmark';
@@ -11,27 +11,7 @@ class BookmarkController {
     container.get<BookmarkManager>(BookmarkManager);
 
   constructor() {
-    this.initializeRoutes();
-  }
-
-  public initializeRoutes(): void {
-    this._router.patch(
-      `${this._urlPath}/:nodeid`,
-      [AuthRequest],
-      this.createBookmark
-    );
-
-    this._router.delete(
-      `${this._urlPath}/:nodeid`,
-      [AuthRequest],
-      this.removeBookmark
-    );
-
-    this._router.get(
-      `${this._urlPath}`,
-      [AuthRequest],
-      this.getBookmarksForUser
-    );
+    initializeBookmarkRoutes(this);
   }
 
   getBookmarksForUser = async (
@@ -69,7 +49,7 @@ class BookmarkController {
       const nodeID = request.params.nodeid;
       const workspaceId = request.headers['mex-workspace-id'].toString();
 
-      const result = await this._bookmarkManager.createBookmark(
+      await this._bookmarkManager.createBookmark(
         nodeID,
         response.locals.userId,
         workspaceId,
@@ -95,7 +75,7 @@ class BookmarkController {
       const nodeID = request.params.nodeid;
       const workspaceId = request.headers['mex-workspace-id'].toString();
 
-      const res = await this._bookmarkManager.removeBookmark(
+      await this._bookmarkManager.removeBookmark(
         nodeID,
         response.locals.userId,
         workspaceId,

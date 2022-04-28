@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { injectable } from 'inversify';
 import {
-  ActivityNodeDetail,
+  ArchiveNodeDetail,
   CopyOrMoveBlock,
-  NodeDetail,
   ShareNodeDetail,
 } from '../interfaces/Node';
 import { errorlib } from '../libs/errorlib';
@@ -23,6 +22,7 @@ export class NodeManager {
   async createNode(
     workspaceId: string,
     idToken: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     nodeDetail: any
   ): Promise<string> {
     try {
@@ -114,11 +114,11 @@ export class NodeManager {
       });
     }
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async getAllNodes(
     userId: string,
     workspaceId: string,
     idToken: string
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     try {
       const response = await this._lambda.invoke(
@@ -191,6 +191,7 @@ export class NodeManager {
     nodeId: string,
     workspaceId: string,
     idToken: string
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     const response = await this._lambda.invoke(
       this._nodeLambdaFunctionName,
@@ -207,6 +208,7 @@ export class NodeManager {
     nodeId: string,
     workspaceId: string,
     idToken: string
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     const response = await this._lambda.invoke(
       this._nodeLambdaFunctionName,
@@ -281,7 +283,7 @@ export class NodeManager {
   async archiveNode(
     workspaceId: string,
     idToken: string,
-    archivePayload: any
+    archivePayload: ArchiveNodeDetail
   ): Promise<string[]> {
     try {
       const result = await this._lambda.invoke(
@@ -313,7 +315,7 @@ export class NodeManager {
   async unArchiveNode(
     workspaceId: string,
     idToken: string,
-    unArchivePayload: any
+    unArchivePayload: ArchiveNodeDetail
   ): Promise<string[]> {
     try {
       const result = await this._lambda.invoke(
