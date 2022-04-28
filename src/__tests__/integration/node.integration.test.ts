@@ -8,9 +8,8 @@ import 'dotenv/config';
 const WORKSPACE_ID = process.env.MEXIT_BACKEND_WORKSPACE_ID;
 const REFRESH_TOKEN = process.env.MEXIT_BACKEND_REFRESH_TOKEN;
 const CLIENT_ID = process.env.MEXIT_BACKEND_CLIENT_ID;
-const USER_ID = process.env.MEXIT_BACKEND_USER_ID;
 
-if (!(WORKSPACE_ID && REFRESH_TOKEN && CLIENT_ID && USER_ID)) {
+if (!(WORKSPACE_ID && REFRESH_TOKEN && CLIENT_ID)) {
   throw new Error('Env Variables not supplied');
 }
 
