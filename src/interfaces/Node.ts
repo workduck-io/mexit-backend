@@ -9,6 +9,18 @@ export interface NodeDetail {
   lastEditedBy: string;
 }
 
+export enum NodeAccessType {
+  MANAGE = 'MANAGE',
+  READ = 'READ',
+}
+
+export interface ShareNodeDetail {
+  type: 'SharedNodeRequest';
+  nodeId: string;
+  userIds: string[];
+  accessType: NodeAccessType;
+}
+
 export interface ActivityNodeDetail extends NodeDetail {
   nodeschemaIdentifier: 'ActivityNode';
 }
