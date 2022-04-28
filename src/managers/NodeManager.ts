@@ -461,4 +461,71 @@ export class NodeManager {
       });
     }
   }
+  async getAllTagsOfWorkspace(
+    workspaceId: string,
+    idToken: string
+  ): Promise<string[]> {
+    try {
+      const result = await this._lambda.invoke(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.getAllTagsOfWorkspace,
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        }
+      );
+
+      const response: string = result.body;
+
+      if (!response) throw new Error('Something went wrong');
+
+      let allNodes = response.replace('[', '');
+      allNodes = allNodes.replace(']', '');
+      allNodes = allNodes.replace(/"/g, '');
+      const nodeResponse = allNodes.split(',');
+      return nodeResponse;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+  async getNodeWithTag(
+    workspaceId: string,
+    idToken: string,
+    tagName: string
+  ): Promise<string[]> {
+    try {
+      const result = await this._lambda.invoke(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.getNodeWithTag,
+          pathParameters: { tagName },
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        }
+      );
+      const response: string = result.body;
+
+      if (!response) throw new Error('Something went wrong');
+
+      let allNodes = response.replace('[', '');
+      allNodes = allNodes.replace(']', '');
+      allNodes = allNodes.replace(/"/g, '');
+      const nodeResponse = allNodes.split(',');
+      return nodeResponse;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
 }
