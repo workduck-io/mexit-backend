@@ -22,7 +22,7 @@ export class NodeManager {
   async createNode(
     workspaceId: string,
     idToken: string,
-    nodeDetail: NodeDetail | ActivityNodeDetail
+    nodeDetail: any
   ): Promise<string> {
     try {
       const result = await this._lambda.invoke(
@@ -261,6 +261,74 @@ export class NodeManager {
       );
 
       const response: string = result.body;
+      let allNodes = response.replace('[', '');
+      allNodes = allNodes.replace(']', '');
+      allNodes = allNodes.replace(/"/g, '');
+      const linkResponse = allNodes.split(',');
+      return linkResponse;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+
+  async archiveNode(
+    workspaceId: string,
+    idToken: string,
+    archivePayload: any
+  ): Promise<string[]> {
+    try {
+      const result = await this._lambda.invoke(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.archiveNode,
+          payload: archivePayload,
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        }
+      );
+
+      const response: string = result.body;
+      let allNodes = response.replace('[', '');
+      allNodes = allNodes.replace(']', '');
+      allNodes = allNodes.replace(/"/g, '');
+      const linkResponse = allNodes.split(',');
+      return linkResponse;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+  async unArchiveNode(
+    workspaceId: string,
+    idToken: string,
+    unArchivePayload: any
+  ): Promise<string[]> {
+    try {
+      const result = await this._lambda.invoke(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.unArchiveNode,
+          payload: unArchivePayload,
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        }
+      );
+
+      const response: string = result.body;
+
+      if (!response) throw new Error('Something went wrong');
+
       let allNodes = response.replace('[', '');
       allNodes = allNodes.replace(']', '');
       allNodes = allNodes.replace(/"/g, '');

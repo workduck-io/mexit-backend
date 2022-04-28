@@ -22,6 +22,7 @@ import {
   QueryStringParameters,
   CopyOrMoveBlock,
   ILink,
+  ArchiveNodeDetail,
 } from './interfaces/Node';
 import {
   ContentNodeRequest,
@@ -96,4 +97,5 @@ export default class Interfaces implements Definitions {
   GoogleAuthRefreshToken: GoogleAuthRefreshToken;
   ILink: ILink;
   SnippetUpdateVersionRequest: SnippetUpdateVersionRequest;
+  ArchiveNodeDetail: ArchiveNodeDetail;
 }
