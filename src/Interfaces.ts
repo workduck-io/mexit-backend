@@ -29,6 +29,8 @@ import {
   CopyOrMoveBlockRequest,
   LinkNodeRequest,
   SnippetUpdateVersionRequest,
+  RefactorRequest,
+  NodePath,
 } from './interfaces/Request';
 import {
   NodeResponse,
@@ -98,4 +100,7 @@ export default class Interfaces implements Definitions {
   ILink: ILink;
   SnippetUpdateVersionRequest: SnippetUpdateVersionRequest;
   ArchiveNodeDetail: ArchiveNodeDetail;
+  SnippetUpdate: SnippetUpdate;
+  NodePath: NodePath;
+  RefactorRequest: RefactorRequest;
 }
