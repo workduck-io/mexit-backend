@@ -30,4 +30,5 @@ export const RouteKeys = {
   removeBookmark: 'PATCH /userBookmark/{userID}/{nodeID}',
   getAllBookmarks: 'GET /userBookmark/{userID}',
   refactorHierarchy: 'POST /node/refactor',
+  bulkCreateNode: 'POST /node/bulkCreate',
 };

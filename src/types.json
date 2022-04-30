@@ -172,6 +172,33 @@
             ],
             "type": "object"
         },
+        "BulkCreateNode": {
+            "properties": {
+                "data": {
+                    "items": {},
+                    "type": "array"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "nodePath": {
+                    "$ref": "types#/definitions/NodePath"
+                },
+                "tags": {
+                    "items": {},
+                    "type": "array"
+                },
+                "title": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "nodePath",
+                "title"
+            ],
+            "type": "object"
+        },
         "ClientNode": {
             "properties": {
                 "content": {

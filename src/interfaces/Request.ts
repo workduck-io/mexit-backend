@@ -28,3 +28,11 @@ export interface RefactorRequest {
   newNodePath: NodePath;
   nodeID: string;
 }
+
+export interface BulkCreateNode {
+  nodePath: NodePath;
+  id: string;
+  title: string;
+  data?: any[];
+  tags?: any[];
+}
