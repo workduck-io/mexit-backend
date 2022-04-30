@@ -31,6 +31,7 @@ import {
   SnippetUpdateVersionRequest,
   RefactorRequest,
   NodePath,
+  BulkCreateNode,
 } from './interfaces/Request';
 import {
   NodeResponse,
@@ -103,4 +104,5 @@ export default class Interfaces implements Definitions {
   SnippetUpdate: SnippetUpdate;
   NodePath: NodePath;
   RefactorRequest: RefactorRequest;
+  BulkCreateNode: BulkCreateNode;
 }
