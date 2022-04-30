@@ -17,3 +17,14 @@ export interface CopyOrMoveBlockRequest {
   sourceNodeId: string;
   destinationNodeId: string;
 }
+
+export interface NodePath {
+  path: string;
+  namespaceID?: string;
+}
+
+export interface RefactorRequest {
+  existingNodePath: NodePath;
+  newNodePath: NodePath;
+  nodeID: string;
+}

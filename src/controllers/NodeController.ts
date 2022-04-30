@@ -95,6 +95,11 @@ class NodeController {
       [AuthRequest],
       this.unArchiveNode
     );
+    this._router.post(
+      `${this._urlPath}/refactor`,
+      [AuthRequest],
+      this.refactorHierarchy
+    );
     return;
   }
 
@@ -929,6 +934,30 @@ class NodeController {
         .status(statusCodes.INTERNAL_SERVER_ERROR)
         .send({ message: error.toString() })
         .json();
+    }
+  };
+
+  refactorHierarchy = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
+
+      const requestDetail = new RequestClass(request, 'RefactorRequest');
+      const workspaceID = request.headers['mex-workspace-id'].toString();
+
+      const refactorResp = await this._nodeManager.refactorHierarhy(
+        workspaceID,
+        response.locals.idToken,
+        requestDetail.data
+      );
+      response.status(statusCodes.OK).json(JSON.parse(refactorResp.body));
+    } catch (error) {
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .json({ message: error.toString() });
     }
   };
 }

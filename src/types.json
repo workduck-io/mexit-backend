@@ -1200,6 +1200,20 @@
             },
             "type": "object"
         },
+        "NodePath": {
+            "properties": {
+                "namespaceID": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "path"
+            ],
+            "type": "object"
+        },
         "NodeResponse": {
             "properties": {
                 "bookmarked": {
@@ -1276,6 +1290,25 @@
                 "blockSize",
                 "getMetaDataOfNode",
                 "getReverseOrder"
+            ],
+            "type": "object"
+        },
+        "RefactorRequest": {
+            "properties": {
+                "existingNodePath": {
+                    "$ref": "types#/definitions/NodePath"
+                },
+                "newNodePath": {
+                    "$ref": "types#/definitions/NodePath"
+                },
+                "nodeID": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "existingNodePath",
+                "newNodePath",
+                "nodeID"
             ],
             "type": "object"
         },
