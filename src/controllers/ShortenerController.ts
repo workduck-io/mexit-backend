@@ -1,9 +1,8 @@
 import express, { Request, Response } from 'express';
 import container from '../inversify.config';
-
-import { AuthRequest } from '../middlewares/authrequest';
 import { statusCodes } from '../libs/statusCodes';
 import { ShortenerManager } from '../managers/ShortenerManager';
+import { initializeShortenerRoutes } from '../routes/ShortenerRoutes';
 
 class ShortenerController {
   public _urlPath = '/shortener';
@@ -13,15 +12,7 @@ class ShortenerController {
     container.get<ShortenerManager>(ShortenerManager);
 
   constructor() {
-    this.initializeRoutes();
-  }
-
-  public initializeRoutes(): void {
-    this._router.get(
-      `${this._urlPath}/:workspaceId`,
-      [AuthRequest],
-      this.getShortsByWorkspace
-    );
+    initializeShortenerRoutes(this);
   }
 
   getShortsByWorkspace = async (

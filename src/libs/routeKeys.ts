@@ -29,4 +29,10 @@ export const RouteKeys = {
   createBookmark: 'POST /userBookmark/{userID}/{nodeID}',
   removeBookmark: 'PATCH /userBookmark/{userID}/{nodeID}',
   getAllBookmarks: 'GET /userBookmark/{userID}',
+  shareNode: 'POST /shared/node',
+  updateAccessTypeForshareNode: 'PUT /shared/node',
+  revokeNodeAccessForUsers: 'DELETE /shared/node',
+  getNodeSharedWithUser: 'GET /shared/node/{nodeID}',
+  getAllTagsOfWorkspace: 'GET /tag/all',
+  getNodeWithTag: 'GET /tag/{tagName}/node',
 };
