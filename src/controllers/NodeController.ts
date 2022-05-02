@@ -863,6 +863,8 @@ class NodeController {
     }
   };
 
+  // TODO: Node sharing endpoints are not tested yet.
+
   shareNode = async (request: Request, response: Response): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'ShareNodeDetail');
