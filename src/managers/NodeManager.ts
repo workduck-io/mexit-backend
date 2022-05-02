@@ -17,6 +17,7 @@ export class NodeManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
   private _nodeLambdaFunctionName = 'mex-backend-test-Node';
   private _workspaceLambdaFunctionName = 'mex-backend-test-Workspace';
+  private _tagLambdaFunctionName = 'mex-backend-test-Tag';
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
   async createNode(
@@ -469,7 +470,7 @@ export class NodeManager {
   ): Promise<string[]> {
     try {
       const result = await this._lambda.invoke(
-        this._nodeLambdaFunctionName,
+        this._tagLambdaFunctionName,
         this._lambdaInvocationType,
         {
           routeKey: RouteKeys.getAllTagsOfWorkspace,
@@ -503,11 +504,11 @@ export class NodeManager {
   ): Promise<string[]> {
     try {
       const result = await this._lambda.invoke(
-        this._nodeLambdaFunctionName,
+        this._tagLambdaFunctionName,
         this._lambdaInvocationType,
         {
           routeKey: RouteKeys.getNodeWithTag,
-          pathParameters: { tagName },
+          pathParameters: { tagName: tagName },
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
