@@ -2,12 +2,12 @@ import express, { Request, Response } from 'express';
 import container from '../inversify.config';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
-import { AuthRequest } from '../middlewares/authrequest';
 import { Transformer } from '../libs/TransformerClass';
 import { serializeContent } from '../libs/serialize';
 import { NodeResponse } from '../interfaces/Response';
 import { NodeDetail } from '../interfaces/Node';
 import { SnippetManager } from '../managers/SnippetManager';
+import { initializeSnippetRoutes } from '../routes/SnippetRoutes';
 class SnippetController {
   public _urlPath = '/snippet';
   public _router = express.Router();
@@ -16,42 +16,7 @@ class SnippetController {
   public _transformer: Transformer = container.get<Transformer>(Transformer);
 
   constructor() {
-    this.initializeRoutes();
-  }
-
-  public initializeRoutes(): void {
-    this._router.post(this._urlPath, [AuthRequest], this.createSnippet);
-    this._router.get(
-      `${this._urlPath}/:snippetId`,
-      [AuthRequest],
-      this.getSnippet
-    );
-    this._router.get(
-      `${this._urlPath}/:snippetId/all`,
-      [AuthRequest],
-      this.getAllVersionsOfSnippets
-    );
-    this._router.patch(
-      `${this._urlPath}/:id/:version/makePublic`,
-      [AuthRequest],
-      this.makeSnippetPublic
-    );
-    this._router.patch(
-      `${this._urlPath}/:id/:version/makePrivate`,
-      [AuthRequest],
-      this.makeSnippetPrivate
-    );
-    this._router.post(
-      `${this._urlPath}/clone/:id/:version`,
-      [AuthRequest],
-      this.clonePublicSnippet
-    );
-    this._router.get(
-      `${this._urlPath}/public/:snippetId/:version`,
-      [AuthRequest],
-      this.getPublicSnippet
-    );
-    return;
+    initializeSnippetRoutes(this);
   }
 
   createSnippet = async (
