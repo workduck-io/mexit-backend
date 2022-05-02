@@ -102,7 +102,7 @@ export const initializeNodeRoutes = (
     nodeControllerObject.getNodeSharedWithUser
   );
   nodeControllerObject._router.get(
-    `${nodeControllerObject._urlPath}/tags/all`,
+    `${nodeControllerObject._urlPath}/tag/all`,
     [AuthRequest],
     nodeControllerObject.getAllTagsOfWorkspace
   );
