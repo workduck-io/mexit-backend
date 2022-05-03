@@ -111,5 +111,15 @@ export const initializeNodeRoutes = (
     [AuthRequest],
     nodeControllerObject.getNodeWithTag
   );
+  nodeControllerObject._router.post(
+    `${nodeControllerObject._urlPath}/refactor`,
+    [AuthRequest],
+    nodeControllerObject.refactorHierarchy
+  );
+  nodeControllerObject._router.post(
+    `${nodeControllerObject._urlPath}/bulkCreate`,
+    [AuthRequest],
+    nodeControllerObject.bulkCreateNode
+  );
   return;
 };
