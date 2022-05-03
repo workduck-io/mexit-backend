@@ -35,4 +35,6 @@ export const RouteKeys = {
   getNodeSharedWithUser: 'GET /shared/node/{nodeID}',
   getAllTagsOfWorkspace: 'GET /tag/all',
   getNodeWithTag: 'GET /tag/{tagName}/node',
+  refactorHierarchy: 'POST /node/refactor',
+  bulkCreateNode: 'POST /node/bulkCreate',
 };
