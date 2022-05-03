@@ -31,6 +31,9 @@ import {
   CopyOrMoveBlockRequest,
   LinkNodeRequest,
   SnippetUpdateVersionRequest,
+  RefactorRequest,
+  NodePath,
+  BulkCreateNode,
 } from './interfaces/Request';
 import {
   NodeResponse,
@@ -103,4 +106,7 @@ export default class Interfaces implements Definitions {
   ArchiveNodeDetail: ArchiveNodeDetail;
   ShareNodeDetail: ShareNodeDetail;
   NodeAccessType: NodeAccessType;
+  NodePath: NodePath;
+  RefactorRequest: RefactorRequest;
+  BulkCreateNode: BulkCreateNode;
 }

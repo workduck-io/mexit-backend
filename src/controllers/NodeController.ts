@@ -1012,6 +1012,54 @@ class NodeController {
         .json();
     }
   };
+
+  refactorHierarchy = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
+
+      const requestDetail = new RequestClass(request, 'RefactorRequest');
+      const workspaceID = request.headers['mex-workspace-id'].toString();
+
+      const refactorResp = await this._nodeManager.refactorHierarchy(
+        workspaceID,
+        response.locals.idToken,
+        requestDetail.data
+      );
+      response.status(statusCodes.OK).json(JSON.parse(refactorResp.body));
+    } catch (error) {
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .json({ message: error.toString() });
+    }
+  };
+
+  bulkCreateNode = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
+
+      const requestDetail = new RequestClass(request, 'BulkCreateNode');
+      const workspaceID = request.headers['mex-workspace-id'].toString();
+
+      const bulkCreateResp = await this._nodeManager.bulkCreateNode(
+        workspaceID,
+        response.locals.idToken,
+        requestDetail.data
+      );
+      response.status(statusCodes.OK).json(JSON.parse(bulkCreateResp.body));
+    } catch (error) {
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .json({ message: error.toString() });
+    }
+  };
 }
 
 export default NodeController;
