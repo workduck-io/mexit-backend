@@ -40,4 +40,5 @@ export const RouteKeys = {
   getNodeWithTag: 'GET /tag/{tagName}/node',
   refactorHierarchy: 'POST /node/refactor',
   bulkCreateNode: 'POST /node/bulkCreate',
+  registerUser: 'POST /user/register',
 };

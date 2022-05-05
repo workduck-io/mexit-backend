@@ -373,7 +373,6 @@ export class NodeManager {
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
-
       return result.body;
     } catch (error) {
       errorlib({
