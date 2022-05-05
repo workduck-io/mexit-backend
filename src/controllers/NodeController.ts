@@ -1060,6 +1060,28 @@ class NodeController {
         .json({ message: error.toString() });
     }
   };
+
+  getArchivedNodes = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
+
+      const workspaceID = request.headers['mex-workspace-id'].toString();
+      const getArchiveResp = await this._nodeManager.getArchivedNodes(
+        workspaceID,
+        response.locals.idToken
+      );
+
+      response.status(statusCodes.OK).json(JSON.parse(getArchiveResp.body));
+    } catch (error) {
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .json({ message: error.toString() });
+    }
+  };
 }
 
 export default NodeController;
