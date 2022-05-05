@@ -45,3 +45,22 @@ export class Lambda {
     );
   }
 }
+
+@injectable()
+export class DirectLambdaInvocation {
+  async invoke(
+    functionName: string,
+    invocationType: InvocationType,
+    body: any
+  ) {
+    return JSON.parse(
+      (
+        await LambdaConfig.invokeLambdaClient({
+          FunctionName: functionName,
+          Payload: JSON.stringify(body),
+          InvocationType: invocationType,
+        })
+      ).Payload as string
+    );
+  }
+}
