@@ -1024,12 +1024,25 @@ class NodeController {
       const requestDetail = new RequestClass(request, 'RefactorRequest');
       const workspaceID = request.headers['mex-workspace-id'].toString();
 
-      const refactorResp = await this._nodeManager.refactorHierarchy(
-        workspaceID,
-        response.locals.idToken,
-        requestDetail.data
+      const refactorResp = JSON.parse(
+        (
+          await this._nodeManager.refactorHierarchy(
+            workspaceID,
+            response.locals.idToken,
+            requestDetail.data
+          )
+        ).body
       );
-      response.status(statusCodes.OK).json(JSON.parse(refactorResp.body));
+
+      const { addedPaths, removedPaths } = refactorResp;
+      const addedILinks = await this._transformer.decodeLinkHierarchy(
+        addedPaths
+      );
+      const removedILinks = await this._transformer.decodeLinkHierarchy(
+        removedPaths
+      );
+
+      response.status(statusCodes.OK).json({ addedILinks, removedILinks });
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
@@ -1048,12 +1061,25 @@ class NodeController {
       const requestDetail = new RequestClass(request, 'BulkCreateNode');
       const workspaceID = request.headers['mex-workspace-id'].toString();
 
-      const bulkCreateResp = await this._nodeManager.bulkCreateNode(
-        workspaceID,
-        response.locals.idToken,
-        requestDetail.data
+      const bulkCreateResp = JSON.parse(
+        (
+          await this._nodeManager.bulkCreateNode(
+            workspaceID,
+            response.locals.idToken,
+            requestDetail.data
+          )
+        ).body
       );
-      response.status(statusCodes.OK).json(JSON.parse(bulkCreateResp.body));
+
+      const { addedPaths, removedPaths } = bulkCreateResp;
+      const addedILinks = await this._transformer.decodeLinkHierarchy(
+        addedPaths
+      );
+      const removedILinks = await this._transformer.decodeLinkHierarchy(
+        removedPaths
+      );
+
+      response.status(statusCodes.OK).json({ addedILinks, removedILinks });
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
