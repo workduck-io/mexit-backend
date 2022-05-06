@@ -33,6 +33,8 @@ export const RouteKeys = {
   updateAccessTypeForshareNode: 'PUT /shared/node',
   revokeNodeAccessForUsers: 'DELETE /shared/node',
   getNodeSharedWithUser: 'GET /shared/node/{nodeID}',
+  updateSharedNode: 'POST /shared/node/update',
+  getUsersWithNodesShared: 'GET /shared/node/{id}/users',
   getAllTagsOfWorkspace: 'GET /tag/all',
   getNodeWithTag: 'GET /tag/{tagName}/node',
   refactorHierarchy: 'POST /node/refactor',
