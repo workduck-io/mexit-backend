@@ -4,11 +4,7 @@ import { errorlib } from '../libs/errorlib';
 import { errorCodes } from '../libs/errorCodes';
 import { statusCodes } from '../libs/statusCodes';
 import container from '../inversify.config';
-import {
-  Lambda,
-  InvocationType,
-  DirectLambdaInvocation,
-} from '../libs/LambdaClass';
+import { Lambda, InvocationType } from '../libs/LambdaClass';
 import { RouteKeys } from '../libs/routeKeys';
 import { UserPreference } from '../interfaces/User';
 
@@ -21,9 +17,6 @@ export class UserManager {
     'initialize-workspace-test-initializeWorkspace';
 
   private _lambda: Lambda = container.get<Lambda>(Lambda);
-  private _directLambda = container.get<DirectLambdaInvocation>(
-    DirectLambdaInvocation
-  );
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async updateUserPreference(userPreference: UserPreference): Promise<any> {
@@ -164,10 +157,14 @@ export class UserManager {
   // eslint-disable-next-line
   async initializeWorkspace(payload: any): Promise<any> {
     try {
-      const result = await this._directLambda.invoke(
+      const result = await this._lambda.invoke(
         this._initializeWorkspaceLambdaName,
         this._lambdaInvocationType,
-        payload
+        {
+          payload: payload,
+        },
+        false,
+        'Direct'
       );
 
       return result;
