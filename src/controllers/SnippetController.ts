@@ -34,7 +34,6 @@ class SnippetController {
         id: requestDetail.data.id,
         title: requestDetail.data.title,
         type: 'SnippetRequest',
-        lastEditedBy: response.locals.userEmail,
         namespaceIdentifier: 'NAMESPACE1',
         data: serializeContent(requestDetail.data.content),
       };

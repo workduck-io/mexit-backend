@@ -6,7 +6,6 @@ export interface NodeDetail {
   path?: string;
   namespaceIdentifier: string;
   data: NodeData[];
-  lastEditedBy: string;
 }
 
 export enum NodeAccessType {

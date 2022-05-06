@@ -41,7 +41,6 @@ describe('Node Manager', () => {
         title: 'test-title',
         namespaceIdentifier: 'test-namespace',
         data: [],
-        lastEditedBy: 'testuser@testorg.com',
         type: 'NodeRequest',
       };
 
@@ -128,7 +127,6 @@ describe('Node Manager', () => {
         title: 'test-title',
         namespaceIdentifier: 'test-namespace',
         data: [],
-        lastEditedBy: 'testuser@testorg.com',
         type: 'InvalidTypeRequest',
       };
       const testNodeResult = await nodeManager.createNode(
