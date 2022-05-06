@@ -121,5 +121,15 @@ export const initializeNodeRoutes = (
     [AuthRequest],
     nodeControllerObject.bulkCreateNode
   );
+  nodeControllerObject._router.post(
+    `${nodeControllerObject._urlPath}/shared/update`,
+    [AuthRequest],
+    nodeControllerObject.updateSharedNode
+  );
+  nodeControllerObject._router.get(
+    `${nodeControllerObject._urlPath}/shared/:nodeId/users`,
+    [AuthRequest],
+    nodeControllerObject.getUserWithNodesShared
+  );
   return;
 };

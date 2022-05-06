@@ -3,6 +3,7 @@ import { injectable } from 'inversify';
 import {
   ArchiveNodeDetail,
   CopyOrMoveBlock,
+  NodeDetail,
   ShareNodeDetail,
 } from '../interfaces/Node';
 import { errorlib } from '../libs/errorlib';
@@ -353,23 +354,27 @@ export class NodeManager {
     workspaceId: string,
     idToken: string,
     shareNodePayload: ShareNodeDetail
-  ): Promise<void> {
+  ): Promise<string> {
     try {
+      const payloadDetail = {
+        ...shareNodePayload,
+        nodeID: shareNodePayload.nodeId,
+        userIDs: shareNodePayload.userIds,
+      };
+      delete payloadDetail.nodeId;
+      delete payloadDetail.userIds;
+
       const result = await this._lambda.invoke(
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
         {
           routeKey: RouteKeys.shareNode,
-          payload: {
-            ...shareNodePayload,
-            nodeID: shareNodePayload.nodeId,
-            userIDs: shareNodePayload.userIds,
-          },
+          payload: payloadDetail,
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
 
-      console.log({ result });
+      return result.body;
     } catch (error) {
       errorlib({
         message: error.message,
@@ -384,9 +389,9 @@ export class NodeManager {
     workspaceId: string,
     idToken: string,
     shareNodePayload: ShareNodeDetail
-  ): Promise<void> {
+  ): Promise<string> {
     try {
-      await this._lambda.invoke(
+      const result = await this._lambda.invoke(
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -399,6 +404,7 @@ export class NodeManager {
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
+      return result.body;
     } catch (error) {
       errorlib({
         message: error.message,
@@ -413,9 +419,9 @@ export class NodeManager {
     workspaceId: string,
     idToken: string,
     shareNodePayload: ShareNodeDetail
-  ): Promise<void> {
+  ): Promise<string> {
     try {
-      await this._lambda.invoke(
+      const result = await this._lambda.invoke(
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -428,6 +434,7 @@ export class NodeManager {
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
+      return result.body;
     } catch (error) {
       errorlib({
         message: error.message,
@@ -442,7 +449,7 @@ export class NodeManager {
     workspaceId: string,
     idToken: string,
     nodeId: string
-  ): Promise<void> {
+  ): Promise<string> {
     try {
       const result = await this._lambda.invoke(
         this._nodeLambdaFunctionName,
@@ -453,7 +460,7 @@ export class NodeManager {
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
-      return result;
+      return result.body;
     } catch (error) {
       errorlib({
         message: error.message,
@@ -567,6 +574,59 @@ export class NodeManager {
       );
 
       return result;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+  async updateSharedNode(
+    workspaceId: string,
+    idToken: string,
+    nodeDetail: NodeDetail
+  ): Promise<string> {
+    try {
+      const result = await this._lambda.invoke(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.updateSharedNode,
+          payload: nodeDetail,
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        }
+      );
+
+      return result.body;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+  async getUserWithNodesShared(
+    workspaceId: string,
+    idToken: string,
+    nodeId: string
+  ): Promise<string> {
+    try {
+      const result = await this._lambda.invoke(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.getUsersWithNodesShared,
+          pathParameters: { id: nodeId },
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        }
+      );
+      return result.body;
     } catch (error) {
       errorlib({
         message: error.message,
