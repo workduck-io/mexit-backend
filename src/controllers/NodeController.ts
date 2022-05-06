@@ -775,8 +775,9 @@ class NodeController {
       if (!request.headers['mex-workspace-id'])
         throw new Error('workspace-id header missing');
       const workspaceId = request.headers['mex-workspace-id'].toString();
+
       const linkDataResult = await this._cache.getOrSet(
-        request.params.userId,
+        response.locals.userId,
         this._linkHierarchyLabel,
         () =>
           this._nodeManager.getLinkHierarchy(
