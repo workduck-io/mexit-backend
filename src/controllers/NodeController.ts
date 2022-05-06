@@ -863,8 +863,6 @@ class NodeController {
     }
   };
 
-  // TODO: Node sharing endpoints are not tested yet.
-
   shareNode = async (request: Request, response: Response): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'ShareNodeDetail');
@@ -873,13 +871,14 @@ class NodeController {
 
       const workspaceId = request.headers['mex-workspace-id'].toString();
 
-      await this._nodeManager.shareNode(
+      const result = await this._nodeManager.shareNode(
         workspaceId,
         response.locals.idToken,
         requestDetail.data
       );
 
-      response.send();
+      if (result) response.json(JSON.parse(result));
+      else response.json({ message: 'No response' });
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
@@ -898,13 +897,14 @@ class NodeController {
 
       const workspaceId = request.headers['mex-workspace-id'].toString();
 
-      await this._nodeManager.updateAccessTypeForSharedNode(
+      const result = await this._nodeManager.updateAccessTypeForSharedNode(
         workspaceId,
         response.locals.idToken,
         requestDetail.data
       );
 
-      response.send();
+      if (result) response.json(JSON.parse(result));
+      else response.json({ message: 'No response' });
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
@@ -924,13 +924,14 @@ class NodeController {
 
       const workspaceId = request.headers['mex-workspace-id'].toString();
 
-      await this._nodeManager.revokeNodeAccessForUsers(
+      const result = await this._nodeManager.revokeNodeAccessForUsers(
         workspaceId,
         response.locals.idToken,
         requestDetail.data
       );
 
-      response.send();
+      if (result) response.json(JSON.parse(result));
+      else response.json({ message: 'No response' });
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
@@ -955,7 +956,61 @@ class NodeController {
         nodeId
       );
 
-      response.json(result);
+      if (result) response.json(JSON.parse(result));
+      else response.json({ message: 'No response' });
+    } catch (error) {
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ message: error.toString() })
+        .json();
+    }
+  };
+  updateSharedNode = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      const requestDetail = new RequestClass(request, 'NodeDetail');
+
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
+
+      const workspaceId = request.headers['mex-workspace-id'].toString();
+
+      const result = await this._nodeManager.updateSharedNode(
+        workspaceId,
+        response.locals.idToken,
+        requestDetail.data
+      );
+
+      if (result) response.json(JSON.parse(result));
+      else response.json({ message: 'No response' });
+    } catch (error) {
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ message: error.toString() })
+        .json();
+    }
+  };
+  getUserWithNodesShared = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      const nodeId = request.params.nodeId;
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
+
+      const workspaceId = request.headers['mex-workspace-id'].toString();
+
+      const result = await this._nodeManager.getUserWithNodesShared(
+        workspaceId,
+        response.locals.idToken,
+        nodeId
+      );
+
+      if (result) response.json(JSON.parse(result));
+      else response.json({ message: 'No response' });
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
