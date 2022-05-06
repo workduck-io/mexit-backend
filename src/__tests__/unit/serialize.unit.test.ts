@@ -10,7 +10,6 @@ describe('Serializer library module', () => {
         createdBy: 'testuser@testorg.com',
         nodePath: 'test.doc',
         createNodeUID: 'NODE_test-node',
-        lastEditedBy: 'testuser@testorg.com',
         namespaceIdentifier: 'test-namespace',
         workspaceIdentifier: 'test-workspace',
         content: [
@@ -90,17 +89,11 @@ describe('Serializer library module', () => {
       expect(deserialiseData.children.length).toBeGreaterThan(0);
       expect(deserialiseData.type).toEqual('p');
       expect(deserialiseData.id).toEqual('BLOCK_test-block');
-      expect(deserialiseData.metadata.lastEditedBy).toEqual(
-        'testuser@testorg.com'
-      );
       expect(deserialiseData.metadata.createdBy).toEqual(
         'testuser@testorg.com'
       );
       expect(deserialiseData.children[0].type).toEqual('p');
       expect(deserialiseData.children[0].id).toEqual('TEMP_test-data');
-      expect(deserialiseData.children[0].metadata.lastEditedBy).toEqual(
-        'testuser@testorg.com'
-      );
       expect(deserialiseData.children[0].metadata.createdBy).toEqual(
         'testuser@testorg.com'
       );

@@ -197,7 +197,6 @@ class NodeController {
         id: userId,
         namespaceIdentifier: '#mex-it',
         data: [],
-        lastEditedBy: response.locals.userEmail,
         type: 'NodeRequest',
       };
 
@@ -320,7 +319,6 @@ class NodeController {
               // nodePath: reqBody.nodePath,
               title: reqBody.title,
               type: 'NodeRequest',
-              lastEditedBy: response.locals.userEmail,
               namespaceIdentifier: 'NAMESPACE1',
               data: serializeContent(reqBody.content),
               metadata: reqBody.metadata,
