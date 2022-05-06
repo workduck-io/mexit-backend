@@ -3,6 +3,7 @@ export const RouteKeys = {
   getAllNodes: `GET /node/all/{id}`,
   getNode: 'GET /node/{id}',
   appendNode: 'POST /node/{id}/append',
+  getArchivedNodes: 'GET /node/archive/{id}',
   archiveNode: 'PUT /node/archive',
   unArchiveNode: 'PUT /node/unarchive',
   editBlock: 'POST /node/{id}/blockUpdate',
@@ -39,4 +40,5 @@ export const RouteKeys = {
   getNodeWithTag: 'GET /tag/{tagName}/node',
   refactorHierarchy: 'POST /node/refactor',
   bulkCreateNode: 'POST /node/bulkCreate',
+  registerUser: 'POST /user/register',
 };

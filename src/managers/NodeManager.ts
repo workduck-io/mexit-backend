@@ -373,7 +373,6 @@ export class NodeManager {
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
-
       return result.body;
     } catch (error) {
       errorlib({
@@ -627,6 +626,29 @@ export class NodeManager {
         }
       );
       return result.body;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+  async getArchivedNodes(workspaceId: string, idToken: string) {
+    try {
+      const result = await this._lambda.invoke(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.getArchivedNodes,
+          pathParameters: { id: workspaceId },
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        }
+      );
+
+      return result;
     } catch (error) {
       errorlib({
         message: error.message,

@@ -4,6 +4,11 @@ import { AuthRequest } from '../middlewares/authrequest';
 export const initializeNodeRoutes = (
   nodeControllerObject: NodeController
 ): void => {
+  nodeControllerObject._router.get(
+    `${nodeControllerObject._urlPath}/archive`,
+    [AuthRequest],
+    nodeControllerObject.getArchivedNodes
+  );
   nodeControllerObject._router.post(
     nodeControllerObject._urlPath,
     [AuthRequest],

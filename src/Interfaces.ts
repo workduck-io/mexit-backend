@@ -34,6 +34,7 @@ import {
   RefactorRequest,
   NodePath,
   BulkCreateNode,
+  RegisterUserRequest,
 } from './interfaces/Request';
 import {
   NodeResponse,
@@ -109,4 +110,5 @@ export default class Interfaces implements Definitions {
   NodePath: NodePath;
   RefactorRequest: RefactorRequest;
   BulkCreateNode: BulkCreateNode;
+  RegisterUserRequest: RegisterUserRequest;
 }

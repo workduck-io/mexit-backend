@@ -36,3 +36,12 @@ export interface BulkCreateNode {
   data?: any[];
   tags?: any[];
 }
+
+export interface RegisterUserRequest {
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  workspaceName: string;
+}
