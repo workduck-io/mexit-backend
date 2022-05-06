@@ -94,6 +94,30 @@ class UserController {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
+
+  registerUser = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      const requestDetail = new RequestClass(request, 'RegisterUserRequest');
+      const idToken = response.locals.idToken;
+
+      const registerResp = JSON.parse(
+        (await this._userManager.registerUser(idToken, requestDetail.data)).body
+      );
+
+      await this._userManager.initializeWorkspace({
+        workspaceID: registerResp.id,
+        userEmail: requestDetail.data.user.email,
+      });
+      response.status(statusCodes.OK).json(registerResp);
+    } catch (error) {
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .json({ message: error.toString() });
+    }
+  };
 }
 
 export default UserController;

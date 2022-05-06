@@ -1079,12 +1079,25 @@ class NodeController {
       const requestDetail = new RequestClass(request, 'RefactorRequest');
       const workspaceID = request.headers['mex-workspace-id'].toString();
 
-      const refactorResp = await this._nodeManager.refactorHierarchy(
-        workspaceID,
-        response.locals.idToken,
-        requestDetail.data
+      const refactorResp = JSON.parse(
+        (
+          await this._nodeManager.refactorHierarchy(
+            workspaceID,
+            response.locals.idToken,
+            requestDetail.data
+          )
+        ).body
       );
-      response.status(statusCodes.OK).json(JSON.parse(refactorResp.body));
+
+      const { addedPaths, removedPaths } = refactorResp;
+      const addedILinks = await this._transformer.decodeLinkHierarchy(
+        addedPaths
+      );
+      const removedILinks = await this._transformer.decodeLinkHierarchy(
+        removedPaths
+      );
+
+      response.status(statusCodes.OK).json({ addedILinks, removedILinks });
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
@@ -1103,12 +1116,47 @@ class NodeController {
       const requestDetail = new RequestClass(request, 'BulkCreateNode');
       const workspaceID = request.headers['mex-workspace-id'].toString();
 
-      const bulkCreateResp = await this._nodeManager.bulkCreateNode(
-        workspaceID,
-        response.locals.idToken,
-        requestDetail.data
+      const bulkCreateResp = JSON.parse(
+        (
+          await this._nodeManager.bulkCreateNode(
+            workspaceID,
+            response.locals.idToken,
+            requestDetail.data
+          )
+        ).body
       );
-      response.status(statusCodes.OK).json(JSON.parse(bulkCreateResp.body));
+
+      const { addedPaths, removedPaths } = bulkCreateResp;
+      const addedILinks = await this._transformer.decodeLinkHierarchy(
+        addedPaths
+      );
+      const removedILinks = await this._transformer.decodeLinkHierarchy(
+        removedPaths
+      );
+
+      response.status(statusCodes.OK).json({ addedILinks, removedILinks });
+    } catch (error) {
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .json({ message: error.toString() });
+    }
+  };
+
+  getArchivedNodes = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
+
+      const workspaceID = request.headers['mex-workspace-id'].toString();
+      const getArchiveResp = await this._nodeManager.getArchivedNodes(
+        workspaceID,
+        response.locals.idToken
+      );
+
+      response.status(statusCodes.OK).json(JSON.parse(getArchiveResp.body));
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)

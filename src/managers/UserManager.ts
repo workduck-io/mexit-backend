@@ -12,6 +12,9 @@ import { UserPreference } from '../interfaces/User';
 export class UserManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
   private _userLambdaFunctionName = 'workduck-user-service-dev-user';
+  private _userMexBackendLambdaFunctionName = 'mex-backend-test-User';
+  private _initializeWorkspaceLambdaName =
+    'initialize-workspace-test-initializeWorkspace';
 
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
@@ -118,6 +121,53 @@ export class UserManager {
       );
 
       return result.body;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+  // eslint-disable-next-line
+  async registerUser(idToken: string, payload: any): Promise<any> {
+    try {
+      const result = await this._lambda.invoke(
+        this._userMexBackendLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.registerUser,
+          payload: { ...payload, type: 'RegisterUserRequest' },
+          headers: { 'mex-workspace-id': '', authorization: idToken },
+        }
+      );
+      return result;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+  // eslint-disable-next-line
+  async initializeWorkspace(payload: any): Promise<any> {
+    try {
+      const result = await this._lambda.invoke(
+        this._initializeWorkspaceLambdaName,
+        this._lambdaInvocationType,
+        {
+          payload: payload,
+        },
+        false,
+        'Direct'
+      );
+
+      return result;
     } catch (error) {
       errorlib({
         message: error.message,
