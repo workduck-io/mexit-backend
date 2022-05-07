@@ -4,12 +4,13 @@ import { statusCodes } from '../libs/statusCodes';
 import { UserManager } from '../managers/UserManager';
 import { RequestClass } from '../libs/RequestClass';
 import { initializeUserRoutes } from '../routes/UserRoutes';
-
+import { Transformer } from './../libs/TransformerClass';
 class UserController {
   public _urlPath = '/user';
   public _router = express.Router();
 
   public _userManager: UserManager = container.get<UserManager>(UserManager);
+  public _transformer: Transformer = container.get<Transformer>(Transformer);
 
   constructor() {
     initializeUserRoutes(this);
@@ -107,11 +108,25 @@ class UserController {
         (await this._userManager.registerUser(idToken, requestDetail.data)).body
       );
 
-      await this._userManager.initializeWorkspace({
-        workspaceID: registerResp.id,
-        userEmail: requestDetail.data.user.email,
+      const initWorkspaceResp = JSON.parse(
+        (
+          await this._userManager.initializeWorkspace({
+            workspaceID: registerResp.id,
+            userEmail: requestDetail.data.user.email,
+          })
+        ).body
+      );
+
+      const nodeHierarchyInfo = await this._transformer.decodeLinkHierarchy(
+        initWorkspaceResp.nodeHierarchy
+      );
+
+      response.status(statusCodes.OK).json({
+        registrationInfo: registerResp,
+        nodes: initWorkspaceResp.baseData.nodes,
+        snippets: initWorkspaceResp.baseData.snippets,
+        ilinks: nodeHierarchyInfo,
       });
-      response.status(statusCodes.OK).json(registerResp);
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
