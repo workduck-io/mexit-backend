@@ -251,10 +251,8 @@ export class NodeManager {
       });
     }
   }
-  async getLinkHierarchy(
-    workspaceId: string,
-    idToken: string
-  ): Promise<string[]> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async getLinkHierarchy(workspaceId: string, idToken: string): Promise<any> {
     try {
       const result = await this._lambda.invoke(
         this._workspaceLambdaFunctionName,
@@ -266,6 +264,9 @@ export class NodeManager {
       );
 
       const response: string = result.body;
+
+      if (response.includes('message')) return JSON.parse(response);
+
       let allNodes = response.replace('[', '');
       allNodes = allNodes.replace(']', '');
       allNodes = allNodes.replace(/"/g, '');

@@ -776,15 +776,31 @@ class NodeController {
         throw new Error('workspace-id header missing');
       const workspaceId = request.headers['mex-workspace-id'].toString();
 
-      const linkDataResult = await this._cache.getOrSet(
-        response.locals.userId,
-        this._linkHierarchyLabel,
-        () =>
-          this._nodeManager.getLinkHierarchy(
-            workspaceId,
-            response.locals.idToken
-          )
-      );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let linkDataResult: any[];
+
+      if (this._cache.has(response.locals.userId, this._linkHierarchyLabel)) {
+        linkDataResult = await this._cache.get(
+          response.locals.userId,
+          this._linkHierarchyLabel
+        );
+      } else {
+        const linkHierarchyResult = await this._nodeManager.getLinkHierarchy(
+          workspaceId,
+          response.locals.idToken
+        );
+
+        if (linkHierarchyResult?.message)
+          throw new Error(linkHierarchyResult.message);
+        else {
+          this._cache.set(
+            response.locals.userId,
+            this._linkHierarchyLabel,
+            linkHierarchyResult
+          );
+          linkDataResult = linkHierarchyResult;
+        }
+      }
 
       const result = await this._transformer.decodeLinkHierarchy(
         linkDataResult
