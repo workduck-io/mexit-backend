@@ -259,15 +259,8 @@ export class NodeManager {
         }
       );
 
-      const response: string = result.body;
-
-      if (response.includes('message')) return JSON.parse(response);
-
-      let allNodes = response.replace('[', '');
-      allNodes = allNodes.replace(']', '');
-      allNodes = allNodes.replace(/"/g, '');
-      const linkResponse = allNodes.split(',');
-      return linkResponse;
+      const response: string = JSON.parse(result.body);
+      return response;
     } catch (error) {
       errorlib({
         message: error.message,
