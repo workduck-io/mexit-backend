@@ -33,7 +33,7 @@ export class NodeManager {
         this._lambdaInvocationType,
         {
           routeKey: RouteKeys.createNode,
-          payload: nodeDetail,
+          payload: { ...nodeDetail, type: 'NodeRequest' },
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
@@ -223,11 +223,7 @@ export class NodeManager {
     );
     return response;
   }
-  async getPublicNode(
-    nodeId: string,
-    workspaceId: string,
-    idToken: string
-  ): Promise<string> {
+  async getPublicNode(nodeId: string): Promise<string> {
     try {
       const result = await this._lambda.invoke(
         this._nodeLambdaFunctionName,
@@ -235,7 +231,7 @@ export class NodeManager {
         {
           routeKey: RouteKeys.getPublicNode,
           pathParameters: { id: nodeId },
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+          headers: { 'mex-workspace-id': '', authorization: '' },
         }
       );
 
