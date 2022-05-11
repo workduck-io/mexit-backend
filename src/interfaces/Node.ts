@@ -77,6 +77,7 @@ export interface ContentNode {
   id: string;
   title: string;
   content?: any[];
+  referenceID?: string
   range?: {
     startMeta: {
       parentTagName: string;
