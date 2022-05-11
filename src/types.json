@@ -403,6 +403,9 @@
                     ],
                     "type": "object"
                 },
+                "referenceID": {
+                    "type": "string"
+                },
                 "title": {
                     "type": "string"
                 },
@@ -504,6 +507,9 @@
                         "text"
                     ],
                     "type": "object"
+                },
+                "referenceID": {
+                    "type": "string"
                 },
                 "title": {
                     "type": "string"
@@ -612,6 +618,9 @@
                         "text"
                     ],
                     "type": "object"
+                },
+                "referenceID": {
+                    "type": "string"
                 },
                 "title": {
                     "type": "string"
@@ -1558,6 +1567,9 @@
                         "text"
                     ],
                     "type": "object"
+                },
+                "referenceID": {
+                    "type": "string"
                 },
                 "title": {
                     "type": "string"
