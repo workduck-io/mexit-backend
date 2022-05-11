@@ -136,13 +136,9 @@ export class NodeManager {
 
       if (result.includes('message')) {
         return JSON.parse(result);
-      } else if (result.length === 2 && result[0] === '[' && result[1] === ']')
-        return [];
-      else {
-        let allNodes = result.replace('[', '');
-        allNodes = allNodes.replace(']', '');
-        allNodes = allNodes.replace(/"/g, '');
-        return allNodes.split(',');
+      } else {
+        const allNodes = JSON.parse(result);
+        return allNodes;
       }
     } catch (error) {
       errorlib({
@@ -289,11 +285,8 @@ export class NodeManager {
       );
 
       const response: string = result.body;
-      let allNodes = response.replace('[', '');
-      allNodes = allNodes.replace(']', '');
-      allNodes = allNodes.replace(/"/g, '');
-      const linkResponse = allNodes.split(',');
-      return linkResponse;
+      const allNodes = JSON.parse(response);
+      return allNodes;
     } catch (error) {
       errorlib({
         message: error.message,
@@ -323,12 +316,8 @@ export class NodeManager {
       const response: string = result.body;
 
       if (!response) throw new Error('Something went wrong');
-
-      let allNodes = response.replace('[', '');
-      allNodes = allNodes.replace(']', '');
-      allNodes = allNodes.replace(/"/g, '');
-      const linkResponse = allNodes.split(',');
-      return linkResponse;
+      const allNodes = JSON.parse(response);
+      return allNodes;
     } catch (error) {
       errorlib({
         message: error.message,
@@ -477,12 +466,8 @@ export class NodeManager {
       const response: string = result.body;
 
       if (!response) throw new Error('Something went wrong');
-
-      let allNodes = response.replace('[', '');
-      allNodes = allNodes.replace(']', '');
-      allNodes = allNodes.replace(/"/g, '');
-      const nodeResponse = allNodes.split(',');
-      return nodeResponse;
+      const allNodes = JSON.parse(response);
+      return allNodes;
     } catch (error) {
       errorlib({
         message: error.message,
@@ -511,12 +496,8 @@ export class NodeManager {
       const response: string = result.body;
 
       if (!response) throw new Error('Something went wrong');
-
-      let allNodes = response.replace('[', '');
-      allNodes = allNodes.replace(']', '');
-      allNodes = allNodes.replace(/"/g, '');
-      const nodeResponse = allNodes.split(',');
-      return nodeResponse;
+      const allNodes = JSON.parse(response);
+      return allNodes;
     } catch (error) {
       errorlib({
         message: error.message,

@@ -98,10 +98,8 @@ export class SnippetManager {
       } else if (result.length === 2 && result[0] === '[' && result[1] === ']')
         return [];
       else {
-        let allVersions = result.replace('[', '');
-        allVersions = allVersions.replace(']', '');
-        allVersions = allVersions.replace(/"/g, '');
-        return allVersions.split(',');
+        const allVersions = JSON.parse(result);
+        return allVersions;
       }
     } catch (error) {
       errorlib({
