@@ -1130,7 +1130,7 @@ class NodeController {
         ).body
       );
 
-      const { addedPaths, removedPaths } = bulkCreateResp;
+      const { addedPaths, removedPaths, node } = bulkCreateResp;
       const addedILinks = await this._transformer.decodeLinkHierarchy(
         addedPaths
       );
@@ -1138,7 +1138,13 @@ class NodeController {
         removedPaths
       );
 
-      response.status(statusCodes.OK).json({ addedILinks, removedILinks });
+      const createdNode = await this._transformer.genericNodeConverter(
+        JSON.parse(node) as NodeResponse
+      );
+
+      response
+        .status(statusCodes.OK)
+        .json({ addedILinks, removedILinks, node: createdNode });
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
