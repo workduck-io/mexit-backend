@@ -33,7 +33,7 @@ export class NodeManager {
         this._lambdaInvocationType,
         {
           routeKey: RouteKeys.createNode,
-          payload: nodeDetail,
+          payload: { ...nodeDetail, type: 'NodeRequest' },
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
@@ -223,11 +223,7 @@ export class NodeManager {
     );
     return response;
   }
-  async getPublicNode(
-    nodeId: string,
-    workspaceId: string,
-    idToken: string
-  ): Promise<string> {
+  async getPublicNode(nodeId: string): Promise<string> {
     try {
       const result = await this._lambda.invoke(
         this._nodeLambdaFunctionName,
@@ -235,7 +231,7 @@ export class NodeManager {
         {
           routeKey: RouteKeys.getPublicNode,
           pathParameters: { id: nodeId },
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+          headers: { 'mex-workspace-id': '', authorization: '' },
         }
       );
 
@@ -251,10 +247,8 @@ export class NodeManager {
       });
     }
   }
-  async getLinkHierarchy(
-    workspaceId: string,
-    idToken: string
-  ): Promise<string[]> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async getLinkHierarchy(workspaceId: string, idToken: string): Promise<any> {
     try {
       const result = await this._lambda.invoke(
         this._workspaceLambdaFunctionName,
@@ -265,12 +259,8 @@ export class NodeManager {
         }
       );
 
-      const response: string = result.body;
-      let allNodes = response.replace('[', '');
-      allNodes = allNodes.replace(']', '');
-      allNodes = allNodes.replace(/"/g, '');
-      const linkResponse = allNodes.split(',');
-      return linkResponse;
+      const response: string = JSON.parse(result.body);
+      return response;
     } catch (error) {
       errorlib({
         message: error.message,
