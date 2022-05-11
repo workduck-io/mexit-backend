@@ -178,13 +178,8 @@ describe('Node Manager', () => {
   });
   describe('Get public node by UID', () => {
     it('should return the corresponding public node for the given node id', async () => {
-      const ID_TOKEN = await getIdToken();
       const nodeId = 'NODE_test-user-id';
-      const node = await nodeManager.getPublicNode(
-        nodeId,
-        WORKSPACE_ID,
-        ID_TOKEN
-      );
+      const node = await nodeManager.getPublicNode(nodeId);
 
       expect(JSON.parse(node).id).toBe(nodeId);
       expect(JSON.parse(node).data.length).toBeGreaterThan(0);
@@ -206,11 +201,7 @@ describe('Node Manager', () => {
     it('should fail since the given node UID was made private', async () => {
       const ID_TOKEN = await getIdToken();
       const nodeId = 'NODE_FAILPUBLICNODE';
-      const node = await nodeManager.getPublicNode(
-        nodeId,
-        WORKSPACE_ID,
-        ID_TOKEN
-      );
+      const node = await nodeManager.getPublicNode(nodeId);
 
       expect(JSON.parse(node).message).toBe('Requested Resource Not Found');
     });

@@ -735,30 +735,19 @@ class NodeController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
       const nodeId = request.params.nodeId;
-      const workspaceId = request.headers['mex-workspace-id'].toString();
 
-      const result = await this._nodeManager.getPublicNode(
-        nodeId,
-        workspaceId,
-        response.locals.idToken
-      );
+      const result = await this._nodeManager.getPublicNode(nodeId);
 
       if (JSON.parse(result).message) {
         throw new Error(JSON.parse(result).message);
       }
 
       const nodeResponse = JSON.parse(result) as NodeResponse;
-      const convertedResponse =
-        this._transformer.genericNodeConverter(nodeResponse);
+      // const convertedResponse =
+      //   this._transformer.genericNodeConverter(nodeResponse);
 
-      response
-        .contentType('application/json')
-        .status(statusCodes.OK)
-        .send(convertedResponse);
+      response.status(statusCodes.OK).json(nodeResponse);
     } catch (error) {
       const resp = {
         message: error.message,
@@ -776,15 +765,31 @@ class NodeController {
         throw new Error('workspace-id header missing');
       const workspaceId = request.headers['mex-workspace-id'].toString();
 
-      const linkDataResult = await this._cache.getOrSet(
-        response.locals.userId,
-        this._linkHierarchyLabel,
-        () =>
-          this._nodeManager.getLinkHierarchy(
-            workspaceId,
-            response.locals.idToken
-          )
-      );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let linkDataResult: any[];
+
+      if (this._cache.has(response.locals.userId, this._linkHierarchyLabel)) {
+        linkDataResult = await this._cache.get(
+          response.locals.userId,
+          this._linkHierarchyLabel
+        );
+      } else {
+        const linkHierarchyResult = await this._nodeManager.getLinkHierarchy(
+          workspaceId,
+          response.locals.idToken
+        );
+
+        if (linkHierarchyResult?.message)
+          throw new Error(linkHierarchyResult.message);
+        else {
+          this._cache.set(
+            response.locals.userId,
+            this._linkHierarchyLabel,
+            linkHierarchyResult
+          );
+          linkDataResult = linkHierarchyResult;
+        }
+      }
 
       const result = await this._transformer.decodeLinkHierarchy(
         linkDataResult
