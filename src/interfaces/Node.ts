@@ -11,6 +11,7 @@ export interface NodeDetail {
 export enum NodeAccessType {
   MANAGE = 'MANAGE',
   READ = 'READ',
+  WRITE = 'WRITE',
 }
 
 export interface ShareNodeDetail {
@@ -18,6 +19,12 @@ export interface ShareNodeDetail {
   nodeId: string;
   userIds: string[];
   accessType: NodeAccessType;
+}
+
+export interface UpdateAccessTypeForSharedNodeDetail {
+  type: 'UpdateAccessTypesRequest';
+  nodeId: string;
+  userIDToAccessTypeMap: { [key: string]: NodeAccessType };
 }
 
 export interface ActivityNodeDetail extends NodeDetail {
@@ -77,7 +84,7 @@ export interface ContentNode {
   id: string;
   title: string;
   content?: any[];
-  referenceID?: string
+  referenceID?: string;
   range?: {
     startMeta: {
       parentTagName: string;

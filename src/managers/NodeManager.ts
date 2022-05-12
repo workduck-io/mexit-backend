@@ -5,6 +5,7 @@ import {
   CopyOrMoveBlock,
   NodeDetail,
   ShareNodeDetail,
+  UpdateAccessTypeForSharedNodeDetail,
 } from '../interfaces/Node';
 import { errorlib } from '../libs/errorlib';
 import { errorCodes } from '../libs/errorCodes';
@@ -366,19 +367,21 @@ export class NodeManager {
   async updateAccessTypeForSharedNode(
     workspaceId: string,
     idToken: string,
-    shareNodePayload: ShareNodeDetail
+    updatedAccessTypeForSharedNodePayload: UpdateAccessTypeForSharedNodeDetail
   ): Promise<string> {
     try {
+      const payloadDetail = {
+        ...updatedAccessTypeForSharedNodePayload,
+        nodeID: updatedAccessTypeForSharedNodePayload.nodeId,
+      };
+      delete payloadDetail.nodeId;
+
       const result = await this._lambda.invoke(
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
         {
           routeKey: RouteKeys.updateAccessTypeForshareNode,
-          payload: {
-            ...shareNodePayload,
-            nodeID: shareNodePayload.nodeId,
-            userIDs: shareNodePayload.userIds,
-          },
+          payload: payloadDetail,
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );

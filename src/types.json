@@ -1050,7 +1050,8 @@
         "NodeAccessType": {
             "enum": [
                 "MANAGE",
-                "READ"
+                "READ",
+                "WRITE"
             ],
             "type": "string"
         },
@@ -1596,6 +1597,31 @@
             },
             "required": [
                 "text"
+            ],
+            "type": "object"
+        },
+        "UpdateAccessTypeForSharedNodeDetail": {
+            "properties": {
+                "nodeId": {
+                    "type": "string"
+                },
+                "type": {
+                    "enum": [
+                        "UpdateAccessTypesRequest"
+                    ],
+                    "type": "string"
+                },
+                "userIDToAccessTypeMap": {
+                    "additionalProperties": {
+                        "$ref": "types#/definitions/NodeAccessType"
+                    },
+                    "type": "object"
+                }
+            },
+            "required": [
+                "nodeId",
+                "type",
+                "userIDToAccessTypeMap"
             ],
             "type": "object"
         },

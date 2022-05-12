@@ -25,6 +25,7 @@ import {
   ArchiveNodeDetail,
   ShareNodeDetail,
   NodeAccessType,
+  UpdateAccessTypeForSharedNodeDetail,
 } from './interfaces/Node';
 import {
   ContentNodeRequest,
@@ -111,4 +112,5 @@ export default class Interfaces implements Definitions {
   RefactorRequest: RefactorRequest;
   BulkCreateNode: BulkCreateNode;
   RegisterUserRequest: RegisterUserRequest;
+  UpdateAccessTypeForSharedNodeDetail: UpdateAccessTypeForSharedNodeDetail;
 }
