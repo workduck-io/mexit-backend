@@ -895,7 +895,10 @@ class NodeController {
     response: Response
   ): Promise<void> => {
     try {
-      const requestDetail = new RequestClass(request, 'ShareNodeDetail');
+      const requestDetail = new RequestClass(
+        request,
+        'UpdateAccessTypeForSharedNodeDetail'
+      );
       if (!request.headers['mex-workspace-id'])
         throw new Error('mex-workspace-id header missing');
 
