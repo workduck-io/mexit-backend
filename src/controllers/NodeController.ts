@@ -1156,9 +1156,7 @@ class NodeController {
         removedPaths
       );
 
-      const createdNode = await this._transformer.genericNodeConverter(
-        JSON.parse(node) as NodeResponse
-      );
+      const createdNode = JSON.parse(node) as NodeResponse;
 
       response
         .status(statusCodes.OK)
