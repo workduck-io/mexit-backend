@@ -511,6 +511,7 @@ export class NodeManager {
       });
     }
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async refactorHierarchy(workspaceId: string, idToken: string, payload: any) {
     try {
       const result = await this._lambda.invoke(
@@ -534,6 +535,7 @@ export class NodeManager {
       });
     }
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async bulkCreateNode(workspaceId: string, idToken: string, payload: any) {
     try {
       const result = await this._lambda.invoke(
@@ -596,6 +598,30 @@ export class NodeManager {
         {
           routeKey: RouteKeys.getUsersWithNodesShared,
           pathParameters: { id: nodeId },
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        }
+      );
+      return result.body;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+  async getAllNodesSharedForUser(
+    workspaceId: string,
+    idToken: string
+  ): Promise<string> {
+    try {
+      const result = await this._lambda.invoke(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.getAllSharedNodeForUser,
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );

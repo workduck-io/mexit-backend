@@ -41,4 +41,5 @@ export const RouteKeys = {
   refactorHierarchy: 'POST /node/refactor',
   bulkCreateNode: 'POST /node/bulkCreate',
   registerUser: 'POST /user/register',
+  getAllSharedNodeForUser: 'GET /shared/node/all',
 };
