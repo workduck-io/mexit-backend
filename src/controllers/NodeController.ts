@@ -1025,6 +1025,31 @@ class NodeController {
         .json();
     }
   };
+
+  getAllNodesSharedForUser = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
+
+      const workspaceId = request.headers['mex-workspace-id'].toString();
+
+      const result = await this._nodeManager.getAllNodesSharedForUser(
+        workspaceId,
+        response.locals.idToken
+      );
+
+      if (result) response.json(JSON.parse(result));
+      else response.json({ message: 'No response' });
+    } catch (error) {
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ message: error.toString() })
+        .json();
+    }
+  };
   getAllTagsOfWorkspace = async (
     request: Request,
     response: Response
