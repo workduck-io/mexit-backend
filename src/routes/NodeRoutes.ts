@@ -5,6 +5,11 @@ export const initializeNodeRoutes = (
   nodeControllerObject: NodeController
 ): void => {
   nodeControllerObject._router.get(
+    `${nodeControllerObject._urlPath}/shared/all`,
+    [AuthRequest],
+    nodeControllerObject.getAllNodesSharedForUser
+  );
+  nodeControllerObject._router.get(
     `${nodeControllerObject._urlPath}/archive`,
     [AuthRequest],
     nodeControllerObject.getArchivedNodes
