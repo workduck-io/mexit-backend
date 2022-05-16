@@ -398,7 +398,7 @@ class NodeController {
       }
       // update the Link hierarchy cache
       await this.updateILinkCache(
-        request.params.userId,
+        response.locals.userId,
         workspaceId,
         response.locals.idToken
       );
@@ -496,7 +496,7 @@ class NodeController {
 
       // update the Link hierarchy cache
       await this.updateILinkCache(
-        request.params.userId,
+        response.locals.userId,
         workspaceId,
         response.locals.idToken
       );
@@ -530,13 +530,10 @@ class NodeController {
         requestDetail.data
       );
 
-      const deserialisedContent = this._transformer.genericNodeConverter(
-        JSON.parse(nodeResult)
-      );
-      response.json(deserialisedContent);
+      response.status(statusCodes.OK).json(JSON.parse(nodeResult));
 
       await this.updateILinkCache(
-        request.params.userId,
+        response.locals.userId,
         workspaceId,
         response.locals.idToken
       );
@@ -580,7 +577,7 @@ class NodeController {
       response.json(result);
 
       await this.updateILinkCache(
-        request.params.userId,
+        response.locals.userId,
         workspaceId,
         response.locals.idToken
       );
@@ -691,12 +688,7 @@ class NodeController {
         response.locals.idToken
       );
 
-      const resp = {
-        status: statusCodes.OK,
-        nodeUID: JSON.parse(result.body),
-      };
-
-      response.json(resp);
+      response.status(statusCodes.OK).json(JSON.parse(result.body));
     } catch (error) {
       console.error(error);
       response.status(statusCodes.INTERNAL_SERVER_ERROR).json(error);
@@ -719,12 +711,7 @@ class NodeController {
         response.locals.idToken
       );
 
-      const resp = {
-        status: statusCodes.OK,
-        nodeUID: JSON.parse(result.body),
-      };
-
-      response.json(resp);
+      response.status(statusCodes.OK).json(JSON.parse(result.body));
     } catch (error) {
       console.error(error);
       response.status(statusCodes.INTERNAL_SERVER_ERROR).json(error);
@@ -744,8 +731,6 @@ class NodeController {
       }
 
       const nodeResponse = JSON.parse(result) as NodeResponse;
-      // const convertedResponse =
-      //   this._transformer.genericNodeConverter(nodeResponse);
 
       response.status(statusCodes.OK).json(nodeResponse);
     } catch (error) {
@@ -824,7 +809,7 @@ class NodeController {
       // update the Link hierarchy cache
       response.json(archiveNodeResult);
       await this.updateILinkCache(
-        request.params.userId,
+        response.locals.userId,
         workspaceId,
         response.locals.idToken
       );
@@ -855,7 +840,7 @@ class NodeController {
       // update the Link hierarchy cache
       response.json(archiveNodeResult);
       await this.updateILinkCache(
-        request.params.userId,
+        response.locals.userId,
         workspaceId,
         response.locals.idToken
       );
@@ -1130,6 +1115,11 @@ class NodeController {
       );
 
       response.status(statusCodes.OK).json({ addedILinks, removedILinks });
+      await this.updateILinkCache(
+        response.locals.userId,
+        workspaceID,
+        response.locals.idToken
+      );
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
@@ -1173,6 +1163,12 @@ class NodeController {
       response
         .status(statusCodes.OK)
         .json({ addedILinks, removedILinks, node: createdNode });
+
+      await this.updateILinkCache(
+        response.locals.userId,
+        workspaceID,
+        response.locals.idToken
+      );
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
