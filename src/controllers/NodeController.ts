@@ -496,17 +496,17 @@ class NodeController {
 
       const resp = JSON.parse(result);
 
+      if (resp.message) throw new Error(resp.message);
+
+      resp.shortenedURL = shortenedURL;
+      response.json(resp);
+
       // update the Link hierarchy cache
       await this.updateILinkCache(
         response.locals.userId,
         workspaceId,
         response.locals.idToken
       );
-
-      if (resp.message) throw new Error(resp.message);
-
-      resp.shortenedURL = shortenedURL;
-      response.json(resp);
     } catch (error) {
       response
         .status(statusCodes.INTERNAL_SERVER_ERROR)
