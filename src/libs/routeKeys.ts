@@ -22,6 +22,7 @@ export const RouteKeys = {
   getLinkHierarchy: 'GET /workspace/hierarchy',
   getSnippet: 'GET /snippet/{id}',
   getAllVersionsOfSnippet: 'GET /snippet/{id}/all',
+  getAllSnippetsOfWorkspace: 'GET /snippet/all',
   createSnippet: 'POST /snippet',
   makeSnippetPublic: 'PATCH /snippet/makePublic/{id}/{version}',
   makeSnippetPrivate: 'PATCH /snippet/makePrivate/{id}/{version}',

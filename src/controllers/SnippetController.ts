@@ -110,6 +110,32 @@ class SnippetController {
     }
   };
 
+  getAllSnippetsOfWorkspace = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
+
+      const workspaceId = request.headers['mex-workspace-id'].toString();
+      const result = await this._snippetManager.getAllSnippetsOfWorkspace(
+        workspaceId,
+        response.locals.idToken
+      );
+
+      response
+        .contentType('application/json')
+        .status(statusCodes.OK)
+        .send(result);
+    } catch (error) {
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ message: error.toString() })
+        .json();
+    }
+  };
+
   makeSnippetPublic = async (
     request: Request,
     response: Response
