@@ -24,26 +24,17 @@ class SnippetController {
     response: Response
   ): Promise<void> => {
     try {
-      const requestDetail = new RequestClass(request, 'ContentNodeRequest');
       if (!request.headers['mex-workspace-id'])
         throw new Error('mex-workspace-id header missing');
 
       const workspaceId = request.headers['mex-workspace-id'].toString();
-
-      const snippetDetail: NodeDetail = {
-        id: requestDetail.data.id,
-        title: requestDetail.data.title,
-        type: 'SnippetRequest',
-        namespaceIdentifier: 'NAMESPACE1',
-        data: serializeContent(requestDetail.data.content),
-      };
 
       const createNextVersion = request.query.createNextVersion === 'true';
 
       const nodeResult = await this._snippetManager.createSnippet(
         workspaceId,
         response.locals.idToken,
-        snippetDetail,
+        request.body,
         createNextVersion
       );
 
