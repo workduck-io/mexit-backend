@@ -17,7 +17,8 @@ export class SnippetManager {
   async createSnippet(
     workspaceId: string,
     idToken: string,
-    snippetDetail: NodeDetail,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    snippetDetail: any,
     createNextVersion = false
   ): Promise<string> {
     try {
