@@ -39,4 +39,9 @@ export const initializeSnippetRoutes = (
     [AuthRequest],
     snippetObject.getPublicSnippet
   );
+  snippetObject._router.get(
+    `${snippetObject._urlPath}/all`,
+    [AuthRequest],
+    snippetObject.getAllSnippetsOfWorkspace
+  );
 };

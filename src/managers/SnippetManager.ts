@@ -113,6 +113,39 @@ export class SnippetManager {
     }
   }
 
+  async getAllSnippetsOfWorkspace(
+    workspaceId: string,
+    idToken: string
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<any> {
+    try {
+      const response = await this._lambda.invoke(
+        this._snippetLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.getAllSnippetsOfWorkspace,
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        }
+      );
+      const result: string = response.body;
+
+      if (result.includes('message')) {
+        return JSON.parse(result);
+      } else {
+        const allVersions = JSON.parse(result);
+        return allVersions;
+      }
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+
   async makeSnippetPublic(
     snippetId: string,
     version: string,
