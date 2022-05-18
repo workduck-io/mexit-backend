@@ -1,7 +1,7 @@
 import winston from 'winston';
 import WinstonCloudWatch from 'winston-cloudwatch';
 import crypto from 'crypto';
-import { AWS_REGION } from 'src/env';
+import { AWS_REGION } from '../env';
 const loggerFormat = winston.format.printf(({ level, message, timestamp }) => {
   return `[${level}] ${message} ${timestamp}`;
 });
