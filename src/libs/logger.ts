@@ -1,6 +1,7 @@
 import winston from 'winston';
 import WinstonCloudWatch from 'winston-cloudwatch';
 import crypto from 'crypto';
+import { AWS_REGION } from 'src/env';
 const loggerFormat = winston.format.printf(({ level, message, timestamp }) => {
   return `[${level}] ${message} ${timestamp}`;
 });
@@ -36,6 +37,7 @@ const productionLogger = () =>
             crypto.createHash('md5').update(startTime).digest('hex')
           );
         },
+        awsRegion: AWS_REGION,
       }),
     ],
   });
