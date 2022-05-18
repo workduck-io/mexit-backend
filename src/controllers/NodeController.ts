@@ -432,7 +432,6 @@ class NodeController {
       if (!request.headers['mex-workspace-id'])
         throw new Error('mex-workspace-id header missing');
       const reqBody = new RequestClass(request, 'LinkCapture').data;
-      const activityNodeUID = `NODE_${response.locals.userId}`;
       const workspaceId = request.headers['mex-workspace-id'].toString();
 
       const shortenerResp = await this._shortenerManager.createNewShort(
@@ -447,9 +446,13 @@ class NodeController {
         return;
       }
 
-      const activityNodeDetail = {
-        type: 'ElementRequest',
-        elements: [
+      const nodeDetail = {
+        id: GuidGenerator.generateNodeGUID(),
+        type: 'NodeRequest',
+        title: reqBody.short,
+        lastEditedBy: response.locals.userEmail,
+        namespaceIdentifier: 'NAMESPACE1',
+        data: [
           {
             id: GuidGenerator.generateBlockGUID(),
             elementType: 'h1',
@@ -485,11 +488,10 @@ class NodeController {
         ],
       };
 
-      const result = await this._nodeManager.appendNode(
-        activityNodeUID,
+      const result = await this._nodeManager.createNode(
         workspaceId,
         response.locals.idToken,
-        activityNodeDetail
+        nodeDetail
       );
 
       const resp = JSON.parse(result);

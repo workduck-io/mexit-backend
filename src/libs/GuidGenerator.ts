@@ -5,8 +5,10 @@ const nanoid = customAlphabet(nolookalikes, 21);
 
 const generateBlockGUID = () => `BLOCK_${nanoid()}`;
 const generateTempGUID = () => `TEMP_${nanoid()}`;
+const generateNodeGUID = () => `NODE_${nanoid()}`;
 
 export default {
   generateBlockGUID,
   generateTempGUID,
+  generateNodeGUID,
 };
