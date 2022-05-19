@@ -4,6 +4,11 @@ import SnippetController from '../controllers/SnippetController';
 export const initializeSnippetRoutes = (
   snippetObject: SnippetController
 ): void => {
+  snippetObject._router.get(
+    `${snippetObject._urlPath}/all`,
+    [AuthRequest],
+    snippetObject.getAllSnippetsOfWorkspace
+  );
   snippetObject._router.post(
     snippetObject._urlPath,
     [AuthRequest],
@@ -38,10 +43,5 @@ export const initializeSnippetRoutes = (
     `${snippetObject._urlPath}/public/:snippetId/:version`,
     [AuthRequest],
     snippetObject.getPublicSnippet
-  );
-  snippetObject._router.get(
-    `${snippetObject._urlPath}/all`,
-    [AuthRequest],
-    snippetObject.getAllSnippetsOfWorkspace
   );
 };
