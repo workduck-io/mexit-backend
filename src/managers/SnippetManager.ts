@@ -96,9 +96,7 @@ export class SnippetManager {
 
       if (result.includes('message')) {
         return JSON.parse(result);
-      } else if (result.length === 2 && result[0] === '[' && result[1] === ']')
-        return [];
-      else {
+      } else {
         const allVersions = JSON.parse(result);
         return allVersions;
       }
