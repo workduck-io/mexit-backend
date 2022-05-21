@@ -414,7 +414,6 @@ class NodeController {
     userId: string,
     workspaceId: string,
     idToken: string
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     const result = await this._nodeManager.getLinkHierarchy(
       workspaceId,
@@ -752,7 +751,6 @@ class NodeController {
         throw new Error('workspace-id header missing');
       const workspaceId = request.headers['mex-workspace-id'].toString();
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let linkDataResult: any[];
 
       if (this._cache.has(response.locals.userId, this._linkHierarchyLabel)) {

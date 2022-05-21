@@ -18,7 +18,6 @@ class ShortenerController {
   getShortsByWorkspace = async (
     request: Request,
     response: Response
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> => {
     const workspaceId = request.params.workspaceId;
     try {
