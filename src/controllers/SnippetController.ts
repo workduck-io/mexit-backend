@@ -1,11 +1,8 @@
 import express, { Request, Response } from 'express';
 import container from '../inversify.config';
-import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
-import { serializeContent } from '../libs/serialize';
 import { NodeResponse } from '../interfaces/Response';
-import { NodeDetail } from '../interfaces/Node';
 import { SnippetManager } from '../managers/SnippetManager';
 import { initializeSnippetRoutes } from '../routes/SnippetRoutes';
 class SnippetController {
@@ -119,9 +116,11 @@ class SnippetController {
         throw new Error('mex-workspace-id header missing');
 
       const workspaceId = request.headers['mex-workspace-id'].toString();
+      const getData = request.query.getData === 'true';
       const result = await this._snippetManager.getAllSnippetsOfWorkspace(
         workspaceId,
-        response.locals.idToken
+        response.locals.idToken,
+        getData
       );
 
       response

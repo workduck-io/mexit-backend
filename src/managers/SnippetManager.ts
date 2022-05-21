@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { injectable } from 'inversify';
-import { NodeDetail } from '../interfaces/Node';
 import { errorlib } from '../libs/errorlib';
 import { errorCodes } from '../libs/errorCodes';
 import { statusCodes } from '../libs/statusCodes';
@@ -17,7 +16,6 @@ export class SnippetManager {
   async createSnippet(
     workspaceId: string,
     idToken: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     snippetDetail: any,
     createNextVersion = false
   ): Promise<string> {
@@ -49,7 +47,6 @@ export class SnippetManager {
     snippetId: string,
     workspaceId: string,
     idToken: string
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     try {
       const result = await this._lambda.invoke(
@@ -113,8 +110,8 @@ export class SnippetManager {
 
   async getAllSnippetsOfWorkspace(
     workspaceId: string,
-    idToken: string
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    idToken: string,
+    getData = false
   ): Promise<any> {
     try {
       const response = await this._lambda.invoke(
@@ -123,6 +120,7 @@ export class SnippetManager {
         {
           routeKey: RouteKeys.getAllSnippetsOfWorkspace,
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+          queryStringParameters: { getData },
         }
       );
       const result: string = response.body;
