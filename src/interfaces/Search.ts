@@ -4,7 +4,7 @@ export interface Document {
 }
 
 export interface SearchHit extends Document {
-  _matchesInfo?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  _matchesInfo?: any;
 }
 
 export interface SearchResults {

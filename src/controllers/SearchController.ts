@@ -30,7 +30,7 @@ class SearchController {
 
   private _convertSearchResults = (data: SearchResponse): SearchResults => {
     return {
-      hits: data.hits as any, // eslint-disable-line @typescript-eslint/no-explicit-any
+      hits: data.hits as any,
       count: data.hits.length,
       total: data.nbHits,
     };
