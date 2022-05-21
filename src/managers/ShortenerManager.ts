@@ -15,7 +15,6 @@ export class ShortenerManager {
 
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async getStatsByWorkspace(namespace: string): Promise<any> {
     try {
       const result = await this._lambda.invoke(
@@ -38,7 +37,6 @@ export class ShortenerManager {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async createNewShort(data: LinkCapture): Promise<any> {
     try {
       const result = await this._lambda.invoke(

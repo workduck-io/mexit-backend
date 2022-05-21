@@ -12,7 +12,6 @@ export interface ClaimVerifyResult {
   readonly userId: string;
   readonly eventId: string;
   readonly isValid: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   readonly error?: any;
 }
 

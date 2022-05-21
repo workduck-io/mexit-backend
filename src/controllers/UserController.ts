@@ -16,7 +16,6 @@ class UserController {
     initializeUserRoutes(this);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   updateUser = async (request: Request, response: Response): Promise<any> => {
     const userId = response.locals.userIdRaw;
     const requestDetail = new RequestClass(request, 'UserPreference');
@@ -39,11 +38,7 @@ class UserController {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
-  get = async (
-    request: Request,
-    response: Response
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<any> => {
+  get = async (request: Request, response: Response): Promise<any> => {
     try {
       const result = await this._userManager.get(response.locals.idToken);
       response.json(JSON.parse(result));
@@ -51,11 +46,7 @@ class UserController {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
-  getById = async (
-    request: Request,
-    response: Response
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<any> => {
+  getById = async (request: Request, response: Response): Promise<any> => {
     try {
       const result = await this._userManager.getById(request.params.id);
       response.json(JSON.parse(result));
@@ -63,11 +54,7 @@ class UserController {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
-  getByGroupId = async (
-    request: Request,
-    response: Response
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<any> => {
+  getByGroupId = async (request: Request, response: Response): Promise<any> => {
     try {
       const result = await this._userManager.getByGroupId(
         request.params.groupId
@@ -80,7 +67,6 @@ class UserController {
   getUserByLinkedin = async (
     request: Request,
     response: Response
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> => {
     try {
       request.body.linkedinURL = request.body.linkedinURL.replace(/\/+$/, '');
