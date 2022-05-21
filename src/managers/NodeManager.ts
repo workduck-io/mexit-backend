@@ -25,7 +25,6 @@ export class NodeManager {
   async createNode(
     workspaceId: string,
     idToken: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     nodeDetail: any
   ): Promise<string> {
     try {
@@ -55,9 +54,7 @@ export class NodeManager {
     nodeId: string,
     workspaceId: string,
     idToken: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     queryParams?: any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     try {
       const result = await this._lambda.invoke(
@@ -91,7 +88,6 @@ export class NodeManager {
     nodeId: string,
     workspaceId: string,
     idToken: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     block: any
   ): Promise<string> {
     try {
@@ -121,7 +117,6 @@ export class NodeManager {
     userId: string,
     workspaceId: string,
     idToken: string
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     try {
       const response = await this._lambda.invoke(
@@ -190,7 +185,6 @@ export class NodeManager {
     nodeId: string,
     workspaceId: string,
     idToken: string
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     const response = await this._lambda.invoke(
       this._nodeLambdaFunctionName,
@@ -207,7 +201,6 @@ export class NodeManager {
     nodeId: string,
     workspaceId: string,
     idToken: string
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     const response = await this._lambda.invoke(
       this._nodeLambdaFunctionName,
@@ -244,7 +237,6 @@ export class NodeManager {
       });
     }
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async getLinkHierarchy(workspaceId: string, idToken: string): Promise<any> {
     try {
       const result = await this._lambda.invoke(
@@ -511,7 +503,6 @@ export class NodeManager {
       });
     }
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async refactorHierarchy(workspaceId: string, idToken: string, payload: any) {
     try {
       const result = await this._lambda.invoke(
@@ -535,7 +526,6 @@ export class NodeManager {
       });
     }
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async bulkCreateNode(workspaceId: string, idToken: string, payload: any) {
     try {
       const result = await this._lambda.invoke(

@@ -89,7 +89,6 @@ class OAuth2Controller {
   getGoogleCalendarScopeAuth = async (
     request: Request,
     response: Response
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> => {
     try {
       const scopes = [

@@ -18,7 +18,6 @@ export class UserManager {
 
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async updateUserPreference(userPreference: UserPreference): Promise<any> {
     try {
       const result = await this._lambda.invoke(
@@ -42,7 +41,6 @@ export class UserManager {
       });
     }
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async get(idToken: string): Promise<any> {
     try {
       const result = await this._lambda.invoke(
@@ -64,7 +62,6 @@ export class UserManager {
       });
     }
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async getById(userId: string): Promise<any> {
     try {
       const result = await this._lambda.invoke(
@@ -86,7 +83,6 @@ export class UserManager {
       });
     }
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async getByGroupId(groupId: string): Promise<any> {
     try {
       const result = await this._lambda.invoke(
@@ -108,6 +104,7 @@ export class UserManager {
       });
     }
   }
+  // eslint-disable-next-line
   async getUserByLinkedin(payload: any): Promise<any> {
     try {
       const result = await this._lambda.invoke(

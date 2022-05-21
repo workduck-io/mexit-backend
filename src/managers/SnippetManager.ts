@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { injectable } from 'inversify';
-import { NodeDetail } from '../interfaces/Node';
 import { errorlib } from '../libs/errorlib';
 import { errorCodes } from '../libs/errorCodes';
 import { statusCodes } from '../libs/statusCodes';
@@ -17,7 +16,7 @@ export class SnippetManager {
   async createSnippet(
     workspaceId: string,
     idToken: string,
-    snippetDetail: NodeDetail,
+    snippetDetail: any,
     createNextVersion = false
   ): Promise<string> {
     try {
@@ -48,7 +47,6 @@ export class SnippetManager {
     snippetId: string,
     workspaceId: string,
     idToken: string
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any> {
     try {
       const result = await this._lambda.invoke(
@@ -95,9 +93,41 @@ export class SnippetManager {
 
       if (result.includes('message')) {
         return JSON.parse(result);
-      } else if (result.length === 2 && result[0] === '[' && result[1] === ']')
-        return [];
-      else {
+      } else {
+        const allVersions = JSON.parse(result);
+        return allVersions;
+      }
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: errorCodes.UNKNOWN,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+
+  async getAllSnippetsOfWorkspace(
+    workspaceId: string,
+    idToken: string,
+    getData = false
+  ): Promise<any> {
+    try {
+      const response = await this._lambda.invoke(
+        this._snippetLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.getAllSnippetsOfWorkspace,
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+          queryStringParameters: { getData },
+        }
+      );
+      const result: string = response.body;
+
+      if (result.includes('message')) {
+        return JSON.parse(result);
+      } else {
         const allVersions = JSON.parse(result);
         return allVersions;
       }

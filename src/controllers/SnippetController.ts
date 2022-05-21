@@ -1,11 +1,8 @@
 import express, { Request, Response } from 'express';
 import container from '../inversify.config';
-import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
-import { serializeContent } from '../libs/serialize';
 import { NodeResponse } from '../interfaces/Response';
-import { NodeDetail } from '../interfaces/Node';
 import { SnippetManager } from '../managers/SnippetManager';
 import { initializeSnippetRoutes } from '../routes/SnippetRoutes';
 class SnippetController {
@@ -24,26 +21,17 @@ class SnippetController {
     response: Response
   ): Promise<void> => {
     try {
-      const requestDetail = new RequestClass(request, 'ContentNodeRequest');
       if (!request.headers['mex-workspace-id'])
         throw new Error('mex-workspace-id header missing');
 
       const workspaceId = request.headers['mex-workspace-id'].toString();
-
-      const snippetDetail: NodeDetail = {
-        id: requestDetail.data.id,
-        title: requestDetail.data.title,
-        type: 'SnippetRequest',
-        namespaceIdentifier: 'NAMESPACE1',
-        data: serializeContent(requestDetail.data.content),
-      };
 
       const createNextVersion = request.query.createNextVersion === 'true';
 
       const nodeResult = await this._snippetManager.createSnippet(
         workspaceId,
         response.locals.idToken,
-        snippetDetail,
+        request.body,
         createNextVersion
       );
 
@@ -105,6 +93,34 @@ class SnippetController {
         request.params.snippetId,
         workspaceId,
         response.locals.idToken
+      );
+
+      response
+        .contentType('application/json')
+        .status(statusCodes.OK)
+        .send(result);
+    } catch (error) {
+      response
+        .status(statusCodes.INTERNAL_SERVER_ERROR)
+        .send({ message: error.toString() })
+        .json();
+    }
+  };
+
+  getAllSnippetsOfWorkspace = async (
+    request: Request,
+    response: Response
+  ): Promise<void> => {
+    try {
+      if (!request.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
+
+      const workspaceId = request.headers['mex-workspace-id'].toString();
+      const getData = request.query.getData === 'true';
+      const result = await this._snippetManager.getAllSnippetsOfWorkspace(
+        workspaceId,
+        response.locals.idToken,
+        getData
       );
 
       response
