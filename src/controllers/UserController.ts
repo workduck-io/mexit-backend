@@ -103,7 +103,7 @@ class UserController {
         ).body
       );
 
-      const nodeHierarchyInfo = await this._transformer.decodeLinkHierarchy(
+      const nodeHierarchyInfo = this._transformer.linkHierarchyParser(
         initWorkspaceResp.nodeHierarchy
       );
 

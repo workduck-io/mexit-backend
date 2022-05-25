@@ -775,10 +775,7 @@ class NodeController {
           linkDataResult = linkHierarchyResult;
         }
       }
-
-      const result = await this._transformer.decodeLinkHierarchy(
-        linkDataResult
-      );
+      const result = this._transformer.linkHierarchyParser(linkDataResult);
       response
         .contentType('application/json')
         .status(statusCodes.OK)
@@ -1107,12 +1104,8 @@ class NodeController {
       );
 
       const { addedPaths, removedPaths } = refactorResp;
-      const addedILinks = await this._transformer.decodeLinkHierarchy(
-        addedPaths
-      );
-      const removedILinks = await this._transformer.decodeLinkHierarchy(
-        removedPaths
-      );
+      const addedILinks = this._transformer.linkHierarchyParser(addedPaths);
+      const removedILinks = this._transformer.linkHierarchyParser(removedPaths);
 
       response.status(statusCodes.OK).json({ addedILinks, removedILinks });
       await this.updateILinkCache(
@@ -1149,12 +1142,8 @@ class NodeController {
       );
 
       const { addedPaths, removedPaths, node } = bulkCreateResp;
-      const addedILinks = await this._transformer.decodeLinkHierarchy(
-        addedPaths
-      );
-      const removedILinks = await this._transformer.decodeLinkHierarchy(
-        removedPaths
-      );
+      const addedILinks = this._transformer.linkHierarchyParser(addedPaths);
+      const removedILinks = this._transformer.linkHierarchyParser(removedPaths);
 
       const createdNode = JSON.parse(node) as NodeResponse;
 
