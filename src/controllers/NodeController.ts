@@ -695,6 +695,7 @@ class NodeController {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).json(error);
     }
   };
+
   makeNodePrivate = async (
     request: Request,
     response: Response
@@ -716,29 +717,6 @@ class NodeController {
     } catch (error) {
       console.error(error);
       response.status(statusCodes.INTERNAL_SERVER_ERROR).json(error);
-    }
-  };
-  getPublicNode = async (
-    request: Request,
-    response: Response
-  ): Promise<void> => {
-    try {
-      const nodeId = request.params.nodeId;
-
-      const result = await this._nodeManager.getPublicNode(nodeId);
-
-      if (JSON.parse(result).message) {
-        throw new Error(JSON.parse(result).message);
-      }
-
-      const nodeResponse = JSON.parse(result) as NodeResponse;
-
-      response.status(statusCodes.OK).json(nodeResponse);
-    } catch (error) {
-      const resp = {
-        message: error.message,
-      };
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).json(resp);
     }
   };
 
@@ -817,6 +795,7 @@ class NodeController {
         .json();
     }
   };
+
   unArchiveNode = async (
     request: Request,
     response: Response
@@ -872,6 +851,7 @@ class NodeController {
         .json();
     }
   };
+
   updateAccessTypeForSharedNode = async (
     request: Request,
     response: Response
@@ -928,6 +908,7 @@ class NodeController {
         .json();
     }
   };
+
   getNodeSharedWithUser = async (
     request: Request,
     response: Response
@@ -954,6 +935,7 @@ class NodeController {
         .json();
     }
   };
+
   updateSharedNode = async (
     request: Request,
     response: Response
@@ -981,6 +963,7 @@ class NodeController {
         .json();
     }
   };
+
   getUserWithNodesShared = async (
     request: Request,
     response: Response
@@ -1032,6 +1015,7 @@ class NodeController {
         .json();
     }
   };
+
   getAllTagsOfWorkspace = async (
     request: Request,
     response: Response

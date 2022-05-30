@@ -213,7 +213,7 @@ export class NodeManager {
     );
     return response;
   }
-  async getPublicNode(nodeId: string): Promise<string> {
+  async getPublicNode(nodeId: string, idToken: string): Promise<string> {
     try {
       const result = await this._lambda.invoke(
         this._nodeLambdaFunctionName,
@@ -221,7 +221,10 @@ export class NodeManager {
         {
           routeKey: RouteKeys.getPublicNode,
           pathParameters: { id: nodeId },
-          headers: { 'mex-workspace-id': '', authorization: '' },
+          headers: {
+            'mex-workspace-id': '',
+            authorization: idToken,
+          },
         }
       );
 
