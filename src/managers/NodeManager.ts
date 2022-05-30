@@ -222,7 +222,7 @@ export class NodeManager {
           routeKey: RouteKeys.getPublicNode,
           pathParameters: { id: nodeId },
           headers: {
-            'mex-workspace-id': 'WORKSPACE_INTERNAL',
+            'mex-workspace-id': '',
             authorization: idToken,
           },
         }
