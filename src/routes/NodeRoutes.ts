@@ -76,11 +76,6 @@ export const initializeNodeRoutes = (
     [AuthRequest],
     nodeControllerObject.makeNodePrivate
   );
-  nodeControllerObject._router.get(
-    `${nodeControllerObject._urlPath}/public/:nodeId`,
-    [],
-    nodeControllerObject.getPublicNode
-  );
   nodeControllerObject._router.put(
     `${nodeControllerObject._urlPath}/archive`,
     [AuthRequest],
