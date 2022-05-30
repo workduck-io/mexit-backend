@@ -21,7 +21,8 @@ class PublicController {
   ): Promise<void> => {
     try {
       const nodeId = request.params.nodeId;
-      const result = await this._nodeManager.getPublicNode(nodeId);
+      const idToken = request.headers.authorization;
+      const result = await this._nodeManager.getPublicNode(nodeId, idToken);
 
       if (JSON.parse(result).message) {
         throw new Error(JSON.parse(result).message);
