@@ -12,6 +12,7 @@ import logger from './libs/logger';
 import OAuth2Controller from './controllers/OAuth2Controller';
 import SnippetController from './controllers/SnippetController';
 import BookmarkController from './controllers/BookmarkController';
+import PublicController from './controllers/PublicController';
 
 class App {
   public _app: express.Application;
@@ -65,6 +66,7 @@ const application = new App([
   new UserController(),
   new SnippetController(),
   new BookmarkController(),
+  new PublicController(),
 ]);
 application.build();
 application._app.listen(application._port, () => {
