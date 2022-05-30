@@ -221,7 +221,10 @@ export class NodeManager {
         {
           routeKey: RouteKeys.getPublicNode,
           pathParameters: { id: nodeId },
-          headers: { 'mex-workspace-id': '', authorization: idToken },
+          headers: {
+            'mex-workspace-id': 'WORKSPACE_INTERNAL',
+            authorization: idToken,
+          },
         }
       );
 

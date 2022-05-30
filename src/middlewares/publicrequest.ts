@@ -18,11 +18,9 @@ async function PublicRequest(
   try {
     if (accessCreds.accessToken && Date.now() < accessCreds.expiry) {
       req.headers.authorization = accessCreds.idToken;
-      console.log('Using Existing Creds for Public Nodes: ', accessCreds);
       next();
     } else {
       accessCreds = await refreshAccessCreds(accessCreds.refreshToken);
-      console.log('Refreshed Public Access Creds: ', accessCreds);
       req.headers.authorization = accessCreds.idToken;
       next();
     }
