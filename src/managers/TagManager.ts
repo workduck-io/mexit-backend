@@ -7,11 +7,12 @@ import { statusCodes } from '../libs/statusCodes';
 import container from '../inversify.config';
 import { Lambda, InvocationType } from '../libs/LambdaClass';
 import { RouteKeys } from '../libs/routeKeys';
+import { STAGE } from '../env';
 
 @injectable()
 export class TagManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
-  private _tagLambdaFunctionName = 'mex-backend-test-Tag';
+  private _tagLambdaFunctionName = `mex-backend-${STAGE}-Tag`;
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
   async getAllTagsOfWorkspace(

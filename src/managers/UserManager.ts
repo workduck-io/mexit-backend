@@ -7,12 +7,13 @@ import container from '../inversify.config';
 import { Lambda, InvocationType } from '../libs/LambdaClass';
 import { RouteKeys } from '../libs/routeKeys';
 import { UserPreference } from '../interfaces/User';
+import { STAGE } from '../env';
 
 @injectable()
 export class UserManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
   private _userLambdaFunctionName = 'workduck-user-service-dev-user';
-  private _userMexBackendLambdaFunctionName = 'mex-backend-test-User';
+  private _userMexBackendLambdaFunctionName = `mex-backend-${STAGE}-User`;
   private _initializeWorkspaceLambdaName =
     'initialize-workspace-test-initializeWorkspace';
 

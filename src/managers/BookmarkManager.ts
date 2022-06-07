@@ -7,11 +7,12 @@ import { statusCodes } from '../libs/statusCodes';
 
 import { Lambda, InvocationType } from '../libs/LambdaClass';
 import { RouteKeys } from '../libs/routeKeys';
+import { STAGE } from '../env';
 
 @injectable()
 export class BookmarkManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
-  private _userLambdaFunctionName = 'mex-backend-test-UserBookmark';
+  private _userLambdaFunctionName = `mex-backend-${STAGE}-UserBookmark`;
 
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 

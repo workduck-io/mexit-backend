@@ -12,11 +12,12 @@ import {
   ShareNodeDetail,
   UpdateAccessTypeForSharedNodeDetail,
 } from '../interfaces/Node';
+import { STAGE } from '../env';
 
 @injectable()
 export class SharedManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
-  private _nodeLambdaFunctionName = 'mex-backend-test-Node';
+  private _nodeLambdaFunctionName = `mex-backend-${STAGE}-Node`;
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
   async shareNode(
