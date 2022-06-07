@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import container from '../inversify.config';
 import { NodeManager } from '../managers/NodeManager';
 import { RequestClass } from '../libs/RequestClass';
@@ -36,6 +36,100 @@ class NodeController {
     this._cache.replaceAndSet(userId, this._linkHierarchyLabel, result);
     return this._cache.get(userId, this._linkHierarchyLabel);
   }
+
+  getLinkHierarchy = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      let linkDataResult: any[];
+
+      if (this._cache.has(response.locals.userId, this._linkHierarchyLabel)) {
+        linkDataResult = await this._cache.get(
+          response.locals.userId,
+          this._linkHierarchyLabel
+        );
+      } else {
+        const linkHierarchyResult = await this._nodeManager.getLinkHierarchy(
+          response.locals.workspaceID,
+          response.locals.idToken
+        );
+
+        this._cache.set(
+          response.locals.userId,
+          this._linkHierarchyLabel,
+          linkHierarchyResult
+        );
+        linkDataResult = linkHierarchyResult;
+      }
+      const result = this._transformer.linkHierarchyParser(linkDataResult);
+      response.status(statusCodes.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  createNode = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const requestDetail = new RequestClass(request, 'ContentNodeRequest');
+      const nodeResult = await this._nodeManager.createNode(
+        response.locals.workspaceID,
+        response.locals.idToken,
+        requestDetail.data
+      );
+
+      response.status(statusCodes.OK).json(nodeResult);
+
+      await this.updateILinkCache(
+        response.locals.userId,
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getNode = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const result = (await this._nodeManager.getNode(
+        request.params.nodeId,
+        response.locals.workspaceID,
+        response.locals.idToken
+      )) as NodeResponse;
+
+      response.status(statusCodes.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getAllNodes = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const result = await this._nodeManager.getAllNodes(
+        request.params.userId,
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
+
+      response.status(statusCodes.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
 
   createLinkCapture = async (
     request: Request,
@@ -125,111 +219,31 @@ class NodeController {
     }
   };
 
-  createNode = async (request: Request, response: Response): Promise<void> => {
-    try {
-      const requestDetail = new RequestClass(request, 'ContentNodeRequest');
-
-      if (requestDetail.data.id === `NODE_${response.locals.userId}`)
-        throw new Error('Cannot create a node using activitynode id.');
-
-      const nodeResult = await this._nodeManager.createNode(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        requestDetail.data
-      );
-
-      response.status(statusCodes.OK).json(JSON.parse(nodeResult));
-
-      await this.updateILinkCache(
-        response.locals.userId,
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
-    } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: error.toString() })
-        .json();
-    }
-  };
-
-  getAllNodes = async (request: Request, response: Response): Promise<void> => {
-    try {
-      const result = await this._nodeManager.getAllNodes(
-        request.params.userId,
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
-
-      response
-        .contentType('application/json')
-        .status(statusCodes.OK)
-        .send(result);
-    } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: error.toString() })
-        .json();
-    }
-  };
-
-  getNode = async (request: Request, response: Response): Promise<void> => {
-    try {
-      const result = await this._nodeManager.getNode(
-        request.params.nodeId,
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
-
-      if (JSON.parse(result).message)
-        throw new Error(JSON.parse(result).message);
-
-      const nodeResponse = JSON.parse(result) as NodeResponse;
-      // const convertedResponse =
-      //   this._transformer.genericNodeConverter(nodeResponse);
-      const convertedResponse = nodeResponse;
-      response
-        .contentType('application/json')
-        .status(statusCodes.OK)
-        .send(convertedResponse);
-    } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: error.toString() })
-        .json();
-    }
-  };
-
   copyOrMoveBlock = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'CopyOrMoveBlockRequest');
 
-      const result = await this._nodeManager.moveBlocks(
+      await this._nodeManager.moveBlocks(
         requestDetail.data.blockId,
         requestDetail.data.sourceNodeId,
         requestDetail.data.destinationNodeId,
         response.locals.workspaceID,
         response.locals.idToken
       );
-
-      if (result) {
-        throw new Error(result);
-      }
-      response.contentType('application/json').status(statusCodes.NO_CONTENT);
+      response.status(statusCodes.NO_CONTENT).json();
     } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: error.toString() })
-        .json();
+      next(error);
     }
   };
 
   makeNodePublic = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
       const nodeId = request.params.id;
@@ -240,16 +254,16 @@ class NodeController {
         response.locals.idToken
       );
 
-      response.status(statusCodes.OK).json(JSON.parse(result.body));
+      response.status(statusCodes.OK).json(result);
     } catch (error) {
-      console.error(error);
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).json(error);
+      next(error);
     }
   };
 
   makeNodePrivate = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
       const nodeId = request.params.id;
@@ -259,58 +273,17 @@ class NodeController {
         response.locals.workspaceID,
         response.locals.idToken
       );
-
-      response.status(statusCodes.OK).json(JSON.parse(result.body));
+      response.status(statusCodes.OK).json(result);
     } catch (error) {
-      console.error(error);
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).json(error);
+      next(error);
     }
   };
 
-  getLinkHierarchy = async (
+  archiveNode = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
-    try {
-      let linkDataResult: any[];
-
-      if (this._cache.has(response.locals.userId, this._linkHierarchyLabel)) {
-        linkDataResult = await this._cache.get(
-          response.locals.userId,
-          this._linkHierarchyLabel
-        );
-      } else {
-        const linkHierarchyResult = await this._nodeManager.getLinkHierarchy(
-          response.locals.workspaceID,
-          response.locals.idToken
-        );
-
-        if (linkHierarchyResult?.message)
-          throw new Error(linkHierarchyResult.message);
-        else {
-          this._cache.set(
-            response.locals.userId,
-            this._linkHierarchyLabel,
-            linkHierarchyResult
-          );
-          linkDataResult = linkHierarchyResult;
-        }
-      }
-      const result = this._transformer.linkHierarchyParser(linkDataResult);
-      response
-        .contentType('application/json')
-        .status(statusCodes.OK)
-        .send(result);
-    } catch (error) {
-      console.error(error);
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ errorMsg: error.message })
-        .json();
-    }
-  };
-
-  archiveNode = async (request: Request, response: Response): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'ArchiveNodeDetail');
 
@@ -319,25 +292,22 @@ class NodeController {
         response.locals.idToken,
         requestDetail.data
       );
+      response.status(statusCodes.OK).json(archiveNodeResult);
 
-      // update the Link hierarchy cache
-      response.json(archiveNodeResult);
       await this.updateILinkCache(
         response.locals.userId,
         response.locals.workspaceID,
         response.locals.idToken
       );
     } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: error.toString() })
-        .json();
+      next(error);
     }
   };
 
   unArchiveNode = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'ArchiveNodeDetail');
@@ -347,37 +317,30 @@ class NodeController {
         response.locals.idToken,
         requestDetail.data
       );
+      response.status(statusCodes.OK).json(archiveNodeResult);
 
-      // update the Link hierarchy cache
-      response.json(archiveNodeResult);
       await this.updateILinkCache(
         response.locals.userId,
         response.locals.workspaceID,
         response.locals.idToken
       );
     } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: error.toString() })
-        .json();
+      next(error);
     }
   };
 
   refactorHierarchy = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'RefactorRequest');
 
-      const refactorResp = JSON.parse(
-        (
-          await this._nodeManager.refactorHierarchy(
-            response.locals.workspaceID,
-            response.locals.idToken,
-            requestDetail.data
-          )
-        ).body
+      const refactorResp = await this._nodeManager.refactorHierarchy(
+        response.locals.workspaceID,
+        response.locals.idToken,
+        requestDetail.data
       );
 
       const { addedPaths, removedPaths } = refactorResp;
@@ -391,27 +354,22 @@ class NodeController {
         response.locals.idToken
       );
     } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .json({ message: error.toString() });
+      next(error);
     }
   };
 
   bulkCreateNode = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'BulkCreateNode');
 
-      const bulkCreateResp = JSON.parse(
-        (
-          await this._nodeManager.bulkCreateNode(
-            response.locals.workspaceID,
-            response.locals.idToken,
-            requestDetail.data
-          )
-        ).body
+      const bulkCreateResp = await this._nodeManager.bulkCreateNode(
+        response.locals.workspaceID,
+        response.locals.idToken,
+        requestDetail.data
       );
 
       const { addedPaths, removedPaths, node } = bulkCreateResp;
@@ -430,15 +388,14 @@ class NodeController {
         response.locals.idToken
       );
     } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .json({ message: error.toString() });
+      next(error);
     }
   };
 
   getArchivedNodes = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
       const getArchiveResp = await this._nodeManager.getArchivedNodes(
@@ -446,11 +403,9 @@ class NodeController {
         response.locals.idToken
       );
 
-      response.status(statusCodes.OK).json(JSON.parse(getArchiveResp.body));
+      response.status(statusCodes.OK).json(getArchiveResp);
     } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .json({ message: error.toString() });
+      next(error);
     }
   };
 }

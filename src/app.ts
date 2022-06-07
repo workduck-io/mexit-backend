@@ -19,6 +19,7 @@ import ShortenerController from './controllers/ShortenerController';
 import SnippetController from './controllers/SnippetController';
 import TagController from './controllers/TagController';
 import UserController from './controllers/UserController';
+import responseErrorHandler from './middlewares/responseErrorHandler';
 
 class App {
   public _app: express.Application;
@@ -61,6 +62,7 @@ class App {
       });
       next();
     });
+    this._app.use(responseErrorHandler);
   }
 }
 
