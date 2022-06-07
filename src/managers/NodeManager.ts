@@ -8,12 +8,13 @@ import container from '../inversify.config';
 import { Lambda, InvocationType } from '../libs/LambdaClass';
 import { RouteKeys } from '../libs/routeKeys';
 import WDError from '../libs/WDError';
+import { STAGE } from '../env';
 
 @injectable()
 export class NodeManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
-  private _nodeLambdaFunctionName = 'mex-backend-test-Node';
-  private _workspaceLambdaFunctionName = 'mex-backend-test-Workspace';
+  private _nodeLambdaFunctionName = `mex-backend-${STAGE}-Node`;
+  private _workspaceLambdaFunctionName = `mex-backend-${STAGE}-Workspace`;
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
   async createNode(
