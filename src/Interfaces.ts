@@ -47,7 +47,6 @@ import {
   LinkChildrenType,
   ActivityNodeResponse,
 } from './interfaces/Response';
-import { Document, SearchHit, SearchResults } from './interfaces/Search';
 import { UserPreference } from './interfaces/User';
 import { WDErrorType } from './interfaces/WDError';
 import { errorCodes } from './libs/errorCodes';
@@ -90,9 +89,6 @@ export default class Interfaces implements Definitions {
   LinkResponseContent: LinkResponseContent;
   LinkChildrenType: LinkChildrenType;
   TextType: TextType;
-  Document: Document;
-  SearchHit: SearchHit;
-  SearchResults: SearchResults;
   NodeMetadata: NodeMetadata;
   ContentBlock: ContentBlock;
   ActivityNodeDetail: ActivityNodeDetail;

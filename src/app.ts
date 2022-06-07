@@ -14,7 +14,6 @@ import OAuth2Controller from './controllers/OAuth2Controller';
 import BookmarkController from './controllers/BookmarkController';
 import NodeController from './controllers/NodeController';
 import PublicController from './controllers/PublicController';
-import SearchController from './controllers/SearchController';
 import SharedController from './controllers/SharedController';
 import ShortenerController from './controllers/ShortenerController';
 import SnippetController from './controllers/SnippetController';
@@ -70,7 +69,6 @@ const application = new App([
   new NodeController(),
   new OAuth2Controller(),
   new PublicController(),
-  new SearchController(),
   new SharedController(),
   new ShortenerController(),
   new SnippetController(),
