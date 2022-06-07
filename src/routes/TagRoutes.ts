@@ -13,7 +13,7 @@ export const initializeTagRoutes = (
     tagControllerObject.getAllTagsOfWorkspace
   );
   tagControllerObject._router.get(
-    `${tagControllerObject._urlPath}/{tagName}`,
+    `${tagControllerObject._urlPath}/:tagName`,
     [AuthRequest],
     tagControllerObject.getNodesWithTag
   );
