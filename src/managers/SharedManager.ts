@@ -141,7 +141,6 @@ export class SharedManager {
       });
     }
   }
-
   async updateSharedNode(
     workspaceId: string,
     idToken: string,

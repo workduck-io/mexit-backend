@@ -72,7 +72,6 @@ class OAuth2Controller {
     try {
       const { tokens } = await this._oauth2Client.getToken(code.toString());
       // TODO: store this refresh token into the auth service
-      console.log(tokens);
       response
         .set('Content-Type', 'text/html')
         .send(
