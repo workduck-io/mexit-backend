@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import { BookmarkManager } from '../managers/BookmarkManager';
 import container from '../inversify.config';
 import { statusCodes } from '../libs/statusCodes';
@@ -16,7 +16,8 @@ class BookmarkController {
 
   getBookmarksForUser = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
       const result = await this._bookmarkManager.getAllBookmarksForUser(
@@ -24,19 +25,17 @@ class BookmarkController {
         response.locals.workspaceID,
         response.locals.idToken
       );
-      const parsedResult = JSON.parse(result.body);
 
-      response.status(statusCodes.OK).json(parsedResult);
+      response.status(statusCodes.OK).json(result);
     } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .json({ message: error.toString() });
+      next(error);
     }
   };
 
   createBookmark = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
       const nodeID = request.params.nodeid;
@@ -48,16 +47,14 @@ class BookmarkController {
       );
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: error.toString() })
-        .json();
+      next(error);
     }
   };
 
   removeBookmark = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
       const nodeID = request.params.nodeid;
@@ -71,10 +68,7 @@ class BookmarkController {
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: error.toString() })
-        .json();
+      next(error);
     }
   };
 }

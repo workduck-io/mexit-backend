@@ -2,7 +2,6 @@
 import { injectable } from 'inversify';
 
 import { errorlib } from '../libs/errorlib';
-import { errorCodes } from '../libs/errorCodes';
 import { statusCodes } from '../libs/statusCodes';
 import container from '../inversify.config';
 import { Lambda, InvocationType } from '../libs/LambdaClass';
@@ -18,9 +17,9 @@ export class TagManager {
   async getAllTagsOfWorkspace(
     workspaceId: string,
     idToken: string
-  ): Promise<string[]> {
+  ): Promise<any> {
     try {
-      const result = await this._lambda.invoke(
+      const response = await this._lambda.invokeAndCheck(
         this._tagLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -28,16 +27,11 @@ export class TagManager {
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
-
-      const response: string = result.body;
-
-      if (!response) throw new Error('Something went wrong');
-      const allNodes = JSON.parse(response);
-      return allNodes;
+      return response;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -48,9 +42,9 @@ export class TagManager {
     workspaceId: string,
     idToken: string,
     tagName: string
-  ): Promise<string[]> {
+  ): Promise<any> {
     try {
-      const result = await this._lambda.invoke(
+      const response = await this._lambda.invokeAndCheck(
         this._tagLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -59,15 +53,11 @@ export class TagManager {
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
-      const response: string = result.body;
-
-      if (!response) throw new Error('Something went wrong');
-      const allNodes = JSON.parse(response);
-      return allNodes;
+      return response;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
