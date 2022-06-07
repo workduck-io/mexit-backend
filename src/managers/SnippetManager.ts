@@ -19,9 +19,9 @@ export class SnippetManager {
     idToken: string,
     snippetDetail: any,
     createNextVersion = false
-  ): Promise<string> {
+  ): Promise<any> {
     try {
-      const result = await this._lambda.invoke(
+      const result = await this._lambda.invokeAndCheck(
         this._snippetLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -31,12 +31,11 @@ export class SnippetManager {
           queryStringParameters: { createNextVersion },
         }
       );
-
-      return result.body;
+      return result;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -50,7 +49,7 @@ export class SnippetManager {
     idToken: string
   ): Promise<any> {
     try {
-      const result = await this._lambda.invoke(
+      const response = await this._lambda.invokeAndCheck(
         this._snippetLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -59,16 +58,11 @@ export class SnippetManager {
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
-
-      const response: string = result.body;
-
-      if (response.includes('message')) return JSON.parse(response);
-
       return response;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -81,7 +75,7 @@ export class SnippetManager {
     idToken: string
   ): Promise<any> {
     try {
-      const response = await this._lambda.invoke(
+      const response = await this._lambda.invokeAndCheck(
         this._snippetLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -90,18 +84,11 @@ export class SnippetManager {
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
-      const result: string = response.body;
-
-      if (result.includes('message')) {
-        return JSON.parse(result);
-      } else {
-        const allVersions = JSON.parse(result);
-        return allVersions;
-      }
+      return response;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -115,7 +102,7 @@ export class SnippetManager {
     getData = false
   ): Promise<any> {
     try {
-      const response = await this._lambda.invoke(
+      const response = await this._lambda.invokeAndCheck(
         this._snippetLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -124,18 +111,11 @@ export class SnippetManager {
           queryStringParameters: { getData },
         }
       );
-      const result: string = response.body;
-
-      if (result.includes('message')) {
-        return JSON.parse(result);
-      } else {
-        const allVersions = JSON.parse(result);
-        return allVersions;
-      }
+      return response;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -149,16 +129,26 @@ export class SnippetManager {
     workspaceId: string,
     idToken: string
   ): Promise<any> {
-    const response = await this._lambda.invoke(
-      this._snippetLambdaFunctionName,
-      this._lambdaInvocationType,
-      {
-        routeKey: RouteKeys.makeSnippetPublic,
-        pathParameters: { id: snippetId, version },
-        headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-      }
-    );
-    return response;
+    try {
+      const response = await this._lambda.invokeAndCheck(
+        this._snippetLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.makeSnippetPublic,
+          pathParameters: { id: snippetId, version },
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        }
+      );
+      return response;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
   }
 
   async makeSnippetPrivate(
@@ -167,16 +157,26 @@ export class SnippetManager {
     workspaceId: string,
     idToken: string
   ): Promise<any> {
-    const response = await this._lambda.invoke(
-      this._snippetLambdaFunctionName,
-      this._lambdaInvocationType,
-      {
-        routeKey: RouteKeys.makeSnippetPrivate,
-        pathParameters: { id: snippetId, version },
-        headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-      }
-    );
-    return response;
+    try {
+      const response = await this._lambda.invokeAndCheck(
+        this._snippetLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.makeSnippetPrivate,
+          pathParameters: { id: snippetId, version },
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        }
+      );
+      return response;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
   }
 
   async getPublicSnippet(
@@ -185,17 +185,26 @@ export class SnippetManager {
     workspaceId: string,
     idToken: string
   ): Promise<any> {
-    const result = await this._lambda.invoke(
-      this._snippetLambdaFunctionName,
-      this._lambdaInvocationType,
-      {
-        routeKey: RouteKeys.getPublicSnippet,
-        pathParameters: { id: snippetId, version },
-        headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-      }
-    );
-    const response: string = result.body;
-    return response;
+    try {
+      const response = await this._lambda.invokeAndCheck(
+        this._snippetLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.getPublicSnippet,
+          pathParameters: { id: snippetId, version },
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        }
+      );
+      return response;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
   }
 
   async clonePublicSnippet(
@@ -204,15 +213,25 @@ export class SnippetManager {
     workspaceId: string,
     idToken: string
   ): Promise<any> {
-    const response = await this._lambda.invoke(
-      this._snippetLambdaFunctionName,
-      this._lambdaInvocationType,
-      {
-        routeKey: RouteKeys.clonePublicSnippet,
-        pathParameters: { id: snippetId, version },
-        headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-      }
-    );
-    return response;
+    try {
+      const response = await this._lambda.invokeAndCheck(
+        this._snippetLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.clonePublicSnippet,
+          pathParameters: { id: snippetId, version },
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        }
+      );
+      return response;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
   }
 }
