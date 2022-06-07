@@ -14,6 +14,8 @@ import SnippetController from './controllers/SnippetController';
 import BookmarkController from './controllers/BookmarkController';
 import PublicController from './controllers/PublicController';
 import TagController from './controllers/TagController';
+import expressListRoutes, { COLORS, colorText } from './libs/routeList';
+import { IS_DEV } from './env';
 
 class App {
   public _app: express.Application;
@@ -70,9 +72,17 @@ const application = new App([
   new PublicController(),
   new TagController(),
 ]);
+
 application.build();
 application._app.listen(application._port, () => {
-  return console.log(
-    `Express is listening at http://localhost:${application._port}`
-  );
+  if (IS_DEV) {
+    console.log(
+      colorText(
+        COLORS.red,
+        `Express is listening at http://localhost:${application._port}`
+      )
+    );
+    expressListRoutes(application._app);
+  }
+  return;
 });
