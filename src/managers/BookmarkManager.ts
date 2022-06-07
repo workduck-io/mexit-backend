@@ -23,7 +23,7 @@ export class BookmarkManager {
     idToken: string
   ): Promise<any> {
     try {
-      const result = await this._lambda.invoke(
+      const result = await this._lambda.invokeAndCheck(
         this._userLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -38,7 +38,7 @@ export class BookmarkManager {
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -52,7 +52,7 @@ export class BookmarkManager {
     idToken: string
   ): Promise<any> {
     try {
-      const result = await this._lambda.invoke(
+      const result = await this._lambda.invokeAndCheck(
         this._userLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -67,7 +67,7 @@ export class BookmarkManager {
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -81,7 +81,7 @@ export class BookmarkManager {
     idToken: string
   ): Promise<any> {
     try {
-      const result = await this._lambda.invoke(
+      const result = await this._lambda.invokeAndCheck(
         this._userLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -95,7 +95,7 @@ export class BookmarkManager {
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,

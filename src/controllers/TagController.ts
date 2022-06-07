@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import container from '../inversify.config';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
@@ -17,7 +17,8 @@ class TagController {
 
   getAllTagsOfWorkspace = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
       const result = await this._tagManager.getAllTagsOfWorkspace(
@@ -25,18 +26,16 @@ class TagController {
         response.locals.idToken
       );
 
-      response.json(result);
+      response.status(statusCodes.OK).json(result);
     } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: error.toString() })
-        .json();
+      next(error);
     }
   };
 
   getNodesWithTag = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
       const tagName = request.params.tagName;
@@ -46,12 +45,9 @@ class TagController {
         tagName
       );
 
-      response.json(result);
+      response.status(statusCodes.OK).json(result);
     } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: error.toString() })
-        .json();
+      next(error);
     }
   };
 }
