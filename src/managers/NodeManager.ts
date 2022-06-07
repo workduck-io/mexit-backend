@@ -13,13 +13,13 @@ import { statusCodes } from '../libs/statusCodes';
 import container from '../inversify.config';
 import { Lambda, InvocationType } from '../libs/LambdaClass';
 import { RouteKeys } from '../libs/routeKeys';
+import WDError from '../libs/WDError';
 
 @injectable()
 export class NodeManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
   private _nodeLambdaFunctionName = 'mex-backend-test-Node';
   private _workspaceLambdaFunctionName = 'mex-backend-test-Workspace';
-  private _tagLambdaFunctionName = 'mex-backend-test-Tag';
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
   async createNode(
@@ -38,11 +38,21 @@ export class NodeManager {
         }
       );
 
+      const body = JSON.parse(result.body);
+
+      if (result.statusCode !== 200) {
+        throw new WDError({
+          statusCode: result.statusCode,
+          message: body.message,
+          code: result.statusCode,
+        });
+      }
+
       return result.body;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -437,65 +447,6 @@ export class NodeManager {
         }
       );
       return result.body;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: errorCodes.UNKNOWN,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
-  }
-  async getAllTagsOfWorkspace(
-    workspaceId: string,
-    idToken: string
-  ): Promise<string[]> {
-    try {
-      const result = await this._lambda.invoke(
-        this._tagLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.getAllTagsOfWorkspace,
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-        }
-      );
-
-      const response: string = result.body;
-
-      if (!response) throw new Error('Something went wrong');
-      const allNodes = JSON.parse(response);
-      return allNodes;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: errorCodes.UNKNOWN,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
-  }
-  async getNodeWithTag(
-    workspaceId: string,
-    idToken: string,
-    tagName: string
-  ): Promise<string[]> {
-    try {
-      const result = await this._lambda.invoke(
-        this._tagLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.getNodeWithTag,
-          pathParameters: { tagName: tagName },
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-        }
-      );
-      const response: string = result.body;
-
-      if (!response) throw new Error('Something went wrong');
-      const allNodes = JSON.parse(response);
-      return allNodes;
     } catch (error) {
       errorlib({
         message: error.message,

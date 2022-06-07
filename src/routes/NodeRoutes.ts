@@ -25,26 +25,9 @@ export const initializeNodeRoutes = (
     nodeControllerObject.getLinkHierarchy
   );
   nodeControllerObject._router.post(
-    `${nodeControllerObject._urlPath}/:nodeId/append`,
-    [AuthRequest],
-    nodeControllerObject.appendNode
-  );
-
-  nodeControllerObject._router.post(
-    `${nodeControllerObject._urlPath}/capture`,
-    [AuthRequest],
-    nodeControllerObject.newCapture
-  );
-
-  nodeControllerObject._router.post(
     `${nodeControllerObject._urlPath}/capture/link`,
     [AuthRequest],
     nodeControllerObject.createLinkCapture
-  );
-  nodeControllerObject._router.get(
-    `${nodeControllerObject._urlPath}/getactivityblocks`,
-    [AuthRequest],
-    nodeControllerObject.getLastNActivityBlocks
   );
   nodeControllerObject._router.get(
     `${nodeControllerObject._urlPath}/:nodeId/`,
@@ -55,11 +38,6 @@ export const initializeNodeRoutes = (
     `${nodeControllerObject._urlPath}/all/:userId`,
     [AuthRequest],
     nodeControllerObject.getAllNodes
-  );
-  nodeControllerObject._router.post(
-    `${nodeControllerObject._urlPath}/activitynode`,
-    [AuthRequest],
-    nodeControllerObject.createActivityNodeForUser
   );
   nodeControllerObject._router.post(
     `${nodeControllerObject._urlPath}/block/movement`,
@@ -105,16 +83,6 @@ export const initializeNodeRoutes = (
     `${nodeControllerObject._urlPath}/shared/:nodeId`,
     [AuthRequest],
     nodeControllerObject.getNodeSharedWithUser
-  );
-  nodeControllerObject._router.get(
-    `${nodeControllerObject._urlPath}/tag/all`,
-    [AuthRequest],
-    nodeControllerObject.getAllTagsOfWorkspace
-  );
-  nodeControllerObject._router.get(
-    `${nodeControllerObject._urlPath}/tag/:tagName`,
-    [AuthRequest],
-    nodeControllerObject.getNodeWithTag
   );
   nodeControllerObject._router.post(
     `${nodeControllerObject._urlPath}/refactor`,

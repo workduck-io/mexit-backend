@@ -9,6 +9,7 @@ import { Lambda } from './libs/LambdaClass';
 import { UserManager } from './managers/UserManager';
 import { SnippetManager } from './managers/SnippetManager';
 import { BookmarkManager } from './managers/BookmarkManager';
+import { TagManager } from './managers/TagManager';
 
 const container = new Container();
 
@@ -23,6 +24,7 @@ container
   .bind<ShortenerManager>(ShortenerManager)
   .to(ShortenerManager)
   .inSingletonScope();
+container.bind<TagManager>(TagManager).to(TagManager).inSingletonScope();
 container.bind<UserManager>(UserManager).to(UserManager).inSingletonScope();
 container.bind<Cache>(Cache).to(Cache).inSingletonScope();
 container.bind<Lambda>(Lambda).to(Lambda).inSingletonScope();
