@@ -42,10 +42,7 @@ class NodeController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
       const reqBody = new RequestClass(request, 'LinkCapture').data;
-      const workspaceId = request.headers['mex-workspace-id'].toString();
 
       const shortenerResp = await this._shortenerManager.createNewShort(
         reqBody
@@ -102,7 +99,7 @@ class NodeController {
       };
 
       const result = await this._nodeManager.createNode(
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken,
         nodeDetail
       );
@@ -117,7 +114,7 @@ class NodeController {
       // update the Link hierarchy cache
       await this.updateILinkCache(
         response.locals.userId,
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken
       );
     } catch (error) {
@@ -131,16 +128,12 @@ class NodeController {
   createNode = async (request: Request, response: Response): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'ContentNodeRequest');
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
-      const workspaceId = request.headers['mex-workspace-id'].toString();
 
       if (requestDetail.data.id === `NODE_${response.locals.userId}`)
         throw new Error('Cannot create a node using activitynode id.');
 
       const nodeResult = await this._nodeManager.createNode(
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken,
         requestDetail.data
       );
@@ -149,7 +142,7 @@ class NodeController {
 
       await this.updateILinkCache(
         response.locals.userId,
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken
       );
     } catch (error) {
@@ -162,13 +155,9 @@ class NodeController {
 
   getAllNodes = async (request: Request, response: Response): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
-      const workspaceId = request.headers['mex-workspace-id'].toString();
       const result = await this._nodeManager.getAllNodes(
         request.params.userId,
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken
       );
 
@@ -186,13 +175,9 @@ class NodeController {
 
   getNode = async (request: Request, response: Response): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
-      const workspaceId = request.headers['mex-workspace-id'].toString();
       const result = await this._nodeManager.getNode(
         request.params.nodeId,
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken
       );
 
@@ -221,15 +206,12 @@ class NodeController {
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'CopyOrMoveBlockRequest');
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
 
-      const workspaceId = request.headers['mex-workspace-id'].toString();
       const result = await this._nodeManager.moveBlocks(
         requestDetail.data.blockId,
         requestDetail.data.sourceNodeId,
         requestDetail.data.destinationNodeId,
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken
       );
 
@@ -250,15 +232,11 @@ class NodeController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
       const nodeId = request.params.id;
-      const workspaceId = request.headers['mex-workspace-id'].toString();
 
       const result = await this._nodeManager.makeNodePublic(
         nodeId,
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken
       );
 
@@ -274,15 +252,11 @@ class NodeController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
       const nodeId = request.params.id;
-      const workspaceId = request.headers['mex-workspace-id'].toString();
 
       const result = await this._nodeManager.makeNodePrivate(
         nodeId,
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken
       );
 
@@ -298,10 +272,6 @@ class NodeController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('workspace-id header missing');
-      const workspaceId = request.headers['mex-workspace-id'].toString();
-
       let linkDataResult: any[];
 
       if (this._cache.has(response.locals.userId, this._linkHierarchyLabel)) {
@@ -311,7 +281,7 @@ class NodeController {
         );
       } else {
         const linkHierarchyResult = await this._nodeManager.getLinkHierarchy(
-          workspaceId,
+          response.locals.workspaceID,
           response.locals.idToken
         );
 
@@ -343,13 +313,9 @@ class NodeController {
   archiveNode = async (request: Request, response: Response): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'ArchiveNodeDetail');
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
-      const workspaceId = request.headers['mex-workspace-id'].toString();
 
       const archiveNodeResult = await this._nodeManager.archiveNode(
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken,
         requestDetail.data
       );
@@ -358,7 +324,7 @@ class NodeController {
       response.json(archiveNodeResult);
       await this.updateILinkCache(
         response.locals.userId,
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken
       );
     } catch (error) {
@@ -375,13 +341,9 @@ class NodeController {
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'ArchiveNodeDetail');
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
-      const workspaceId = request.headers['mex-workspace-id'].toString();
 
       const archiveNodeResult = await this._nodeManager.unArchiveNode(
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken,
         requestDetail.data
       );
@@ -390,7 +352,7 @@ class NodeController {
       response.json(archiveNodeResult);
       await this.updateILinkCache(
         response.locals.userId,
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken
       );
     } catch (error) {
@@ -406,16 +368,12 @@ class NodeController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
       const requestDetail = new RequestClass(request, 'RefactorRequest');
-      const workspaceID = request.headers['mex-workspace-id'].toString();
 
       const refactorResp = JSON.parse(
         (
           await this._nodeManager.refactorHierarchy(
-            workspaceID,
+            response.locals.workspaceID,
             response.locals.idToken,
             requestDetail.data
           )
@@ -429,7 +387,7 @@ class NodeController {
       response.status(statusCodes.OK).json({ addedILinks, removedILinks });
       await this.updateILinkCache(
         response.locals.userId,
-        workspaceID,
+        response.locals.workspaceID,
         response.locals.idToken
       );
     } catch (error) {
@@ -444,16 +402,12 @@ class NodeController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
       const requestDetail = new RequestClass(request, 'BulkCreateNode');
-      const workspaceID = request.headers['mex-workspace-id'].toString();
 
       const bulkCreateResp = JSON.parse(
         (
           await this._nodeManager.bulkCreateNode(
-            workspaceID,
+            response.locals.workspaceID,
             response.locals.idToken,
             requestDetail.data
           )
@@ -472,7 +426,7 @@ class NodeController {
 
       await this.updateILinkCache(
         response.locals.userId,
-        workspaceID,
+        response.locals.workspaceID,
         response.locals.idToken
       );
     } catch (error) {
@@ -487,12 +441,8 @@ class NodeController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
-      const workspaceID = request.headers['mex-workspace-id'].toString();
       const getArchiveResp = await this._nodeManager.getArchivedNodes(
-        workspaceID,
+        response.locals.workspaceID,
         response.locals.idToken
       );
 

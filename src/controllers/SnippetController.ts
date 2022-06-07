@@ -21,15 +21,10 @@ class SnippetController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
-      const workspaceId = request.headers['mex-workspace-id'].toString();
-
       const createNextVersion = request.query.createNextVersion === 'true';
 
       const nodeResult = await this._snippetManager.createSnippet(
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken,
         request.body,
         createNextVersion
@@ -53,13 +48,9 @@ class SnippetController {
 
   getSnippet = async (request: Request, response: Response): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
-      const workspaceId = request.headers['mex-workspace-id'].toString();
       const result = await this._snippetManager.getSnippet(
         request.params.snippetId,
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken
       );
 
@@ -85,13 +76,9 @@ class SnippetController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
-      const workspaceId = request.headers['mex-workspace-id'].toString();
       const result = await this._snippetManager.getAllVersionsOfSnippet(
         request.params.snippetId,
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken
       );
 
@@ -112,13 +99,9 @@ class SnippetController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
-      const workspaceId = request.headers['mex-workspace-id'].toString();
       const getData = request.query.getData === 'true';
       const result = await this._snippetManager.getAllSnippetsOfWorkspace(
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken,
         getData
       );
@@ -140,17 +123,13 @@ class SnippetController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
       const snippetId = request.params.id;
       const version = request.params.version;
-      const workspaceId = request.headers['mex-workspace-id'].toString();
 
       await this._snippetManager.makeSnippetPublic(
         snippetId,
         version,
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken
       );
 
@@ -165,17 +144,13 @@ class SnippetController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
       const snippetId = request.params.id;
       const version = request.params.version;
-      const workspaceId = request.headers['mex-workspace-id'].toString();
 
       await this._snippetManager.makeSnippetPrivate(
         snippetId,
         version,
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken
       );
 
@@ -191,17 +166,13 @@ class SnippetController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
       const snippetId = request.params.snippetId;
       const version = request.params.version;
-      const workspaceId = request.headers['mex-workspace-id'].toString();
 
       const result = await this._snippetManager.getPublicSnippet(
         snippetId,
         version,
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken
       );
 
@@ -230,17 +201,13 @@ class SnippetController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
       const snippetId = request.params.id;
       const version = request.params.version;
-      const workspaceId = request.headers['mex-workspace-id'].toString();
 
       const result = await this._snippetManager.clonePublicSnippet(
         snippetId,
         version,
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken
       );
 

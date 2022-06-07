@@ -20,13 +20,8 @@ class TagController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
-      const workspaceId = request.headers['mex-workspace-id'].toString();
-
       const result = await this._tagManager.getAllTagsOfWorkspace(
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken
       );
 
@@ -45,13 +40,8 @@ class TagController {
   ): Promise<void> => {
     try {
       const tagName = request.params.tagName;
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
-      const workspaceId = request.headers['mex-workspace-id'].toString();
-
       const result = await this._tagManager.getNodeWithTag(
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken,
         tagName
       );

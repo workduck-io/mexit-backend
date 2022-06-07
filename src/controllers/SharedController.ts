@@ -20,13 +20,9 @@ class SharedController {
   shareNode = async (request: Request, response: Response): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'ShareNodeDetail');
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
-      const workspaceId = request.headers['mex-workspace-id'].toString();
 
       const result = await this._sharedManager.shareNode(
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken,
         requestDetail.data
       );
@@ -50,13 +46,9 @@ class SharedController {
         request,
         'UpdateAccessTypeForSharedNodeDetail'
       );
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
-      const workspaceId = request.headers['mex-workspace-id'].toString();
 
       const result = await this._sharedManager.updateAccessTypeForSharedNode(
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken,
         requestDetail.data
       );
@@ -77,13 +69,9 @@ class SharedController {
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'ShareNodeDetail');
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
-      const workspaceId = request.headers['mex-workspace-id'].toString();
 
       const result = await this._sharedManager.revokeNodeAccessForUsers(
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken,
         requestDetail.data
       );
@@ -104,13 +92,9 @@ class SharedController {
   ): Promise<void> => {
     try {
       const nodeId = request.params.nodeId;
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
-      const workspaceId = request.headers['mex-workspace-id'].toString();
 
       const result = await this._sharedManager.getNodeSharedWithUser(
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken,
         nodeId
       );
@@ -132,13 +116,8 @@ class SharedController {
     try {
       const requestDetail = new RequestClass(request, 'NodeDetail');
 
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
-      const workspaceId = request.headers['mex-workspace-id'].toString();
-
       const result = await this._sharedManager.updateSharedNode(
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken,
         requestDetail.data
       );
@@ -159,13 +138,8 @@ class SharedController {
   ): Promise<void> => {
     try {
       const nodeId = request.params.nodeId;
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
-      const workspaceId = request.headers['mex-workspace-id'].toString();
-
       const result = await this._sharedManager.getUserWithNodesShared(
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken,
         nodeId
       );
@@ -185,13 +159,8 @@ class SharedController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
-      const workspaceId = request.headers['mex-workspace-id'].toString();
-
       const result = await this._sharedManager.getAllNodesSharedForUser(
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken
       );
 
