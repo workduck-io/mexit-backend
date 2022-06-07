@@ -698,21 +698,6 @@
             ],
             "type": "object"
         },
-        "Document": {
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "nodePath": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "id",
-                "nodePath"
-            ],
-            "type": "object"
-        },
         "GenericObjectType": {
             "additionalProperties": {
                 "$ref": "types#/definitions/GenericType"
@@ -1376,44 +1361,6 @@
             "required": [
                 "user",
                 "workspaceName"
-            ],
-            "type": "object"
-        },
-        "SearchHit": {
-            "properties": {
-                "_matchesInfo": {},
-                "id": {
-                    "type": "string"
-                },
-                "nodePath": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "id",
-                "nodePath"
-            ],
-            "type": "object"
-        },
-        "SearchResults": {
-            "properties": {
-                "count": {
-                    "type": "number"
-                },
-                "hits": {
-                    "items": {
-                        "$ref": "types#/definitions/SearchHit"
-                    },
-                    "type": "array"
-                },
-                "total": {
-                    "type": "number"
-                }
-            },
-            "required": [
-                "count",
-                "hits",
-                "total"
             ],
             "type": "object"
         },
