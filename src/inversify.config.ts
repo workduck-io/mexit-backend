@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { Container } from 'inversify';
 import { NodeManager } from './managers/NodeManager';
 import { ShortenerManager } from './managers/ShortenerManager';
