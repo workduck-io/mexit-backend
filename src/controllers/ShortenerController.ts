@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import container from '../inversify.config';
 import { statusCodes } from '../libs/statusCodes';
 import { ShortenerManager } from '../managers/ShortenerManager';
@@ -17,16 +17,17 @@ class ShortenerController {
 
   getShortsByWorkspace = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<any> => {
     const workspaceId = request.params.workspaceId;
     try {
       const result = await this._shortenerManager.getStatsByWorkspace(
         workspaceId
       );
-      response.send(result);
+      response.status(statusCodes.OK).json(result);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
+      next(error);
     }
   };
 }

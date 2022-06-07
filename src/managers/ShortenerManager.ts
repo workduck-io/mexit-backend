@@ -17,7 +17,7 @@ export class ShortenerManager {
 
   async getStatsByWorkspace(namespace: string): Promise<any> {
     try {
-      const result = await this._lambda.invoke(
+      const result = await this._lambda.invokeAndCheck(
         this._getShortsLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -25,11 +25,11 @@ export class ShortenerManager {
           pathParameters: { namespace: namespace },
         }
       );
-      return result.body;
+      return result;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -39,7 +39,7 @@ export class ShortenerManager {
 
   async createNewShort(data: LinkCapture): Promise<any> {
     try {
-      const result = await this._lambda.invoke(
+      const result = await this._lambda.invokeAndCheck(
         this._createShortLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -49,11 +49,11 @@ export class ShortenerManager {
         true
       );
 
-      return result.body;
+      return result;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
