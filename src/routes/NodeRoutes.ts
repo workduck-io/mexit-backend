@@ -5,11 +5,6 @@ export const initializeNodeRoutes = (
   nodeControllerObject: NodeController
 ): void => {
   nodeControllerObject._router.get(
-    `${nodeControllerObject._urlPath}/shared/all`,
-    [AuthRequest],
-    nodeControllerObject.getAllNodesSharedForUser
-  );
-  nodeControllerObject._router.get(
     `${nodeControllerObject._urlPath}/archive`,
     [AuthRequest],
     nodeControllerObject.getArchivedNodes
@@ -65,26 +60,6 @@ export const initializeNodeRoutes = (
     nodeControllerObject.unArchiveNode
   );
   nodeControllerObject._router.post(
-    `${nodeControllerObject._urlPath}/shared`,
-    [AuthRequest],
-    nodeControllerObject.shareNode
-  );
-  nodeControllerObject._router.put(
-    `${nodeControllerObject._urlPath}/shared`,
-    [AuthRequest],
-    nodeControllerObject.updateAccessTypeForSharedNode
-  );
-  nodeControllerObject._router.delete(
-    `${nodeControllerObject._urlPath}/shared`,
-    [AuthRequest],
-    nodeControllerObject.revokeNodeAccessForUsers
-  );
-  nodeControllerObject._router.get(
-    `${nodeControllerObject._urlPath}/shared/:nodeId`,
-    [AuthRequest],
-    nodeControllerObject.getNodeSharedWithUser
-  );
-  nodeControllerObject._router.post(
     `${nodeControllerObject._urlPath}/refactor`,
     [AuthRequest],
     nodeControllerObject.refactorHierarchy
@@ -93,16 +68,6 @@ export const initializeNodeRoutes = (
     `${nodeControllerObject._urlPath}/bulkCreate`,
     [AuthRequest],
     nodeControllerObject.bulkCreateNode
-  );
-  nodeControllerObject._router.post(
-    `${nodeControllerObject._urlPath}/shared/update`,
-    [AuthRequest],
-    nodeControllerObject.updateSharedNode
-  );
-  nodeControllerObject._router.get(
-    `${nodeControllerObject._urlPath}/shared/:nodeId/users`,
-    [AuthRequest],
-    nodeControllerObject.getUserWithNodesShared
   );
   return;
 };
