@@ -17,13 +17,35 @@ export class NodeManager {
   private _workspaceLambdaFunctionName = `mex-backend-${STAGE}-Workspace`;
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
+  async getLinkHierarchy(workspaceId: string, idToken: string): Promise<any> {
+    try {
+      const result = await this._lambda.invokeAndCheck(
+        this._workspaceLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.getLinkHierarchy,
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        }
+      );
+      return result;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+
   async createNode(
     workspaceId: string,
     idToken: string,
     nodeDetail: any
-  ): Promise<string> {
+  ): Promise<any> {
     try {
-      const result = await this._lambda.invoke(
+      const result = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -32,18 +54,7 @@ export class NodeManager {
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
-
-      const body = JSON.parse(result.body);
-
-      if (result.statusCode !== 200) {
-        throw new WDError({
-          statusCode: result.statusCode,
-          message: body.message,
-          code: result.statusCode,
-        });
-      }
-
-      return result.body;
+      return result;
     } catch (error) {
       errorlib({
         message: error.message,
@@ -61,7 +72,7 @@ export class NodeManager {
     queryParams?: any
   ): Promise<any> {
     try {
-      const result = await this._lambda.invoke(
+      const result = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -71,45 +82,11 @@ export class NodeManager {
           ...(queryParams && { queryStringParameters: queryParams }),
         }
       );
-
-      const response: string = result.body;
-
-      if (response.includes('message')) return JSON.parse(response);
-
-      return response;
+      return result;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
-  }
-  async appendNode(
-    nodeId: string,
-    workspaceId: string,
-    idToken: string,
-    block: any
-  ): Promise<string> {
-    try {
-      const response = await this._lambda.invoke(
-        this._nodeLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.appendNode,
-          payload: block,
-          pathParameters: { id: nodeId },
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-        }
-      );
-
-      return response.body;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -122,7 +99,7 @@ export class NodeManager {
     idToken: string
   ): Promise<any> {
     try {
-      const response = await this._lambda.invoke(
+      const result = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -131,18 +108,11 @@ export class NodeManager {
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
-      const result: string = response.body;
-
-      if (result.includes('message')) {
-        return JSON.parse(result);
-      } else {
-        const allNodes = JSON.parse(result);
-        return allNodes;
-      }
+      return result;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -155,7 +125,7 @@ export class NodeManager {
     destinationNodeId: string,
     workspaceId: string,
     idToken: string
-  ): Promise<string> {
+  ): Promise<any> {
     try {
       const payload: CopyOrMoveBlock = {
         action: 'move',
@@ -164,7 +134,7 @@ export class NodeManager {
         destinationNodeID: destinationNodeId,
         sourceNodeID: sourceNodeId,
       };
-      const response = await this._lambda.invoke(
+      const result = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -173,11 +143,11 @@ export class NodeManager {
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
-      return response.body;
+      return result;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -189,36 +159,56 @@ export class NodeManager {
     workspaceId: string,
     idToken: string
   ): Promise<any> {
-    const response = await this._lambda.invoke(
-      this._nodeLambdaFunctionName,
-      this._lambdaInvocationType,
-      {
-        routeKey: RouteKeys.makeNodePublic,
-        pathParameters: { id: nodeId },
-        headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-      }
-    );
-    return response;
+    try {
+      const response = await this._lambda.invokeAndCheck(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.makeNodePublic,
+          pathParameters: { id: nodeId },
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        }
+      );
+      return response;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
   }
   async makeNodePrivate(
     nodeId: string,
     workspaceId: string,
     idToken: string
   ): Promise<any> {
-    const response = await this._lambda.invoke(
-      this._nodeLambdaFunctionName,
-      this._lambdaInvocationType,
-      {
-        routeKey: RouteKeys.makeNodePrivate,
-        pathParameters: { id: nodeId },
-        headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-      }
-    );
-    return response;
-  }
-  async getPublicNode(nodeId: string, idToken: string): Promise<string> {
     try {
-      const result = await this._lambda.invoke(
+      const response = await this._lambda.invokeAndCheck(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.makeNodePrivate,
+          pathParameters: { id: nodeId },
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        }
+      );
+      return response;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+  async getPublicNode(nodeId: string, idToken: string): Promise<any> {
+    try {
+      const result = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -230,36 +220,11 @@ export class NodeManager {
           },
         }
       );
-
-      const response: string = result.body;
-      return response;
+      return result;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
-  }
-  async getLinkHierarchy(workspaceId: string, idToken: string): Promise<any> {
-    try {
-      const result = await this._lambda.invoke(
-        this._workspaceLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.getLinkHierarchy,
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-        }
-      );
-
-      const response: string = JSON.parse(result.body);
-      return response;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -270,9 +235,9 @@ export class NodeManager {
     workspaceId: string,
     idToken: string,
     archivePayload: ArchiveNodeDetail
-  ): Promise<string[]> {
+  ): Promise<any> {
     try {
-      const result = await this._lambda.invoke(
+      const result = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -282,13 +247,11 @@ export class NodeManager {
         }
       );
 
-      const response: string = result.body;
-      const allNodes = JSON.parse(response);
-      return allNodes;
+      return result;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -299,9 +262,9 @@ export class NodeManager {
     workspaceId: string,
     idToken: string,
     unArchivePayload: ArchiveNodeDetail
-  ): Promise<string[]> {
+  ): Promise<any> {
     try {
-      const result = await this._lambda.invoke(
+      const result = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -310,16 +273,11 @@ export class NodeManager {
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
-
-      const response: string = result.body;
-
-      if (!response) throw new Error('Something went wrong');
-      const allNodes = JSON.parse(response);
-      return allNodes;
+      return result;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -328,7 +286,7 @@ export class NodeManager {
   }
   async refactorHierarchy(workspaceId: string, idToken: string, payload: any) {
     try {
-      const result = await this._lambda.invoke(
+      const result = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -342,7 +300,7 @@ export class NodeManager {
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -351,7 +309,7 @@ export class NodeManager {
   }
   async bulkCreateNode(workspaceId: string, idToken: string, payload: any) {
     try {
-      const result = await this._lambda.invoke(
+      const result = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -365,7 +323,7 @@ export class NodeManager {
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -374,7 +332,7 @@ export class NodeManager {
   }
   async getArchivedNodes(workspaceId: string, idToken: string) {
     try {
-      const result = await this._lambda.invoke(
+      const result = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -388,7 +346,7 @@ export class NodeManager {
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
