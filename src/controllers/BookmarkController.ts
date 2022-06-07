@@ -19,13 +19,9 @@ class BookmarkController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
-      const workspaceId = request.headers['mex-workspace-id'].toString();
       const result = await this._bookmarkManager.getAllBookmarksForUser(
         response.locals.userId,
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken
       );
       const parsedResult = JSON.parse(result.body);
@@ -43,16 +39,11 @@ class BookmarkController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
       const nodeID = request.params.nodeid;
-      const workspaceId = request.headers['mex-workspace-id'].toString();
-
       await this._bookmarkManager.createBookmark(
         nodeID,
         response.locals.userId,
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken
       );
       response.status(statusCodes.NO_CONTENT).send();
@@ -69,16 +60,12 @@ class BookmarkController {
     response: Response
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
       const nodeID = request.params.nodeid;
-      const workspaceId = request.headers['mex-workspace-id'].toString();
 
       await this._bookmarkManager.removeBookmark(
         nodeID,
         response.locals.userId,
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken
       );
 
