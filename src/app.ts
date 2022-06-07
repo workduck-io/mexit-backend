@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
+import 'reflect-metadata';
 
 import { jsonErrorHandler } from './middlewares/jsonerrorhandler';
 import { errorCodes } from './libs/errorCodes';
