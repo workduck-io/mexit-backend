@@ -13,6 +13,7 @@ import OAuth2Controller from './controllers/OAuth2Controller';
 import SnippetController from './controllers/SnippetController';
 import BookmarkController from './controllers/BookmarkController';
 import PublicController from './controllers/PublicController';
+import TagController from './controllers/TagController';
 
 class App {
   public _app: express.Application;
@@ -67,6 +68,7 @@ const application = new App([
   new SnippetController(),
   new BookmarkController(),
   new PublicController(),
+  new TagController(),
 ]);
 application.build();
 application._app.listen(application._port, () => {
