@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 
 import container from '../inversify.config';
 import { NodeManager } from '../managers/NodeManager';
@@ -17,24 +17,19 @@ class PublicController {
 
   getPublicNode = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
       const nodeId = request.params.nodeId;
       const idToken = request.headers.authorization;
-      const result = await this._nodeManager.getPublicNode(nodeId, idToken);
-
-      if (JSON.parse(result).message) {
-        throw new Error(JSON.parse(result).message);
-      }
-
-      const nodeResponse = JSON.parse(result) as NodeResponse;
-      response.status(statusCodes.OK).json(nodeResponse);
+      const result = (await this._nodeManager.getPublicNode(
+        nodeId,
+        idToken
+      )) as NodeResponse;
+      response.status(statusCodes.OK).json(result);
     } catch (error) {
-      const resp = {
-        message: error.message,
-      };
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).json(resp);
+      next(error);
     }
   };
 }

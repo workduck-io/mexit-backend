@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import container from '../inversify.config';
 import { statusCodes } from '../libs/statusCodes';
 import { UserManager } from '../managers/UserManager';
@@ -16,7 +16,11 @@ class UserController {
     initializeUserRoutes(this);
   }
 
-  updateUser = async (request: Request, response: Response): Promise<any> => {
+  updateUser = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<any> => {
     const userId = response.locals.userIdRaw;
     const requestDetail = new RequestClass(request, 'UserPreference');
     requestDetail.data.id = userId;
@@ -33,75 +37,84 @@ class UserController {
       const result = await this._userManager.updateUserPreference(
         requestDetail.data
       );
-      response.json(JSON.parse(result));
+      response.status(statusCodes.OK).json(result);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
+      next(error);
     }
   };
-  get = async (request: Request, response: Response): Promise<any> => {
+  get = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<any> => {
     try {
       const result = await this._userManager.get(response.locals.idToken);
-      response.json(JSON.parse(result));
+      response.status(statusCodes.OK).json(result);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
+      next(error);
     }
   };
-  getById = async (request: Request, response: Response): Promise<any> => {
+  getById = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<any> => {
     try {
       const result = await this._userManager.getById(request.params.id);
-      response.json(JSON.parse(result));
+      response.status(statusCodes.OK).json(result);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
+      next(error);
     }
   };
-  getByGroupId = async (request: Request, response: Response): Promise<any> => {
+  getByGroupId = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<any> => {
     try {
       const result = await this._userManager.getByGroupId(
         request.params.groupId
       );
-      response.json(JSON.parse(result));
+      response.status(statusCodes.OK).json(result);
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
+      next(error);
     }
   };
   getUserByLinkedin = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<any> => {
     try {
       request.body.linkedinURL = request.body.linkedinURL.replace(/\/+$/, '');
-      const result = JSON.parse(
-        await this._userManager.getUserByLinkedin(request.body)
-      );
+      const result = await this._userManager.getUserByLinkedin(request.body);
 
-      response.json({
+      response.status(statusCodes.OK).json({
         mex_user: result.length > 0 ? true : false,
       });
     } catch (error) {
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
+      next(error);
     }
   };
 
   registerUser = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'RegisterUserRequest');
       const idToken = response.locals.idToken;
 
-      const registerResp = JSON.parse(
-        (await this._userManager.registerUser(idToken, requestDetail.data)).body
+      const registerResp = await this._userManager.registerUser(
+        idToken,
+        requestDetail.data
       );
 
-      const initWorkspaceResp = JSON.parse(
-        (
-          await this._userManager.initializeWorkspace({
-            workspaceID: registerResp.id,
-            userEmail: requestDetail.data.user.email,
-          })
-        ).body
-      );
+      const initWorkspaceResp = await this._userManager.initializeWorkspace({
+        workspaceID: registerResp.id,
+        userEmail: requestDetail.data.user.email,
+      });
 
       const nodeHierarchyInfo = this._transformer.linkHierarchyParser(
         initWorkspaceResp.nodeHierarchy
@@ -114,9 +127,7 @@ class UserController {
         ilinks: nodeHierarchyInfo,
       });
     } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .json({ message: error.toString() });
+      next(error);
     }
   };
 }

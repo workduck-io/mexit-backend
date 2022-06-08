@@ -1,18 +1,25 @@
 import express from 'express';
-import { jsonErrorHandler } from './middlewares/jsonerrorhandler';
 import cors from 'cors';
-import NodeController from './controllers/NodeController';
-import SearchController from './controllers/SearchController';
-import ShortenerController from './controllers/ShortenerController';
-import { errorCodes } from './libs/errorCodes';
 import 'dotenv/config';
-import UserController from './controllers/UserController';
+import 'reflect-metadata';
+
+import { jsonErrorHandler } from './middlewares/jsonerrorhandler';
+import { errorCodes } from './libs/errorCodes';
 import { LogRequest } from './middlewares/logrequest';
 import logger from './libs/logger';
+import expressListRoutes, { COLORS, colorText } from './libs/routeList';
+import { IS_DEV } from './env';
+
 import OAuth2Controller from './controllers/OAuth2Controller';
-import SnippetController from './controllers/SnippetController';
 import BookmarkController from './controllers/BookmarkController';
+import NodeController from './controllers/NodeController';
 import PublicController from './controllers/PublicController';
+import SharedController from './controllers/SharedController';
+import ShortenerController from './controllers/ShortenerController';
+import SnippetController from './controllers/SnippetController';
+import TagController from './controllers/TagController';
+import UserController from './controllers/UserController';
+import responseErrorHandler from './middlewares/responseErrorHandler';
 
 class App {
   public _app: express.Application;
@@ -55,22 +62,32 @@ class App {
       });
       next();
     });
+    this._app.use(responseErrorHandler);
   }
 }
 
 const application = new App([
-  new OAuth2Controller(),
-  new NodeController(),
-  new SearchController(),
-  new ShortenerController(),
-  new UserController(),
-  new SnippetController(),
   new BookmarkController(),
+  new NodeController(),
+  new OAuth2Controller(),
   new PublicController(),
+  new SharedController(),
+  new ShortenerController(),
+  new SnippetController(),
+  new TagController(),
+  new UserController(),
 ]);
+
 application.build();
 application._app.listen(application._port, () => {
-  return console.log(
-    `Express is listening at http://localhost:${application._port}`
-  );
+  if (IS_DEV) {
+    console.log(
+      colorText(
+        COLORS.red,
+        `Express is listening at http://localhost:${application._port}`
+      )
+    );
+    expressListRoutes(application._app);
+  }
+  return;
 });

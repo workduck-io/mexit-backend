@@ -1,5 +1,6 @@
 import { injectable } from 'inversify';
 import LambdaConfig from './InvokeLambda';
+import WDError from './WDError';
 export type InvocationType = 'RequestResponse' | 'Event';
 export type InvocationSource = 'Direct' | 'APIGateway';
 
@@ -49,5 +50,31 @@ export class Lambda {
         })
       ).Payload as string
     );
+  }
+
+  async invokeAndCheck(
+    functionName: string,
+    invocationType: InvocationType,
+    options: LambdaOptions,
+    sendRawBody = false,
+    invocationSource: InvocationSource = 'APIGateway'
+  ) {
+    const response = await this.invoke(
+      functionName,
+      invocationType,
+      options,
+      sendRawBody,
+      invocationSource
+    );
+
+    const body = JSON.parse(response.body);
+    if (response.statusCode !== 200) {
+      throw new WDError({
+        statusCode: response.statusCode,
+        message: body.message,
+        code: response.statusCode,
+      });
+    }
+    return body;
   }
 }
