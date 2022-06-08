@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import container from '../../inversify.config';
 import { Transformer } from '../../libs/TransformerClass';
 
@@ -16,7 +17,7 @@ describe('Transformer Module', () => {
       expect(iLinks[3].nodeid).toEqual('Fid');
       expect(iLinks[4].nodeid).toEqual('Rid');
       expect(iLinks[5].nodeid).toEqual('Qid');
-    // Assert the node path
+      // Assert the node path
       expect(iLinks[0].path).toEqual('A');
       expect(iLinks[1].path).toEqual('A.B');
       expect(iLinks[2].path).toEqual('A.B.C');
