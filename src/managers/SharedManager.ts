@@ -23,7 +23,7 @@ export class SharedManager {
     workspaceId: string,
     idToken: string,
     shareNodePayload: ShareNodeDetail
-  ): Promise<string> {
+  ): Promise<any> {
     try {
       const payloadDetail = {
         ...shareNodePayload,
@@ -57,7 +57,7 @@ export class SharedManager {
     workspaceId: string,
     idToken: string,
     updatedAccessTypeForSharedNodePayload: UpdateAccessTypeForSharedNodeDetail
-  ): Promise<string> {
+  ): Promise<any> {
     try {
       const payloadDetail = {
         ...updatedAccessTypeForSharedNodePayload,
@@ -89,7 +89,7 @@ export class SharedManager {
     workspaceId: string,
     idToken: string,
     shareNodePayload: ShareNodeDetail
-  ): Promise<string> {
+  ): Promise<any> {
     try {
       const response = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
@@ -119,7 +119,7 @@ export class SharedManager {
     workspaceId: string,
     idToken: string,
     nodeId: string
-  ): Promise<string> {
+  ): Promise<any> {
     try {
       const response = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
@@ -145,7 +145,7 @@ export class SharedManager {
     workspaceId: string,
     idToken: string,
     nodeDetail: NodeDetail
-  ): Promise<string> {
+  ): Promise<any> {
     try {
       const response = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
@@ -171,7 +171,7 @@ export class SharedManager {
     workspaceId: string,
     idToken: string,
     nodeId: string
-  ): Promise<string> {
+  ): Promise<any> {
     try {
       const response = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
@@ -196,7 +196,7 @@ export class SharedManager {
   async getAllNodesSharedForUser(
     workspaceId: string,
     idToken: string
-  ): Promise<string> {
+  ): Promise<any> {
     try {
       const response = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,

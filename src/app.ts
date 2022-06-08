@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
 import 'reflect-metadata';
+import compression from 'compression';
 
 import { jsonErrorHandler } from './middlewares/jsonerrorhandler';
 import { errorCodes } from './libs/errorCodes';
@@ -39,6 +40,7 @@ class App {
   }
 
   private initializeMiddlewares() {
+    this._app.use(compression());
     this._app.use(cors());
     this._app.use(express.json());
     this._app.use(LogRequest);

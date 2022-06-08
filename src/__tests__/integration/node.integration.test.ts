@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { NodeDetail } from '../../interfaces/Node';
 import container from '../../inversify.config';
 import { NodeManager } from '../../managers/NodeManager';
@@ -50,8 +51,7 @@ describe('Node Manager', () => {
         testNodeDetail
       );
 
-      expect(testNodeResult.length).toBeGreaterThan(0);
-      expect(JSON.parse(testNodeResult)).toBeTruthy();
+      expect(testNodeResult.id).toEqual('NODE_test-user-id');
     });
   });
   describe('Get node function', () => {
@@ -59,17 +59,18 @@ describe('Node Manager', () => {
       const ID_TOKEN = await getIdToken();
       const nodeId = 'NODE_test-user-id';
       const node = await nodeManager.getNode(nodeId, WORKSPACE_ID, ID_TOKEN);
-
-      expect(JSON.parse(node)).toBeTruthy();
+      expect(node.id).toEqual('NODE_test-user-id');
     });
   });
   describe('Get node function - Fail Case', () => {
     it('should return undefined for the given node id', async () => {
-      const ID_TOKEN = await getIdToken();
-      const nodeId = 'NODE_does-not-exist';
-      const node = await nodeManager.getNode(nodeId, WORKSPACE_ID, ID_TOKEN);
-
-      expect(node.message).toContain('Error');
+      try {
+        const ID_TOKEN = await getIdToken();
+        const nodeId = 'NODE_does-not-exist';
+        await nodeManager.getNode(nodeId, WORKSPACE_ID, ID_TOKEN);
+      } catch (error) {
+        expect(error.response.statusCode).toBeGreaterThanOrEqual(400);
+      }
     });
   });
   describe('Get all nodes function - Fail Case 1', () => {
@@ -85,85 +86,23 @@ describe('Node Manager', () => {
       expect(allNodes.length).toEqual(0);
     });
   });
-  describe('Append node function', () => {
-    it('should return no content with status code 204', async () => {
-      const ID_TOKEN = await getIdToken();
-      const appendNodeDetail = {
-        type: 'ElementRequest',
-        elements: [
-          {
-            createdBy: 'test-user-id',
-            id: 'BLOCK_test',
-            content: 'Sample Content 4',
-            elementType: 'list',
-            children: [
-              {
-                elementType: 'paragraph',
-                id: 'test-child-id',
-                content: 'test child content',
-              },
-            ],
-          },
-        ],
-      };
-
-      const appendNodeResult = JSON.parse(
-        await nodeManager.appendNode(
-          'NODE_test-user-id',
-          WORKSPACE_ID,
-          ID_TOKEN,
-          appendNodeDetail
-        )
-      );
-
-      expect(appendNodeResult.appendedElements.length).toBeGreaterThan(0);
-    });
-  });
   describe('Create a node function - Fail Case', () => {
     it('should return undefined as the type is given invalid for the payload', async () => {
-      const ID_TOKEN = await getIdToken();
-      const testNodeDetail: NodeDetail = {
-        id: 'NODE_test-user-id',
-        title: 'test-title',
-        namespaceIdentifier: 'test-namespace',
-        data: [],
-        type: 'InvalidTypeRequest',
-      };
-      const testNodeResult = await nodeManager.createNode(
-        WORKSPACE_ID,
-        ID_TOKEN,
-        testNodeDetail
-      );
-
-      expect(JSON.parse(testNodeResult).message).toContain('Malformed Request');
+      try {
+        const ID_TOKEN = await getIdToken();
+        const testNodeDetail = {
+          id: 'NODE_test-user-id',
+          namespaceIdentifier: 'test-namespace',
+          data: [],
+        };
+        await nodeManager.createNode(WORKSPACE_ID, ID_TOKEN, testNodeDetail);
+      } catch (error) {
+        expect(error.response.statusCode).toEqual(400);
+        expect(error.response.message).toEqual('Malformed Request');
+      }
     });
   });
 
-  describe('Append node function - Fail Case', () => {
-    it('should return error message when passing invalid node id and payload for append', async () => {
-      const ID_TOKEN = await getIdToken();
-      const appendNodeDetail = {
-        type: 'ElementRequest',
-        elements: [
-          {
-            id: 'BLOCK_test',
-            children: [{ id: 'sampleChildID' }],
-            createdBy: 'test-user',
-          },
-        ],
-      };
-      const appendNodeResult = JSON.parse(
-        await nodeManager.appendNode(
-          'NODE_invalid-node-id',
-          WORKSPACE_ID,
-          ID_TOKEN,
-          appendNodeDetail
-        )
-      );
-
-      expect(appendNodeResult.message).not.toBeUndefined();
-    });
-  });
   describe('Make Node Public by UID', () => {
     it('make the node by given UID public', async () => {
       const ID_TOKEN = await getIdToken();
@@ -173,16 +112,16 @@ describe('Node Manager', () => {
         WORKSPACE_ID,
         ID_TOKEN
       );
-      expect(JSON.parse(node.body)).toBe(nodeId);
+      expect(node).toBe(nodeId);
     });
   });
   describe('Get public node by UID', () => {
     it('should return the corresponding public node for the given node id', async () => {
+      const ID_TOKEN = await getIdToken();
       const nodeId = 'NODE_test-user-id';
-      const node = await nodeManager.getPublicNode(nodeId);
-
-      expect(JSON.parse(node).id).toBe(nodeId);
-      expect(JSON.parse(node).data.length).toBeGreaterThan(0);
+      const node = await nodeManager.getPublicNode(nodeId, ID_TOKEN);
+      expect(node.id).toBe(nodeId);
+      expect(node.data.length).toBeGreaterThanOrEqual(0);
     });
   });
   describe('Make Node Private by UID', () => {
@@ -194,16 +133,18 @@ describe('Node Manager', () => {
         WORKSPACE_ID,
         ID_TOKEN
       );
-      expect(JSON.parse(node.body)).toBe(nodeId);
+      expect(node).toBe(nodeId);
     });
   });
   describe('Get node by UID - Fail Case', () => {
     it('should fail since the given node UID was made private', async () => {
-      const ID_TOKEN = await getIdToken();
-      const nodeId = 'NODE_FAILPUBLICNODE';
-      const node = await nodeManager.getPublicNode(nodeId);
-
-      expect(JSON.parse(node).message).toBe('Requested Resource Not Found');
+      try {
+        const ID_TOKEN = await getIdToken();
+        const nodeId = 'NODE_FAILPUBLICNODE';
+        await nodeManager.getPublicNode(nodeId, ID_TOKEN);
+      } catch (error) {
+        expect(error.response.statusCode).toEqual(404);
+      }
     });
   });
 });
