@@ -20,6 +20,11 @@ async function AuthRequest(
       res.locals.userId = result.userId.replace(/-/g, '');
       res.locals.userIdRaw = result.userId;
       res.locals.idToken = req.headers.authorization;
+
+      if (!req.headers['mex-workspace-id'])
+        throw new Error('mex-workspace-id header missing');
+
+      res.locals.workspaceID = req.headers['mex-workspace-id'].toString();
       next();
     } else throw new Error(result.error);
   } catch (error) {

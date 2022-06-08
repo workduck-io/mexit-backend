@@ -56,7 +56,6 @@
     "jsonwebtoken": "^8.5.1",
     "jwk-to-pem": "^2.0.5",
     "lodash": "^4.17.21",
-    "meilisearch": "^0.24.0",
     "mem": "8.1.1",
     "nanoid": "^3.2.0",
     "node-cache": "^5.1.2",

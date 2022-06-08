@@ -1,31 +1,33 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { injectable } from 'inversify';
 
 import { errorlib } from '../libs/errorlib';
-import { errorCodes } from '../libs/errorCodes';
 import { statusCodes } from '../libs/statusCodes';
 import container from '../inversify.config';
 import { Lambda, InvocationType } from '../libs/LambdaClass';
 import { RouteKeys } from '../libs/routeKeys';
-import { LinkCapture } from '../interfaces/Node';
-@injectable()
-export class ShortenerManager {
-  private _lambdaInvocationType: InvocationType = 'RequestResponse';
-  private _getShortsLambdaFunctionName = 'mex-integration-dev-namespaceDetails';
-  private _createShortLambdaFunctionName = 'mex-integration-dev-shorten';
+import { STAGE } from '../env';
 
+@injectable()
+export class TagManager {
+  private _lambdaInvocationType: InvocationType = 'RequestResponse';
+  private _tagLambdaFunctionName = `mex-backend-${STAGE}-Tag`;
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
-  async getStatsByWorkspace(namespace: string): Promise<any> {
+  async getAllTagsOfWorkspace(
+    workspaceId: string,
+    idToken: string
+  ): Promise<any> {
     try {
-      const result = await this._lambda.invokeAndCheck(
-        this._getShortsLambdaFunctionName,
+      const response = await this._lambda.invokeAndCheck(
+        this._tagLambdaFunctionName,
         this._lambdaInvocationType,
         {
-          routeKey: RouteKeys.getShorts,
-          pathParameters: { namespace: namespace },
+          routeKey: RouteKeys.getAllTagsOfWorkspace,
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
-      return result;
+      return response;
     } catch (error) {
       errorlib({
         message: error.message,
@@ -36,20 +38,22 @@ export class ShortenerManager {
       });
     }
   }
-
-  async createNewShort(data: LinkCapture): Promise<any> {
+  async getNodeWithTag(
+    workspaceId: string,
+    idToken: string,
+    tagName: string
+  ): Promise<any> {
     try {
-      const result = await this._lambda.invokeAndCheck(
-        this._createShortLambdaFunctionName,
+      const response = await this._lambda.invokeAndCheck(
+        this._tagLambdaFunctionName,
         this._lambdaInvocationType,
         {
-          routeKey: RouteKeys.shorten,
-          payload: data,
-        },
-        true
+          routeKey: RouteKeys.getNodeWithTag,
+          pathParameters: { tagName: tagName },
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        }
       );
-
-      return result;
+      return response;
     } catch (error) {
       errorlib({
         message: error.message,

@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import container from '../inversify.config';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
@@ -18,241 +18,169 @@ class SnippetController {
 
   createSnippet = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
-      const workspaceId = request.headers['mex-workspace-id'].toString();
-
       const createNextVersion = request.query.createNextVersion === 'true';
 
-      const nodeResult = await this._snippetManager.createSnippet(
-        workspaceId,
+      const snippetResult = await this._snippetManager.createSnippet(
+        response.locals.workspaceID,
         response.locals.idToken,
         request.body,
         createNextVersion
       );
+      const deserialisedContent =
+        this._transformer.genericNodeConverter(snippetResult);
 
-      if (JSON.parse(nodeResult).message) {
-        throw new Error(JSON.parse(nodeResult).message);
-      }
-
-      const deserialisedContent = this._transformer.genericNodeConverter(
-        JSON.parse(nodeResult)
-      );
-      response.json(deserialisedContent);
+      response.status(statusCodes.OK).json(deserialisedContent);
     } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: error.toString() })
-        .json();
+      next(error);
     }
   };
 
-  getSnippet = async (request: Request, response: Response): Promise<void> => {
+  getSnippet = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
-      const workspaceId = request.headers['mex-workspace-id'].toString();
-      const result = await this._snippetManager.getSnippet(
+      const result = (await this._snippetManager.getSnippet(
         request.params.snippetId,
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken
-      );
+      )) as NodeResponse;
 
-      if (result.message) throw new Error(result.message);
+      const convertedResponse = this._transformer.genericNodeConverter(result);
 
-      const nodeResponse = JSON.parse(result) as NodeResponse;
-      const convertedResponse =
-        this._transformer.genericNodeConverter(nodeResponse);
-
-      response
-        .contentType('application/json')
-        .status(statusCodes.OK)
-        .send(convertedResponse);
+      response.status(statusCodes.OK).json(convertedResponse);
     } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: error.toString() })
-        .json();
+      next(error);
     }
   };
   getAllVersionsOfSnippets = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
-      const workspaceId = request.headers['mex-workspace-id'].toString();
       const result = await this._snippetManager.getAllVersionsOfSnippet(
         request.params.snippetId,
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken
       );
 
-      response
-        .contentType('application/json')
-        .status(statusCodes.OK)
-        .send(result);
+      response.status(statusCodes.OK).json(result);
     } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: error.toString() })
-        .json();
+      next(error);
     }
   };
 
   getAllSnippetsOfWorkspace = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
-      const workspaceId = request.headers['mex-workspace-id'].toString();
       const getData = request.query.getData === 'true';
       const result = await this._snippetManager.getAllSnippetsOfWorkspace(
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken,
         getData
       );
 
-      response
-        .contentType('application/json')
-        .status(statusCodes.OK)
-        .send(result);
+      response.status(statusCodes.OK).json(result);
     } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: error.toString() })
-        .json();
+      next(error);
     }
   };
 
   makeSnippetPublic = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
       const snippetId = request.params.id;
       const version = request.params.version;
-      const workspaceId = request.headers['mex-workspace-id'].toString();
 
       await this._snippetManager.makeSnippetPublic(
         snippetId,
         version,
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken
       );
 
-      response.send();
+      response.status(statusCodes.OK).send();
     } catch (error) {
-      console.error(error);
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).json(error);
+      next(error);
     }
   };
   makeSnippetPrivate = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
       const snippetId = request.params.id;
       const version = request.params.version;
-      const workspaceId = request.headers['mex-workspace-id'].toString();
 
       await this._snippetManager.makeSnippetPrivate(
         snippetId,
         version,
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken
       );
 
-      response.send();
+      response.status(statusCodes.OK).send();
     } catch (error) {
-      console.error(error);
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).json(error);
+      next(error);
     }
   };
 
   getPublicSnippet = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
       const snippetId = request.params.snippetId;
       const version = request.params.version;
-      const workspaceId = request.headers['mex-workspace-id'].toString();
 
-      const result = await this._snippetManager.getPublicSnippet(
+      const result = (await this._snippetManager.getPublicSnippet(
         snippetId,
         version,
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken
-      );
+      )) as NodeResponse;
 
-      if (JSON.parse(result).message) {
-        throw new Error(JSON.parse(result).message);
-      }
+      const convertedResponse = this._transformer.genericNodeConverter(result);
 
-      const nodeResponse = JSON.parse(result) as NodeResponse;
-      const convertedResponse =
-        this._transformer.genericNodeConverter(nodeResponse);
-
-      response
-        .contentType('application/json')
-        .status(statusCodes.OK)
-        .send(convertedResponse);
+      response.status(statusCodes.OK).json(convertedResponse);
     } catch (error) {
-      const resp = {
-        message: error.message,
-      };
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).json(resp);
+      next(error);
     }
   };
 
   clonePublicSnippet = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
-      if (!request.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
-
       const snippetId = request.params.id;
       const version = request.params.version;
-      const workspaceId = request.headers['mex-workspace-id'].toString();
 
       const result = await this._snippetManager.clonePublicSnippet(
         snippetId,
         version,
-        workspaceId,
+        response.locals.workspaceID,
         response.locals.idToken
       );
 
-      const resp = {
-        status: statusCodes.OK,
-        nodeUID: JSON.parse(result.body),
-      };
-
-      response.json(resp);
+      response.json(result);
     } catch (error) {
-      console.error(error);
-      response.status(statusCodes.INTERNAL_SERVER_ERROR).json(error);
+      next(error);
     }
   };
 }
