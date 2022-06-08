@@ -2,7 +2,6 @@
 import { injectable } from 'inversify';
 
 import { errorlib } from '../libs/errorlib';
-import { errorCodes } from '../libs/errorCodes';
 import { statusCodes } from '../libs/statusCodes';
 import container from '../inversify.config';
 import { Lambda, InvocationType } from '../libs/LambdaClass';
@@ -34,7 +33,7 @@ export class SharedManager {
       delete payloadDetail.nodeId;
       delete payloadDetail.userIds;
 
-      const result = await this._lambda.invoke(
+      const response = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -43,11 +42,11 @@ export class SharedManager {
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
-      return result.body;
+      return response;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -66,7 +65,7 @@ export class SharedManager {
       };
       delete payloadDetail.nodeId;
 
-      const result = await this._lambda.invoke(
+      const response = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -75,11 +74,11 @@ export class SharedManager {
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
-      return result.body;
+      return response;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -92,7 +91,7 @@ export class SharedManager {
     shareNodePayload: ShareNodeDetail
   ): Promise<string> {
     try {
-      const result = await this._lambda.invoke(
+      const response = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -105,11 +104,11 @@ export class SharedManager {
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
-      return result.body;
+      return response;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -122,7 +121,7 @@ export class SharedManager {
     nodeId: string
   ): Promise<string> {
     try {
-      const result = await this._lambda.invoke(
+      const response = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -131,11 +130,11 @@ export class SharedManager {
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
-      return result.body;
+      return response;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -148,7 +147,7 @@ export class SharedManager {
     nodeDetail: NodeDetail
   ): Promise<string> {
     try {
-      const result = await this._lambda.invoke(
+      const response = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -157,12 +156,11 @@ export class SharedManager {
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
-
-      return result.body;
+      return response;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -175,7 +173,7 @@ export class SharedManager {
     nodeId: string
   ): Promise<string> {
     try {
-      const result = await this._lambda.invoke(
+      const response = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -184,11 +182,11 @@ export class SharedManager {
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
-      return result.body;
+      return response;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -200,7 +198,7 @@ export class SharedManager {
     idToken: string
   ): Promise<string> {
     try {
-      const result = await this._lambda.invoke(
+      const response = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -208,11 +206,11 @@ export class SharedManager {
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
-      return result.body;
+      return response;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
