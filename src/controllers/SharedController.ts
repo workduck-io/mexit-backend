@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import container from '../inversify.config';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
@@ -17,7 +17,11 @@ class SharedController {
     initializeSharedRoutes(this);
   }
 
-  shareNode = async (request: Request, response: Response): Promise<void> => {
+  shareNode = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'ShareNodeDetail');
 
@@ -26,20 +30,16 @@ class SharedController {
         response.locals.idToken,
         requestDetail.data
       );
-
-      if (result) response.json(JSON.parse(result));
-      else response.json({ message: 'No response' });
+      response.status(statusCodes.OK).json(result);
     } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: error.toString() })
-        .json();
+      next(error);
     }
   };
 
   updateAccessTypeForSharedNode = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(
@@ -52,20 +52,16 @@ class SharedController {
         response.locals.idToken,
         requestDetail.data
       );
-
-      if (result) response.json(JSON.parse(result));
-      else response.json({ message: 'No response' });
+      response.status(statusCodes.OK).json(result);
     } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: error.toString() })
-        .json();
+      next(error);
     }
   };
 
   revokeNodeAccessForUsers = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'ShareNodeDetail');
@@ -75,20 +71,16 @@ class SharedController {
         response.locals.idToken,
         requestDetail.data
       );
-
-      if (result) response.json(JSON.parse(result));
-      else response.json({ message: 'No response' });
+      response.status(statusCodes.OK).json(result);
     } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: error.toString() })
-        .json();
+      next(error);
     }
   };
 
   getNodeSharedWithUser = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
       const nodeId = request.params.nodeId;
@@ -98,20 +90,16 @@ class SharedController {
         response.locals.idToken,
         nodeId
       );
-
-      if (result) response.json(JSON.parse(result));
-      else response.json({ message: 'No response' });
+      response.status(statusCodes.OK).json(result);
     } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: error.toString() })
-        .json();
+      next(error);
     }
   };
 
   updateSharedNode = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'NodeDetail');
@@ -121,20 +109,16 @@ class SharedController {
         response.locals.idToken,
         requestDetail.data
       );
-
-      if (result) response.json(JSON.parse(result));
-      else response.json({ message: 'No response' });
+      response.status(statusCodes.OK).json(result);
     } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: error.toString() })
-        .json();
+      next(error);
     }
   };
 
   getUserWithNodesShared = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
       const nodeId = request.params.nodeId;
@@ -143,34 +127,25 @@ class SharedController {
         response.locals.idToken,
         nodeId
       );
-
-      if (result) response.json(JSON.parse(result));
-      else response.json({ message: 'No response' });
+      response.status(statusCodes.OK).json(result);
     } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: error.toString() })
-        .json();
+      next(error);
     }
   };
 
   getAllNodesSharedForUser = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
       const result = await this._sharedManager.getAllNodesSharedForUser(
         response.locals.workspaceID,
         response.locals.idToken
       );
-
-      if (result) response.json(JSON.parse(result));
-      else response.json({ message: 'No response' });
+      response.status(statusCodes.OK).json(result);
     } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: error.toString() })
-        .json();
+      next(error);
     }
   };
 }

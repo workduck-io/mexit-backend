@@ -21,7 +21,7 @@ export class UserManager {
 
   async updateUserPreference(userPreference: UserPreference): Promise<any> {
     try {
-      const result = await this._lambda.invoke(
+      const response = await this._lambda.invokeAndCheck(
         this._userLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -30,12 +30,11 @@ export class UserManager {
         },
         true
       );
-
-      return result.body;
+      return response;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -44,7 +43,7 @@ export class UserManager {
   }
   async get(idToken: string): Promise<any> {
     try {
-      const result = await this._lambda.invoke(
+      const response = await this._lambda.invokeAndCheck(
         this._userLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -52,11 +51,11 @@ export class UserManager {
           headers: { authorization: idToken },
         }
       );
-      return result.body;
+      return response;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -65,7 +64,7 @@ export class UserManager {
   }
   async getById(userId: string): Promise<any> {
     try {
-      const result = await this._lambda.invoke(
+      const response = await this._lambda.invokeAndCheck(
         this._userLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -73,11 +72,11 @@ export class UserManager {
           pathParameters: { userId },
         }
       );
-      return result.body;
+      return response;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -86,7 +85,7 @@ export class UserManager {
   }
   async getByGroupId(groupId: string): Promise<any> {
     try {
-      const result = await this._lambda.invoke(
+      const respone = await this._lambda.invokeAndCheck(
         this._userLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -94,11 +93,11 @@ export class UserManager {
           pathParameters: { groupId: groupId },
         }
       );
-      return result.body;
+      return respone;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -108,7 +107,7 @@ export class UserManager {
   // eslint-disable-next-line
   async getUserByLinkedin(payload: any): Promise<any> {
     try {
-      const result = await this._lambda.invoke(
+      const response = await this._lambda.invokeAndCheck(
         this._userLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -118,11 +117,11 @@ export class UserManager {
         true
       );
 
-      return result.body;
+      return response;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -132,7 +131,7 @@ export class UserManager {
   // eslint-disable-next-line
   async registerUser(idToken: string, payload: any): Promise<any> {
     try {
-      const result = await this._lambda.invoke(
+      const response = await this._lambda.invokeAndCheck(
         this._userMexBackendLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -141,11 +140,11 @@ export class UserManager {
           headers: { 'mex-workspace-id': '', authorization: idToken },
         }
       );
-      return result;
+      return response;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
@@ -155,7 +154,7 @@ export class UserManager {
   // eslint-disable-next-line
   async initializeWorkspace(payload: any): Promise<any> {
     try {
-      const result = await this._lambda.invoke(
+      const response = await this._lambda.invokeAndCheck(
         this._initializeWorkspaceLambdaName,
         this._lambdaInvocationType,
         {
@@ -165,11 +164,11 @@ export class UserManager {
         'Direct'
       );
 
-      return result;
+      return response;
     } catch (error) {
       errorlib({
         message: error.message,
-        errorCode: errorCodes.UNKNOWN,
+        errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
         metaData: error.message,
