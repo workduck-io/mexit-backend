@@ -131,6 +131,32 @@ class NodeController {
     }
   };
 
+  appendNode = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const blockDetail = new RequestClass(request, 'AppendBlockRequest').data;
+      const result = await this._nodeManager.appendNode(
+        request.params.nodeId,
+        response.locals.workspaceID,
+        response.locals.idToken,
+        blockDetail
+      );
+
+      response.status(statusCodes.OK).json(result);
+
+      await this.updateILinkCache(
+        response.locals.userId,
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
+    } catch (error) {
+      next(error);
+    }
+  };
+
   createLinkCapture = async (
     request: Request,
     response: Response,

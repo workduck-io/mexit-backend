@@ -14,6 +14,11 @@ export const initializeNodeRoutes = (
     [AuthRequest],
     nodeControllerObject.createNode
   );
+  nodeControllerObject._router.put(
+    `${nodeControllerObject._urlPath}/:nodeId`,
+    [AuthRequest],
+    nodeControllerObject.appendNode
+  );
   nodeControllerObject._router.get(
     `${nodeControllerObject._urlPath}/linkhierarchy`,
     [AuthRequest],
