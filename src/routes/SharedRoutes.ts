@@ -5,12 +5,12 @@ export const initializeSharedRoutes = (
   sharedControllerObject: SharedController
 ): void => {
   sharedControllerObject._router.post(
-    `${sharedControllerObject._urlPath}/shared/update`,
+    `${sharedControllerObject._urlPath}/update`,
     [AuthRequest],
     sharedControllerObject.updateSharedNode
   );
   sharedControllerObject._router.get(
-    `${sharedControllerObject._urlPath}/shared/:nodeId/users`,
+    `${sharedControllerObject._urlPath}/:nodeId/users`,
     [AuthRequest],
     sharedControllerObject.getUserWithNodesShared
   );
@@ -20,22 +20,22 @@ export const initializeSharedRoutes = (
     sharedControllerObject.shareNode
   );
   sharedControllerObject._router.put(
-    `${sharedControllerObject._urlPath}/shared`,
+    `${sharedControllerObject._urlPath}`,
     [AuthRequest],
     sharedControllerObject.updateAccessTypeForSharedNode
   );
   sharedControllerObject._router.delete(
-    `${sharedControllerObject._urlPath}/shared`,
+    `${sharedControllerObject._urlPath}`,
     [AuthRequest],
     sharedControllerObject.revokeNodeAccessForUsers
   );
   sharedControllerObject._router.get(
-    `${sharedControllerObject._urlPath}/shared/:nodeId`,
+    `${sharedControllerObject._urlPath}/:nodeId`,
     [AuthRequest],
     sharedControllerObject.getNodeSharedWithUser
   );
   sharedControllerObject._router.get(
-    `${sharedControllerObject._urlPath}/shared/all`,
+    `${sharedControllerObject._urlPath}/all`,
     [AuthRequest],
     sharedControllerObject.getAllNodesSharedForUser
   );
