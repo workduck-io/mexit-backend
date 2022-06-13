@@ -45,3 +45,7 @@ export interface RegisterUserRequest {
   };
   workspaceName: string;
 }
+
+export interface AppendBlockRequest {
+  elements: any[];
+}

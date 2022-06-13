@@ -131,17 +131,43 @@ class NodeController {
     }
   };
 
+  appendNode = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const blockDetail = new RequestClass(request, 'AppendBlockRequest').data;
+      const result = await this._nodeManager.appendNode(
+        request.params.nodeId,
+        response.locals.workspaceID,
+        response.locals.idToken,
+        blockDetail
+      );
+
+      response.status(statusCodes.OK).json(result);
+
+      await this.updateILinkCache(
+        response.locals.userId,
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
+    } catch (error) {
+      next(error);
+    }
+  };
+
   createLinkCapture = async (
     request: Request,
-    response: Response
+    response: Response,
+    next: NextFunction
   ): Promise<void> => {
     try {
       const reqBody = new RequestClass(request, 'LinkCapture').data;
 
-      const shortenerResp = await this._shortenerManager.createNewShort(
-        reqBody
-      );
-      const shortenedURL = JSON.parse(shortenerResp).message;
+      const shortenedURL = (
+        await this._shortenerManager.createNewShort(reqBody)
+      ).message;
 
       if (shortenedURL === 'URL already exists') {
         response.status(statusCodes.BAD_REQUEST).json({
@@ -150,19 +176,20 @@ class NodeController {
         return;
       }
 
+      response.status(statusCodes.OK).json({ message: shortenedURL });
+
       const nodeDetail = {
+        nodePath: {
+          path: `Links#${reqBody.short}`,
+        },
         id: GuidGenerator.generateNodeGUID(),
-        type: 'NodeRequest',
         title: reqBody.short,
-        lastEditedBy: response.locals.userEmail,
-        namespaceIdentifier: 'NAMESPACE1',
         data: [
           {
             id: GuidGenerator.generateBlockGUID(),
             elementType: 'h1',
-            createdBy: response.locals.userEmail,
             children: [
-              { id: GuidGenerator.generateTempGUID(), content: shortenedURL },
+              { id: GuidGenerator.generateTempGUID(), content: reqBody.short },
             ],
           },
           {
@@ -178,12 +205,12 @@ class NodeController {
                 id: GuidGenerator.generateTempGUID(),
                 elementType: 'a',
                 properties: {
-                  url: reqBody.long,
+                  url: shortenedURL,
                 },
                 children: [
                   {
                     id: GuidGenerator.generateTempGUID(),
-                    content: reqBody.long,
+                    content: shortenedURL,
                   },
                 ],
               },
@@ -192,18 +219,11 @@ class NodeController {
         ],
       };
 
-      const result = await this._nodeManager.createNode(
+      await this._nodeManager.bulkCreateNode(
         response.locals.workspaceID,
         response.locals.idToken,
         nodeDetail
       );
-
-      const resp = JSON.parse(result);
-
-      if (resp.message) throw new Error(resp.message);
-
-      resp.shortenedURL = shortenedURL;
-      response.json(resp);
 
       // update the Link hierarchy cache
       await this.updateILinkCache(
@@ -212,10 +232,7 @@ class NodeController {
         response.locals.idToken
       );
     } catch (error) {
-      response
-        .status(statusCodes.INTERNAL_SERVER_ERROR)
-        .send({ message: error.toString() })
-        .json();
+      next(error);
     }
   };
 

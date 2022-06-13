@@ -119,6 +119,36 @@ export class NodeManager {
       });
     }
   }
+
+  async appendNode(
+    nodeId: string,
+    workspaceId: string,
+    idToken: string,
+    block: any
+  ) {
+    try {
+      const response = await this._lambda.invokeAndCheck(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.appendNode,
+          payload: { ...block, type: 'ElementRequest' },
+          pathParameters: { id: nodeId },
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        }
+      );
+      return response;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+
   async moveBlocks(
     blockId: string,
     sourceNodeId: string,

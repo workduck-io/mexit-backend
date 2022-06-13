@@ -7,7 +7,7 @@ import { SharedManager } from '../managers/SharedManager';
 import { initializeSharedRoutes } from '../routes/SharedRoutes';
 
 class SharedController {
-  public _urlPath = '/node';
+  public _urlPath = '/shared';
   public _router = express.Router();
   public _sharedManager: SharedManager =
     container.get<SharedManager>(SharedManager);

@@ -28,6 +28,7 @@ import {
   UpdateAccessTypeForSharedNodeDetail,
 } from './interfaces/Node';
 import {
+  AppendBlockRequest,
   ContentNodeRequest,
   CopyOrMoveBlockRequest,
   LinkNodeRequest,
@@ -109,4 +110,5 @@ export default class Interfaces implements Definitions {
   BulkCreateNode: BulkCreateNode;
   RegisterUserRequest: RegisterUserRequest;
   UpdateAccessTypeForSharedNodeDetail: UpdateAccessTypeForSharedNodeDetail;
+  AppendBlockRequest: AppendBlockRequest;
 }

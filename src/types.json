@@ -106,6 +106,18 @@
             ],
             "type": "object"
         },
+        "AppendBlockRequest": {
+            "properties": {
+                "elements": {
+                    "items": {},
+                    "type": "array"
+                }
+            },
+            "required": [
+                "elements"
+            ],
+            "type": "object"
+        },
         "ArchiveNodeDetail": {
             "properties": {
                 "ids": {
