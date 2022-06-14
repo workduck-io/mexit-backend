@@ -1,14 +1,32 @@
+import { statusCodes } from './../libs/statusCodes';
 import { ErrorRequestHandler, Request, Response, NextFunction } from 'express';
+import logger from '../libs/logger';
+import WDError from '../libs/WDError';
 
 const responseErrorHandler: ErrorRequestHandler = (
-  error: any,
+  error: WDError,
   request: Request,
   response: Response,
   next: NextFunction // eslint-disable-line
 ) => {
-  response.status(error.response.statusCode).json({
-    message: error.response.message,
-    statusCode: error.response.statusCode,
+  const statusCode: number =
+    error.response?.statusCode ?? statusCodes.INTERNAL_SERVER_ERROR;
+  const message = error.response?.message ?? error.message;
+
+  if (statusCode >= 400 && statusCode < 500) {
+    logger.warn(
+      `HTTP [${request.method}] ${request.url} - ${statusCode} ${message}`
+    );
+  } else if (statusCode >= 500) {
+    logger.error(
+      `HTTP [${request.method}] ${request.url} - ${statusCode} ${message}`
+    );
+    logger.error(`Call Stack ${error.response?.stackTrace ?? error.stack}`);
+  }
+
+  response.status(statusCode).json({
+    message: message,
+    statusCode: statusCode,
   });
 };
 

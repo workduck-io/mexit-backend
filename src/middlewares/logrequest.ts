@@ -6,7 +6,9 @@ async function LogRequest(
   res: Response,
   next: NextFunction
 ): Promise<void> {
-  logger.info(`HTTP [${req.method}] ${req.url}}`);
+  if (!req.url.includes('ping')) {
+    logger.info(`HTTP [${req.method}] ${req.url}`);
+  }
   next();
 }
 
