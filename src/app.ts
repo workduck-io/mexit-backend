@@ -21,6 +21,7 @@ import SnippetController from './controllers/SnippetController';
 import TagController from './controllers/TagController';
 import UserController from './controllers/UserController';
 import responseErrorHandler from './middlewares/responseErrorHandler';
+import HealthCheckController from './controllers/HealthCheckController';
 
 class App {
   public _app: express.Application;
@@ -69,6 +70,7 @@ class App {
 }
 
 const application = new App([
+  new HealthCheckController(),
   new BookmarkController(),
   new NodeController(),
   new OAuth2Controller(),
