@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { errorCodes } from '../libs/errorCodes';
 import { statusCodes } from '../libs/statusCodes';
 import { TokenHandler } from '../libs/tokenvalidator';
+import WDError from '../libs/WDError';
 // Authenticates the user for accessing
 // the endpoint routes.
 async function AuthRequest(
@@ -26,13 +27,14 @@ async function AuthRequest(
 
       res.locals.workspaceID = req.headers['mex-workspace-id'].toString();
       next();
-    } else throw new Error(result.error);
+    } else
+      throw new WDError({
+        statusCode: statusCodes.UNAUTHORIZED,
+        message: result.error,
+        code: statusCodes.UNAUTHORIZED,
+      });
   } catch (error) {
-    res.status(statusCodes.UNAUTHORIZED).send({
-      message: error.message,
-      statusCode: statusCodes.FORBIDDEN,
-      errorCode: errorCodes.AUTH_ERROR,
-    });
+    next(error);
   }
 }
 
