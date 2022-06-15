@@ -22,10 +22,26 @@ async function AuthRequest(
       res.locals.userIdRaw = result.userId;
       res.locals.idToken = req.headers.authorization;
 
-      if (!req.headers['mex-workspace-id'])
-        throw new Error('mex-workspace-id header missing');
+      const headerNeeded = () => {
+        const noHeaderPaths = ['/user/register', '/public', '/oauth2'];
+        const url = req.url;
 
-      res.locals.workspaceID = req.headers['mex-workspace-id'].toString();
+        for (const path of noHeaderPaths) {
+          if (url.includes(path)) return false;
+        }
+        return true;
+      };
+
+      if (headerNeeded()) {
+        if (req.headers['mex-workspace-id'])
+          res.locals.workspaceID = req.headers['mex-workspace-id'].toString();
+        else
+          throw new WDError({
+            statusCode: statusCodes.BAD_REQUEST,
+            code: statusCodes.BAD_REQUEST,
+            message: 'mex-workspace-id header missing',
+          });
+      }
       next();
     } else
       throw new WDError({
