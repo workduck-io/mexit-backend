@@ -23,7 +23,7 @@ async function AuthRequest(
       res.locals.idToken = req.headers.authorization;
 
       const headerNeeded = () => {
-        const noHeaderPaths = ['/user/register', '/public'];
+        const noHeaderPaths = ['/user/register', '/public', '/oauth2'];
         const url = req.url;
 
         for (const path of noHeaderPaths) {
