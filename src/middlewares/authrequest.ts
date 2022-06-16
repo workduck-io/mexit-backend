@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from 'express';
-import { errorCodes } from '../libs/errorCodes';
 import { statusCodes } from '../libs/statusCodes';
 import { TokenHandler } from '../libs/tokenvalidator';
 import WDError from '../libs/WDError';
@@ -13,7 +12,12 @@ async function AuthRequest(
   // remove the 'Bearer ' token from the auth token
   const token = req.headers.authorization?.replace('Bearer ', '');
   try {
-    if (!token) throw new Error('Access denied. No token provided');
+    if (!token)
+      throw new WDError({
+        statusCode: statusCodes.BAD_REQUEST,
+        message: 'Access denied. No token provided',
+        code: statusCodes.BAD_REQUEST,
+      });
 
     const result = await TokenHandler({ token });
     if (result.isValid) {
