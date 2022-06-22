@@ -2,12 +2,10 @@
 import { injectable } from 'inversify';
 import { ArchiveNodeDetail, CopyOrMoveBlock } from '../interfaces/Node';
 import { errorlib } from '../libs/errorlib';
-import { errorCodes } from '../libs/errorCodes';
 import { statusCodes } from '../libs/statusCodes';
 import container from '../inversify.config';
 import { Lambda, InvocationType } from '../libs/LambdaClass';
 import { RouteKeys } from '../libs/routeKeys';
-import WDError from '../libs/WDError';
 import { STAGE } from '../env';
 
 @injectable()
