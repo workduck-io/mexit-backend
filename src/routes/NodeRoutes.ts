@@ -55,11 +55,6 @@ export const initializeNodeRoutes = (
     nodeControllerObject.makeNodePrivate
   );
   nodeControllerObject._router.put(
-    `${nodeControllerObject._urlPath}/archive`,
-    [AuthRequest],
-    nodeControllerObject.archiveNode
-  );
-  nodeControllerObject._router.put(
     `${nodeControllerObject._urlPath}/unarchive`,
     [AuthRequest],
     nodeControllerObject.unArchiveNode
@@ -73,6 +68,11 @@ export const initializeNodeRoutes = (
     `${nodeControllerObject._urlPath}/bulkCreate`,
     [AuthRequest],
     nodeControllerObject.bulkCreateNode
+  );
+  nodeControllerObject._router.put(
+    `${nodeControllerObject._urlPath}/archive`,
+    [AuthRequest],
+    nodeControllerObject.archiveNode
   );
   return;
 };

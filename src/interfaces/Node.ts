@@ -71,8 +71,7 @@ export interface MetaTag {
 }
 
 export interface UserTag {
-  id: string;
-  text: string;
+  value: string;
 }
 
 export interface ContentBlock {
