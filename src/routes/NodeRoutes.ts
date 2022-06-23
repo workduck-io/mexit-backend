@@ -4,6 +4,11 @@ import { AuthRequest } from '../middlewares/authrequest';
 export const initializeNodeRoutes = (
   nodeControllerObject: NodeController
 ): void => {
+  nodeControllerObject._router.put(
+    `${nodeControllerObject._urlPath}/archive`,
+    [AuthRequest],
+    nodeControllerObject.archiveNode
+  );
   nodeControllerObject._router.get(
     `${nodeControllerObject._urlPath}/archive`,
     [AuthRequest],
@@ -68,11 +73,6 @@ export const initializeNodeRoutes = (
     `${nodeControllerObject._urlPath}/bulkCreate`,
     [AuthRequest],
     nodeControllerObject.bulkCreateNode
-  );
-  nodeControllerObject._router.put(
-    `${nodeControllerObject._urlPath}/archive`,
-    [AuthRequest],
-    nodeControllerObject.archiveNode
   );
   return;
 };
