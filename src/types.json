@@ -1608,16 +1608,12 @@
         },
         "UserTag": {
             "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "text": {
+                "value": {
                     "type": "string"
                 }
             },
             "required": [
-                "id",
-                "text"
+                "value"
             ],
             "type": "object"
         },
