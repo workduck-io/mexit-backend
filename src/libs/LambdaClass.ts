@@ -67,6 +67,8 @@ export class Lambda {
       invocationSource
     );
 
+    console.log(JSON.stringify(response, null, 4));
+
     const body = JSON.parse(response.body);
     if (response.statusCode !== 200) {
       throw new WDError({
