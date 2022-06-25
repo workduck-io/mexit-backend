@@ -4,6 +4,11 @@ import { AuthRequest } from '../middlewares/authrequest';
 export const initializeNodeRoutes = (
   nodeControllerObject: NodeController
 ): void => {
+  nodeControllerObject._router.put(
+    `${nodeControllerObject._urlPath}/archive`,
+    [AuthRequest],
+    nodeControllerObject.archiveNode
+  );
   nodeControllerObject._router.get(
     `${nodeControllerObject._urlPath}/archive`,
     [AuthRequest],
@@ -53,11 +58,6 @@ export const initializeNodeRoutes = (
     `${nodeControllerObject._urlPath}/:id/makePrivate`,
     [AuthRequest],
     nodeControllerObject.makeNodePrivate
-  );
-  nodeControllerObject._router.put(
-    `${nodeControllerObject._urlPath}/archive`,
-    [AuthRequest],
-    nodeControllerObject.archiveNode
   );
   nodeControllerObject._router.put(
     `${nodeControllerObject._urlPath}/unarchive`,
