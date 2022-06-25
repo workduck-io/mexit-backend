@@ -67,13 +67,11 @@ export class Lambda {
       invocationSource
     );
 
-    console.log(JSON.stringify(response, null, 4));
-
-    const body = JSON.parse(response.body);
-    if (response.statusCode !== 200) {
+    const body = response.body ? JSON.parse(response.body) : undefined;
+    if (response.statusCode !== 200 || response.statusCode !== 204) {
       throw new WDError({
         statusCode: response.statusCode,
-        message: body.message,
+        message: body ? body.message : '',
         code: response.statusCode,
       });
     }
