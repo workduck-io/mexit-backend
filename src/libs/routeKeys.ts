@@ -3,7 +3,7 @@ export const RouteKeys = {
   getAllNodes: `GET /node/all/{id}`,
   getNode: 'GET /node/{id}',
   appendNode: 'POST /node/{id}/append',
-  getArchivedNodes: 'GET /node/archive/{id}',
+  getArchivedNodes: 'GET /node/archive',
   archiveNode: 'PUT /node/archive',
   unArchiveNode: 'PUT /node/unarchive',
   deleteArchivedNode: 'POST /node/archive/delete',

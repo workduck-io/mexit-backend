@@ -392,7 +392,6 @@ export class NodeManager {
         this._lambdaInvocationType,
         {
           routeKey: RouteKeys.getArchivedNodes,
-          pathParameters: { id: workspaceId },
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
