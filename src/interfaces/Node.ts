@@ -145,6 +145,7 @@ export interface LinkCapture {
     metaTags?: MetaTag[];
     userTags?: UserTag[];
   };
+  linkNodeID?: string;
 }
 
 export interface QueryStringParameters {

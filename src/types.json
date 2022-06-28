@@ -780,6 +780,9 @@
         },
         "LinkCapture": {
             "properties": {
+                "linkNodeID": {
+                    "type": "string"
+                },
                 "long": {
                     "type": "string"
                 },

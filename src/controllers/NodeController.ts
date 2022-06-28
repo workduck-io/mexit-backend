@@ -178,12 +178,16 @@ class NodeController {
 
       response.status(statusCodes.OK).json({ message: shortenedURL });
 
+      const nodeUID = GuidGenerator.generateNodeGUID();
+      const linksNodeID = reqBody.linkNodeID;
+
       const nodeDetail = {
         nodePath: {
-          path: `Links#${reqBody.short}`,
+          path: `Links#${linksNodeID}#${reqBody.short}#${nodeUID}`,
         },
-        id: GuidGenerator.generateNodeGUID(),
+        id: nodeUID,
         title: reqBody.short,
+        tags: [...reqBody?.metadata?.metaTags, ...reqBody?.metadata?.userTags],
         data: [
           {
             id: GuidGenerator.generateBlockGUID(),
