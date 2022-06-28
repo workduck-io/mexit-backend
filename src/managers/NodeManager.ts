@@ -7,6 +7,7 @@ import container from '../inversify.config';
 import { Lambda, InvocationType } from '../libs/LambdaClass';
 import { RouteKeys } from '../libs/routeKeys';
 import { STAGE } from '../env';
+import logger from '../libs/logger';
 
 @injectable()
 export class NodeManager {
@@ -312,6 +313,32 @@ export class NodeManager {
       });
     }
   }
+  async deletedArchivedNode(
+    workspaceId: string,
+    idToken: string,
+    deleteArchivePayload: ArchiveNodeDetail
+  ): Promise<any> {
+    try {
+      const result = await this._lambda.invokeAndCheck(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.deleteArchivedNode,
+          payload: deleteArchivePayload,
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        }
+      );
+      return result;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
   async refactorHierarchy(workspaceId: string, idToken: string, payload: any) {
     try {
       const result = await this._lambda.invokeAndCheck(
@@ -365,7 +392,6 @@ export class NodeManager {
         this._lambdaInvocationType,
         {
           routeKey: RouteKeys.getArchivedNodes,
-          pathParameters: { id: workspaceId },
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
