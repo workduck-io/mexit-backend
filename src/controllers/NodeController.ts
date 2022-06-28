@@ -321,6 +321,31 @@ class NodeController {
     }
   };
 
+  deleteArchivedNode = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const requestDetail = new RequestClass(request, 'ArchiveNodeDetail');
+
+      const archiveNodeResult = await this._nodeManager.deletedArchivedNode(
+        response.locals.workspaceID,
+        response.locals.idToken,
+        requestDetail.data
+      );
+      response.status(statusCodes.OK).json(archiveNodeResult);
+
+      await this.updateILinkCache(
+        response.locals.userId,
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
+    } catch (error) {
+      next(error);
+    }
+  };
+
   unArchiveNode = async (
     request: Request,
     response: Response,
