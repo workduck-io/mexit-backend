@@ -187,7 +187,10 @@ class NodeController {
         },
         id: nodeUID,
         title: reqBody.short,
-        tags: [...reqBody?.metadata?.metaTags, ...reqBody?.metadata?.userTags],
+        tags: [
+          ...(reqBody?.metadata?.metaTags || []),
+          ...(reqBody?.metadata?.userTags || []),
+        ],
         data: [
           {
             id: GuidGenerator.generateBlockGUID(),
