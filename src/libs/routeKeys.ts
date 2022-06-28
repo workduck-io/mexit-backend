@@ -6,6 +6,7 @@ export const RouteKeys = {
   getArchivedNodes: 'GET /node/archive/{id}',
   archiveNode: 'PUT /node/archive',
   unArchiveNode: 'PUT /node/unarchive',
+  deleteArchivedNode: 'POST /node/archive/delete',
   editBlock: 'POST /node/{id}/blockUpdate',
   shorten: 'POST /shorten',
   getShorts: 'GET /{namespace}/stats',
