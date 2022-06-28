@@ -1,5 +1,4 @@
 export interface NodeDetail {
-  type: string;
   id: string;
   title: string;
   path?: string;
@@ -14,14 +13,12 @@ export enum NodeAccessType {
 }
 
 export interface ShareNodeDetail {
-  type: 'SharedNodeRequest';
-  nodeId: string;
-  userIds: string[];
+  nodeID: string;
+  userIDs: string[];
   accessType: NodeAccessType;
 }
 
 export interface UpdateAccessTypeForSharedNodeDetail {
-  type: 'UpdateAccessTypesRequest';
   nodeId: string;
   userIDToAccessTypeMap: { [key: string]: NodeAccessType };
 }
@@ -44,7 +41,7 @@ export interface NodeChildData {
   id: string;
   content?: string;
   elementType?: string;
-  properties?: { bold: boolean; italic: boolean };
+  properties?: { bold?: boolean; italic?: boolean };
   createdBy?: string;
   children?: NodeChildData[];
 }

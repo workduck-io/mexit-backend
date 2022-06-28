@@ -27,11 +27,11 @@ export class SharedManager {
     try {
       const payloadDetail = {
         ...shareNodePayload,
-        nodeID: shareNodePayload.nodeId,
-        userIDs: shareNodePayload.userIds,
+        nodeID: shareNodePayload.nodeID,
+        userIDs: shareNodePayload.userIDs,
       };
-      delete payloadDetail.nodeId;
-      delete payloadDetail.userIds;
+      delete payloadDetail.nodeID;
+      delete payloadDetail.userIDs;
 
       const response = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
@@ -70,7 +70,7 @@ export class SharedManager {
         this._lambdaInvocationType,
         {
           routeKey: RouteKeys.updateAccessTypeForshareNode,
-          payload: payloadDetail,
+          payload: { ...payloadDetail, type: 'UpdateAccessTypesRequest' },
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
@@ -98,8 +98,8 @@ export class SharedManager {
           routeKey: RouteKeys.revokeNodeAccessForUsers,
           payload: {
             ...shareNodePayload,
-            nodeID: shareNodePayload.nodeId,
-            userIDs: shareNodePayload.userIds,
+            nodeID: shareNodePayload.nodeID,
+            userIDs: shareNodePayload.userIDs,
           },
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
@@ -152,7 +152,7 @@ export class SharedManager {
         this._lambdaInvocationType,
         {
           routeKey: RouteKeys.updateSharedNode,
-          payload: nodeDetail,
+          payload: { ...nodeDetail, type: 'SharedNodeRequest' },
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
