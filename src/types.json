@@ -27,9 +27,6 @@
                 },
                 "title": {
                     "type": "string"
-                },
-                "type": {
-                    "type": "string"
                 }
             },
             "required": [
@@ -37,8 +34,7 @@
                 "id",
                 "namespaceIdentifier",
                 "nodeschemaIdentifier",
-                "title",
-                "type"
+                "title"
             ],
             "type": "object"
         },
@@ -1081,10 +1077,6 @@
                             "type": "boolean"
                         }
                     },
-                    "required": [
-                        "bold",
-                        "italic"
-                    ],
                     "type": "object"
                 }
             },
@@ -1194,17 +1186,13 @@
                 },
                 "title": {
                     "type": "string"
-                },
-                "type": {
-                    "type": "string"
                 }
             },
             "required": [
                 "data",
                 "id",
                 "namespaceIdentifier",
-                "title",
-                "type"
+                "title"
             ],
             "type": "object"
         },
@@ -1381,16 +1369,10 @@
                 "accessType": {
                     "$ref": "types#/definitions/NodeAccessType"
                 },
-                "nodeId": {
+                "nodeID": {
                     "type": "string"
                 },
-                "type": {
-                    "enum": [
-                        "SharedNodeRequest"
-                    ],
-                    "type": "string"
-                },
-                "userIds": {
+                "userIDs": {
                     "items": {
                         "type": "string"
                     },
@@ -1399,9 +1381,8 @@
             },
             "required": [
                 "accessType",
-                "nodeId",
-                "type",
-                "userIds"
+                "nodeID",
+                "userIDs"
             ],
             "type": "object"
         },
@@ -1425,9 +1406,6 @@
                 "title": {
                     "type": "string"
                 },
-                "type": {
-                    "type": "string"
-                },
                 "version": {
                     "type": "number"
                 }
@@ -1437,7 +1415,6 @@
                 "id",
                 "namespaceIdentifier",
                 "title",
-                "type",
                 "version"
             ],
             "type": "object"
@@ -1564,12 +1541,6 @@
                 "nodeId": {
                     "type": "string"
                 },
-                "type": {
-                    "enum": [
-                        "UpdateAccessTypesRequest"
-                    ],
-                    "type": "string"
-                },
                 "userIDToAccessTypeMap": {
                     "additionalProperties": {
                         "$ref": "types#/definitions/NodeAccessType"
@@ -1579,7 +1550,6 @@
             },
             "required": [
                 "nodeId",
-                "type",
                 "userIDToAccessTypeMap"
             ],
             "type": "object"
