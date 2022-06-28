@@ -179,7 +179,7 @@ class NodeController {
       response.status(statusCodes.OK).json({ message: shortenedURL });
 
       const nodeUID = GuidGenerator.generateNodeGUID();
-      const linksNodeID = reqBody.linkNodeID;
+      const linksNodeID = reqBody.linksNodeID;
 
       const nodeDetail = {
         nodePath: {
