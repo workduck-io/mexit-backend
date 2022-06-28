@@ -38,13 +38,13 @@ export class ShortenerManager {
 
   async createNewShort(data: LinkCapture): Promise<any> {
     try {
-      delete data['linkNodeID'];
+      const { linksNodeID, ...payload } = data;
       const result = await this._lambda.invokeAndCheck(
         this._createShortLambdaFunctionName,
         this._lambdaInvocationType,
         {
           routeKey: RouteKeys.shorten,
-          payload: data,
+          payload: payload,
         },
         true
       );
