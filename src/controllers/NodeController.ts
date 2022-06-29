@@ -188,19 +188,19 @@ class NodeController {
         id: nodeUID,
         title: reqBody.short,
         tags: [
-          ...(reqBody?.metadata?.metaTags || []),
-          ...(reqBody?.metadata?.userTags || []),
+          ...(reqBody?.metadata?.metaTags || []).map(item => item.value),
+          ...(reqBody?.metadata?.userTags || []).map(item => item.value),
         ],
         data: [
           {
-            id: GuidGenerator.generateBlockGUID(),
+            id: GuidGenerator.generateTempGUID(),
             elementType: 'h1',
             children: [
               { id: GuidGenerator.generateTempGUID(), content: reqBody.short },
             ],
           },
           {
-            id: GuidGenerator.generateBlockGUID(),
+            id: GuidGenerator.generateTempGUID(),
             elementType: 'p',
             createdBy: response.locals.userEmail,
             children: [
