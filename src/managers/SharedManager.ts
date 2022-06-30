@@ -30,8 +30,9 @@ export class SharedManager {
         nodeID: shareNodePayload.nodeID,
         userIDs: shareNodePayload.userIDs,
       };
-      delete payloadDetail.nodeID;
-      delete payloadDetail.userIDs;
+
+      // delete payloadDetail.nodeID;
+      // delete payloadDetail.userIDs;
 
       const response = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
@@ -152,7 +153,7 @@ export class SharedManager {
         this._lambdaInvocationType,
         {
           routeKey: RouteKeys.updateSharedNode,
-          payload: { ...nodeDetail, type: 'SharedNodeRequest' },
+          payload: { ...nodeDetail, type: 'NodeRequest' },
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
