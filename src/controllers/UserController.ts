@@ -113,7 +113,7 @@ class UserController {
 
       const initWorkspaceResp = await this._userManager.initializeWorkspace({
         workspaceID: registerResp.id,
-        userEmail: requestDetail.data.user.email,
+        userID: response.locals.userIdRaw,
       });
 
       const nodeHierarchyInfo = this._transformer.linkHierarchyParser(
