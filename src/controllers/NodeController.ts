@@ -202,7 +202,7 @@ class NodeController {
           {
             id: GuidGenerator.generateTempGUID(),
             elementType: 'p',
-            createdBy: response.locals.userEmail,
+            createdBy: response.locals.userIdRaw,
             children: [
               {
                 id: GuidGenerator.generateTempGUID(),

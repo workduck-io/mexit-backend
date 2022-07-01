@@ -25,6 +25,8 @@ class SharedController {
     try {
       const requestDetail = new RequestClass(request, 'ShareNodeDetail');
 
+      console.log(`New Share Request: ${JSON.stringify(requestDetail.data)}`);
+
       const result = await this._sharedManager.shareNode(
         response.locals.workspaceID,
         response.locals.idToken,

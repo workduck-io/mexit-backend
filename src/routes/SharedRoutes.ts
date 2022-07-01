@@ -5,6 +5,16 @@ export const initializeSharedRoutes = (
   sharedControllerObject: SharedController
 ): void => {
   sharedControllerObject._router.post(
+    `${sharedControllerObject._urlPath}`,
+    [AuthRequest],
+    sharedControllerObject.shareNode
+  );
+  sharedControllerObject._router.get(
+    `${sharedControllerObject._urlPath}/all`,
+    [AuthRequest],
+    sharedControllerObject.getAllNodesSharedForUser
+  );
+  sharedControllerObject._router.post(
     `${sharedControllerObject._urlPath}/update`,
     [AuthRequest],
     sharedControllerObject.updateSharedNode
@@ -13,11 +23,6 @@ export const initializeSharedRoutes = (
     `${sharedControllerObject._urlPath}/:nodeId/users`,
     [AuthRequest],
     sharedControllerObject.getUserWithNodesShared
-  );
-  sharedControllerObject._router.post(
-    `${sharedControllerObject._urlPath}/shared`,
-    [AuthRequest],
-    sharedControllerObject.shareNode
   );
   sharedControllerObject._router.put(
     `${sharedControllerObject._urlPath}`,
@@ -33,11 +38,6 @@ export const initializeSharedRoutes = (
     `${sharedControllerObject._urlPath}/:nodeId`,
     [AuthRequest],
     sharedControllerObject.getNodeSharedWithUser
-  );
-  sharedControllerObject._router.get(
-    `${sharedControllerObject._urlPath}/all`,
-    [AuthRequest],
-    sharedControllerObject.getAllNodesSharedForUser
   );
   return;
 };
