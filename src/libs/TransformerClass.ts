@@ -28,7 +28,7 @@ export class Transformer {
   };
 
   linkHierarchyParser = (linkData: LinkHierarchyData): ILinkResponse => {
-    const hierarchy = linkData.hierarchy;
+    const hierarchy = linkData.hierarchy ?? (linkData as unknown as string[]);
     const ilinks: ILink[] = [];
     const idPathMapping: { [key: string]: string } = {};
 
