@@ -24,6 +24,7 @@ export class NodeManager {
         {
           routeKey: RouteKeys.getLinkHierarchy,
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+          queryStringParameters: { getMetadata: true },
         }
       );
       return result;
