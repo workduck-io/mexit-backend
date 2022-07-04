@@ -5,6 +5,16 @@ import { NodeResponse } from '../interfaces/Response';
 import { NodeMetadata } from '../interfaces/Node';
 import { deserializeContent } from './serialize';
 
+interface LinkHierarchyData {
+  hierarchy: string[];
+  nodesMetadata: { [nodeID: string]: any };
+}
+
+interface ILinkResponse {
+  ilinks: ILink[];
+  nodesMetadata: { [nodeID: string]: any };
+}
+
 @injectable()
 export class Transformer {
   private CACHE_KEY_DELIMITER = '+';
@@ -17,11 +27,12 @@ export class Transformer {
     SNIPPET: 'SNIPPET',
   };
 
-  linkHierarchyParser = (linkData: string[]): ILink[] => {
+  linkHierarchyParser = (linkData: LinkHierarchyData): ILinkResponse => {
+    const hierarchy = linkData.hierarchy;
     const ilinks: ILink[] = [];
     const idPathMapping: { [key: string]: string } = {};
 
-    for (const subTree of linkData) {
+    for (const subTree of hierarchy) {
       const nodes = subTree.split(this.LINK_HIERARCHY_DELIMITER);
       let prefix: string;
 
@@ -52,8 +63,7 @@ export class Transformer {
         prefix = nodePath;
       }
     }
-
-    return ilinks;
+    return { ilinks: ilinks, nodesMetadata: linkData.nodesMetadata };
   };
 
   decodeLinkHierarchy = (linkDatas: string[]): Promise<ILink[]> => {
