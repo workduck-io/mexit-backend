@@ -24,18 +24,18 @@ class NodeController {
     initializeNodeRoutes(this);
   }
 
-  async updateILinkCache(
+  updateILinkCache = async (
     userId: string,
     workspaceId: string,
     idToken: string
-  ): Promise<any> {
+  ): Promise<any> => {
     const result = await this._nodeManager.getLinkHierarchy(
       workspaceId,
       idToken
     );
     this._cache.replaceAndSet(userId, this._linkHierarchyLabel, result);
     return this._cache.get(userId, this._linkHierarchyLabel);
-  }
+  };
 
   getLinkHierarchy = async (
     request: Request,
@@ -43,7 +43,7 @@ class NodeController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      let linkDataResult: any[];
+      let linkDataResult;
 
       if (this._cache.has(response.locals.userId, this._linkHierarchyLabel)) {
         linkDataResult = await this._cache.get(
@@ -51,7 +51,7 @@ class NodeController {
           this._linkHierarchyLabel
         );
       } else {
-        const linkHierarchyResult = await this._nodeManager.getLinkHierarchy(
+        linkDataResult = await this._nodeManager.getLinkHierarchy(
           response.locals.workspaceID,
           response.locals.idToken
         );
@@ -59,10 +59,10 @@ class NodeController {
         this._cache.set(
           response.locals.userId,
           this._linkHierarchyLabel,
-          linkHierarchyResult
+          linkDataResult
         );
-        linkDataResult = linkHierarchyResult;
       }
+
       const result = this._transformer.linkHierarchyParser(linkDataResult);
       response.status(statusCodes.OK).json(result);
     } catch (error) {
