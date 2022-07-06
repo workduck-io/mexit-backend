@@ -1,7 +1,7 @@
 import { WDErrorType } from 'src/interfaces/WDError';
 import { errorCodes } from './errorCodes';
 import { statusCodes } from './statusCodes';
-import WDError from './WDError';
+import { WDError } from '@workduck-io/wderror';
 
 export function errorlib(params: WDErrorType) {
   const { message, errorObject, errorCode, statusCode, metaData } = params;
