@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import LambdaConfig from './InvokeLambda';
-import WDError from './WDError';
+import { WDError } from '@workduck-io/wderror';
 export type InvocationType = 'RequestResponse' | 'Event';
 export type InvocationSource = 'Direct' | 'APIGateway';
 

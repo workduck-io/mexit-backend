@@ -1614,6 +1614,13 @@
   resolved "https://npm.pkg.github.com/download/@workduck-io/wderror/0.0.2/fe8b0cd3451519062b2d4c69a0402a4d56bf765bbc195d41bfbc5e299ce69fc6#1bf108d6d8b42739a16e80828a1a21284533d751"
   integrity sha512-iY78BOBL/5rCUyBPo/3RoT79219qoYdi2mJKqv44KW/eb8veptGUFDF5akYjgshvYgppkJWHlN1+gEv1UT8eyw==
 
+"@workduck-io/workspace-validator@^0.0.6":
+  version "0.0.6"
+  resolved "https://npm.pkg.github.com/download/@workduck-io/workspace-validator/0.0.6/78f9e42e690a709b60a6738931ad0613b2b0b112316fba084a963ddaa66cbafb#8189d8642ee1e86d0137aececc05ceda168867c8"
+  integrity sha512-AhJJJEBqEhDPtMW492f2WqiMoVhcIFUYb7AK1pIG1rfGFkIFIZMJfExovat33n6S6/oRxWGInAejtPuWxpuxJw==
+  dependencies:
+    jwt-decode "^3.1.2"
+
 abab@^2.0.3, abab@^2.0.5:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/abab/-/abab-2.0.6.tgz#41b80f2c871d19686216b82309231cfd3cb3d291"
@@ -4561,6 +4568,11 @@ jws@^4.0.0:
   dependencies:
     jwa "^2.0.0"
     safe-buffer "^5.0.1"
+
+jwt-decode@^3.1.2:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/jwt-decode/-/jwt-decode-3.1.2.tgz#3fb319f3675a2df0c2895c8f5e9fa4b67b04ed59"
+  integrity sha512-UfpWE/VZn0iP50d8cz9NrZLM9lSWhcJ+0Gt/nm4by88UL+J1SiKN8/5dkjMmbEzwL2CAe+67GsegCbIKtbp75A==
 
 keyv@^3.0.0:
   version "3.1.0"
