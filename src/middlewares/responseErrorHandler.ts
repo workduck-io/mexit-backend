@@ -1,7 +1,7 @@
 import { statusCodes } from './../libs/statusCodes';
 import { ErrorRequestHandler, Request, Response, NextFunction } from 'express';
 import logger from '../libs/logger';
-import WDError from '../libs/WDError';
+import { WDError } from '@workduck-io/wderror';
 
 const responseErrorHandler: ErrorRequestHandler = (
   error: WDError,

@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import { statusCodes } from '../libs/statusCodes';
 import { TokenHandler } from '../libs/tokenvalidator';
-import WDError from '../libs/WDError';
+import { WDError } from '@workduck-io/wderror';
+import { validate } from '@workduck-io/workspace-validator';
 // Authenticates the user for accessing
 // the endpoint routes.
 async function AuthRequest(
@@ -37,13 +38,20 @@ async function AuthRequest(
       };
 
       if (headerNeeded()) {
-        if (req.headers['mex-workspace-id'])
+        const isValid = validate({
+          headers: {
+            'mex-workspace-id': req.headers['mex-workspace-id'] as string,
+            Authorization: req.headers.authorization,
+          },
+        });
+
+        if (isValid)
           res.locals.workspaceID = req.headers['mex-workspace-id'].toString();
         else
           throw new WDError({
             statusCode: statusCodes.BAD_REQUEST,
             code: statusCodes.BAD_REQUEST,
-            message: 'mex-workspace-id header missing',
+            message: 'Provided workspace is invalid',
           });
       }
       next();
