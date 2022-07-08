@@ -1614,11 +1614,17 @@
   resolved "https://npm.pkg.github.com/download/@workduck-io/wderror/0.0.2/fe8b0cd3451519062b2d4c69a0402a4d56bf765bbc195d41bfbc5e299ce69fc6#1bf108d6d8b42739a16e80828a1a21284533d751"
   integrity sha512-iY78BOBL/5rCUyBPo/3RoT79219qoYdi2mJKqv44KW/eb8veptGUFDF5akYjgshvYgppkJWHlN1+gEv1UT8eyw==
 
-"@workduck-io/workspace-validator@^0.0.6":
-  version "0.0.6"
-  resolved "https://npm.pkg.github.com/download/@workduck-io/workspace-validator/0.0.6/78f9e42e690a709b60a6738931ad0613b2b0b112316fba084a963ddaa66cbafb#8189d8642ee1e86d0137aececc05ceda168867c8"
-  integrity sha512-AhJJJEBqEhDPtMW492f2WqiMoVhcIFUYb7AK1pIG1rfGFkIFIZMJfExovat33n6S6/oRxWGInAejtPuWxpuxJw==
+"@workduck-io/wderror@^0.0.4":
+  version "0.0.4"
+  resolved "https://npm.pkg.github.com/download/@workduck-io/wderror/0.0.4/85981fdf962b70b4b9586eab01b5cbe48f99f523be427e2bbe835fdde5814105#30e6d86b2447a44534cef0e2717a47ef0da8f053"
+  integrity sha512-aMaaCQfmZBIIox55/E/OjiUNRTGh4ip+AEwG3bZfAZRuqgt4eAi6yMJPxYEkbgP0q169NJZVf7F+mGeup/C2cw==
+
+"@workduck-io/workspace-validator@^0.0.7":
+  version "0.0.7"
+  resolved "https://npm.pkg.github.com/download/@workduck-io/workspace-validator/0.0.7/3275230868bfec8336f9e06c37d9e407540acb23d470c932aef363b0d7d54cd1#d2bf5ba68abc94a31e8562ddc879d8afd4f19e72"
+  integrity sha512-8v3q1Z/OtwfjqSUZsoUNwa2CMU2nkreCdqmWfwdQi3oDLubOVnfNBnBFCPDCM3CtO8XucYLCapp9/Ql5IFy7bg==
   dependencies:
+    "@workduck-io/wderror" "^0.0.4"
     jwt-decode "^3.1.2"
 
 abab@^2.0.3, abab@^2.0.5:
