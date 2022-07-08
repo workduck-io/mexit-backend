@@ -45,7 +45,7 @@
   "dependencies": {
     "@aws-sdk/client-cloudwatch-logs": "^3.92.0",
     "@workduck-io/wderror": "^0.0.2",
-    "@workduck-io/workspace-validator": "^0.0.6",
+    "@workduck-io/workspace-validator": "^0.0.7",
     "ajv": "7.2.4",
     "amazon-cognito-identity-js": "^5.2.4",
     "aws-sdk": "^2.1066.0",
