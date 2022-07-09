@@ -5,9 +5,14 @@ import { NodeResponse } from '../interfaces/Response';
 import { NodeMetadata } from '../interfaces/Node';
 import { deserializeContent } from './serialize';
 
+interface ILinkNodeMetadata {
+  metadata?: { iconUrl?: string };
+  updatedAt?: number;
+  createdAt?: number;
+}
 interface LinkHierarchyData {
   hierarchy: string[];
-  nodesMetadata: { [nodeID: string]: any };
+  nodesMetadata: { [nodeID: string]: ILinkNodeMetadata };
 }
 
 interface ILinkResponse {
@@ -29,6 +34,7 @@ export class Transformer {
 
   linkHierarchyParser = (linkData: LinkHierarchyData): ILinkResponse => {
     const hierarchy = linkData.hierarchy ?? (linkData as unknown as string[]);
+    const nodesMetadata = linkData.nodesMetadata;
     const ilinks: ILink[] = [];
     const idPathMapping: { [key: string]: string } = {};
 
@@ -58,12 +64,17 @@ export class Transformer {
             throw new Error('Invalid Linkdata Input');
         } else {
           idPathMapping[nodeID] = nodePath;
-          ilinks.push({ nodeid: nodeID, path: nodePath });
+          ilinks.push({
+            nodeid: nodeID,
+            path: nodePath,
+            icon: nodesMetadata[nodeID]?.metadata?.iconUrl,
+            createdAt: nodesMetadata[nodeID]?.createdAt || Infinity,
+          });
         }
         prefix = nodePath;
       }
     }
-    return { ilinks: ilinks, nodesMetadata: linkData.nodesMetadata };
+    return { ilinks: ilinks, nodesMetadata: nodesMetadata };
   };
 
   decodeLinkHierarchy = (linkDatas: string[]): Promise<ILink[]> => {

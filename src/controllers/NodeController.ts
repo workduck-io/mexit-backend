@@ -29,11 +29,14 @@ class NodeController {
     workspaceId: string,
     idToken: string
   ): Promise<any> => {
-    const result = await this._nodeManager.getLinkHierarchy(
+    const linkDataRaw = await this._nodeManager.getLinkHierarchy(
       workspaceId,
       idToken
     );
-    this._cache.replaceAndSet(userId, this._linkHierarchyLabel, result);
+    const linkDataResult = this._transformer.linkHierarchyParser(linkDataRaw);
+
+    this._cache.replaceAndSet(userId, this._linkHierarchyLabel, linkDataResult);
+
     return this._cache.get(userId, this._linkHierarchyLabel);
   };
 
@@ -51,10 +54,12 @@ class NodeController {
           this._linkHierarchyLabel
         );
       } else {
-        linkDataResult = await this._nodeManager.getLinkHierarchy(
+        const linkDataRaw = await this._nodeManager.getLinkHierarchy(
           response.locals.workspaceID,
           response.locals.idToken
         );
+
+        linkDataResult = this._transformer.linkHierarchyParser(linkDataRaw);
 
         this._cache.set(
           response.locals.userId,
@@ -63,8 +68,7 @@ class NodeController {
         );
       }
 
-      const result = this._transformer.linkHierarchyParser(linkDataResult);
-      response.status(statusCodes.OK).json(result);
+      response.status(statusCodes.OK).json(linkDataResult);
     } catch (error) {
       next(error);
     }
