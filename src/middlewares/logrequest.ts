@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import logger from '../libs/logger';
+import geoip from 'geoip-lite';
 
 async function LogRequest(
   req: Request,
@@ -8,10 +9,13 @@ async function LogRequest(
 ): Promise<void> {
   if (!req.url.includes('ping')) {
     const clientIp =
-      req.headers['x-forwarded-for'].toString().split(',')[0] ||
+      req.headers['x-forwarded-for']?.toString().split(',')[0] ||
       req.socket.remoteAddress;
+    const clientLocation = geoip.lookup(clientIp);
 
-    logger.info(`HTTP [${req.method}] ${req.url} | client IP ${clientIp}`);
+    logger.info(
+      `HTTP [${req.method}] ${req.url} | client IP ${clientIp} | LatLong ${clientLocation?.ll} | ${clientLocation?.city}, ${clientLocation?.region}, ${clientLocation?.country}`
+    );
   }
   next();
 }
