@@ -65,6 +65,7 @@ export class NodeManager {
       });
     }
   }
+
   async getNode(
     nodeId: string,
     workspaceId: string,
@@ -93,6 +94,7 @@ export class NodeManager {
       });
     }
   }
+
   async getAllNodes(
     userId: string,
     workspaceId: string,
@@ -184,6 +186,7 @@ export class NodeManager {
       });
     }
   }
+
   async makeNodePublic(
     nodeId: string,
     workspaceId: string,
@@ -210,6 +213,7 @@ export class NodeManager {
       });
     }
   }
+
   async makeNodePrivate(
     nodeId: string,
     workspaceId: string,
@@ -236,6 +240,7 @@ export class NodeManager {
       });
     }
   }
+
   async getPublicNode(nodeId: string, idToken: string): Promise<any> {
     try {
       const result = await this._lambda.invokeAndCheck(
@@ -261,6 +266,7 @@ export class NodeManager {
       });
     }
   }
+
   async archiveNode(
     workspaceId: string,
     idToken: string,
@@ -288,6 +294,7 @@ export class NodeManager {
       });
     }
   }
+
   async unArchiveNode(
     workspaceId: string,
     idToken: string,
@@ -314,6 +321,7 @@ export class NodeManager {
       });
     }
   }
+
   async deletedArchivedNode(
     workspaceId: string,
     idToken: string,
@@ -340,6 +348,7 @@ export class NodeManager {
       });
     }
   }
+
   async refactorHierarchy(workspaceId: string, idToken: string, payload: any) {
     try {
       const result = await this._lambda.invokeAndCheck(
@@ -363,6 +372,7 @@ export class NodeManager {
       });
     }
   }
+
   async bulkCreateNode(workspaceId: string, idToken: string, payload: any) {
     try {
       const result = await this._lambda.invokeAndCheck(
@@ -386,6 +396,7 @@ export class NodeManager {
       });
     }
   }
+
   async getArchivedNodes(workspaceId: string, idToken: string) {
     try {
       const result = await this._lambda.invokeAndCheck(
