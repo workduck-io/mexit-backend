@@ -7,7 +7,11 @@ async function LogRequest(
   next: NextFunction
 ): Promise<void> {
   if (!req.url.includes('ping')) {
-    logger.info(`HTTP [${req.method}] ${req.url}`);
+    const clientIp =
+      req.headers['x-forwarded-for'].toString().split(',')[0] ||
+      req.socket.remoteAddress;
+
+    logger.info(`HTTP [${req.method}] ${req.url} | client IP ${clientIp}`);
   }
   next();
 }
