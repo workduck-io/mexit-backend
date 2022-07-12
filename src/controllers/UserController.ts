@@ -111,21 +111,7 @@ class UserController {
         requestDetail.data
       );
 
-      const initWorkspaceResp = await this._userManager.initializeWorkspace({
-        workspaceID: registerResp.id,
-        userID: response.locals.userIdRaw,
-      });
-
-      const nodeHierarchyInfo = this._transformer.linkHierarchyParser(
-        initWorkspaceResp.nodeHierarchy
-      );
-
-      response.status(statusCodes.OK).json({
-        registrationInfo: registerResp,
-        nodes: initWorkspaceResp.baseData.nodes,
-        snippets: initWorkspaceResp.baseData.snippets,
-        ilinks: nodeHierarchyInfo,
-      });
+      response.status(statusCodes.OK).json(registerResp);
     } catch (error) {
       next(error);
     }
