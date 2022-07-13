@@ -19,7 +19,7 @@ export interface ShareNodeDetail {
 }
 
 export interface UpdateAccessTypeForSharedNodeDetail {
-  nodeId: string;
+  nodeID: string;
   userIDToAccessTypeMap: { [key: string]: NodeAccessType };
 }
 
