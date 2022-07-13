@@ -761,10 +761,19 @@
         },
         "ILink": {
             "properties": {
+                "createdAt": {
+                    "type": "number"
+                },
+                "icon": {
+                    "description": "Iconify Icon string",
+                    "type": "string"
+                },
                 "nodeid": {
+                    "description": "Unique Identifier",
                     "type": "string"
                 },
                 "path": {
+                    "description": "The title of the node.\nUses separator for hierarchy",
                     "type": "string"
                 }
             },
@@ -1541,7 +1550,7 @@
         },
         "UpdateAccessTypeForSharedNodeDetail": {
             "properties": {
-                "nodeId": {
+                "nodeID": {
                     "type": "string"
                 },
                 "userIDToAccessTypeMap": {
@@ -1552,7 +1561,7 @@
                 }
             },
             "required": [
-                "nodeId",
+                "nodeID",
                 "userIDToAccessTypeMap"
             ],
             "type": "object"
