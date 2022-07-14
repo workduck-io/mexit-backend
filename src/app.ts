@@ -22,6 +22,7 @@ import TagController from './controllers/TagController';
 import UserController from './controllers/UserController';
 import responseErrorHandler from './middlewares/responseErrorHandler';
 import HealthCheckController from './controllers/HealthCheckController';
+import { wdRequestIdExpressParser } from '@workduck-io/wd-request-id-parser';
 
 class App {
   public _app: express.Application;
@@ -45,6 +46,7 @@ class App {
     this._app.use(cors());
     this._app.use(express.json());
     this._app.use(LogRequest);
+    this._app.use(wdRequestIdExpressParser);
   }
 
   private initializeErrorHandlers() {
