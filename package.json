@@ -44,6 +44,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-cloudwatch-logs": "^3.92.0",
+    "@workduck-io/wd-request-id-parser": "^0.0.3",
     "@workduck-io/wderror": "^0.0.2",
     "@workduck-io/workspace-validator": "^0.0.7",
     "ajv": "7.2.4",
@@ -66,7 +67,7 @@
     "reflect-metadata": "^0.1.13",
     "stats-map": "^1.0.0",
     "ts-node": "^10.4.0",
-    "typescript": "4.5.4",
+    "typescript": "4.7.4",
     "typescript-json-schema": "^0.52.0",
     "winston": "^3.6.0",
     "winston-cloudwatch": "^6.0.0"
