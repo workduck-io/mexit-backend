@@ -60,18 +60,15 @@ export class SharedManager {
     updatedAccessTypeForSharedNodePayload: UpdateAccessTypeForSharedNodeDetail
   ): Promise<any> {
     try {
-      const payloadDetail = {
-        ...updatedAccessTypeForSharedNodePayload,
-        nodeID: updatedAccessTypeForSharedNodePayload.nodeId,
-      };
-      delete payloadDetail.nodeId;
-
       const response = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,
         {
           routeKey: RouteKeys.updateAccessTypeForshareNode,
-          payload: { ...payloadDetail, type: 'UpdateAccessTypesRequest' },
+          payload: {
+            ...updatedAccessTypeForSharedNodePayload,
+            type: 'UpdateAccessTypesRequest',
+          },
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
