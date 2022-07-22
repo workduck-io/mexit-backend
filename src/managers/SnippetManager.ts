@@ -69,6 +69,46 @@ export class SnippetManager {
       });
     }
   }
+
+  async bulkGetSnippet(
+    snippetIDs: string[],
+    workspaceId: string,
+    idToken: string
+  ): Promise<any> {
+    try {
+      const lambdaPromises = snippetIDs.map(id =>
+        this._lambda.invokeAndCheck(
+          this._snippetLambdaFunctionName,
+          this._lambdaInvocationType,
+          {
+            routeKey: RouteKeys.getSnippet,
+            pathParameters: { id: id },
+            headers: {
+              'mex-workspace-id': workspaceId,
+              authorization: idToken,
+            },
+          }
+        )
+      );
+
+      const promiseResponses = await Promise.allSettled(lambdaPromises);
+
+      const result = promiseResponses
+        .filter(snippet => snippet.status === 'fulfilled')
+        .map((item: PromiseFulfilledResult<any>) => item.value);
+
+      return result;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+
   async getAllVersionsOfSnippet(
     snippetId: string,
     workspaceId: string,
