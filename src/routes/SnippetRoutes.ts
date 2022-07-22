@@ -44,4 +44,9 @@ export const initializeSnippetRoutes = (
     [AuthRequest],
     snippetObject.getPublicSnippet
   );
+  snippetObject._router.post(
+    `${snippetObject._urlPath}/bulk`,
+    [AuthRequest],
+    snippetObject.bulkGetSnippet
+  );
 };
