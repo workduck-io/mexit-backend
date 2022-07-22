@@ -26,7 +26,7 @@ const responseErrorHandler: ErrorRequestHandler = (
     const workspaceId = request.headers['mex-workspace-id'];
 
     if (workspaceId)
-      logger.info(
+      logger.error(
         `HTTP [${request.method}] ${request.url} | ${workspaceId} | client IP ${clientIp} | LatLong ${clientLocation?.ll} | ${clientLocation?.city}, ${clientLocation?.region}, ${clientLocation?.country}`
       );
     else
