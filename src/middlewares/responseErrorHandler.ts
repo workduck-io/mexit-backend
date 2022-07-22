@@ -23,9 +23,17 @@ const responseErrorHandler: ErrorRequestHandler = (
       `HTTP [${request.method}] ${request.url} - ${statusCode} ${message} | client IP ${clientIp} | LatLong ${clientLocation?.ll} | ${clientLocation?.city}, ${clientLocation?.region}, ${clientLocation?.country}`
     );
   } else if (statusCode >= 500) {
-    logger.error(
-      `HTTP [${request.method}] ${request.url} - ${statusCode} ${message} | client IP ${clientIp} | LatLong ${clientLocation?.ll} | ${clientLocation?.city}, ${clientLocation?.region}, ${clientLocation?.country}`
-    );
+    const workspaceId = request.headers['mex-workspace-id'];
+
+    if (workspaceId)
+      logger.info(
+        `HTTP [${request.method}] ${request.url} | ${workspaceId} | client IP ${clientIp} | LatLong ${clientLocation?.ll} | ${clientLocation?.city}, ${clientLocation?.region}, ${clientLocation?.country}`
+      );
+    else
+      logger.error(
+        `HTTP [${request.method}] ${request.url} - ${statusCode} ${message} | client IP ${clientIp} | LatLong ${clientLocation?.ll} | ${clientLocation?.city}, ${clientLocation?.region}, ${clientLocation?.country}`
+      );
+
     logger.error(`Call Stack ${error.response?.stackTrace ?? error.stack}`);
   }
 
