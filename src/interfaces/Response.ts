@@ -13,6 +13,7 @@ export interface NodeResponse {
   namespaceID: string;
   workspaceIdentifier: string;
   bookmarked: boolean | null;
+  template?: boolean;
 }
 
 export interface ActivityNodeResponse extends NodeResponse {
