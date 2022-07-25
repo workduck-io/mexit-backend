@@ -73,6 +73,9 @@
                     ],
                     "type": "string"
                 },
+                "template": {
+                    "type": "boolean"
+                },
                 "title": {
                     "type": "string"
                 },
@@ -1275,6 +1278,9 @@
                 },
                 "namespaceID": {
                     "type": "string"
+                },
+                "template": {
+                    "type": "boolean"
                 },
                 "title": {
                     "type": "string"
