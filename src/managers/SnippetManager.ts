@@ -58,7 +58,6 @@ export class SnippetManager {
         }
       );
 
-      response.template = !!(response.template === 'true');
       return response;
     } catch (error) {
       errorlib({
