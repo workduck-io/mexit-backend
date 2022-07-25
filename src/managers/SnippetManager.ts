@@ -57,6 +57,8 @@ export class SnippetManager {
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
+
+      response.template = !!(response.template === 'true');
       return response;
     } catch (error) {
       errorlib({
@@ -110,6 +112,11 @@ export class SnippetManager {
           queryStringParameters: { getData },
         }
       );
+
+      response.forEach(item => {
+        item.template = !!(item.template === 'true');
+      });
+
       return response;
     } catch (error) {
       errorlib({
