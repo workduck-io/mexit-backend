@@ -145,6 +145,9 @@ export class Transformer {
       title: nodeResponse.title,
       content: content,
       metadata: metadata,
+      ...(nodeResponse.id.startsWith(this.CAPTURES.SNIPPET) && {
+        template: nodeResponse.template,
+      }),
     };
 
     return contentResponse;
