@@ -58,6 +58,29 @@ class SnippetController {
       next(error);
     }
   };
+
+  bulkGetSnippet = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const rawSnippets: any[] = await this._snippetManager.bulkGetSnippet(
+        request.body['ids'],
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
+
+      const result = rawSnippets.map(snippet =>
+        this._transformer.genericNodeConverter(snippet)
+      );
+
+      response.status(statusCodes.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   getAllVersionsOfSnippets = async (
     request: Request,
     response: Response,
