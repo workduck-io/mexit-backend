@@ -20,6 +20,30 @@ interface ILinkResponse {
   nodesMetadata: { [nodeID: string]: any };
 }
 
+
+export interface NamespaceInfo {
+  id: string
+  name: string
+  createdAt: number
+  updatedAt: number
+  itemType: string // Always going to be 'Namespace'
+  nodeHierarchy: string[]
+  publicAccess: boolean
+}
+
+export interface ParsedNamespaceHierarchy {
+  name: string
+  hierarchy: ILink[]
+}
+
+export type AllNamespaceHierarchyResponse = { namespaceInfo: Record<string, { name: string; hierarchy: string[] }> }
+export type ParsedAllNamespacesHierarchy = Record<string, ParsedNamespaceHierarchy>
+
+type AllNamespaceHierarchyParserFn = (
+  allNamespacesResp: AllNamespaceHierarchyResponse,
+  options?: { withParentNodeId: boolean; allowDuplicates?: boolean }
+) => Record<string, ParsedNamespaceHierarchy>
+
 @injectable()
 export class Transformer {
   private CACHE_KEY_DELIMITER = '+';
@@ -77,6 +101,65 @@ export class Transformer {
     return { ilinks: ilinks, nodesMetadata: nodesMetadata };
   };
 
+
+  hierarchyParser = (
+    linkData: string[],
+    options?: { withParentNodeId: boolean; allowDuplicates?: boolean }
+  ): ILink[] => {
+    const ilinks: ILink[] = []
+    const idPathMapping: { [key: string]: string } = {}
+    const pathIdMapping: { [key: string]: { nodeid: string; index: number } } = {}
+
+    for (const subTree of linkData) {
+      const nodes = subTree.split('#')
+
+      let prefix: string | undefined
+      let parentNodeId: string | undefined
+
+      if (nodes.length % 2 !== 0) throw new Error('Invalid Linkdata Input')
+
+      for (let index = 0; index < nodes.length; index += 2) {
+        const nodeTitle = nodes[index]
+        const nodeID = nodes[index + 1]
+
+        const nodePath = prefix ? `${prefix}.${nodeTitle}` : nodeTitle
+
+        /*
+              Drafts.A and Drafts.B exist, we need to check if the Drafts parent node is the same by checking
+              the parent nodeUID. This handles the case in which a nodeID might have two different node paths. 
+     
+              We still do not handle the case where there are 2 nodes with the same path but different Node IDs,
+              we handle that on the frontend for now
+            */
+
+        if (idPathMapping[nodeID]) {
+          if (idPathMapping[nodeID] !== nodePath) {
+            const ilinkAt = ilinks?.findIndex((ilink) => ilink.nodeid === nodeID)
+
+            if (ilinkAt) {
+              ilinks.splice(ilinkAt, 1, { ...ilinks[ilinkAt], path: nodePath })
+            }
+          }
+        } else if (pathIdMapping[nodePath] && !options?.allowDuplicates) {
+          // mog(`Found existing notePath: ${nodePath} with ${nodeID} at index: ${pathIdMapping[nodePath].index}`)
+          ilinks[pathIdMapping[nodePath].index] = { nodeid: nodeID, path: nodePath }
+        } else {
+          // mog(`Inserting: ${nodePath} with ${nodeID} at index: ${ilinks.length}`)
+          idPathMapping[nodeID] = nodePath
+          pathIdMapping[nodePath] = { nodeid: nodeID, index: ilinks.length }
+          const ilink: ILink = { nodeid: nodeID, path: nodePath }
+          ilinks.push(options?.withParentNodeId ? { ...ilink, parentNodeId } : ilink)
+        }
+
+        prefix = nodePath
+        parentNodeId = nodeID
+      }
+    }
+
+    return ilinks
+  }
+
+
   decodeLinkHierarchy = (linkDatas: string[]): Promise<ILink[]> => {
     return new Promise((resolve, reject) => {
       const iLinks: ILink[] = [];
@@ -90,7 +173,7 @@ export class Transformer {
           reject(new Error('Invalid linkdata input'));
 
         let cumulativePath: string;
-        for (let index = 0; index < delimitedStrings.length; ) {
+        for (let index = 0; index < delimitedStrings.length;) {
           if (!cumulativePath) cumulativePath = delimitedStrings[index];
           else
             cumulativePath = cumulativePath.concat(
@@ -152,4 +235,27 @@ export class Transformer {
 
     return contentResponse;
   };
+
+
+
+  allNamespacesHierarchyParser: AllNamespaceHierarchyParserFn = (
+    allNamespacesResp,
+    options = { withParentNodeId: false, allowDuplicates: false }
+  ) => {
+    const parsedNSHierarchy: Record<string, ParsedNamespaceHierarchy> = {}
+    Object.entries(allNamespacesResp.namespaceInfo).forEach(([namespaceID, namespaceValue]) => {
+      const nHierarchy = this.hierarchyParser(namespaceValue.hierarchy, options)
+      parsedNSHierarchy[namespaceID] = { name: namespaceValue.name, hierarchy: nHierarchy }
+    })
+
+    return parsedNSHierarchy
+  }
+
+  namespaceHierarchyParser = (
+    namespace: NamespaceInfo,
+    options = { withParentNodeId: false, allowDuplicates: false }
+  ) => {
+    return { ...namespace, nodeHierarchy: this.hierarchyParser(namespace.nodeHierarchy, options) }
+  }
+
 }

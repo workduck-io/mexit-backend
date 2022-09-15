@@ -160,16 +160,20 @@ export interface CopyOrMoveBlock {
   action: 'move';
 }
 
+
 export interface ILink {
   /** Unique Identifier */
-  nodeid: string;
+  nodeid: string
 
   /** The title of the node.
-   * Uses separator for hierarchy */
-  path: string;
+   * Uses separator for heirarchy */
+  path: string
 
   /** Iconify Icon string */
-  icon?: string;
+  icon?: string
 
-  createdAt?: number;
+  createdAt?: number
+
+  parentNodeId?: string
 }
+

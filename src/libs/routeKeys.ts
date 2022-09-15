@@ -44,4 +44,11 @@ export const RouteKeys = {
   bulkCreateNode: 'POST /node/bulkCreate',
   registerUser: 'POST /user/register',
   getAllSharedNodeForUser: 'GET /shared/node/all',
+  createNamespace: 'POST /namespace',
+  getNamespace: 'GET /namespace/{id}',
+  renameNamespace: 'PATCH /namespace/{id}',
+  makeNamespacePublic: 'PATCH /namespace/makePublic/{id}',
+  makeNamespacePrivate: 'PATCH /namespace/makePrivate/{id}',
+  getPublicNamespace: 'GET /namespace/public/{id}',
+  getAllNamespaceHierarchy: 'GET /namespace/all/hierarchy'
 };
