@@ -5,9 +5,6 @@ import { Transformer } from '../libs/TransformerClass';
 import { NamespaceManager } from '../managers/NamespaceManager'
 import { initializeNamespaceRoutes } from '../routes/NamespaceRoutes'
 
-import { allNamespacesHierarchyParser, namespaceHierarchyParser } from '@workduck-io/mex-utils'
-
-
 class NamespaceController {
   public _urlPath = '/namespace';
   public _router = express.Router()
@@ -42,7 +39,7 @@ class NamespaceController {
         request.params.namespaceID
       )
 
-      const parsedNS = namespaceHierarchyParser(namespace)
+      const parsedNS = this._transformer.namespaceHierarchyParser(namespace)
       response.status(statusCodes.OK).json(parsedNS)
 
     } catch (error) {
@@ -100,7 +97,7 @@ class NamespaceController {
         request.params.namespaceID
       )
 
-      const parsedPublicNS = namespaceHierarchyParser(publicNamespace)
+      const parsedPublicNS = this._transformer.namespaceHierarchyParser(publicNamespace)
       response.status(statusCodes.OK).json(parsedPublicNS)
 
 
@@ -111,12 +108,15 @@ class NamespaceController {
 
   getAllNamespaceHierarchy = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
+      const getMetadata = !!request.query['getMetadata']
       const result = await this._namespaceManager.getAllNamespaceHierarchy(
         response.locals.workspaceID,
-        response.locals.idToken
+        response.locals.idToken,
+        getMetadata
       )
-
-      const parsedNamespaceHierarchy = allNamespacesHierarchyParser(result)
+      const namespaceInfo = getMetadata ? result.hierarchy : result
+      const nodesMetadata = getMetadata ? result.nodesMetadata : undefined
+      const parsedNamespaceHierarchy = this._transformer.allNamespacesHierarchyParser(namespaceInfo, nodesMetadata)
       response.status(statusCodes.OK).json(parsedNamespaceHierarchy)
     } catch (error) {
       next(error)

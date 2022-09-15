@@ -154,14 +154,15 @@ export class NamespaceManager {
     }
   }
 
-  async getAllNamespaceHierarchy(workspaceId: string, idToken: string): Promise<any> {
+  async getAllNamespaceHierarchy(workspaceId: string, idToken: string, getMetadata = false): Promise<any> {
     try {
       const result = this._lambda.invokeAndCheck(
         this._namespaceLambdaFunctionName,
         this._lambdaInvocationType,
         {
           routeKey: RouteKeys.getAllNamespaceHierarchy,
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken }
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+          queryStringParameters: { getMetadata: getMetadata }
         }
       );
       return result;

@@ -15,6 +15,7 @@ interface LinkHierarchyData {
   nodesMetadata: { [nodeID: string]: ILinkNodeMetadata };
 }
 
+
 interface ILinkResponse {
   ilinks: ILink[];
   nodesMetadata: { [nodeID: string]: any };
@@ -31,16 +32,22 @@ export interface NamespaceInfo {
   publicAccess: boolean
 }
 
-export interface ParsedNamespaceHierarchy {
-  name: string
-  hierarchy: ILink[]
+interface ILinkWithMetadata extends ILink {
+  updatedAt?: number
+  metadata?: any
 }
 
-export type AllNamespaceHierarchyResponse = { namespaceInfo: Record<string, { name: string; hierarchy: string[] }> }
+export interface ParsedNamespaceHierarchy {
+  name: string
+  nodeHierarchy: ILinkWithMetadata[]
+}
+
+export type AllNamespaceHierarchyResponse = { namespaceInfo: Record<string, { name: string; nodeHierarchy: string[] }> }
 export type ParsedAllNamespacesHierarchy = Record<string, ParsedNamespaceHierarchy>
 
 type AllNamespaceHierarchyParserFn = (
   allNamespacesResp: AllNamespaceHierarchyResponse,
+  nodesMetadata?: Record<string, { metadata: any, updatedAt: number, createdAt: number }>,
   options?: { withParentNodeId: boolean; allowDuplicates?: boolean }
 ) => Record<string, ParsedNamespaceHierarchy>
 
@@ -240,13 +247,27 @@ export class Transformer {
 
   allNamespacesHierarchyParser: AllNamespaceHierarchyParserFn = (
     allNamespacesResp,
+    nodesMetadata?,
     options = { withParentNodeId: false, allowDuplicates: false }
   ) => {
     const parsedNSHierarchy: Record<string, ParsedNamespaceHierarchy> = {}
     Object.entries(allNamespacesResp.namespaceInfo).forEach(([namespaceID, namespaceValue]) => {
-      const nHierarchy = this.hierarchyParser(namespaceValue.hierarchy, options)
-      parsedNSHierarchy[namespaceID] = { name: namespaceValue.name, hierarchy: nHierarchy }
+      const nHierarchy = this.hierarchyParser(namespaceValue.nodeHierarchy, options)
+      parsedNSHierarchy[namespaceID] = { name: namespaceValue.name, nodeHierarchy: nHierarchy }
     })
+
+    if (nodesMetadata) {
+      Object.entries(parsedNSHierarchy).forEach(([namespaceID, namespaceValue]) => {
+        namespaceValue.nodeHierarchy = namespaceValue.nodeHierarchy.map((ilink) => {
+          return {
+            ...ilink,
+            createdAt: nodesMetadata[ilink.nodeid]?.createdAt || Infinity,
+            updatedAt: nodesMetadata[ilink.nodeid]?.updatedAt || Infinity,
+            metadata: nodesMetadata[ilink.nodeid]?.metadata || undefined
+          }
+        })
+      })
+    }
 
     return parsedNSHierarchy
   }
