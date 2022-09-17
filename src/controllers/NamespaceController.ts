@@ -24,7 +24,6 @@ class NamespaceController {
         request.body
       )
 
-      console.log(`Namespace Result: ${namespaceResult}`)
       response.status(statusCodes.OK).json(namespaceResult)
     } catch (error) {
       next(error);
@@ -47,15 +46,15 @@ class NamespaceController {
     }
   }
 
-  renameNamespace = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
+  updateNamespace = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      await this._namespaceManager.renameNamespace(
+      const res = await this._namespaceManager.updateNamespace(
         response.locals.workspaceID,
         response.locals.idToken,
         request.body
       )
 
-      response.status(statusCodes.NO_CONTENT)
+      response.status(statusCodes.NO_CONTENT).send()
     } catch (error) {
       next(error);
     }
