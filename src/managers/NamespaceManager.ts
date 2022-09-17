@@ -62,13 +62,13 @@ export class NamespaceManager {
     }
   }
 
-  async renameNamespace(workspaceId: string, idToken: string, namespaceDetail: { name: string }): Promise<any> {
+  async updateNamespace(workspaceId: string, idToken: string, namespaceDetail: { name: string }): Promise<any> {
     try {
-      const result = this._lambda.invokeAndCheck(
+      const result = await this._lambda.invoke(
         this._namespaceLambdaFunctionName,
         this._lambdaInvocationType,
         {
-          routeKey: RouteKeys.renameNamespace,
+          routeKey: RouteKeys.updateNamespace,
           payload: { ...namespaceDetail, type: "NamespaceRequest" },
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken }
         }

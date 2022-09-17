@@ -19,9 +19,9 @@ export const initializeNamespaceRoutes = (
   );
 
   nsObject._router.patch(
-    `${nsObject._urlPath}/:namespaceID`,
+    `${nsObject._urlPath}/`,
     [AuthRequest],
-    nsObject.renameNamespace
+    nsObject.updateNamespace
   );
 
   nsObject._router.patch(

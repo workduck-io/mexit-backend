@@ -46,7 +46,7 @@ export const RouteKeys = {
   getAllSharedNodeForUser: 'GET /shared/node/all',
   createNamespace: 'POST /namespace',
   getNamespace: 'GET /namespace/{id}',
-  renameNamespace: 'PATCH /namespace/{id}',
+  updateNamespace: 'PATCH /namespace',
   makeNamespacePublic: 'PATCH /namespace/makePublic/{id}',
   makeNamespacePrivate: 'PATCH /namespace/makePrivate/{id}',
   getPublicNamespace: 'GET /namespace/public/{id}',
