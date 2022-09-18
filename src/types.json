@@ -330,15 +330,9 @@
         },
         "ContentNode": {
             "properties": {
-                "appendNodeUID": {
-                    "type": "string"
-                },
                 "content": {
                     "items": {},
                     "type": "array"
-                },
-                "createNodeUID": {
-                    "type": "string"
                 },
                 "id": {
                     "type": "string"
@@ -359,6 +353,9 @@
                         }
                     },
                     "type": "object"
+                },
+                "namespaceID": {
+                    "type": "string"
                 },
                 "nodePath": {
                     "type": "string"
@@ -419,28 +416,20 @@
                 },
                 "title": {
                     "type": "string"
-                },
-                "type": {
-                    "type": "string"
                 }
             },
             "required": [
                 "id",
+                "namespaceID",
                 "title"
             ],
             "type": "object"
         },
         "ContentNodeRequest": {
             "properties": {
-                "appendNodeUID": {
-                    "type": "string"
-                },
                 "content": {
                     "items": {},
                     "type": "array"
-                },
-                "createNodeUID": {
-                    "type": "string"
                 },
                 "createdBy": {
                     "type": "string"
@@ -465,6 +454,9 @@
                     },
                     "type": "object"
                 },
+                "namespaceID": {
+                    "type": "string"
+                },
                 "nodePath": {
                     "type": "string"
                 },
@@ -524,28 +516,20 @@
                 },
                 "title": {
                     "type": "string"
-                },
-                "type": {
-                    "type": "string"
                 }
             },
             "required": [
                 "id",
+                "namespaceID",
                 "title"
             ],
             "type": "object"
         },
         "ContentResponse": {
             "properties": {
-                "appendNodeUID": {
-                    "type": "string"
-                },
                 "content": {
                     "items": {},
                     "type": "array"
-                },
-                "createNodeUID": {
-                    "type": "string"
                 },
                 "createdAt": {
                     "type": "number"
@@ -572,6 +556,9 @@
                         }
                     },
                     "type": "object"
+                },
+                "namespaceID": {
+                    "type": "string"
                 },
                 "namespaceIdentifier": {
                     "type": "string"
@@ -636,9 +623,6 @@
                 "title": {
                     "type": "string"
                 },
-                "type": {
-                    "type": "string"
-                },
                 "updatedAt": {
                     "type": "number"
                 },
@@ -650,6 +634,7 @@
                 "createdAt",
                 "createdBy",
                 "id",
+                "namespaceID",
                 "namespaceIdentifier",
                 "title",
                 "updatedAt",
@@ -775,8 +760,11 @@
                     "description": "Unique Identifier",
                     "type": "string"
                 },
+                "parentNodeId": {
+                    "type": "string"
+                },
                 "path": {
-                    "description": "The title of the node.\nUses separator for hierarchy",
+                    "description": "The title of the node.\nUses separator for heirarchy",
                     "type": "string"
                 }
             },
@@ -1246,6 +1234,7 @@
                 }
             },
             "required": [
+                "namespaceID",
                 "path"
             ],
             "type": "object"
@@ -1439,15 +1428,9 @@
         },
         "SnippetUpdateVersionRequest": {
             "properties": {
-                "appendNodeUID": {
-                    "type": "string"
-                },
                 "content": {
                     "items": {},
                     "type": "array"
-                },
-                "createNodeUID": {
-                    "type": "string"
                 },
                 "id": {
                     "type": "string"
@@ -1468,6 +1451,9 @@
                         }
                     },
                     "type": "object"
+                },
+                "namespaceID": {
+                    "type": "string"
                 },
                 "nodePath": {
                     "type": "string"
@@ -1529,15 +1515,13 @@
                 "title": {
                     "type": "string"
                 },
-                "type": {
-                    "type": "string"
-                },
                 "version": {
                     "type": "number"
                 }
             },
             "required": [
                 "id",
+                "namespaceID",
                 "title",
                 "version"
             ],

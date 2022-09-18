@@ -7,13 +7,10 @@ import { Lambda, InvocationType } from '../libs/LambdaClass';
 import { RouteKeys } from '../libs/routeKeys';
 import { STAGE } from '../env';
 
-
-
-
 @injectable()
 export class NamespaceManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
-  private _namespaceLambdaFunctionName = 'mex-backend-staging-Namespace';
+  private _namespaceLambdaFunctionName = `mex-backend-${STAGE}-Namespace`;
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
   async createNamespace(workspaceId: string, idToken: string, namespaceDetail: { name: string }): Promise<any> {

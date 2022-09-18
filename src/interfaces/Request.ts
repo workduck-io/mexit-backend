@@ -20,7 +20,7 @@ export interface CopyOrMoveBlockRequest {
 
 export interface NodePath {
   path: string;
-  namespaceID?: string;
+  namespaceID: string;
 }
 
 export interface RefactorRequest {

@@ -15,41 +15,47 @@ interface LinkHierarchyData {
   nodesMetadata: { [nodeID: string]: ILinkNodeMetadata };
 }
 
-
 interface ILinkResponse {
   ilinks: ILink[];
   nodesMetadata: { [nodeID: string]: any };
 }
 
-
 export interface NamespaceInfo {
-  id: string
-  name: string
-  createdAt: number
-  updatedAt: number
-  itemType: string // Always going to be 'Namespace'
-  nodeHierarchy: string[]
-  publicAccess: boolean
+  id: string;
+  name: string;
+  createdAt: number;
+  updatedAt: number;
+  itemType: string; // Always going to be 'Namespace'
+  nodeHierarchy: string[];
+  publicAccess: boolean;
 }
 
 interface ILinkWithMetadata extends ILink {
-  updatedAt?: number
-  metadata?: any
+  updatedAt?: number;
+  metadata?: any;
 }
 
 export interface ParsedNamespaceHierarchy {
-  name: string
-  nodeHierarchy: ILinkWithMetadata[]
+  name: string;
+  nodeHierarchy: ILinkWithMetadata[];
 }
 
-export type AllNamespaceHierarchyResponse = { namespaceInfo: Record<string, { name: string; nodeHierarchy: string[] }> }
-export type ParsedAllNamespacesHierarchy = Record<string, ParsedNamespaceHierarchy>
+export type AllNamespaceHierarchyResponse = {
+  namespaceInfo: Record<string, { name: string; nodeHierarchy: string[] }>;
+};
+export type ParsedAllNamespacesHierarchy = Record<
+  string,
+  ParsedNamespaceHierarchy
+>;
 
 type AllNamespaceHierarchyParserFn = (
   allNamespacesResp: AllNamespaceHierarchyResponse,
-  nodesMetadata?: Record<string, { metadata: any, updatedAt: number, createdAt: number }>,
+  nodesMetadata?: Record<
+    string,
+    { metadata: any; updatedAt: number; createdAt: number }
+  >,
   options?: { withParentNodeId: boolean; allowDuplicates?: boolean }
-) => Record<string, ParsedNamespaceHierarchy>
+) => Record<string, ParsedNamespaceHierarchy>;
 
 @injectable()
 export class Transformer {
@@ -108,28 +114,28 @@ export class Transformer {
     return { ilinks: ilinks, nodesMetadata: nodesMetadata };
   };
 
-
   hierarchyParser = (
     linkData: string[],
     options?: { withParentNodeId: boolean; allowDuplicates?: boolean }
   ): ILink[] => {
-    const ilinks: ILink[] = []
-    const idPathMapping: { [key: string]: string } = {}
-    const pathIdMapping: { [key: string]: { nodeid: string; index: number } } = {}
+    const ilinks: ILink[] = [];
+    const idPathMapping: { [key: string]: string } = {};
+    const pathIdMapping: { [key: string]: { nodeid: string; index: number } } =
+      {};
 
     for (const subTree of linkData) {
-      const nodes = subTree.split('#')
+      const nodes = subTree.split('#');
 
-      let prefix: string | undefined
-      let parentNodeId: string | undefined
+      let prefix: string | undefined;
+      let parentNodeId: string | undefined;
 
-      if (nodes.length % 2 !== 0) throw new Error('Invalid Linkdata Input')
+      if (nodes.length % 2 !== 0) throw new Error('Invalid Linkdata Input');
 
       for (let index = 0; index < nodes.length; index += 2) {
-        const nodeTitle = nodes[index]
-        const nodeID = nodes[index + 1]
+        const nodeTitle = nodes[index];
+        const nodeID = nodes[index + 1];
 
-        const nodePath = prefix ? `${prefix}.${nodeTitle}` : nodeTitle
+        const nodePath = prefix ? `${prefix}.${nodeTitle}` : nodeTitle;
 
         /*
               Drafts.A and Drafts.B exist, we need to check if the Drafts parent node is the same by checking
@@ -141,31 +147,35 @@ export class Transformer {
 
         if (idPathMapping[nodeID]) {
           if (idPathMapping[nodeID] !== nodePath) {
-            const ilinkAt = ilinks?.findIndex((ilink) => ilink.nodeid === nodeID)
+            const ilinkAt = ilinks?.findIndex(ilink => ilink.nodeid === nodeID);
 
             if (ilinkAt) {
-              ilinks.splice(ilinkAt, 1, { ...ilinks[ilinkAt], path: nodePath })
+              ilinks.splice(ilinkAt, 1, { ...ilinks[ilinkAt], path: nodePath });
             }
           }
         } else if (pathIdMapping[nodePath] && !options?.allowDuplicates) {
           // mog(`Found existing notePath: ${nodePath} with ${nodeID} at index: ${pathIdMapping[nodePath].index}`)
-          ilinks[pathIdMapping[nodePath].index] = { nodeid: nodeID, path: nodePath }
+          ilinks[pathIdMapping[nodePath].index] = {
+            nodeid: nodeID,
+            path: nodePath,
+          };
         } else {
           // mog(`Inserting: ${nodePath} with ${nodeID} at index: ${ilinks.length}`)
-          idPathMapping[nodeID] = nodePath
-          pathIdMapping[nodePath] = { nodeid: nodeID, index: ilinks.length }
-          const ilink: ILink = { nodeid: nodeID, path: nodePath }
-          ilinks.push(options?.withParentNodeId ? { ...ilink, parentNodeId } : ilink)
+          idPathMapping[nodeID] = nodePath;
+          pathIdMapping[nodePath] = { nodeid: nodeID, index: ilinks.length };
+          const ilink: ILink = { nodeid: nodeID, path: nodePath };
+          ilinks.push(
+            options?.withParentNodeId ? { ...ilink, parentNodeId } : ilink
+          );
         }
 
-        prefix = nodePath
-        parentNodeId = nodeID
+        prefix = nodePath;
+        parentNodeId = nodeID;
       }
     }
 
-    return ilinks
-  }
-
+    return ilinks;
+  };
 
   decodeLinkHierarchy = (linkDatas: string[]): Promise<ILink[]> => {
     return new Promise((resolve, reject) => {
@@ -180,7 +190,7 @@ export class Transformer {
           reject(new Error('Invalid linkdata input'));
 
         let cumulativePath: string;
-        for (let index = 0; index < delimitedStrings.length;) {
+        for (let index = 0; index < delimitedStrings.length; ) {
           if (!cumulativePath) cumulativePath = delimitedStrings[index];
           else
             cumulativePath = cumulativePath.concat(
@@ -233,6 +243,7 @@ export class Transformer {
     const contentResponse = {
       id: nodeResponse.id,
       title: nodeResponse.title,
+      namespaceID: nodeResponse.namespaceID,
       content: content,
       metadata: metadata,
       ...(nodeResponse.id.startsWith(this.CAPTURES.SNIPPET) && {
@@ -243,40 +254,74 @@ export class Transformer {
     return contentResponse;
   };
 
-
-
   allNamespacesHierarchyParser: AllNamespaceHierarchyParserFn = (
     allNamespacesResp,
     nodesMetadata?,
     options = { withParentNodeId: false, allowDuplicates: false }
   ) => {
-    const parsedNSHierarchy: Record<string, ParsedNamespaceHierarchy> = {}
-    Object.entries(allNamespacesResp.namespaceInfo).forEach(([namespaceID, namespaceValue]) => {
-      const nHierarchy = this.hierarchyParser(namespaceValue.nodeHierarchy, options)
-      parsedNSHierarchy[namespaceID] = { name: namespaceValue.name, nodeHierarchy: nHierarchy }
-    })
+    const parsedNSHierarchy: Record<string, ParsedNamespaceHierarchy> = {};
+    Object.entries(allNamespacesResp.namespaceInfo).forEach(
+      ([namespaceID, namespaceValue]) => {
+        const nHierarchy = this.hierarchyParser(
+          namespaceValue.nodeHierarchy,
+          options
+        );
+        parsedNSHierarchy[namespaceID] = {
+          name: namespaceValue.name,
+          nodeHierarchy: nHierarchy,
+        };
+      }
+    );
 
     if (nodesMetadata) {
-      Object.entries(parsedNSHierarchy).forEach(([namespaceID, namespaceValue]) => {
-        namespaceValue.nodeHierarchy = namespaceValue.nodeHierarchy.map((ilink) => {
-          return {
-            ...ilink,
-            createdAt: nodesMetadata[ilink.nodeid]?.createdAt || Infinity,
-            updatedAt: nodesMetadata[ilink.nodeid]?.updatedAt || Infinity,
-            metadata: nodesMetadata[ilink.nodeid]?.metadata || undefined
-          }
-        })
-      })
+      Object.entries(parsedNSHierarchy).forEach(
+        ([namespaceID, namespaceValue]) => {
+          namespaceValue.nodeHierarchy = namespaceValue.nodeHierarchy.map(
+            ilink => {
+              return {
+                ...ilink,
+                createdAt: nodesMetadata[ilink.nodeid]?.createdAt || Infinity,
+                updatedAt: nodesMetadata[ilink.nodeid]?.updatedAt || Infinity,
+                metadata: nodesMetadata[ilink.nodeid]?.metadata || undefined,
+              };
+            }
+          );
+        }
+      );
     }
 
-    return parsedNSHierarchy
-  }
+    return parsedNSHierarchy;
+  };
 
   namespaceHierarchyParser = (
     namespace: NamespaceInfo,
     options = { withParentNodeId: false, allowDuplicates: false }
   ) => {
-    return { ...namespace, nodeHierarchy: this.hierarchyParser(namespace.nodeHierarchy, options) }
-  }
+    return {
+      ...namespace,
+      nodeHierarchy: this.hierarchyParser(namespace.nodeHierarchy, options),
+    };
+  };
 
+  refactoredPathsHierarchyParser = (
+    refactorChangedPaths: Record<
+      string,
+      { removedPaths: string[]; addedPaths: string[] }
+    >[],
+    options = { withParentNodeId: false, allowDuplicates: false }
+  ) => {
+    const parsedRefactorChangedPaths: Record<
+      string,
+      { addedPaths: ILinkWithMetadata[]; removedPaths: ILinkWithMetadata[] }
+    > = {};
+    refactorChangedPaths.forEach(record => {
+      Object.entries(record).forEach(([namespaceID, nsValue]) => {
+        parsedRefactorChangedPaths[namespaceID] = {
+          addedPaths: this.hierarchyParser(nsValue.addedPaths, options),
+          removedPaths: this.hierarchyParser(nsValue.removedPaths, options),
+        };
+      });
+    });
+    return parsedRefactorChangedPaths;
+  };
 }
