@@ -395,17 +395,16 @@ class NodeController {
         response.locals.idToken,
         requestDetail.data
       );
+      const { changedPaths } = refactorResp
+      const parsedChangedPathsRefactor = this._transformer.refactoredPathsHierarchyParser(changedPaths)
 
-      const { addedPaths, removedPaths } = refactorResp;
-      const addedILinks = this._transformer.linkHierarchyParser(addedPaths);
-      const removedILinks = this._transformer.linkHierarchyParser(removedPaths);
+      response.status(statusCodes.OK).json({ changedPaths: parsedChangedPathsRefactor })
 
-      response.status(statusCodes.OK).json({ addedILinks, removedILinks });
-      await this.updateILinkCache(
-        response.locals.userId,
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
+      // await this.updateILinkCache(
+      //   response.locals.userId,
+      //   response.locals.workspaceID,
+      //   response.locals.idToken
+      // );
     } catch (error) {
       next(error);
     }
