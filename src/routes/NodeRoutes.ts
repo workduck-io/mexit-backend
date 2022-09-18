@@ -10,7 +10,7 @@ export const initializeNodeRoutes = (
     nodeControllerObject.deleteArchivedNode
   );
   nodeControllerObject._router.put(
-    `${nodeControllerObject._urlPath}/archive`,
+    `${nodeControllerObject._urlPath}/archive/:namespaceID`,
     [AuthRequest],
     nodeControllerObject.archiveNode
   );
