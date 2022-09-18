@@ -314,19 +314,19 @@ class NodeController {
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'ArchiveNodeDetail');
-
       const archiveNodeResult = await this._nodeManager.archiveNode(
         response.locals.workspaceID,
         response.locals.idToken,
-        requestDetail.data
+        requestDetail.data,
+        request.params.namespaceID
       );
       response.status(statusCodes.OK).json(archiveNodeResult);
 
-      await this.updateILinkCache(
-        response.locals.userId,
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
+      // await this.updateILinkCache(
+      //   response.locals.userId,
+      //   response.locals.workspaceID,
+      //   response.locals.idToken
+      // );
     } catch (error) {
       next(error);
     }
@@ -347,11 +347,11 @@ class NodeController {
       );
       response.status(statusCodes.OK).json(archiveNodeResult);
 
-      await this.updateILinkCache(
-        response.locals.userId,
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
+      // await this.updateILinkCache(
+      //   response.locals.userId,
+      //   response.locals.workspaceID,
+      //   response.locals.idToken
+      // );
     } catch (error) {
       next(error);
     }

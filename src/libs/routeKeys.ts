@@ -4,7 +4,7 @@ export const RouteKeys = {
   getNode: 'GET /node/{id}',
   appendNode: 'POST /node/{id}/append',
   getArchivedNodes: 'GET /node/archive',
-  archiveNode: 'PUT /node/archive',
+  archiveNode: 'PUT /node/archive/{id}',
   unArchiveNode: 'PUT /node/unarchive',
   deleteArchivedNode: 'POST /node/archive/delete',
   editBlock: 'POST /node/{id}/blockUpdate',
