@@ -89,11 +89,11 @@ class NodeController {
 
       response.status(statusCodes.OK).json(nodeResult);
 
-      await this.updateILinkCache(
-        response.locals.userId,
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
+      // await this.updateILinkCache(
+      //   response.locals.userId,
+      //   response.locals.workspaceID,
+      //   response.locals.idToken
+      // );
     } catch (error) {
       next(error);
     }
@@ -424,22 +424,18 @@ class NodeController {
         response.locals.idToken,
         requestDetail.data
       );
-
-      const { addedPaths, removedPaths, node } = bulkCreateResp;
-      const addedILinks = this._transformer.linkHierarchyParser(addedPaths);
-      const removedILinks = this._transformer.linkHierarchyParser(removedPaths);
-
-      const createdNode = JSON.parse(node) as NodeResponse;
+      const { node, changedPaths } = bulkCreateResp
+      const parsedChangedPathsRefactor = this._transformer.refactoredPathsHierarchyParser(changedPaths)
 
       response
         .status(statusCodes.OK)
-        .json({ addedILinks, removedILinks, node: createdNode });
+        .json({ node, changedPaths: parsedChangedPathsRefactor });
 
-      await this.updateILinkCache(
-        response.locals.userId,
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
+      // await this.updateILinkCache(
+      //   response.locals.userId,
+      //   response.locals.workspaceID,
+      //   response.locals.idToken
+      // );
     } catch (error) {
       next(error);
     }

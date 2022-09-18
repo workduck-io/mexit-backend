@@ -78,8 +78,9 @@ export interface ContentBlock {
 export interface ContentNode {
   id: string;
   title: string;
+  referenceID?: string
+  namespaceID: string
   content?: any[];
-  referenceID?: string;
   range?: {
     startMeta: {
       parentTagName: string;
@@ -97,10 +98,7 @@ export interface ContentNode {
     metaTags?: MetaTag[];
     userTags?: UserTag[];
   };
-  type?: string;
   nodePath?: string;
-  appendNodeUID?: string;
-  createNodeUID?: string;
 }
 
 export interface ClientNode {
