@@ -24,56 +24,6 @@ class NodeController {
     initializeNodeRoutes(this);
   }
 
-  updateILinkCache = async (
-    userId: string,
-    workspaceId: string,
-    idToken: string
-  ): Promise<any> => {
-    const linkDataRaw = await this._nodeManager.getLinkHierarchy(
-      workspaceId,
-      idToken
-    );
-    const linkDataResult = this._transformer.linkHierarchyParser(linkDataRaw);
-
-    this._cache.replaceAndSet(userId, this._linkHierarchyLabel, linkDataResult);
-
-    return this._cache.get(userId, this._linkHierarchyLabel);
-  };
-
-  getLinkHierarchy = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      let linkDataResult;
-
-      if (this._cache.has(response.locals.userId, this._linkHierarchyLabel)) {
-        linkDataResult = await this._cache.get(
-          response.locals.userId,
-          this._linkHierarchyLabel
-        );
-      } else {
-        const linkDataRaw = await this._nodeManager.getLinkHierarchy(
-          response.locals.workspaceID,
-          response.locals.idToken
-        );
-
-        linkDataResult = this._transformer.linkHierarchyParser(linkDataRaw);
-
-        this._cache.set(
-          response.locals.userId,
-          this._linkHierarchyLabel,
-          linkDataResult
-        );
-      }
-
-      response.status(statusCodes.OK).json(linkDataResult);
-    } catch (error) {
-      next(error);
-    }
-  };
-
   createNode = async (
     request: Request,
     response: Response,
@@ -117,24 +67,6 @@ class NodeController {
     }
   };
 
-  getAllNodes = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const result = await this._nodeManager.getAllNodes(
-        request.params.userId,
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
-
-      response.status(statusCodes.OK).json(result);
-    } catch (error) {
-      next(error);
-    }
-  };
-
   appendNode = async (
     request: Request,
     response: Response,
@@ -151,11 +83,11 @@ class NodeController {
 
       response.status(statusCodes.OK).json(result);
 
-      await this.updateILinkCache(
-        response.locals.userId,
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
+      // await this.updateILinkCache(
+      //   response.locals.userId,
+      //   response.locals.workspaceID,
+      //   response.locals.idToken
+      // );
     } catch (error) {
       next(error);
     }
@@ -236,12 +168,12 @@ class NodeController {
         nodeDetail
       );
 
-      // update the Link hierarchy cache
-      await this.updateILinkCache(
-        response.locals.userId,
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
+      // // update the Link hierarchy cache
+      // await this.updateILinkCache(
+      //   response.locals.userId,
+      //   response.locals.workspaceID,
+      //   response.locals.idToken
+      // );
     } catch (error) {
       next(error);
     }
@@ -372,11 +304,11 @@ class NodeController {
       );
       response.status(statusCodes.OK).json(archiveNodeResult);
 
-      await this.updateILinkCache(
-        response.locals.userId,
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
+      // await this.updateILinkCache(
+      //   response.locals.userId,
+      //   response.locals.workspaceID,
+      //   response.locals.idToken
+      // );
     } catch (error) {
       next(error);
     }

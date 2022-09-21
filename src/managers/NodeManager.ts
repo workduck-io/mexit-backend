@@ -16,29 +16,6 @@ export class NodeManager {
   private _workspaceLambdaFunctionName = `mex-backend-${STAGE}-Workspace`;
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
-  async getLinkHierarchy(workspaceId: string, idToken: string): Promise<any> {
-    try {
-      const result = await this._lambda.invokeAndCheck(
-        this._workspaceLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.getLinkHierarchy,
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-          queryStringParameters: { getMetadata: true },
-        }
-      );
-      return result;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
-  }
-
   async createNode(
     workspaceId: string,
     idToken: string,
@@ -81,33 +58,6 @@ export class NodeManager {
           pathParameters: { id: nodeId },
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
           ...(queryParams && { queryStringParameters: queryParams }),
-        }
-      );
-      return result;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
-  }
-
-  async getAllNodes(
-    userId: string,
-    workspaceId: string,
-    idToken: string
-  ): Promise<any> {
-    try {
-      const result = await this._lambda.invokeAndCheck(
-        this._nodeLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.getAllNodes,
-          pathParameters: { id: userId },
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
       return result;

@@ -4,6 +4,11 @@ import { AuthRequest } from '../middlewares/authrequest';
 export const initializeNodeRoutes = (
   nodeControllerObject: NodeController
 ): void => {
+  nodeControllerObject._router.get(
+    `${nodeControllerObject._urlPath}/:nodeId/`,
+    [AuthRequest],
+    nodeControllerObject.getNode
+  );
   nodeControllerObject._router.post(
     `${nodeControllerObject._urlPath}/archive/delete`,
     [AuthRequest],
@@ -29,25 +34,10 @@ export const initializeNodeRoutes = (
     [AuthRequest],
     nodeControllerObject.appendNode
   );
-  nodeControllerObject._router.get(
-    `${nodeControllerObject._urlPath}/linkhierarchy`,
-    [AuthRequest],
-    nodeControllerObject.getLinkHierarchy
-  );
   nodeControllerObject._router.post(
     `${nodeControllerObject._urlPath}/capture/link`,
     [AuthRequest],
     nodeControllerObject.createLinkCapture
-  );
-  nodeControllerObject._router.get(
-    `${nodeControllerObject._urlPath}/:nodeId/`,
-    [AuthRequest],
-    nodeControllerObject.getNode
-  );
-  nodeControllerObject._router.get(
-    `${nodeControllerObject._urlPath}/all/:userId`,
-    [AuthRequest],
-    nodeControllerObject.getAllNodes
   );
   nodeControllerObject._router.post(
     `${nodeControllerObject._urlPath}/block/movement`,
