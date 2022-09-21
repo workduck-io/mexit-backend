@@ -25,13 +25,13 @@ export const initializeNamespaceRoutes = (
   );
 
   nsObject._router.patch(
-    `${nsObject._urlPath}/:namespaceID/makePublic`,
+    `${nsObject._urlPath}/makePublic/:namespaceID`,
     [AuthRequest],
     nsObject.makeNamespacePublic
   );
 
   nsObject._router.patch(
-    `${nsObject._urlPath}/:namespaceID/makePrivate`,
+    `${nsObject._urlPath}/makePrivate/:namespaceID`,
     [AuthRequest],
     nsObject.makeNamespacePrivate
   );
