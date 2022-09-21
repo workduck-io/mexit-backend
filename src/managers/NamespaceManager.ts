@@ -84,7 +84,7 @@ export class NamespaceManager {
 
   async makeNamespacePublic(workspaceId: string, idToken: string, namespaceId: string): Promise<any> {
     try {
-      const result = this._lambda.invokeAndCheck(
+      const result = await this._lambda.invokeAndCheck(
         this._namespaceLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -107,7 +107,8 @@ export class NamespaceManager {
 
   async makeNamespacePrivate(workspaceId: string, idToken: string, namespaceId: string): Promise<any> {
     try {
-      const result = this._lambda.invokeAndCheck(
+      console.log(`Make Private: ${namespaceId}`)
+      const result = await this._lambda.invokeAndCheck(
         this._namespaceLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -116,6 +117,7 @@ export class NamespaceManager {
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken }
         }
       );
+      console.log(`Make Private Result: `, result)
       return result;
     } catch (error) {
       errorlib({
@@ -130,7 +132,7 @@ export class NamespaceManager {
 
   async getPublicNamespace(workspaceId: string, idToken: string, namespaceId: string): Promise<any> {
     try {
-      const result = this._lambda.invokeAndCheck(
+      const result = await this._lambda.invokeAndCheck(
         this._namespaceLambdaFunctionName,
         this._lambdaInvocationType,
         {
@@ -153,7 +155,7 @@ export class NamespaceManager {
 
   async getAllNamespaceHierarchy(workspaceId: string, idToken: string, getMetadata = false): Promise<any> {
     try {
-      const result = this._lambda.invokeAndCheck(
+      const result = await this._lambda.invokeAndCheck(
         this._namespaceLambdaFunctionName,
         this._lambdaInvocationType,
         {
