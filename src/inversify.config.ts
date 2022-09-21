@@ -10,6 +10,7 @@ import { SnippetManager } from './managers/SnippetManager';
 import { BookmarkManager } from './managers/BookmarkManager';
 import { TagManager } from './managers/TagManager';
 import { SharedManager } from './managers/SharedManager';
+import { NamespaceManager } from './managers/NamespaceManager';
 
 const container = new Container();
 
@@ -36,4 +37,6 @@ container
   .bind<BookmarkManager>(BookmarkManager)
   .to(BookmarkManager)
   .inSingletonScope();
+container.bind<NamespaceManager>(NamespaceManager).to(NamespaceManager).inSingletonScope()
+
 export default container;
