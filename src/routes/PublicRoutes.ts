@@ -9,5 +9,12 @@ export const initializePublicRoutes = (
     [PublicRequest],
     publicControllerObject.getPublicNode
   );
+
+  publicControllerObject._router.get(
+    `${publicControllerObject._urlPath}/namespace/:namespaceID`,
+    [PublicRequest],
+    publicControllerObject.getPublicNamespace
+  )
+
   return;
 };

@@ -37,12 +37,6 @@ export const initializeNamespaceRoutes = (
   );
 
   nsObject._router.get(
-    `${nsObject._urlPath}/public/:namespaceID`,
-    [PublicRequest],
-    nsObject.getPublicNamespace
-  );
-
-  nsObject._router.get(
     `${nsObject._urlPath}/all/hierarchy`,
     [AuthRequest],
     nsObject.getAllNamespaceHierarchy

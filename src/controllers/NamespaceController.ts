@@ -88,22 +88,6 @@ class NamespaceController {
     }
   }
 
-  getPublicNamespace = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
-    try {
-      const publicNamespace = await this._namespaceManager.getPublicNamespace(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.namespaceID
-      )
-
-      const parsedPublicNS = this._transformer.namespaceHierarchyParser(publicNamespace)
-      response.status(statusCodes.OK).json(parsedPublicNS)
-
-
-    } catch (error) {
-      next(error);
-    }
-  }
 
   getAllNamespaceHierarchy = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
