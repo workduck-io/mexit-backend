@@ -9,6 +9,9 @@ on:
 jobs:
   Jest:
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+      YARN_TOKEN: ${{ secrets.YARN_TOKEN }}
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v2
