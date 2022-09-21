@@ -23,6 +23,7 @@ import UserController from './controllers/UserController';
 import responseErrorHandler from './middlewares/responseErrorHandler';
 import HealthCheckController from './controllers/HealthCheckController';
 import { wdRequestIdExpressParser } from '@workduck-io/wd-request-id-parser';
+import NamespaceController from './controllers/NamespaceController';
 
 class App {
   public _app: express.Application;
@@ -82,6 +83,7 @@ const application = new App([
   new SnippetController(),
   new TagController(),
   new UserController(),
+  new NamespaceController(),
 ]);
 
 application.build();

@@ -78,8 +78,9 @@ export interface ContentBlock {
 export interface ContentNode {
   id: string;
   title: string;
+  referenceID?: string
+  namespaceID: string
   content?: any[];
-  referenceID?: string;
   range?: {
     startMeta: {
       parentTagName: string;
@@ -97,10 +98,7 @@ export interface ContentNode {
     metaTags?: MetaTag[];
     userTags?: UserTag[];
   };
-  type?: string;
   nodePath?: string;
-  appendNodeUID?: string;
-  createNodeUID?: string;
 }
 
 export interface ClientNode {
@@ -160,16 +158,20 @@ export interface CopyOrMoveBlock {
   action: 'move';
 }
 
+
 export interface ILink {
   /** Unique Identifier */
-  nodeid: string;
+  nodeid: string
 
   /** The title of the node.
-   * Uses separator for hierarchy */
-  path: string;
+   * Uses separator for heirarchy */
+  path: string
 
   /** Iconify Icon string */
-  icon?: string;
+  icon?: string
 
-  createdAt?: number;
+  createdAt?: number
+
+  parentNodeId?: string
 }
+

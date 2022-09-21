@@ -4,13 +4,13 @@ export interface NodeResponse {
   id: string;
   title?: string;
   data: NodeDataResponse[];
+  namespaceID: string;
   lastEditedBy: string;
   createdBy: string;
   createdAt: number;
   updatedAt: number;
   itemType: string;
   version: number;
-  namespaceID: string;
   workspaceIdentifier: string;
   bookmarked: boolean | null;
   template?: boolean;
