@@ -5,6 +5,12 @@ import { NodeResponse } from '../interfaces/Response';
 import { NodeMetadata } from '../interfaces/Node';
 import { deserializeContent } from './serialize';
 
+
+interface IconMetadata {
+  type: string
+  value: string
+}
+
 interface ILinkNodeMetadata {
   metadata?: { iconUrl?: string };
   updatedAt?: number;
@@ -32,16 +38,17 @@ export interface NamespaceInfo {
 
 interface ILinkWithMetadata extends ILink {
   updatedAt?: number;
-  metadata?: any;
+  metadata?: { icon?: IconMetadata };
 }
 
 export interface ParsedNamespaceHierarchy {
   name: string;
   nodeHierarchy: ILinkWithMetadata[];
+  namespaceMetadata?: { icon: IconMetadata }
 }
 
 export type AllNamespaceHierarchyResponse = {
-  namespaceInfo: Record<string, { name: string; nodeHierarchy: string[] }>;
+  namespaceInfo: Record<string, { name: string; nodeHierarchy: string[], namespaceMetadata?: { icon: IconMetadata } }>;
 };
 export type ParsedAllNamespacesHierarchy = Record<
   string,
@@ -190,7 +197,7 @@ export class Transformer {
           reject(new Error('Invalid linkdata input'));
 
         let cumulativePath: string;
-        for (let index = 0; index < delimitedStrings.length; ) {
+        for (let index = 0; index < delimitedStrings.length;) {
           if (!cumulativePath) cumulativePath = delimitedStrings[index];
           else
             cumulativePath = cumulativePath.concat(
@@ -269,6 +276,7 @@ export class Transformer {
         parsedNSHierarchy[namespaceID] = {
           name: namespaceValue.name,
           nodeHierarchy: nHierarchy,
+          namespaceMetadata: namespaceValue.namespaceMetadata
         };
       }
     );
