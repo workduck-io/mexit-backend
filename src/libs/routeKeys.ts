@@ -5,7 +5,7 @@ export const RouteKeys = {
   appendNode: 'POST /node/{id}/append',
   editBlock: 'POST /node/{id}/blockUpdate',
   refactorHierarchy: 'POST /node/refactor',
-  bulkCreateNode: 'POST /node/bulkCreate',
+  bulkCreateNode: 'POST /node/bulk',
   copyOrMoveBlock: 'PATCH /node/block/movement',
   makeNodePublic: 'PATCH /node/makePublic/{id}',
   makeNodePrivate: 'PATCH /node/makePrivate/{id}',
