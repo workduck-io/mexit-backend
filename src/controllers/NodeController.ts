@@ -7,8 +7,8 @@ import { Transformer } from '../libs/TransformerClass';
 import { ShortenerManager } from '../managers/ShortenerManager';
 import { NodeResponse } from '../interfaces/Response';
 import { Cache } from '../libs/CacheClass';
-import GuidGenerator from '../libs/GuidGenerator';
 import { initializeNodeRoutes } from '../routes/NodeRoutes';
+import { NamespaceManager } from '../managers/NamespaceManager';
 
 class NodeController {
   public _urlPath = '/node';
@@ -18,11 +18,37 @@ class NodeController {
     container.get<ShortenerManager>(ShortenerManager);
   public _transformer: Transformer = container.get<Transformer>(Transformer);
   private _cache: Cache = container.get<Cache>(Cache);
-  private _linkHierarchyLabel = 'LINKHIERARCHY';
+  private _NSHierarchyLabel = 'NSHIERARCHY';
+  private _nsManager: NamespaceManager =
+    container.get<NamespaceManager>(NamespaceManager);
 
   constructor() {
     initializeNodeRoutes(this);
   }
+
+  updateILinkCache = async (
+    userId: string,
+    workspaceId: string,
+    idToken: string
+  ): Promise<any> => {
+    const nsHierarchy = await this._nsManager.getAllNamespaceHierarchy(
+      workspaceId,
+      idToken,
+      true
+    );
+
+    const { hierarchy, nodesMetadata } = nsHierarchy;
+    const parsedNamespaceHierarchy =
+      this._transformer.allNamespacesHierarchyParser(hierarchy, nodesMetadata);
+
+    this._cache.replaceAndSet(
+      userId,
+      this._NSHierarchyLabel,
+      parsedNamespaceHierarchy
+    );
+
+    return this._cache.get(userId, this._NSHierarchyLabel);
+  };
 
   createNode = async (
     request: Request,
