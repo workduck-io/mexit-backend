@@ -12,25 +12,23 @@ import { STAGE } from '../env';
 @injectable()
 export class BookmarkManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
-  private _userLambdaFunctionName = `mex-backend-${STAGE}-UserBookmark`;
+  private _userStarLambdaFunctionName = `mex-backend-${STAGE}-UserStar`;
 
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
   async createBookmark(
-    nodeID: string,
-    userID: string,
     workspaceId: string,
-    idToken: string
+    idToken: string,
+    nodeID: string
   ): Promise<any> {
     try {
       const result = await this._lambda.invokeAndCheck(
-        this._userLambdaFunctionName,
+        this._userStarLambdaFunctionName,
         this._lambdaInvocationType,
         {
           routeKey: RouteKeys.createBookmark,
           headers: { authorization: idToken, 'mex-workspace-id': workspaceId },
-          pathParameters: { userID, nodeID },
-          payload: { type: 'BookmarkRequest' },
+          pathParameters: { id: nodeID },
         }
       );
 
@@ -45,21 +43,20 @@ export class BookmarkManager {
       });
     }
   }
+
   async removeBookmark(
-    nodeID: string,
-    userID: string,
     workspaceId: string,
-    idToken: string
+    idToken: string,
+    nodeID: string
   ): Promise<any> {
     try {
       const result = await this._lambda.invokeAndCheck(
-        this._userLambdaFunctionName,
+        this._userStarLambdaFunctionName,
         this._lambdaInvocationType,
         {
           routeKey: RouteKeys.removeBookmark,
           headers: { authorization: idToken, 'mex-workspace-id': workspaceId },
-          pathParameters: { userID, nodeID },
-          payload: { type: 'BookmarkRequest' },
+          pathParameters: { id: nodeID },
         }
       );
 
@@ -76,18 +73,16 @@ export class BookmarkManager {
   }
 
   async getAllBookmarksForUser(
-    userID: string,
     workspaceId: string,
     idToken: string
   ): Promise<any> {
     try {
       const result = await this._lambda.invokeAndCheck(
-        this._userLambdaFunctionName,
+        this._userStarLambdaFunctionName,
         this._lambdaInvocationType,
         {
           routeKey: RouteKeys.getAllBookmarks,
           headers: { authorization: idToken, 'mex-workspace-id': workspaceId },
-          pathParameters: { userID },
         }
       );
 
@@ -95,6 +90,62 @@ export class BookmarkManager {
     } catch (error) {
       errorlib({
         message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+
+  async batchCreateBookmarks(
+    workspaceId: string,
+    idToken: string,
+    requestBody: { ids: string[] }
+  ): Promise<any> {
+    try {
+      const result = await this._lambda.invokeAndCheck(
+        this._userStarLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.batchCreateBookmark,
+          payload: requestBody,
+          headers: { authorization: idToken, 'mex-workspace-id': workspaceId },
+        }
+      );
+
+      return result;
+    } catch (error) {
+      errorlib({
+        message: error.messsage,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+
+  async batchRemoveBookmarks(
+    workspaceId: string,
+    idToken: string,
+    requestBody: { ids: string[] }
+  ): Promise<any> {
+    try {
+      const result = await this._lambda.invokeAndCheck(
+        this._userStarLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.batchRemoveBookmark,
+          payload: requestBody,
+          headers: { authorization: idToken, 'mex-workspace-id': workspaceId },
+        }
+      );
+
+      return result;
+    } catch (error) {
+      errorlib({
+        message: error.messsage,
         errorCode: error.statusCode,
         errorObject: error,
         statusCode: statusCodes.INTERNAL_SERVER_ERROR,
