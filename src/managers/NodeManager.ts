@@ -224,7 +224,6 @@ export class NodeManager {
     namespaceID: string
   ): Promise<any> {
     try {
-      console.log(`Archive Payload: ${archivePayload} | NamespaceID: ${namespaceID}`)
       const result = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
         this._lambdaInvocationType,

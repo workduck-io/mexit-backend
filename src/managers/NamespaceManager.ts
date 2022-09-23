@@ -1,6 +1,6 @@
-import { injectable } from 'inversify'
+import { injectable } from 'inversify';
 
-import { errorlib } from '../libs/errorlib'
+import { errorlib } from '../libs/errorlib';
 import { statusCodes } from '../libs/statusCodes';
 import container from '../inversify.config';
 import { Lambda, InvocationType } from '../libs/LambdaClass';
@@ -13,7 +13,11 @@ export class NamespaceManager {
   private _namespaceLambdaFunctionName = `mex-backend-${STAGE}-Namespace`;
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
-  async createNamespace(workspaceId: string, idToken: string, namespaceDetail: { name: string }): Promise<any> {
+  async createNamespace(
+    workspaceId: string,
+    idToken: string,
+    namespaceDetail: { name: string }
+  ): Promise<any> {
     try {
       const result = await this._lambda.invokeAndCheck(
         this._namespaceLambdaFunctionName,
@@ -21,7 +25,7 @@ export class NamespaceManager {
         {
           routeKey: RouteKeys.createNamespace,
           payload: { ...namespaceDetail, type: 'NamespaceRequest' },
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken }
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
       return result;
@@ -36,7 +40,11 @@ export class NamespaceManager {
     }
   }
 
-  async getNamespace(workspaceId: string, idToken: string, namespaceId: string): Promise<any> {
+  async getNamespace(
+    workspaceId: string,
+    idToken: string,
+    namespaceId: string
+  ): Promise<any> {
     try {
       const result = await this._lambda.invokeAndCheck(
         this._namespaceLambdaFunctionName,
@@ -44,7 +52,7 @@ export class NamespaceManager {
         {
           routeKey: RouteKeys.getNamespace,
           pathParameters: { id: namespaceId },
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken }
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
       return result;
@@ -59,15 +67,19 @@ export class NamespaceManager {
     }
   }
 
-  async updateNamespace(workspaceId: string, idToken: string, namespaceDetail: { name: string }): Promise<any> {
+  async updateNamespace(
+    workspaceId: string,
+    idToken: string,
+    namespaceDetail: { name: string }
+  ): Promise<any> {
     try {
       const result = await this._lambda.invoke(
         this._namespaceLambdaFunctionName,
         this._lambdaInvocationType,
         {
           routeKey: RouteKeys.updateNamespace,
-          payload: { ...namespaceDetail, type: "NamespaceRequest" },
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken }
+          payload: { ...namespaceDetail, type: 'NamespaceRequest' },
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
       return result;
@@ -82,7 +94,11 @@ export class NamespaceManager {
     }
   }
 
-  async makeNamespacePublic(workspaceId: string, idToken: string, namespaceId: string): Promise<any> {
+  async makeNamespacePublic(
+    workspaceId: string,
+    idToken: string,
+    namespaceId: string
+  ): Promise<any> {
     try {
       const result = await this._lambda.invokeAndCheck(
         this._namespaceLambdaFunctionName,
@@ -90,7 +106,7 @@ export class NamespaceManager {
         {
           routeKey: RouteKeys.makeNamespacePublic,
           pathParameters: { id: namespaceId },
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken }
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
       return result;
@@ -105,19 +121,21 @@ export class NamespaceManager {
     }
   }
 
-  async makeNamespacePrivate(workspaceId: string, idToken: string, namespaceId: string): Promise<any> {
+  async makeNamespacePrivate(
+    workspaceId: string,
+    idToken: string,
+    namespaceId: string
+  ): Promise<any> {
     try {
-      console.log(`Make Private: ${namespaceId}`)
       const result = await this._lambda.invokeAndCheck(
         this._namespaceLambdaFunctionName,
         this._lambdaInvocationType,
         {
           routeKey: RouteKeys.makeNamespacePrivate,
           pathParameters: { id: namespaceId },
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken }
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
-      console.log(`Make Private Result: `, result)
       return result;
     } catch (error) {
       errorlib({
@@ -130,7 +148,11 @@ export class NamespaceManager {
     }
   }
 
-  async getPublicNamespace(workspaceId: string, idToken: string, namespaceId: string): Promise<any> {
+  async getPublicNamespace(
+    workspaceId: string,
+    idToken: string,
+    namespaceId: string
+  ): Promise<any> {
     try {
       const result = await this._lambda.invokeAndCheck(
         this._namespaceLambdaFunctionName,
@@ -138,7 +160,7 @@ export class NamespaceManager {
         {
           routeKey: RouteKeys.getPublicNamespace,
           pathParameters: { id: namespaceId },
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken }
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
       return result;
@@ -153,7 +175,11 @@ export class NamespaceManager {
     }
   }
 
-  async getAllNamespaceHierarchy(workspaceId: string, idToken: string, getMetadata = false): Promise<any> {
+  async getAllNamespaceHierarchy(
+    workspaceId: string,
+    idToken: string,
+    getMetadata = false
+  ): Promise<any> {
     try {
       const result = await this._lambda.invokeAndCheck(
         this._namespaceLambdaFunctionName,
@@ -161,7 +187,7 @@ export class NamespaceManager {
         {
           routeKey: RouteKeys.getAllNamespaceHierarchy,
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-          queryStringParameters: { getMetadata: getMetadata }
+          queryStringParameters: { getMetadata: getMetadata },
         }
       );
       return result;
