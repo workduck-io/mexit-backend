@@ -64,12 +64,11 @@ class NodeController {
       );
 
       response.status(statusCodes.OK).json(nodeResult);
-
-      // await this.updateILinkCache(
-      //   response.locals.userId,
-      //   response.locals.workspaceID,
-      //   response.locals.idToken
-      // );
+      await this.updateILinkCache(
+        response.locals.userId,
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
     } catch (error) {
       next(error);
     }
@@ -109,11 +108,11 @@ class NodeController {
 
       response.status(statusCodes.OK).json(result);
 
-      // await this.updateILinkCache(
-      //   response.locals.userId,
-      //   response.locals.workspaceID,
-      //   response.locals.idToken
-      // );
+      await this.updateILinkCache(
+        response.locals.userId,
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
     } catch (error) {
       next(error);
     }
@@ -194,11 +193,11 @@ class NodeController {
       );
       response.status(statusCodes.OK).json(archiveNodeResult);
 
-      // await this.updateILinkCache(
-      //   response.locals.userId,
-      //   response.locals.workspaceID,
-      //   response.locals.idToken
-      // );
+      await this.updateILinkCache(
+        response.locals.userId,
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
     } catch (error) {
       next(error);
     }
@@ -219,11 +218,11 @@ class NodeController {
       );
       response.status(statusCodes.OK).json(archiveNodeResult);
 
-      // await this.updateILinkCache(
-      //   response.locals.userId,
-      //   response.locals.workspaceID,
-      //   response.locals.idToken
-      // );
+      await this.updateILinkCache(
+        response.locals.userId,
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
     } catch (error) {
       next(error);
     }
@@ -244,11 +243,11 @@ class NodeController {
       );
       response.status(statusCodes.OK).json(archiveNodeResult);
 
-      // await this.updateILinkCache(
-      //   response.locals.userId,
-      //   response.locals.workspaceID,
-      //   response.locals.idToken
-      // );
+      await this.updateILinkCache(
+        response.locals.userId,
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
     } catch (error) {
       next(error);
     }
@@ -275,11 +274,11 @@ class NodeController {
         .status(statusCodes.OK)
         .json({ changedPaths: parsedChangedPathsRefactor });
 
-      // await this.updateILinkCache(
-      //   response.locals.userId,
-      //   response.locals.workspaceID,
-      //   response.locals.idToken
-      // );
+      await this.updateILinkCache(
+        response.locals.userId,
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
     } catch (error) {
       next(error);
     }
@@ -306,11 +305,11 @@ class NodeController {
         .status(statusCodes.OK)
         .json({ node, changedPaths: parsedChangedPathsRefactor });
 
-      // await this.updateILinkCache(
-      //   response.locals.userId,
-      //   response.locals.workspaceID,
-      //   response.locals.idToken
-      // );
+      await this.updateILinkCache(
+        response.locals.userId,
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
     } catch (error) {
       next(error);
     }
