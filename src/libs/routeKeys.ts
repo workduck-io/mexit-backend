@@ -3,13 +3,11 @@ export const RouteKeys = {
   createNode: 'POST /node',
   getNode: 'GET /node/{id}',
   appendNode: 'POST /node/{id}/append',
-  editBlock: 'POST /node/{id}/blockUpdate',
   refactorHierarchy: 'POST /node/refactor',
   bulkCreateNode: 'POST /node/bulk',
   copyOrMoveBlock: 'PATCH /node/block/movement',
   makeNodePublic: 'PATCH /node/makePublic/{id}',
   makeNodePrivate: 'PATCH /node/makePrivate/{id}',
-  getPublicNode: 'GET /node/public/{id}',
 
   // Node Archive Operations
   getArchivedNodes: 'GET /node/archive',
@@ -24,14 +22,16 @@ export const RouteKeys = {
   getByGroupId: 'GET /user/group/{groupId}',
   updateUserPreference: 'POST /user/update',
   createUserPreference: 'POST /user',
+  getUserByLinkedin: 'POST /user/linkedin',
 
-  // Snippet Ops
+  // Shared Note Ops
   shareNode: 'POST /shared/node',
   updateAccessTypeForshareNode: 'PUT /shared/node',
   revokeNodeAccessForUsers: 'DELETE /shared/node',
   getNodeSharedWithUser: 'GET /shared/node/{nodeID}',
   updateSharedNode: 'POST /shared/node/update',
   getUsersWithNodesShared: 'GET /shared/node/{id}/users',
+  getAllSharedNodeForUser: 'GET /shared/node/all',
 
   // Snippet Ops
   getSnippet: 'GET /snippet/{id}',
@@ -40,18 +40,15 @@ export const RouteKeys = {
   createSnippet: 'POST /snippet',
   makeSnippetPublic: 'PATCH /snippet/makePublic/{id}/{version}',
   makeSnippetPrivate: 'PATCH /snippet/makePrivate/{id}/{version}',
-  getPublicSnippet: 'GET /snippet/public/{id}/{version}',
   clonePublicSnippet: 'POST /snippet/clone/{id}/{version}',
 
   shorten: 'POST /shorten',
   getShorts: 'GET /{namespace}/stats',
-  getUserByLinkedin: 'POST /user/linkedin',
   createBookmark: 'POST /userBookmark/{userID}/{nodeID}',
   removeBookmark: 'PATCH /userBookmark/{userID}/{nodeID}',
   getAllBookmarks: 'GET /userBookmark/{userID}',
   getAllTagsOfWorkspace: 'GET /tag/all',
   getNodeWithTag: 'GET /tag/{tagName}/node',
-  getAllSharedNodeForUser: 'GET /shared/node/all',
 
   // Namespace Ops - CRUD, Fetch Hierarchy
   createNamespace: 'POST /namespace',
@@ -59,6 +56,10 @@ export const RouteKeys = {
   updateNamespace: 'PATCH /namespace',
   makeNamespacePublic: 'PATCH /namespace/makePublic/{id}',
   makeNamespacePrivate: 'PATCH /namespace/makePrivate/{id}',
+  getAllNamespaceHierarchy: 'GET /namespace/all/hierarchy',
+
+  // Public Namespace, Node and Snippet Ops
+  getPublicNode: 'GET /node/public/{id}',
   getPublicNamespace: 'GET /namespace/public/{id}',
-  getAllNamespaceHierarchy: 'GET /namespace/all/hierarchy'
+  getPublicSnippet: 'GET /snippet/public/{id}/{version}'
 };
