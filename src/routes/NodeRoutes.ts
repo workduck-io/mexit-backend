@@ -29,7 +29,7 @@ export const initializeNodeRoutes = (
   );
 
   nodeControllerObject._router.post(
-    `${nodeControllerObject._urlPath}/bulkCreate`,
+    `${nodeControllerObject._urlPath}/bulk`,
     [AuthRequest],
     nodeControllerObject.bulkCreateNode
   );
