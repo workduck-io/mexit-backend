@@ -42,11 +42,18 @@ export const RouteKeys = {
   makeSnippetPrivate: 'PATCH /snippet/makePrivate/{id}/{version}',
   clonePublicSnippet: 'POST /snippet/clone/{id}/{version}',
 
+  // Shortener Endpoints
   shorten: 'POST /shorten',
   getShorts: 'GET /{namespace}/stats',
-  createBookmark: 'POST /userBookmark/{userID}/{nodeID}',
-  removeBookmark: 'PATCH /userBookmark/{userID}/{nodeID}',
-  getAllBookmarks: 'GET /userBookmark/{userID}',
+
+  // User Star (Bookmark) Endpoints
+  createBookmark: 'POST /userStar/{id}',
+  removeBookmark: 'DELETE /userStar/{id}',
+  getAllBookmarks: 'GET /userStar/all',
+  batchCreateBookmark: 'POST /userStar/batch',
+  batchRemoveBookmark: 'DELETE /userStar/batch',
+
+  // Tags Endpoints
   getAllTagsOfWorkspace: 'GET /tag/all',
   getNodeWithTag: 'GET /tag/{tagName}/node',
 
@@ -61,5 +68,5 @@ export const RouteKeys = {
   // Public Namespace, Node and Snippet Ops
   getPublicNode: 'GET /node/public/{id}',
   getPublicNamespace: 'GET /namespace/public/{id}',
-  getPublicSnippet: 'GET /snippet/public/{id}/{version}'
+  getPublicSnippet: 'GET /snippet/public/{id}/{version}',
 };
