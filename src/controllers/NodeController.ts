@@ -7,8 +7,8 @@ import { Transformer } from '../libs/TransformerClass';
 import { ShortenerManager } from '../managers/ShortenerManager';
 import { NodeResponse } from '../interfaces/Response';
 import { Cache } from '../libs/CacheClass';
-import GuidGenerator from '../libs/GuidGenerator';
 import { initializeNodeRoutes } from '../routes/NodeRoutes';
+import { NamespaceManager } from '../managers/NamespaceManager';
 
 class NodeController {
   public _urlPath = '/node';
@@ -18,11 +18,37 @@ class NodeController {
     container.get<ShortenerManager>(ShortenerManager);
   public _transformer: Transformer = container.get<Transformer>(Transformer);
   private _cache: Cache = container.get<Cache>(Cache);
-  private _linkHierarchyLabel = 'LINKHIERARCHY';
+  private _NSHierarchyLabel = 'NSHIERARCHY';
+  private _nsManager: NamespaceManager =
+    container.get<NamespaceManager>(NamespaceManager);
 
   constructor() {
     initializeNodeRoutes(this);
   }
+
+  updateILinkCache = async (
+    userId: string,
+    workspaceId: string,
+    idToken: string
+  ): Promise<any> => {
+    const nsHierarchy = await this._nsManager.getAllNamespaceHierarchy(
+      workspaceId,
+      idToken,
+      true
+    );
+
+    const { hierarchy, nodesMetadata } = nsHierarchy;
+    const parsedNamespaceHierarchy =
+      this._transformer.allNamespacesHierarchyParser(hierarchy, nodesMetadata);
+
+    this._cache.replaceAndSet(
+      userId,
+      this._NSHierarchyLabel,
+      parsedNamespaceHierarchy
+    );
+
+    return this._cache.get(userId, this._NSHierarchyLabel);
+  };
 
   createNode = async (
     request: Request,
@@ -38,12 +64,11 @@ class NodeController {
       );
 
       response.status(statusCodes.OK).json(nodeResult);
-
-      // await this.updateILinkCache(
-      //   response.locals.userId,
-      //   response.locals.workspaceID,
-      //   response.locals.idToken
-      // );
+      await this.updateILinkCache(
+        response.locals.userId,
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
     } catch (error) {
       next(error);
     }
@@ -83,97 +108,11 @@ class NodeController {
 
       response.status(statusCodes.OK).json(result);
 
-      // await this.updateILinkCache(
-      //   response.locals.userId,
-      //   response.locals.workspaceID,
-      //   response.locals.idToken
-      // );
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  createLinkCapture = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const reqBody = new RequestClass(request, 'LinkCapture').data;
-
-      const shortenedURL = (
-        await this._shortenerManager.createNewShort(reqBody)
-      ).message;
-
-      if (shortenedURL === 'URL already exists') {
-        response.status(statusCodes.BAD_REQUEST).json({
-          message: 'Alias Already Exists',
-        });
-        return;
-      }
-
-      response.status(statusCodes.OK).json({ message: shortenedURL });
-
-      const nodeUID = GuidGenerator.generateNodeGUID();
-      const linksNodeID = reqBody.linksNodeID;
-
-      const nodeDetail = {
-        nodePath: {
-          path: `Links#${linksNodeID}#${reqBody.short}#${nodeUID}`,
-        },
-        id: nodeUID,
-        title: reqBody.short,
-        tags: [
-          ...(reqBody?.metadata?.metaTags || []).map(item => item.value),
-          ...(reqBody?.metadata?.userTags || []).map(item => item.value),
-        ],
-        data: [
-          {
-            id: GuidGenerator.generateTempGUID(),
-            elementType: 'h1',
-            children: [
-              { id: GuidGenerator.generateTempGUID(), content: reqBody.short },
-            ],
-          },
-          {
-            id: GuidGenerator.generateTempGUID(),
-            elementType: 'p',
-            createdBy: response.locals.userIdRaw,
-            children: [
-              {
-                id: GuidGenerator.generateTempGUID(),
-                content: '',
-              },
-              {
-                id: GuidGenerator.generateTempGUID(),
-                elementType: 'a',
-                properties: {
-                  url: shortenedURL,
-                },
-                children: [
-                  {
-                    id: GuidGenerator.generateTempGUID(),
-                    content: shortenedURL,
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      };
-
-      await this._nodeManager.bulkCreateNode(
+      await this.updateILinkCache(
+        response.locals.userId,
         response.locals.workspaceID,
-        response.locals.idToken,
-        nodeDetail
+        response.locals.idToken
       );
-
-      // // update the Link hierarchy cache
-      // await this.updateILinkCache(
-      //   response.locals.userId,
-      //   response.locals.workspaceID,
-      //   response.locals.idToken
-      // );
     } catch (error) {
       next(error);
     }
@@ -254,11 +193,11 @@ class NodeController {
       );
       response.status(statusCodes.OK).json(archiveNodeResult);
 
-      // await this.updateILinkCache(
-      //   response.locals.userId,
-      //   response.locals.workspaceID,
-      //   response.locals.idToken
-      // );
+      await this.updateILinkCache(
+        response.locals.userId,
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
     } catch (error) {
       next(error);
     }
@@ -279,11 +218,11 @@ class NodeController {
       );
       response.status(statusCodes.OK).json(archiveNodeResult);
 
-      // await this.updateILinkCache(
-      //   response.locals.userId,
-      //   response.locals.workspaceID,
-      //   response.locals.idToken
-      // );
+      await this.updateILinkCache(
+        response.locals.userId,
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
     } catch (error) {
       next(error);
     }
@@ -304,11 +243,11 @@ class NodeController {
       );
       response.status(statusCodes.OK).json(archiveNodeResult);
 
-      // await this.updateILinkCache(
-      //   response.locals.userId,
-      //   response.locals.workspaceID,
-      //   response.locals.idToken
-      // );
+      await this.updateILinkCache(
+        response.locals.userId,
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
     } catch (error) {
       next(error);
     }
@@ -327,16 +266,19 @@ class NodeController {
         response.locals.idToken,
         requestDetail.data
       );
-      const { changedPaths } = refactorResp
-      const parsedChangedPathsRefactor = this._transformer.refactoredPathsHierarchyParser(changedPaths)
+      const { changedPaths } = refactorResp;
+      const parsedChangedPathsRefactor =
+        this._transformer.refactoredPathsHierarchyParser(changedPaths);
 
-      response.status(statusCodes.OK).json({ changedPaths: parsedChangedPathsRefactor })
+      response
+        .status(statusCodes.OK)
+        .json({ changedPaths: parsedChangedPathsRefactor });
 
-      // await this.updateILinkCache(
-      //   response.locals.userId,
-      //   response.locals.workspaceID,
-      //   response.locals.idToken
-      // );
+      await this.updateILinkCache(
+        response.locals.userId,
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
     } catch (error) {
       next(error);
     }
@@ -355,18 +297,19 @@ class NodeController {
         response.locals.idToken,
         requestDetail.data
       );
-      const { node, changedPaths } = bulkCreateResp
-      const parsedChangedPathsRefactor = this._transformer.refactoredPathsHierarchyParser(changedPaths)
+      const { node, changedPaths } = bulkCreateResp;
+      const parsedChangedPathsRefactor =
+        this._transformer.refactoredPathsHierarchyParser(changedPaths);
 
       response
         .status(statusCodes.OK)
         .json({ node, changedPaths: parsedChangedPathsRefactor });
 
-      // await this.updateILinkCache(
-      //   response.locals.userId,
-      //   response.locals.workspaceID,
-      //   response.locals.idToken
-      // );
+      await this.updateILinkCache(
+        response.locals.userId,
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
     } catch (error) {
       next(error);
     }
