@@ -8,7 +8,7 @@ export class Cache {
   private TTL = 1200;
   private refreshPeriod = 1205;
   private maxKeys = 1000;
-  private _cache;
+  private _cache: NodeCache;
   private _transformer: Transformer = container.get<Transformer>(Transformer);
 
   constructor() {
@@ -29,6 +29,7 @@ export class Cache {
       this._cache.get(this._transformer.encodeCacheKey(entity, key))
     );
   }
+
   async getOrSet(key: string, entity: string, storeFunction) {
     const value = await this._cache.get(
       this._transformer.encodeCacheKey(entity, key)

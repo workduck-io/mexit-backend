@@ -93,92 +93,6 @@ class NodeController {
     }
   };
 
-  createLinkCapture = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const reqBody = new RequestClass(request, 'LinkCapture').data;
-
-      const shortenedURL = (
-        await this._shortenerManager.createNewShort(reqBody)
-      ).message;
-
-      if (shortenedURL === 'URL already exists') {
-        response.status(statusCodes.BAD_REQUEST).json({
-          message: 'Alias Already Exists',
-        });
-        return;
-      }
-
-      response.status(statusCodes.OK).json({ message: shortenedURL });
-
-      const nodeUID = GuidGenerator.generateNodeGUID();
-      const linksNodeID = reqBody.linksNodeID;
-
-      const nodeDetail = {
-        nodePath: {
-          path: `Links#${linksNodeID}#${reqBody.short}#${nodeUID}`,
-        },
-        id: nodeUID,
-        title: reqBody.short,
-        tags: [
-          ...(reqBody?.metadata?.metaTags || []).map(item => item.value),
-          ...(reqBody?.metadata?.userTags || []).map(item => item.value),
-        ],
-        data: [
-          {
-            id: GuidGenerator.generateTempGUID(),
-            elementType: 'h1',
-            children: [
-              { id: GuidGenerator.generateTempGUID(), content: reqBody.short },
-            ],
-          },
-          {
-            id: GuidGenerator.generateTempGUID(),
-            elementType: 'p',
-            createdBy: response.locals.userIdRaw,
-            children: [
-              {
-                id: GuidGenerator.generateTempGUID(),
-                content: '',
-              },
-              {
-                id: GuidGenerator.generateTempGUID(),
-                elementType: 'a',
-                properties: {
-                  url: shortenedURL,
-                },
-                children: [
-                  {
-                    id: GuidGenerator.generateTempGUID(),
-                    content: shortenedURL,
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      };
-
-      await this._nodeManager.bulkCreateNode(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        nodeDetail
-      );
-
-      // // update the Link hierarchy cache
-      // await this.updateILinkCache(
-      //   response.locals.userId,
-      //   response.locals.workspaceID,
-      //   response.locals.idToken
-      // );
-    } catch (error) {
-      next(error);
-    }
-  };
-
   copyOrMoveBlock = async (
     request: Request,
     response: Response,
@@ -327,10 +241,13 @@ class NodeController {
         response.locals.idToken,
         requestDetail.data
       );
-      const { changedPaths } = refactorResp
-      const parsedChangedPathsRefactor = this._transformer.refactoredPathsHierarchyParser(changedPaths)
+      const { changedPaths } = refactorResp;
+      const parsedChangedPathsRefactor =
+        this._transformer.refactoredPathsHierarchyParser(changedPaths);
 
-      response.status(statusCodes.OK).json({ changedPaths: parsedChangedPathsRefactor })
+      response
+        .status(statusCodes.OK)
+        .json({ changedPaths: parsedChangedPathsRefactor });
 
       // await this.updateILinkCache(
       //   response.locals.userId,
@@ -355,8 +272,9 @@ class NodeController {
         response.locals.idToken,
         requestDetail.data
       );
-      const { node, changedPaths } = bulkCreateResp
-      const parsedChangedPathsRefactor = this._transformer.refactoredPathsHierarchyParser(changedPaths)
+      const { node, changedPaths } = bulkCreateResp;
+      const parsedChangedPathsRefactor =
+        this._transformer.refactoredPathsHierarchyParser(changedPaths);
 
       response
         .status(statusCodes.OK)
