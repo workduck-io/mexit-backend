@@ -64,6 +64,7 @@ export const RouteKeys = {
   makeNamespacePublic: 'PATCH /namespace/makePublic/{id}',
   makeNamespacePrivate: 'PATCH /namespace/makePrivate/{id}',
   getAllNamespaceHierarchy: 'GET /namespace/all/hierarchy',
+  getAllNamespaces: 'GET /namespace/all',
 
   // Public Namespace, Node and Snippet Ops
   getPublicNode: 'GET /node/public/{id}',
