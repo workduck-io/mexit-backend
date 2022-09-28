@@ -113,6 +113,28 @@ class NamespaceController {
     }
   };
 
+  getAllNamespaces = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const result = await this._namespaceManager.getAllNamespaces(
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
+
+      result.forEach(ns => {
+        ns.archivedNodeHierarchyInformation = this._transformer.hierarchyParser(
+          ns.archivedNodeHierarchyInformation
+        );
+      });
+      response.status(statusCodes.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   getAllNamespaceHierarchy = async (
     request: Request,
     response: Response,
