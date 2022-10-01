@@ -1,15 +1,19 @@
-import { AuthRequest } from '../middlewares/authrequest'
-import { PublicRequest } from '../middlewares/publicrequest'
-import NamespaceController from '../controllers/NamespaceController'
+import { AuthRequest } from '../middlewares/authrequest';
+import NamespaceController from '../controllers/NamespaceController';
 
 export const initializeNamespaceRoutes = (
   nsObject: NamespaceController
 ): void => {
-
   nsObject._router.post(
     `${nsObject._urlPath}/`,
     [AuthRequest],
     nsObject.createNamespace
+  );
+
+  nsObject._router.get(
+    `${nsObject._urlPath}/all`,
+    [AuthRequest],
+    nsObject.getAllNamespaces
   );
 
   nsObject._router.get(
@@ -41,5 +45,4 @@ export const initializeNamespaceRoutes = (
     [AuthRequest],
     nsObject.getAllNamespaceHierarchy
   );
-
-}
+};
