@@ -5,6 +5,12 @@ export const initializeSnippetRoutes = (
   snippetObject: SnippetController
 ): void => {
   snippetObject._router.get(
+    `${snippetObject._urlPath}/all`,
+    [AuthRequest],
+    snippetObject.getAllSnippetsOfWorkspace
+  );
+
+  snippetObject._router.get(
     `${snippetObject._urlPath}/:snippetId`,
     [AuthRequest],
     snippetObject.getSnippet
@@ -14,12 +20,6 @@ export const initializeSnippetRoutes = (
     `${snippetObject._urlPath}/:snippetId/all`,
     [AuthRequest],
     snippetObject.getAllVersionsOfSnippets
-  );
-
-  snippetObject._router.get(
-    `${snippetObject._urlPath}/all`,
-    [AuthRequest],
-    snippetObject.getAllSnippetsOfWorkspace
   );
 
   snippetObject._router.post(

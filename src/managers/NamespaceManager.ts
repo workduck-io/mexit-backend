@@ -175,6 +175,29 @@ export class NamespaceManager {
     }
   }
 
+  async getAllNamespaces(workspaceID: string, idToken: string): Promise<any> {
+    try {
+      const result = await this._lambda.invokeAndCheck(
+        this._namespaceLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.getAllNamespaces,
+          headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
+        }
+      );
+
+      return result;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+
   async getAllNamespaceHierarchy(
     workspaceId: string,
     idToken: string,

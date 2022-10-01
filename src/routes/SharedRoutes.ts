@@ -4,6 +4,12 @@ import { AuthRequest } from '../middlewares/authrequest';
 export const initializeSharedRoutes = (
   sharedControllerObject: SharedController
 ): void => {
+  sharedControllerObject._router.get(
+    `${sharedControllerObject._urlPath}/all`,
+    [AuthRequest],
+    sharedControllerObject.getAllNodesSharedForUser
+  );
+
   sharedControllerObject._router.post(
     `${sharedControllerObject._urlPath}`,
     [AuthRequest],
@@ -39,13 +45,6 @@ export const initializeSharedRoutes = (
     [AuthRequest],
     sharedControllerObject.getUserWithNodesShared
   );
- 
-  sharedControllerObject._router.get(
-    `${sharedControllerObject._urlPath}/all`,
-    [AuthRequest],
-    sharedControllerObject.getAllNodesSharedForUser
-  );
 
-  
   return;
 };
