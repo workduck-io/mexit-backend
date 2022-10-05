@@ -4,6 +4,7 @@ import container from '../inversify.config';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
 import { ViewManager } from '../managers/ViewManager';
+import { RequestClass } from '../libs/RequestClass';
 
 class ViewController {
   public _urlPath = '/view';
@@ -74,10 +75,11 @@ class ViewController {
     next: NextFunction
   ): Promise<void> => {
     try {
+      const requestDetail = new RequestClass(request, 'PostView');
       const result = await this._viewManager.saveView(
         response.locals.workspaceID,
         response.locals.idToken,
-        request.body
+        requestDetail.data
       );
       response.status(statusCodes.OK).json(result);
     } catch (error) {
