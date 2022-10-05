@@ -111,4 +111,5 @@ export default class Interfaces implements Definitions {
   RegisterUserRequest: RegisterUserRequest;
   UpdateAccessTypeForSharedNodeDetail: UpdateAccessTypeForSharedNodeDetail;
   AppendBlockRequest: AppendBlockRequest;
+  PostView: PostView;
 }
