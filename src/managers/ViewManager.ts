@@ -5,11 +5,12 @@ import { statusCodes } from '../libs/statusCodes';
 import container from '../inversify.config';
 import { Lambda, InvocationType } from '../libs/LambdaClass';
 import { STAGE } from '../env';
+import { RouteKeys } from '../libs/routeKeys';
 
 @injectable()
 export class ViewManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
-  private _taskViewLambdaNameBase = `${STAGE}-task`;
+  private _taskViewLambdaNameBase = `task-${STAGE}`;
 
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
@@ -23,8 +24,13 @@ export class ViewManager {
         `${this._taskViewLambdaNameBase}-getView`,
         this._lambdaInvocationType,
         {
+          httpMethod: 'GET',
           pathParameters: { id: viewID },
-          headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
+          headers: {
+            'mex-workspace-id': workspaceID,
+            authorization: idToken,
+            'mex-api-ver': 'v2',
+          },
         }
       );
       return result;
@@ -45,7 +51,12 @@ export class ViewManager {
         `${this._taskViewLambdaNameBase}-getAllViewsOfWorkspace`,
         this._lambdaInvocationType,
         {
-          headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
+          httpMethod: 'GET',
+          headers: {
+            'mex-workspace-id': workspaceID,
+            authorization: idToken,
+            'mex-api-ver': 'v2',
+          },
         }
       );
       return result;
@@ -70,8 +81,13 @@ export class ViewManager {
         `${this._taskViewLambdaNameBase}-delView`,
         this._lambdaInvocationType,
         {
+          httpMethod: 'DELETE',
           pathParameters: { id: viewID },
-          headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
+          headers: {
+            'mex-workspace-id': workspaceID,
+            authorization: idToken,
+            'mex-api-ver': 'v2',
+          },
         }
       );
       return result;
@@ -96,8 +112,13 @@ export class ViewManager {
         `${this._taskViewLambdaNameBase}-postView`,
         this._lambdaInvocationType,
         {
+          httpMethod: 'POST',
           payload: data,
-          headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
+          headers: {
+            'mex-workspace-id': workspaceID,
+            authorization: idToken,
+            'mex-api-ver': 'v2',
+          },
         }
       );
       return result;
