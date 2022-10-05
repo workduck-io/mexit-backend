@@ -25,7 +25,7 @@ export class ViewManager {
         this._lambdaInvocationType,
         {
           httpMethod: 'GET',
-          pathParameters: { id: viewID },
+          pathParameters: { entityId: viewID },
           headers: {
             'mex-workspace-id': workspaceID,
             authorization: idToken,
@@ -82,7 +82,7 @@ export class ViewManager {
         this._lambdaInvocationType,
         {
           httpMethod: 'DELETE',
-          pathParameters: { id: viewID },
+          pathParameters: { entityId: viewID },
           headers: {
             'mex-workspace-id': workspaceID,
             authorization: idToken,
@@ -119,7 +119,8 @@ export class ViewManager {
             authorization: idToken,
             'mex-api-ver': 'v2',
           },
-        }
+        },
+        true
       );
       return result;
     } catch (error) {
