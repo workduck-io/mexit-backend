@@ -6,6 +6,13 @@ export interface NodeDetail {
   data: NodeData[];
 }
 
+export interface UpdateShareNodeDetail {
+  id: string;
+  title: string;
+  path?: string;
+  data: NodeData[];
+}
+
 export enum NodeAccessType {
   MANAGE = 'MANAGE',
   READ = 'READ',

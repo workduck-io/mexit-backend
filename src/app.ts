@@ -24,6 +24,7 @@ import responseErrorHandler from './middlewares/responseErrorHandler';
 import HealthCheckController from './controllers/HealthCheckController';
 import { wdRequestIdExpressParser } from '@workduck-io/wd-request-id-parser';
 import NamespaceController from './controllers/NamespaceController';
+import ViewController from './controllers/ViewController';
 
 class App {
   public _app: express.Application;
@@ -84,6 +85,7 @@ const application = new App([
   new TagController(),
   new UserController(),
   new NamespaceController(),
+  new ViewController(),
 ]);
 
 application.build();

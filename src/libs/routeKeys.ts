@@ -66,6 +66,12 @@ export const RouteKeys = {
   getAllNamespaceHierarchy: 'GET /namespace/all/hierarchy',
   getAllNamespaces: 'GET /namespace/all',
 
+  // Views - CRUD Operations
+  getAllViews: 'GET /view/all/workspace',
+  getView: 'GET /view/{id}',
+  deleteView: 'DELETE /view/{id}',
+  saveView: 'POST /view',
+
   // Public Namespace, Node and Snippet Ops
   getPublicNode: 'GET /node/public/{id}',
   getPublicNamespace: 'GET /namespace/public/{id}',

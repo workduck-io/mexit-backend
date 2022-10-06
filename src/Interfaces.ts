@@ -26,6 +26,7 @@ import {
   ShareNodeDetail,
   NodeAccessType,
   UpdateAccessTypeForSharedNodeDetail,
+  UpdateShareNodeDetail,
 } from './interfaces/Node';
 import {
   AppendBlockRequest,
@@ -104,6 +105,7 @@ export default class Interfaces implements Definitions {
   SnippetUpdateVersionRequest: SnippetUpdateVersionRequest;
   ArchiveNodeDetail: ArchiveNodeDetail;
   ShareNodeDetail: ShareNodeDetail;
+  UpdateShareNodeDetail: UpdateShareNodeDetail;
   NodeAccessType: NodeAccessType;
   NodePath: NodePath;
   RefactorRequest: RefactorRequest;
@@ -111,4 +113,5 @@ export default class Interfaces implements Definitions {
   RegisterUserRequest: RegisterUserRequest;
   UpdateAccessTypeForSharedNodeDetail: UpdateAccessTypeForSharedNodeDetail;
   AppendBlockRequest: AppendBlockRequest;
+  PostView: PostView;
 }
