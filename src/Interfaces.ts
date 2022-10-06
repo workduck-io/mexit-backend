@@ -38,6 +38,12 @@ import {
   NodePath,
   BulkCreateNode,
   RegisterUserRequest,
+  PostView,
+  FilterJoin,
+  Filter,
+  FilterType,
+  GlobalFilterJoin,
+  FilterValue,
 } from './interfaces/Request';
 import {
   NodeResponse,
@@ -59,6 +65,7 @@ import { SnippetUpdate } from './interfaces/Snippet';
 
 type SchemaType = typeof schema.definitions;
 type Definitions = { [x in keyof SchemaType]: unknown };
+
 export default class Interfaces implements Definitions {
   NodeDetail: NodeDetail;
   NodeChildData: NodeChildData;
@@ -114,4 +121,9 @@ export default class Interfaces implements Definitions {
   UpdateAccessTypeForSharedNodeDetail: UpdateAccessTypeForSharedNodeDetail;
   AppendBlockRequest: AppendBlockRequest;
   PostView: PostView;
+  FilterValue: FilterValue;
+  Filter: Filter;
+  FilterType: FilterType;
+  FilterJoin: FilterJoin;
+  GlobalFilterJoin: GlobalFilterJoin;
 }
