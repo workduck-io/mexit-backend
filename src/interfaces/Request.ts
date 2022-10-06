@@ -49,3 +49,58 @@ export interface RegisterUserRequest {
 export interface AppendBlockRequest {
   elements: any[];
 }
+
+type GlobalFilterJoin = 'all' | 'any';
+
+const FilterTypeArray = [
+  'note', // Does item belong to note
+  'tag', // Does item have tag
+  'date', // Does item have date TODO: Use updated and created will need before after and range
+  'state', // Does item have a specific
+
+  // TODO: Determine whether it will be a single select or not
+  'has', // Does item have a specific data property
+  // For reminders, has is used to determine if the reminder has a todo attached
+
+  'mention', // Does item mention a specific user
+  'space', // Does item belong to a specific space
+] as const;
+
+// Produces a union type of the values of FilterTypeArray
+type FilterType = typeof FilterTypeArray[number];
+
+const FilterJoinArray = [
+  'all', // All values should match
+  'any', // Any value should match
+  'notAny', // Any value should not match (if any one matches, item dropped)
+  'none', // None of the values should match (if some match, item passed, if all match item dropped)
+] as const;
+
+// How to join the values of a single filter
+type FilterJoin = typeof FilterJoinArray[number];
+
+interface FilterValue {
+  id: string;
+  label: string;
+  value: string;
+  count?: number;
+}
+
+interface Filter {
+  id: string;
+  type: FilterType;
+  join: FilterJoin;
+  multiple: boolean;
+  values: FilterValue[] | FilterValue;
+}
+
+export interface PostView {
+  workspaceId: string;
+  properties: {
+    title: string;
+    description: string;
+    globalJoin: GlobalFilterJoin;
+  };
+  entityId: string;
+  filters: Filter[];
+}

@@ -10,6 +10,7 @@ import {
   NodeDetail,
   ShareNodeDetail,
   UpdateAccessTypeForSharedNodeDetail,
+  UpdateShareNodeDetail,
 } from '../interfaces/Node';
 import { STAGE } from '../env';
 
@@ -142,7 +143,7 @@ export class SharedManager {
   async updateSharedNode(
     workspaceId: string,
     idToken: string,
-    nodeDetail: NodeDetail
+    nodeDetail: UpdateShareNodeDetail
   ): Promise<any> {
     try {
       const response = await this._lambda.invokeAndCheck(
@@ -150,7 +151,7 @@ export class SharedManager {
         this._lambdaInvocationType,
         {
           routeKey: RouteKeys.updateSharedNode,
-          payload: { ...nodeDetail, type: 'NodeRequest' },
+          payload: { ...nodeDetail, type: 'UpdateSharedNodeRequest' },
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );

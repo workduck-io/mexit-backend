@@ -694,6 +694,86 @@
             ],
             "type": "object"
         },
+        "Filter": {
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "join": {
+                    "$ref": "types#/definitions/FilterJoin"
+                },
+                "multiple": {
+                    "type": "boolean"
+                },
+                "type": {
+                    "$ref": "types#/definitions/FilterType"
+                },
+                "values": {
+                    "anyOf": [
+                        {
+                            "$ref": "types#/definitions/FilterValue"
+                        },
+                        {
+                            "items": {
+                                "$ref": "types#/definitions/FilterValue"
+                            },
+                            "type": "array"
+                        }
+                    ]
+                }
+            },
+            "required": [
+                "id",
+                "join",
+                "multiple",
+                "type",
+                "values"
+            ],
+            "type": "object"
+        },
+        "FilterJoin": {
+            "enum": [
+                "all",
+                "any",
+                "none",
+                "notAny"
+            ],
+            "type": "string"
+        },
+        "FilterType": {
+            "enum": [
+                "date",
+                "has",
+                "mention",
+                "note",
+                "space",
+                "state",
+                "tag"
+            ],
+            "type": "string"
+        },
+        "FilterValue": {
+            "properties": {
+                "count": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "label",
+                "value"
+            ],
+            "type": "object"
+        },
         "GenericObjectType": {
             "additionalProperties": {
                 "$ref": "types#/definitions/GenericType"
@@ -719,6 +799,13 @@
                     ]
                 }
             ]
+        },
+        "GlobalFilterJoin": {
+            "enum": [
+                "all",
+                "any"
+            ],
+            "type": "string"
         },
         "GoogleAuthRefreshToken": {
             "properties": {
@@ -1299,6 +1386,48 @@
             ],
             "type": "object"
         },
+        "PostView": {
+            "properties": {
+                "entityId": {
+                    "type": "string"
+                },
+                "filters": {
+                    "items": {
+                        "$ref": "types#/definitions/Filter"
+                    },
+                    "type": "array"
+                },
+                "properties": {
+                    "properties": {
+                        "description": {
+                            "type": "string"
+                        },
+                        "globalJoin": {
+                            "$ref": "types#/definitions/GlobalFilterJoin"
+                        },
+                        "title": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "description",
+                        "globalJoin",
+                        "title"
+                    ],
+                    "type": "object"
+                },
+                "workspaceId": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "entityId",
+                "filters",
+                "properties",
+                "workspaceId"
+            ],
+            "type": "object"
+        },
         "QueryStringParameters": {
             "properties": {
                 "blockSize": {
@@ -1553,6 +1682,31 @@
             "required": [
                 "nodeID",
                 "userIDToAccessTypeMap"
+            ],
+            "type": "object"
+        },
+        "UpdateShareNodeDetail": {
+            "properties": {
+                "data": {
+                    "items": {
+                        "$ref": "types#/definitions/NodeData"
+                    },
+                    "type": "array"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "data",
+                "id",
+                "title"
             ],
             "type": "object"
         },

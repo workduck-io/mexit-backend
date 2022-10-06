@@ -10,6 +10,7 @@ interface LambdaOptions {
   routeKey?: string;
   queryStringParameters?: any;
   headers?: any;
+  httpMethod?: string;
 }
 
 @injectable()
@@ -43,6 +44,9 @@ export class Lambda {
                   }),
                   ...(options.headers && {
                     headers: options.headers,
+                  }),
+                  ...(options.httpMethod && {
+                    httpMethod: options.httpMethod,
                   }),
                 }
           ),
