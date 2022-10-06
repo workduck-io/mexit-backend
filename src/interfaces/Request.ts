@@ -50,7 +50,7 @@ export interface AppendBlockRequest {
   elements: any[];
 }
 
-type GlobalFilterJoin = 'all' | 'any';
+export type GlobalFilterJoin = 'all' | 'any';
 
 const FilterTypeArray = [
   'note', // Does item belong to note
@@ -67,7 +67,7 @@ const FilterTypeArray = [
 ] as const;
 
 // Produces a union type of the values of FilterTypeArray
-type FilterType = typeof FilterTypeArray[number];
+export type FilterType = typeof FilterTypeArray[number];
 
 const FilterJoinArray = [
   'all', // All values should match
@@ -77,16 +77,16 @@ const FilterJoinArray = [
 ] as const;
 
 // How to join the values of a single filter
-type FilterJoin = typeof FilterJoinArray[number];
+export type FilterJoin = typeof FilterJoinArray[number];
 
-interface FilterValue {
+export interface FilterValue {
   id: string;
   label: string;
   value: string;
   count?: number;
 }
 
-interface Filter {
+export interface Filter {
   id: string;
   type: FilterType;
   join: FilterJoin;
