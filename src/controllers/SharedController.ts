@@ -102,7 +102,7 @@ class SharedController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const requestDetail = new RequestClass(request, 'NodeDetail');
+      const requestDetail = new RequestClass(request, 'UpdateShareNodeDetail');
 
       const result = await this._sharedManager.updateSharedNode(
         response.locals.workspaceID,

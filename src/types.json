@@ -1685,6 +1685,31 @@
             ],
             "type": "object"
         },
+        "UpdateShareNodeDetail": {
+            "properties": {
+                "data": {
+                    "items": {
+                        "$ref": "types#/definitions/NodeData"
+                    },
+                    "type": "array"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "data",
+                "id",
+                "title"
+            ],
+            "type": "object"
+        },
         "UserPreference": {
             "properties": {
                 "group": {
