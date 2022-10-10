@@ -2,7 +2,7 @@ export const RouteKeys = {
   // Node Operations - CRU, Refactor, bulkCreate
   createNode: 'POST /node',
   getNode: 'GET /node/{id}',
-  appendNode: 'POST /node/{id}/append',
+  appendNode: 'PATCH /node/{id}/append',
   refactorHierarchy: 'POST /node/refactor',
   bulkCreateNode: 'POST /node/bulk',
   copyOrMoveBlock: 'PATCH /node/block/movement',
