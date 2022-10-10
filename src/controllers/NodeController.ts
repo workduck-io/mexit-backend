@@ -107,12 +107,6 @@ class NodeController {
       );
 
       response.status(statusCodes.OK).json(result);
-
-      await this.updateILinkCache(
-        response.locals.userId,
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
     } catch (error) {
       next(error);
     }
