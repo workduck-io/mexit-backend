@@ -16,7 +16,7 @@ export const initializeNodeRoutes = (
     nodeControllerObject.getNode
   );
 
-  nodeControllerObject._router.put(
+  nodeControllerObject._router.patch(
     `${nodeControllerObject._urlPath}/:nodeId`,
     [AuthRequest],
     nodeControllerObject.appendNode
