@@ -121,3 +121,13 @@ export interface UpdateNamespace {
     };
   };
 }
+
+export interface ShareNamespace {
+  namespaceID: string;
+  userIDs: string[];
+}
+
+export interface RevokeAccessFromNamespace {
+  namespaceID: string;
+  userIDs: string[];
+}
