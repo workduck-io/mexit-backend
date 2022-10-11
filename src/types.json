@@ -694,6 +694,24 @@
             ],
             "type": "object"
         },
+        "CreateNamespace": {
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "name"
+            ],
+            "type": "object"
+        },
         "Filter": {
             "properties": {
                 "id": {
@@ -1682,6 +1700,41 @@
             "required": [
                 "nodeID",
                 "userIDToAccessTypeMap"
+            ],
+            "type": "object"
+        },
+        "UpdateNamespace": {
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "properties": {
+                        "icon": {
+                            "properties": {
+                                "type": {
+                                    "type": "string"
+                                },
+                                "value": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "type",
+                                "value"
+                            ],
+                            "type": "object"
+                        }
+                    },
+                    "type": "object"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "name"
             ],
             "type": "object"
         },

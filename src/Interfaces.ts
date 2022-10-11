@@ -44,6 +44,8 @@ import {
   FilterType,
   GlobalFilterJoin,
   FilterValue,
+  CreateNamespace,
+  UpdateNamespace,
 } from './interfaces/Request';
 import {
   NodeResponse,
@@ -126,4 +128,6 @@ export default class Interfaces implements Definitions {
   FilterType: FilterType;
   FilterJoin: FilterJoin;
   GlobalFilterJoin: GlobalFilterJoin;
+  CreateNamespace: CreateNamespace;
+  UpdateNamespace: UpdateNamespace;
 }
