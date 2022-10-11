@@ -1538,6 +1538,9 @@
         },
         "ShareNamespace": {
             "properties": {
+                "accessType": {
+                    "type": "string"
+                },
                 "namespaceID": {
                     "type": "string"
                 },
@@ -1549,6 +1552,7 @@
                 }
             },
             "required": [
+                "accessType",
                 "namespaceID",
                 "userIDs"
             ],
