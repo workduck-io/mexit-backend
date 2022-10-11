@@ -5,16 +5,15 @@ export const initializePublicRoutes = (
   publicControllerObject: PublicController
 ): void => {
   publicControllerObject._router.get(
+    `${publicControllerObject._urlPath}/namespace/:namespaceID`,
+    [PublicRequest],
+    publicControllerObject.getPublicNamespace
+  );
+
+  publicControllerObject._router.get(
     `${publicControllerObject._urlPath}/:nodeId`,
     [PublicRequest],
     publicControllerObject.getPublicNode
   );
-
-  publicControllerObject._router.get(
-    `${publicControllerObject._urlPath}/namespace/:namespaceID`,
-    [PublicRequest],
-    publicControllerObject.getPublicNamespace
-  )
-
   return;
 };
