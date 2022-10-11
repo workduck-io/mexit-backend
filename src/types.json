@@ -1518,6 +1518,42 @@
             ],
             "type": "object"
         },
+        "RevokeAccessFromNamespace": {
+            "properties": {
+                "namespaceID": {
+                    "type": "string"
+                },
+                "userIDs": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "namespaceID",
+                "userIDs"
+            ],
+            "type": "object"
+        },
+        "ShareNamespace": {
+            "properties": {
+                "namespaceID": {
+                    "type": "string"
+                },
+                "userIDs": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "namespaceID",
+                "userIDs"
+            ],
+            "type": "object"
+        },
         "ShareNodeDetail": {
             "properties": {
                 "accessType": {
