@@ -9,6 +9,7 @@ import {
 } from '../libs/TransformerClass';
 import { NamespaceManager } from '../managers/NamespaceManager';
 import { initializeNamespaceRoutes } from '../routes/NamespaceRoutes';
+import { RequestClass } from '../libs/RequestClass';
 
 class NamespaceController {
   public _urlPath = '/namespace';
@@ -29,13 +30,14 @@ class NamespaceController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const namespaceResult = await this._namespaceManager.createNamespace(
+      const body = new RequestClass(request, 'CreateNamespace').data;
+      await this._namespaceManager.createNamespace(
         response.locals.workspaceID,
         response.locals.idToken,
-        request.body
+        body
       );
 
-      response.status(statusCodes.OK).json(namespaceResult);
+      response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
       next(error);
     }
@@ -66,10 +68,12 @@ class NamespaceController {
     next: NextFunction
   ): Promise<void> => {
     try {
+      const body = new RequestClass(request, 'UpdateNamespace').data;
+
       await this._namespaceManager.updateNamespace(
         response.locals.workspaceID,
         response.locals.idToken,
-        request.body
+        body
       );
 
       response.status(statusCodes.NO_CONTENT).send();

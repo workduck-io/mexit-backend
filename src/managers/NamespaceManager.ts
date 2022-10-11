@@ -148,11 +148,7 @@ export class NamespaceManager {
     }
   }
 
-  async getPublicNamespace(
-    workspaceId: string,
-    idToken: string,
-    namespaceId: string
-  ): Promise<any> {
+  async getPublicNamespace(idToken: string, namespaceId: string): Promise<any> {
     try {
       const result = await this._lambda.invokeAndCheck(
         this._namespaceLambdaFunctionName,
@@ -160,7 +156,7 @@ export class NamespaceManager {
         {
           routeKey: RouteKeys.getPublicNamespace,
           pathParameters: { id: namespaceId },
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+          headers: { 'mex-workspace-id': '', authorization: idToken },
         }
       );
       return result;
