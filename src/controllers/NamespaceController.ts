@@ -1,6 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express';
-import { Cache } from '../libs/CacheClass';
+import { CacheType } from '../interfaces/Config';
 import container from '../inversify.config';
+import { Cache } from '../libs/CacheClass';
 import { statusCodes } from '../libs/statusCodes';
 import {
   ParsedNamespaceHierarchy,
@@ -15,7 +16,7 @@ class NamespaceController {
   public _namespaceManager: NamespaceManager =
     container.get<NamespaceManager>(NamespaceManager);
   public _transformer: Transformer = container.get<Transformer>(Transformer);
-  public _cache: Cache = container.get<Cache>(Cache);
+  public _cache: Cache = container.get<Cache>(CacheType.NamespaceHierarchy);
   private _NSHierarchyLabel = 'NSHIERARCHY';
 
   constructor() {

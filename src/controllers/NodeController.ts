@@ -1,14 +1,15 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
+import { CacheType } from '../interfaces/Config';
+import { NodeResponse } from '../interfaces/Response';
 import container from '../inversify.config';
-import { NodeManager } from '../managers/NodeManager';
+import { Cache } from '../libs/CacheClass';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
-import { ShortenerManager } from '../managers/ShortenerManager';
-import { NodeResponse } from '../interfaces/Response';
-import { Cache } from '../libs/CacheClass';
-import { initializeNodeRoutes } from '../routes/NodeRoutes';
 import { NamespaceManager } from '../managers/NamespaceManager';
+import { NodeManager } from '../managers/NodeManager';
+import { ShortenerManager } from '../managers/ShortenerManager';
+import { initializeNodeRoutes } from '../routes/NodeRoutes';
 
 class NodeController {
   public _urlPath = '/node';
@@ -17,8 +18,12 @@ class NodeController {
   public _shortenerManager: ShortenerManager =
     container.get<ShortenerManager>(ShortenerManager);
   public _transformer: Transformer = container.get<Transformer>(Transformer);
-  private _cache: Cache = container.get<Cache>(Cache);
+  private _iLinkCache: Cache = container.get<Cache>(
+    CacheType.NamespaceHierarchy
+  );
+  private _nodeCache: Cache = container.get<Cache>(CacheType.Node);
   private _NSHierarchyLabel = 'NSHIERARCHY';
+  private _NodeLabel = 'NODE';
   private _nsManager: NamespaceManager =
     container.get<NamespaceManager>(NamespaceManager);
 
@@ -41,13 +46,13 @@ class NodeController {
     const parsedNamespaceHierarchy =
       this._transformer.allNamespacesHierarchyParser(hierarchy, nodesMetadata);
 
-    this._cache.replaceAndSet(
+    this._iLinkCache.replaceAndSet(
       userId,
       this._NSHierarchyLabel,
       parsedNamespaceHierarchy
     );
 
-    return this._cache.get(userId, this._NSHierarchyLabel);
+    return this._iLinkCache.get(userId, this._NSHierarchyLabel);
   };
 
   createNode = async (
@@ -57,6 +62,12 @@ class NodeController {
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'ContentNodeRequest');
+      const workspaceSpecificNodeKey =
+        response.locals.workspaceID + requestDetail.data.id;
+      //TODO: update cache instead of deleting it
+      if (this._nodeCache.has(workspaceSpecificNodeKey, this._NodeLabel))
+        this._nodeCache.del(workspaceSpecificNodeKey, this._NodeLabel);
+
       const nodeResult = await this._nodeManager.createNode(
         response.locals.workspaceID,
         response.locals.idToken,
@@ -79,13 +90,23 @@ class NodeController {
     response: Response,
     next: NextFunction
   ): Promise<void> => {
+    let result: NodeResponse;
     try {
-      const result = (await this._nodeManager.getNode(
-        request.params.nodeId,
-        response.locals.workspaceID,
-        response.locals.idToken
-      )) as NodeResponse;
-
+      const workspaceSpecificNodeKey =
+        response.locals.workspaceID + request.params.nodeId;
+      if (this._nodeCache.has(workspaceSpecificNodeKey, this._NodeLabel)) {
+        result = (await this._nodeCache.get(
+          workspaceSpecificNodeKey,
+          this._NodeLabel
+        )) as NodeResponse;
+      } else {
+        result = (await this._nodeManager.getNode(
+          request.params.nodeId,
+          response.locals.workspaceID,
+          response.locals.idToken
+        )) as NodeResponse;
+        this._nodeCache.set(workspaceSpecificNodeKey, this._NodeLabel, result);
+      }
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -98,6 +119,10 @@ class NodeController {
     next: NextFunction
   ): Promise<void> => {
     try {
+      const workspaceSpecificNodeKey =
+        response.locals.workspaceID + request.params.nodeId;
+      if (this._nodeCache.has(workspaceSpecificNodeKey, this._NodeLabel))
+        this._nodeCache.del(workspaceSpecificNodeKey, this._NodeLabel);
       const blockDetail = new RequestClass(request, 'AppendBlockRequest').data;
       const result = await this._nodeManager.appendNode(
         request.params.nodeId,
@@ -119,6 +144,15 @@ class NodeController {
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'CopyOrMoveBlockRequest');
+      const workspaceSpecificSourceNodeKey =
+        response.locals.workspaceID + requestDetail.data.sourceNodeId;
+      const workspaceSpecificDestNodeKey =
+        response.locals.workspaceID + requestDetail.data.destinationNodeId;
+
+      if (this._nodeCache.has(workspaceSpecificSourceNodeKey, this._NodeLabel))
+        this._nodeCache.del(workspaceSpecificSourceNodeKey, this._NodeLabel);
+      if (this._nodeCache.has(workspaceSpecificDestNodeKey, this._NodeLabel))
+        this._nodeCache.del(workspaceSpecificDestNodeKey, this._NodeLabel);
 
       await this._nodeManager.moveBlocks(
         requestDetail.data.blockId,
@@ -140,6 +174,9 @@ class NodeController {
   ): Promise<void> => {
     try {
       const nodeId = request.params.id;
+      const workspaceSpecificNodeKey = response.locals.workspaceID + nodeId;
+      if (this._nodeCache.has(workspaceSpecificNodeKey, this._NodeLabel))
+        this._nodeCache.del(workspaceSpecificNodeKey, this._NodeLabel);
 
       const result = await this._nodeManager.makeNodePublic(
         nodeId,
@@ -160,6 +197,9 @@ class NodeController {
   ): Promise<void> => {
     try {
       const nodeId = request.params.id;
+      const workspaceSpecificNodeKey = response.locals.workspaceID + nodeId;
+      if (this._nodeCache.has(workspaceSpecificNodeKey, this._NodeLabel))
+        this._nodeCache.del(workspaceSpecificNodeKey, this._NodeLabel);
 
       const result = await this._nodeManager.makeNodePrivate(
         nodeId,
