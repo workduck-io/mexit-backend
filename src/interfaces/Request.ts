@@ -124,6 +124,7 @@ export interface UpdateNamespace {
 
 export interface ShareNamespace {
   namespaceID: string;
+  accessType: string;
   userIDs: string[];
 }
 
