@@ -1,16 +1,17 @@
 import { Container } from 'inversify';
-import { NodeManager } from './managers/NodeManager';
-import { ShortenerManager } from './managers/ShortenerManager';
-import { GotClient } from './libs/GotClientClass';
-import { Transformer } from './libs/TransformerClass';
+import { CacheType } from './interfaces/Config';
 import { Cache } from './libs/CacheClass';
+import { GotClient } from './libs/GotClientClass';
 import { Lambda } from './libs/LambdaClass';
-import { UserManager } from './managers/UserManager';
-import { SnippetManager } from './managers/SnippetManager';
+import { Transformer } from './libs/TransformerClass';
 import { BookmarkManager } from './managers/BookmarkManager';
-import { TagManager } from './managers/TagManager';
-import { SharedManager } from './managers/SharedManager';
 import { NamespaceManager } from './managers/NamespaceManager';
+import { NodeManager } from './managers/NodeManager';
+import { SharedManager } from './managers/SharedManager';
+import { ShortenerManager } from './managers/ShortenerManager';
+import { SnippetManager } from './managers/SnippetManager';
+import { TagManager } from './managers/TagManager';
+import { UserManager } from './managers/UserManager';
 import { ViewManager } from './managers/ViewManager';
 
 const container = new Container();
@@ -32,7 +33,11 @@ container
   .to(SharedManager)
   .inSingletonScope();
 container.bind<UserManager>(UserManager).to(UserManager).inSingletonScope();
-container.bind<Cache>(Cache).to(Cache).inSingletonScope();
+container
+  .bind<Cache>(CacheType.NamespaceHierarchy)
+  .to(Cache)
+  .inSingletonScope();
+container.bind<Cache>(CacheType.Node).to(Cache).inSingletonScope();
 container.bind<Lambda>(Lambda).to(Lambda).inSingletonScope();
 container
   .bind<BookmarkManager>(BookmarkManager)
