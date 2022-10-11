@@ -55,10 +55,8 @@ export class NamespaceManager {
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
-      console.log('Result from getNS: ', result);
       return result;
     } catch (error) {
-      console.log('Error in getNS: ', error);
       errorlib({
         message: error.message,
         errorCode: error.statusCode,
