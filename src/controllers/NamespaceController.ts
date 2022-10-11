@@ -129,11 +129,17 @@ class NamespaceController {
         response.locals.idToken
       );
 
+      console.log('Got result: ', JSON.stringify(result));
+
       const transformedResult = result.reduce(
         (obj, item) => ((obj[item.namespaceID] = item), obj),
         {}
       );
+
+      console.log('Result: ', JSON.stringify(result));
+
       const ids = Object.keys(transformedResult);
+      console.log('IDS: ', ids);
       const promises = ids.map(id =>
         this._namespaceManager.getNamespace(
           response.locals.workspaceID,
@@ -143,6 +149,10 @@ class NamespaceController {
       );
 
       const allNamespacesResults = await Promise.all(promises);
+      console.log(
+        'All Namespaces Result: ',
+        JSON.stringify(allNamespacesResults)
+      );
       allNamespacesResults.forEach(ns => {
         ns.nodeHierarchy = this._transformer.hierarchyParser(ns);
         ns.accessType = transformedResult[ns.id].accessType;
