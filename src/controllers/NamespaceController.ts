@@ -211,11 +211,34 @@ class NamespaceController {
   ): Promise<void> => {
     try {
       const body = new RequestClass(request, 'ShareNamespace').data;
-      const result = await this._namespaceManager.shareNamespace(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        body
+
+      const accessTypeMap: Record<string, string[]> = {};
+
+      Object.entries(body.userIDToAccessTypeMap).forEach(
+        ([userID, accessType]) => {
+          if (accessTypeMap[accessType]) accessTypeMap[accessType].push(userID);
+          else accessTypeMap[accessType] = [userID];
+        }
       );
+
+      const backendRequestBodies = [];
+      Object.entries(accessTypeMap).forEach(([accessType, userIDs]) => {
+        backendRequestBodies.push({
+          namespaceID: body.namespaceID,
+          accessType: accessType,
+          userIDs: userIDs,
+        });
+      });
+
+      const promises = backendRequestBodies.map(i =>
+        this._namespaceManager.shareNamespace(
+          response.locals.workspaceID,
+          response.locals.idToken,
+          i
+        )
+      );
+
+      await Promise.all(promises);
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
