@@ -1468,6 +1468,9 @@
             ],
             "type": "object"
         },
+        "Record<string,string>": {
+            "type": "object"
+        },
         "RefactorRequest": {
             "properties": {
                 "existingNodePath": {
@@ -1538,23 +1541,16 @@
         },
         "ShareNamespace": {
             "properties": {
-                "accessType": {
-                    "type": "string"
-                },
                 "namespaceID": {
                     "type": "string"
                 },
-                "userIDs": {
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
+                "userIDToAccessTypeMap": {
+                    "$ref": "types#/definitions/Record<string,string>"
                 }
             },
             "required": [
-                "accessType",
                 "namespaceID",
-                "userIDs"
+                "userIDToAccessTypeMap"
             ],
             "type": "object"
         },
