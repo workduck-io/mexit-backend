@@ -66,7 +66,7 @@ class NamespaceController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const res = await this._namespaceManager.updateNamespace(
+      await this._namespaceManager.updateNamespace(
         response.locals.workspaceID,
         response.locals.idToken,
         request.body
@@ -151,6 +151,8 @@ class NamespaceController {
         this._cache.has(response.locals.userId, this._NSHierarchyLabel) &&
         !forceRefresh
       ) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //@ts-ignore
         parsedNamespaceHierarchy = await this._cache.get(
           response.locals.userId,
           this._NSHierarchyLabel
