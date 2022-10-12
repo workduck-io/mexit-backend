@@ -1,5 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express';
+import { CacheType } from '../interfaces/Config';
 import container from '../inversify.config';
+import { Cache } from '../libs/CacheClass';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
@@ -12,6 +14,8 @@ class SharedController {
   public _sharedManager: SharedManager =
     container.get<SharedManager>(SharedManager);
   public _transformer: Transformer = container.get<Transformer>(Transformer);
+  private _userAccessCache: Cache = container.get<Cache>(CacheType.UserAccess);
+  private _UserAccessLabel = 'USERACCESS';
 
   constructor() {
     initializeSharedRoutes(this);
@@ -24,12 +28,18 @@ class SharedController {
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'ShareNodeDetail');
-
       const result = await this._sharedManager.shareNode(
         response.locals.workspaceID,
         response.locals.idToken,
         requestDetail.data
       );
+      requestDetail.data.userIDs.forEach(userID => {
+        this._userAccessCache.set(
+          userID + requestDetail.data.nodeID,
+          this._UserAccessLabel,
+          true
+        );
+      });
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -52,6 +62,13 @@ class SharedController {
         response.locals.idToken,
         requestDetail.data
       );
+      Object.keys(requestDetail.data.userIDToAccessTypeMap).forEach(userID => {
+        this._userAccessCache.set(
+          userID + requestDetail.data.nodeID,
+          this._UserAccessLabel,
+          true
+        );
+      });
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -71,6 +88,12 @@ class SharedController {
         response.locals.idToken,
         requestDetail.data
       );
+      requestDetail.data.userIDs.forEach(userID => {
+        this._userAccessCache.del(
+          userID + requestDetail.data.nodeID,
+          this._UserAccessLabel
+        );
+      });
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
