@@ -30,12 +30,17 @@ export class Cache {
     );
   }
 
-  async getOrSet(key: string, entity: string, storeFunction) {
+  async getOrSet<T>(
+    key: string,
+    entity: string,
+    storeFunction,
+    forceGet = false
+  ): Promise<T> {
     const value = await this._cache.get(
       this._transformer.encodeCacheKey(entity, key)
     );
-    if (value) {
-      return Promise.resolve(value);
+    if (value && !forceGet) {
+      return Promise.resolve(value) as Promise<T>;
     }
 
     return storeFunction().then(result => {
@@ -56,6 +61,7 @@ export class Cache {
   }
 
   del(key: string, entity: string) {
-    this._cache.del(this._transformer.encodeCacheKey(entity, key));
+    if (this._cache.has(this._transformer.encodeCacheKey(entity, key)))
+      this._cache.del(this._transformer.encodeCacheKey(entity, key));
   }
 }

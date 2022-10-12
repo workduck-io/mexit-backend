@@ -1,6 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express';
-import { Cache } from '../libs/CacheClass';
+import { CacheType } from '../interfaces/Config';
 import container from '../inversify.config';
+import { Cache } from '../libs/CacheClass';
 import { statusCodes } from '../libs/statusCodes';
 import {
   ParsedNamespaceHierarchy,
@@ -15,7 +16,7 @@ class NamespaceController {
   public _namespaceManager: NamespaceManager =
     container.get<NamespaceManager>(NamespaceManager);
   public _transformer: Transformer = container.get<Transformer>(Transformer);
-  public _cache: Cache = container.get<Cache>(Cache);
+  public _cache: Cache = container.get<Cache>(CacheType.NamespaceHierarchy);
   private _NSHierarchyLabel = 'NSHIERARCHY';
 
   constructor() {
@@ -65,7 +66,7 @@ class NamespaceController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const res = await this._namespaceManager.updateNamespace(
+      await this._namespaceManager.updateNamespace(
         response.locals.workspaceID,
         response.locals.idToken,
         request.body
@@ -150,6 +151,8 @@ class NamespaceController {
         this._cache.has(response.locals.userId, this._NSHierarchyLabel) &&
         !forceRefresh
       ) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //@ts-ignore
         parsedNamespaceHierarchy = await this._cache.get(
           response.locals.userId,
           this._NSHierarchyLabel
