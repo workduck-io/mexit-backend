@@ -56,6 +56,7 @@ export class Cache {
   }
 
   del(key: string, entity: string) {
-    this._cache.del(this._transformer.encodeCacheKey(entity, key));
+    if (this._cache.has(this._transformer.encodeCacheKey(entity, key)))
+      this._cache.del(this._transformer.encodeCacheKey(entity, key));
   }
 }

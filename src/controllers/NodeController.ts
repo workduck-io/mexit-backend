@@ -65,8 +65,7 @@ class NodeController {
       const workspaceSpecificNodeKey =
         response.locals.workspaceID + requestDetail.data.id;
       //TODO: update cache instead of deleting it
-      if (this._nodeCache.has(workspaceSpecificNodeKey, this._NodeLabel))
-        this._nodeCache.del(workspaceSpecificNodeKey, this._NodeLabel);
+      this._nodeCache.del(workspaceSpecificNodeKey, this._NodeLabel);
 
       const nodeResult = await this._nodeManager.createNode(
         response.locals.workspaceID,
@@ -90,23 +89,20 @@ class NodeController {
     response: Response,
     next: NextFunction
   ): Promise<void> => {
-    let result: NodeResponse;
     try {
       const workspaceSpecificNodeKey =
         response.locals.workspaceID + request.params.nodeId;
-      if (this._nodeCache.has(workspaceSpecificNodeKey, this._NodeLabel)) {
-        result = (await this._nodeCache.get(
-          workspaceSpecificNodeKey,
-          this._NodeLabel
-        )) as NodeResponse;
-      } else {
-        result = (await this._nodeManager.getNode(
+
+      const result = this._nodeCache.getOrSet(
+        workspaceSpecificNodeKey,
+        this._NodeLabel,
+        (await this._nodeManager.getNode(
           request.params.nodeId,
           response.locals.workspaceID,
           response.locals.idToken
-        )) as NodeResponse;
-        this._nodeCache.set(workspaceSpecificNodeKey, this._NodeLabel, result);
-      }
+        )) as NodeResponse
+      );
+
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -121,8 +117,7 @@ class NodeController {
     try {
       const workspaceSpecificNodeKey =
         response.locals.workspaceID + request.params.nodeId;
-      if (this._nodeCache.has(workspaceSpecificNodeKey, this._NodeLabel))
-        this._nodeCache.del(workspaceSpecificNodeKey, this._NodeLabel);
+      this._nodeCache.del(workspaceSpecificNodeKey, this._NodeLabel);
       const blockDetail = new RequestClass(request, 'AppendBlockRequest').data;
       const result = await this._nodeManager.appendNode(
         request.params.nodeId,
@@ -149,10 +144,8 @@ class NodeController {
       const workspaceSpecificDestNodeKey =
         response.locals.workspaceID + requestDetail.data.destinationNodeId;
 
-      if (this._nodeCache.has(workspaceSpecificSourceNodeKey, this._NodeLabel))
-        this._nodeCache.del(workspaceSpecificSourceNodeKey, this._NodeLabel);
-      if (this._nodeCache.has(workspaceSpecificDestNodeKey, this._NodeLabel))
-        this._nodeCache.del(workspaceSpecificDestNodeKey, this._NodeLabel);
+      this._nodeCache.del(workspaceSpecificSourceNodeKey, this._NodeLabel);
+      this._nodeCache.del(workspaceSpecificDestNodeKey, this._NodeLabel);
 
       await this._nodeManager.moveBlocks(
         requestDetail.data.blockId,
@@ -175,8 +168,7 @@ class NodeController {
     try {
       const nodeId = request.params.id;
       const workspaceSpecificNodeKey = response.locals.workspaceID + nodeId;
-      if (this._nodeCache.has(workspaceSpecificNodeKey, this._NodeLabel))
-        this._nodeCache.del(workspaceSpecificNodeKey, this._NodeLabel);
+      this._nodeCache.del(workspaceSpecificNodeKey, this._NodeLabel);
 
       const result = await this._nodeManager.makeNodePublic(
         nodeId,
@@ -198,8 +190,7 @@ class NodeController {
     try {
       const nodeId = request.params.id;
       const workspaceSpecificNodeKey = response.locals.workspaceID + nodeId;
-      if (this._nodeCache.has(workspaceSpecificNodeKey, this._NodeLabel))
-        this._nodeCache.del(workspaceSpecificNodeKey, this._NodeLabel);
+      this._nodeCache.del(workspaceSpecificNodeKey, this._NodeLabel);
 
       const result = await this._nodeManager.makeNodePrivate(
         nodeId,
