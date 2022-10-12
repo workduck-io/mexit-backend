@@ -38,6 +38,7 @@ container
   .to(Cache)
   .inSingletonScope();
 container.bind<Cache>(CacheType.Node).to(Cache).inSingletonScope();
+container.bind<Cache>(CacheType.UserAccess).to(Cache).inSingletonScope();
 container.bind<Lambda>(Lambda).to(Lambda).inSingletonScope();
 container
   .bind<BookmarkManager>(BookmarkManager)
