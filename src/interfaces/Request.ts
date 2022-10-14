@@ -1,8 +1,4 @@
-import { ContentNode, LinkNode } from './Node';
-
-export interface LinkNodeRequest extends LinkNode {
-  createdBy: string;
-}
+import { ContentNode } from './Node';
 
 export interface ContentNodeRequest extends ContentNode {
   createdBy?: string;
