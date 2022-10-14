@@ -901,37 +901,6 @@
             ],
             "type": "object"
         },
-        "LinkResponseContent": {
-            "properties": {
-                "children": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "$ref": "types#/definitions/TextType"
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "items": {
-                                "$ref": "types#/definitions/LinkChildrenType"
-                            },
-                            "type": "array"
-                        }
-                    ]
-                },
-                "id": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "children",
-                "type"
-            ],
-            "type": "object"
-        },
         "MetaTag": {
             "properties": {
                 "name": {
