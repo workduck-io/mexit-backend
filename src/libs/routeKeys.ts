@@ -42,10 +42,6 @@ export const RouteKeys = {
   makeSnippetPrivate: 'PATCH /snippet/makePrivate/{id}/{version}',
   clonePublicSnippet: 'POST /snippet/clone/{id}/{version}',
 
-  // Shortener Endpoints
-  shorten: 'POST /shorten',
-  getShorts: 'GET /{namespace}/stats',
-
   // User Star (Bookmark) Endpoints
   createBookmark: 'POST /userStar/{id}',
   removeBookmark: 'DELETE /userStar/{id}',

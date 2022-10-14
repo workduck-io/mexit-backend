@@ -58,17 +58,6 @@ export interface Block {
   elements: NodeChildData[];
 }
 
-export interface LinkNode {
-  id: string;
-  long: string;
-  short: string;
-  metadata: {
-    metaTags: MetaTag[];
-    userTags: UserTag[];
-  };
-  shortenedURL: string;
-}
-
 export interface MetaTag {
   name: string;
   value: string;
@@ -85,8 +74,8 @@ export interface ContentBlock {
 export interface ContentNode {
   id: string;
   title: string;
-  referenceID?: string
-  namespaceID: string
+  referenceID?: string;
+  namespaceID: string;
   content?: any[];
   range?: {
     startMeta: {
@@ -140,16 +129,6 @@ export interface NodeMetadata {
   pageMetaTags?: any[];
 }
 
-export interface LinkCapture {
-  long: string;
-  short: string;
-  metadata?: {
-    metaTags?: MetaTag[];
-    userTags?: UserTag[];
-  };
-  linksNodeID?: string;
-}
-
 export interface QueryStringParameters {
   getReverseOrder: boolean;
   blockSize: number;
@@ -165,20 +144,18 @@ export interface CopyOrMoveBlock {
   action: 'move';
 }
 
-
 export interface ILink {
   /** Unique Identifier */
-  nodeid: string
+  nodeid: string;
 
   /** The title of the node.
    * Uses separator for heirarchy */
-  path: string
+  path: string;
 
   /** Iconify Icon string */
-  icon?: string
+  icon?: string;
 
-  createdAt?: number
+  createdAt?: number;
 
-  parentNodeId?: string
+  parentNodeId?: string;
 }
-
