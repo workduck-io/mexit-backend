@@ -1,18 +1,18 @@
 import express, { NextFunction, Request, Response } from 'express';
 import container from '../inversify.config';
 import { statusCodes } from '../libs/statusCodes';
-import { ShortenerManager } from '../managers/ShortenerManager';
-import { initializeShortenerRoutes } from '../routes/ShortenerRoutes';
+import { LinkManager } from '../managers/LinkManager';
+import { initializeLinkRoutes } from '../routes/LinkRoutes';
 
-class ShortenerController {
-  public _urlPath = '/shortener';
+class LinkController {
+  public _urlPath = '/link';
   public _router = express.Router();
 
-  public _shortenerManager: ShortenerManager =
-    container.get<ShortenerManager>(ShortenerManager);
+  public _shortenerManager: LinkManager =
+    container.get<LinkManager>(LinkManager);
 
   constructor() {
-    initializeShortenerRoutes(this);
+    initializeLinkRoutes(this);
   }
 
   getShortsByWorkspace = async (
@@ -32,4 +32,4 @@ class ShortenerController {
   };
 }
 
-export default ShortenerController;
+export default LinkController;

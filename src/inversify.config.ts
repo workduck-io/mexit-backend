@@ -8,7 +8,7 @@ import { BookmarkManager } from './managers/BookmarkManager';
 import { NamespaceManager } from './managers/NamespaceManager';
 import { NodeManager } from './managers/NodeManager';
 import { SharedManager } from './managers/SharedManager';
-import { ShortenerManager } from './managers/ShortenerManager';
+import { LinkManager } from './managers/LinkManager';
 import { SnippetManager } from './managers/SnippetManager';
 import { TagManager } from './managers/TagManager';
 import { UserManager } from './managers/UserManager';
@@ -23,10 +23,7 @@ container
   .bind<SnippetManager>(SnippetManager)
   .to(SnippetManager)
   .inSingletonScope();
-container
-  .bind<ShortenerManager>(ShortenerManager)
-  .to(ShortenerManager)
-  .inSingletonScope();
+container.bind<LinkManager>(LinkManager).to(LinkManager).inSingletonScope();
 container.bind<TagManager>(TagManager).to(TagManager).inSingletonScope();
 container
   .bind<SharedManager>(SharedManager)

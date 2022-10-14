@@ -8,15 +8,14 @@ import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
 import { NamespaceManager } from '../managers/NamespaceManager';
 import { NodeManager } from '../managers/NodeManager';
-import { ShortenerManager } from '../managers/ShortenerManager';
+import { LinkManager } from '../managers/LinkManager';
 import { initializeNodeRoutes } from '../routes/NodeRoutes';
 
 class NodeController {
   public _urlPath = '/node';
   public _router = express.Router();
   public _nodeManager: NodeManager = container.get<NodeManager>(NodeManager);
-  public _shortenerManager: ShortenerManager =
-    container.get<ShortenerManager>(ShortenerManager);
+  public _linkManager: LinkManager = container.get<LinkManager>(LinkManager);
   public _transformer: Transformer = container.get<Transformer>(Transformer);
   private _iLinkCache: Cache = container.get<Cache>(
     CacheType.NamespaceHierarchy
