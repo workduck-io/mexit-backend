@@ -1344,6 +1344,27 @@
             ],
             "type": "object"
         },
+        "ShortenLink": {
+            "properties": {
+                "alias": {
+                    "type": "string"
+                },
+                "properties": {},
+                "tags": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "url": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "url"
+            ],
+            "type": "object"
+        },
         "SnippetUpdate": {
             "properties": {
                 "data": {

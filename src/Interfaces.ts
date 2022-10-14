@@ -45,6 +45,7 @@ import {
   UpdateNamespace,
   ShareNamespace,
   RevokeAccessFromNamespace,
+  ShortenLink,
 } from './interfaces/Request';
 import {
   NodeResponse,
@@ -124,4 +125,5 @@ export default class Interfaces implements Definitions {
   UpdateNamespace: UpdateNamespace;
   ShareNamespace: ShareNamespace;
   RevokeAccessFromNamespace: RevokeAccessFromNamespace;
+  ShortenLink: ShortenLink;
 }

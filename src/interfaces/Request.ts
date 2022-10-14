@@ -127,3 +127,10 @@ export interface RevokeAccessFromNamespace {
   namespaceID: string;
   userIDs: string[];
 }
+
+export interface ShortenLink {
+  url: string;
+  alias?: string;
+  properties?: any;
+  tags?: string[];
+}

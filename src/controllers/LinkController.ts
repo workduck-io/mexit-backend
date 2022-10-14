@@ -1,4 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
+import { RequestClass } from '../libs/RequestClass';
 import container from '../inversify.config';
 import { statusCodes } from '../libs/statusCodes';
 import { LinkManager } from '../managers/LinkManager';
@@ -20,10 +21,11 @@ class LinkController {
     next: NextFunction
   ): Promise<void> => {
     try {
+      const data = new RequestClass(request, 'ShortenLink').data;
       const result = await this._linkManager.createNewShort(
         response.locals.workspaceID,
         response.locals.idToken,
-        request.body
+        data
       );
 
       response.status(statusCodes.OK).json(result);
