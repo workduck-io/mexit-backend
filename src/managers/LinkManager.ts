@@ -7,7 +7,7 @@ import { Lambda, InvocationType } from '../libs/LambdaClass';
 import { RouteKeys } from '../libs/routeKeys';
 import { LinkCapture } from '../interfaces/Node';
 @injectable()
-export class ShortenerManager {
+export class LinkManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
   private _getShortsLambdaFunctionName = 'mex-integration-dev-namespaceDetails';
   private _createShortLambdaFunctionName = 'mex-integration-dev-shorten';
