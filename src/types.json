@@ -1468,9 +1468,6 @@
             ],
             "type": "object"
         },
-        "Record<string,string>": {
-            "type": "object"
-        },
         "RefactorRequest": {
             "properties": {
                 "existingNodePath": {
@@ -1545,7 +1542,10 @@
                     "type": "string"
                 },
                 "userIDToAccessTypeMap": {
-                    "$ref": "types#/definitions/Record<string,string>"
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "type": "object"
                 }
             },
             "required": [

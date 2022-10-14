@@ -124,7 +124,7 @@ export interface UpdateNamespace {
 
 export interface ShareNamespace {
   namespaceID: string;
-  userIDToAccessTypeMap: Record<string, string>;
+  userIDToAccessTypeMap: { [key: string]: string };
 }
 
 export interface RevokeAccessFromNamespace {
