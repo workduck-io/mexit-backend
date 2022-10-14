@@ -130,6 +130,7 @@ export interface RevokeAccessFromNamespace {
 
 export interface ShortenLink {
   url: string;
+  expiry?: number;
   alias?: string;
   properties?: any;
   tags?: string[];
