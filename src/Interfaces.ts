@@ -8,14 +8,12 @@ import {
   NodeChildData,
   NodeData,
   Block,
-  LinkNode,
   MetaTag,
   UserTag,
   ContentNode,
   ClientNodeContentChildren,
   ClientNodeContent,
   ClientNode,
-  LinkCapture,
   NodeMetadata,
   ContentBlock,
   ActivityNodeDetail,
@@ -32,7 +30,6 @@ import {
   AppendBlockRequest,
   ContentNodeRequest,
   CopyOrMoveBlockRequest,
-  LinkNodeRequest,
   SnippetUpdateVersionRequest,
   RefactorRequest,
   NodePath,
@@ -48,14 +45,13 @@ import {
   UpdateNamespace,
   ShareNamespace,
   RevokeAccessFromNamespace,
+  ShortenLink,
 } from './interfaces/Request';
 import {
   NodeResponse,
   NodeDataResponse,
-  LinkResponse,
   ContentResponse,
   ClientNodeResponse,
-  LinkResponseContent,
   LinkChildrenType,
   ActivityNodeResponse,
 } from './interfaces/Response';
@@ -84,14 +80,10 @@ export default class Interfaces implements Definitions {
   AuthorizeRefreshTokenType: AuthorizeRefreshTokenType;
   GotResponse: GotResponse;
   GotClientType: GotClientType;
-  LinkNode: LinkNode;
   MetaTag: MetaTag;
   UserTag: UserTag;
-  LinkCapture: LinkCapture;
-  LinkNodeRequest: LinkNodeRequest;
   NodeResponse: NodeResponse;
   NodeDataResponse: NodeDataResponse;
-  LinkResponse: LinkResponse;
   ContentNode: ContentNode;
   ContentNodeRequest: ContentNodeRequest;
   ContentResponse: ContentResponse;
@@ -99,7 +91,6 @@ export default class Interfaces implements Definitions {
   ClientNodeContent: ClientNodeContent;
   ClientNodeContentChildren: ClientNodeContentChildren;
   ClientNodeResponse: ClientNodeResponse;
-  LinkResponseContent: LinkResponseContent;
   LinkChildrenType: LinkChildrenType;
   TextType: TextType;
   NodeMetadata: NodeMetadata;
@@ -134,4 +125,5 @@ export default class Interfaces implements Definitions {
   UpdateNamespace: UpdateNamespace;
   ShareNamespace: ShareNamespace;
   RevokeAccessFromNamespace: RevokeAccessFromNamespace;
+  ShortenLink: ShortenLink;
 }

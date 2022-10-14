@@ -879,41 +879,6 @@
             ],
             "type": "object"
         },
-        "LinkCapture": {
-            "properties": {
-                "linksNodeID": {
-                    "type": "string"
-                },
-                "long": {
-                    "type": "string"
-                },
-                "metadata": {
-                    "properties": {
-                        "metaTags": {
-                            "items": {
-                                "$ref": "types#/definitions/MetaTag"
-                            },
-                            "type": "array"
-                        },
-                        "userTags": {
-                            "items": {
-                                "$ref": "types#/definitions/UserTag"
-                            },
-                            "type": "array"
-                        }
-                    },
-                    "type": "object"
-                },
-                "short": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "long",
-                "short"
-            ],
-            "type": "object"
-        },
         "LinkChildrenType": {
             "properties": {
                 "children": {
@@ -933,203 +898,6 @@
                 "children",
                 "type",
                 "url"
-            ],
-            "type": "object"
-        },
-        "LinkNode": {
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "long": {
-                    "type": "string"
-                },
-                "metadata": {
-                    "properties": {
-                        "metaTags": {
-                            "items": {
-                                "$ref": "types#/definitions/MetaTag"
-                            },
-                            "type": "array"
-                        },
-                        "userTags": {
-                            "items": {
-                                "$ref": "types#/definitions/UserTag"
-                            },
-                            "type": "array"
-                        }
-                    },
-                    "required": [
-                        "metaTags",
-                        "userTags"
-                    ],
-                    "type": "object"
-                },
-                "short": {
-                    "type": "string"
-                },
-                "shortenedURL": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "id",
-                "long",
-                "metadata",
-                "short",
-                "shortenedURL"
-            ],
-            "type": "object"
-        },
-        "LinkNodeRequest": {
-            "properties": {
-                "createdBy": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "long": {
-                    "type": "string"
-                },
-                "metadata": {
-                    "properties": {
-                        "metaTags": {
-                            "items": {
-                                "$ref": "types#/definitions/MetaTag"
-                            },
-                            "type": "array"
-                        },
-                        "userTags": {
-                            "items": {
-                                "$ref": "types#/definitions/UserTag"
-                            },
-                            "type": "array"
-                        }
-                    },
-                    "required": [
-                        "metaTags",
-                        "userTags"
-                    ],
-                    "type": "object"
-                },
-                "short": {
-                    "type": "string"
-                },
-                "shortenedURL": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "createdBy",
-                "id",
-                "long",
-                "metadata",
-                "short",
-                "shortenedURL"
-            ],
-            "type": "object"
-        },
-        "LinkResponse": {
-            "properties": {
-                "content": {
-                    "items": {
-                        "$ref": "types#/definitions/LinkResponseContent"
-                    },
-                    "type": "array"
-                },
-                "createdAt": {
-                    "type": "number"
-                },
-                "createdBy": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "long": {
-                    "type": "string"
-                },
-                "metadata": {
-                    "properties": {
-                        "metaTags": {
-                            "items": {
-                                "$ref": "types#/definitions/MetaTag"
-                            },
-                            "type": "array"
-                        },
-                        "userTags": {
-                            "items": {
-                                "$ref": "types#/definitions/UserTag"
-                            },
-                            "type": "array"
-                        }
-                    },
-                    "required": [
-                        "metaTags",
-                        "userTags"
-                    ],
-                    "type": "object"
-                },
-                "namespaceIdentifier": {
-                    "type": "string"
-                },
-                "short": {
-                    "type": "string"
-                },
-                "shortenedURL": {
-                    "type": "string"
-                },
-                "updatedAt": {
-                    "type": "number"
-                },
-                "workspaceIdentifier": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "content",
-                "createdAt",
-                "createdBy",
-                "id",
-                "long",
-                "metadata",
-                "namespaceIdentifier",
-                "short",
-                "shortenedURL",
-                "updatedAt",
-                "workspaceIdentifier"
-            ],
-            "type": "object"
-        },
-        "LinkResponseContent": {
-            "properties": {
-                "children": {
-                    "anyOf": [
-                        {
-                            "items": {
-                                "$ref": "types#/definitions/TextType"
-                            },
-                            "type": "array"
-                        },
-                        {
-                            "items": {
-                                "$ref": "types#/definitions/LinkChildrenType"
-                            },
-                            "type": "array"
-                        }
-                    ]
-                },
-                "id": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "children",
-                "type"
             ],
             "type": "object"
         },
@@ -1468,9 +1236,6 @@
             ],
             "type": "object"
         },
-        "Record<string,string>": {
-            "type": "object"
-        },
         "RefactorRequest": {
             "properties": {
                 "existingNodePath": {
@@ -1545,7 +1310,10 @@
                     "type": "string"
                 },
                 "userIDToAccessTypeMap": {
-                    "$ref": "types#/definitions/Record<string,string>"
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "type": "object"
                 }
             },
             "required": [
@@ -1573,6 +1341,30 @@
                 "accessType",
                 "nodeID",
                 "userIDs"
+            ],
+            "type": "object"
+        },
+        "ShortenLink": {
+            "properties": {
+                "alias": {
+                    "type": "string"
+                },
+                "expiry": {
+                    "type": "number"
+                },
+                "properties": {},
+                "tags": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "url": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "url"
             ],
             "type": "object"
         },
