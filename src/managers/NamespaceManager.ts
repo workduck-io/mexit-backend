@@ -148,11 +148,7 @@ export class NamespaceManager {
     }
   }
 
-  async getPublicNamespace(
-    workspaceId: string,
-    idToken: string,
-    namespaceId: string
-  ): Promise<any> {
+  async getPublicNamespace(idToken: string, namespaceId: string): Promise<any> {
     try {
       const result = await this._lambda.invokeAndCheck(
         this._namespaceLambdaFunctionName,
@@ -160,7 +156,7 @@ export class NamespaceManager {
         {
           routeKey: RouteKeys.getPublicNamespace,
           pathParameters: { id: namespaceId },
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+          headers: { 'mex-workspace-id': '', authorization: idToken },
         }
       );
       return result;
@@ -213,6 +209,88 @@ export class NamespaceManager {
           queryStringParameters: { getMetadata: getMetadata },
         }
       );
+      return result;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+
+  async shareNamespace(
+    workspaceID: string,
+    idToken: string,
+    body: any
+  ): Promise<any> {
+    try {
+      const result = await this._lambda.invokeAndCheck(
+        this._namespaceLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.shareNamespace,
+          payload: { ...body, type: 'SharedNamespaceRequest' },
+          headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
+        }
+      );
+      return result;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+
+  async revokeAccessFromNamespace(
+    workspaceID: string,
+    idToken: string,
+    body: any
+  ): Promise<any> {
+    try {
+      const result = await this._lambda.invokeAndCheck(
+        this._namespaceLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.revokeUserAccessFromNamespace,
+          payload: { ...body, type: 'SharedNamespaceRequest' },
+          headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
+        }
+      );
+      return result;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+
+  async getUsersOfSharedNamespace(
+    workspaceID: string,
+    idToken: string,
+    namespaceID: string
+  ): Promise<any> {
+    try {
+      const result = await this._lambda.invokeAndCheck(
+        this._namespaceLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.getUsersOfSharedNamespace,
+          pathParameters: { id: namespaceID },
+          headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
+        }
+      );
+
       return result;
     } catch (error) {
       errorlib({
