@@ -13,10 +13,10 @@ import { IS_DEV } from './env';
 
 import OAuth2Controller from './controllers/OAuth2Controller';
 import BookmarkController from './controllers/BookmarkController';
+import LinkController from './controllers/LinkController';
 import NodeController from './controllers/NodeController';
 import PublicController from './controllers/PublicController';
 import SharedController from './controllers/SharedController';
-import ShortenerController from './controllers/ShortenerController';
 import SnippetController from './controllers/SnippetController';
 import TagController from './controllers/TagController';
 import UserController from './controllers/UserController';
@@ -76,11 +76,11 @@ class App {
 const application = new App([
   new HealthCheckController(),
   new BookmarkController(),
+  new LinkController(),
   new NodeController(),
   new OAuth2Controller(),
   new PublicController(),
   new SharedController(),
-  new ShortenerController(),
   new SnippetController(),
   new TagController(),
   new UserController(),

@@ -1,8 +1,4 @@
-import { ContentNode, LinkNode } from './Node';
-
-export interface LinkNodeRequest extends LinkNode {
-  createdBy: string;
-}
+import { ContentNode } from './Node';
 
 export interface ContentNodeRequest extends ContentNode {
   createdBy?: string;
@@ -124,10 +120,18 @@ export interface UpdateNamespace {
 
 export interface ShareNamespace {
   namespaceID: string;
-  userIDToAccessTypeMap: Record<string, string>;
+  userIDToAccessTypeMap: { [key: string]: string };
 }
 
 export interface RevokeAccessFromNamespace {
   namespaceID: string;
   userIDs: string[];
+}
+
+export interface ShortenLink {
+  url: string;
+  expiry?: number;
+  alias?: string;
+  properties?: any;
+  tags?: string[];
 }
