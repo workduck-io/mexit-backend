@@ -8,23 +8,77 @@ class LinkController {
   public _urlPath = '/link';
   public _router = express.Router();
 
-  public _shortenerManager: LinkManager =
-    container.get<LinkManager>(LinkManager);
+  public _linkManager: LinkManager = container.get<LinkManager>(LinkManager);
 
   constructor() {
     initializeLinkRoutes(this);
   }
 
-  getShortsByWorkspace = async (
+  shortenLink = async (
     request: Request,
     response: Response,
     next: NextFunction
-  ): Promise<any> => {
-    const workspaceId = request.params.workspaceId;
+  ): Promise<void> => {
     try {
-      const result = await this._shortenerManager.getStatsByWorkspace(
-        workspaceId
+      const result = await this._linkManager.createNewShort(
+        response.locals.workspaceID,
+        response.locals.idToken,
+        request.body
       );
+
+      response.status(statusCodes.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getAllShortsOfWorkspace = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const result = await this._linkManager.getAllShortsOfWorkspace(
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
+
+      response.status(statusCodes.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  deleteShort = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const result = await this._linkManager.deleteShort(
+        response.locals.workspaceID,
+        response.locals.idToken,
+        request.params.url
+      );
+
+      response.status(statusCodes.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getStatsByURL = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const result = await this._linkManager.getStatsByURL(
+        response.locals.workspaceID,
+        response.locals.idToken,
+        request.params.url
+      );
+
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
