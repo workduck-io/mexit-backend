@@ -104,3 +104,30 @@ export interface PostView {
   entityId: string;
   filters: Filter[];
 }
+
+export interface CreateNamespace {
+  id: string;
+  name: string;
+  type?: string;
+}
+
+export interface UpdateNamespace {
+  id: string;
+  name: string;
+  metadata?: {
+    icon?: {
+      type: string;
+      value: string;
+    };
+  };
+}
+
+export interface ShareNamespace {
+  namespaceID: string;
+  userIDToAccessTypeMap: Record<string, string>;
+}
+
+export interface RevokeAccessFromNamespace {
+  namespaceID: string;
+  userIDs: string[];
+}

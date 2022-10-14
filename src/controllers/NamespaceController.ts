@@ -9,6 +9,7 @@ import {
 } from '../libs/TransformerClass';
 import { NamespaceManager } from '../managers/NamespaceManager';
 import { initializeNamespaceRoutes } from '../routes/NamespaceRoutes';
+import { RequestClass } from '../libs/RequestClass';
 
 class NamespaceController {
   public _urlPath = '/namespace';
@@ -29,13 +30,14 @@ class NamespaceController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const namespaceResult = await this._namespaceManager.createNamespace(
+      const body = new RequestClass(request, 'CreateNamespace').data;
+      await this._namespaceManager.createNamespace(
         response.locals.workspaceID,
         response.locals.idToken,
-        request.body
+        body
       );
 
-      response.status(statusCodes.OK).json(namespaceResult);
+      response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
       next(error);
     }
@@ -66,10 +68,12 @@ class NamespaceController {
     next: NextFunction
   ): Promise<void> => {
     try {
+      const body = new RequestClass(request, 'UpdateNamespace').data;
+
       await this._namespaceManager.updateNamespace(
         response.locals.workspaceID,
         response.locals.idToken,
-        request.body
+        body
       );
 
       response.status(statusCodes.NO_CONTENT).send();
@@ -120,17 +124,33 @@ class NamespaceController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._namespaceManager.getAllNamespaces(
+      const result: any[] = await this._namespaceManager.getAllNamespaces(
         response.locals.workspaceID,
         response.locals.idToken
       );
 
-      result.forEach(ns => {
-        ns.archivedNodeHierarchyInformation = this._transformer.hierarchyParser(
-          ns.archivedNodeHierarchyInformation
-        );
+      const transformedResult = result.reduce(
+        (obj, item) => ((obj[item.namespaceID] = item), obj),
+        {}
+      );
+
+      const ids = Object.keys(transformedResult);
+      const promises = ids.map(id =>
+        this._namespaceManager.getNamespace(
+          response.locals.workspaceID,
+          response.locals.idToken,
+          id
+        )
+      );
+
+      const allNamespacesResults = await Promise.all(promises);
+      allNamespacesResults.forEach(ns => {
+        ns.nodeHierarchy = this._transformer.hierarchyParser(ns.nodeHierarchy);
+        ns.accessType = transformedResult[ns.id].accessType;
+        ns.granterID = transformedResult[ns.id].granterID;
       });
-      response.status(statusCodes.OK).json(result);
+
+      response.status(statusCodes.OK).json(allNamespacesResults);
     } catch (error) {
       next(error);
     }
@@ -153,10 +173,10 @@ class NamespaceController {
       ) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         //@ts-ignore
-        parsedNamespaceHierarchy = await this._cache.get(
+        parsedNamespaceHierarchy = (await this._cache.get(
           response.locals.userId,
           this._NSHierarchyLabel
-        );
+        )) as any;
       } else {
         const result = await this._namespaceManager.getAllNamespaceHierarchy(
           response.locals.workspaceID,
@@ -179,6 +199,84 @@ class NamespaceController {
       }
 
       response.status(statusCodes.OK).json(parsedNamespaceHierarchy);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  shareNamespace = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const body = new RequestClass(request, 'ShareNamespace').data;
+
+      const accessTypeMap: Record<string, string[]> = {};
+
+      Object.entries(body.userIDToAccessTypeMap).forEach(
+        ([userID, accessType]) => {
+          if (accessTypeMap[accessType]) accessTypeMap[accessType].push(userID);
+          else accessTypeMap[accessType] = [userID];
+        }
+      );
+
+      const backendRequestBodies = [];
+      Object.entries(accessTypeMap).forEach(([accessType, userIDs]) => {
+        backendRequestBodies.push({
+          namespaceID: body.namespaceID,
+          accessType: accessType,
+          userIDs: userIDs,
+        });
+      });
+
+      const promises = backendRequestBodies.map(i =>
+        this._namespaceManager.shareNamespace(
+          response.locals.workspaceID,
+          response.locals.idToken,
+          i
+        )
+      );
+
+      await Promise.all(promises);
+
+      response.status(statusCodes.NO_CONTENT).send();
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  revokeAccessFromNamespace = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const body = new RequestClass(request, 'RevokeAccessFromNamespace').data;
+      const result = await this._namespaceManager.revokeAccessFromNamespace(
+        response.locals.workspaceID,
+        response.locals.idToken,
+        body
+      );
+
+      response.status(statusCodes.NO_CONTENT).send();
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getUsersInvitedToNamespace = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const result = await this._namespaceManager.getUsersOfSharedNamespace(
+        response.locals.workspaceID,
+        response.locals.idToken,
+        request.params.namespaceID
+      );
+      response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
     }

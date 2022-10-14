@@ -76,4 +76,9 @@ export const RouteKeys = {
   getPublicNode: 'GET /node/public/{id}',
   getPublicNamespace: 'GET /namespace/public/{id}',
   getPublicSnippet: 'GET /snippet/public/{id}/{version}',
+
+  // Shared Namespaces Roues
+  shareNamespace: 'POST /shared/namespace',
+  revokeUserAccessFromNamespace: 'DELETE /shared/namespace',
+  getUsersOfSharedNamespace: 'GET /shared/namespace/{id}/users',
 };

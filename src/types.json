@@ -694,6 +694,24 @@
             ],
             "type": "object"
         },
+        "CreateNamespace": {
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "name"
+            ],
+            "type": "object"
+        },
         "Filter": {
             "properties": {
                 "id": {
@@ -1450,6 +1468,9 @@
             ],
             "type": "object"
         },
+        "Record<string,string>": {
+            "type": "object"
+        },
         "RefactorRequest": {
             "properties": {
                 "existingNodePath": {
@@ -1497,6 +1518,39 @@
             "required": [
                 "user",
                 "workspaceName"
+            ],
+            "type": "object"
+        },
+        "RevokeAccessFromNamespace": {
+            "properties": {
+                "namespaceID": {
+                    "type": "string"
+                },
+                "userIDs": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "namespaceID",
+                "userIDs"
+            ],
+            "type": "object"
+        },
+        "ShareNamespace": {
+            "properties": {
+                "namespaceID": {
+                    "type": "string"
+                },
+                "userIDToAccessTypeMap": {
+                    "$ref": "types#/definitions/Record<string,string>"
+                }
+            },
+            "required": [
+                "namespaceID",
+                "userIDToAccessTypeMap"
             ],
             "type": "object"
         },
@@ -1682,6 +1736,41 @@
             "required": [
                 "nodeID",
                 "userIDToAccessTypeMap"
+            ],
+            "type": "object"
+        },
+        "UpdateNamespace": {
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "properties": {
+                        "icon": {
+                            "properties": {
+                                "type": {
+                                    "type": "string"
+                                },
+                                "value": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "type",
+                                "value"
+                            ],
+                            "type": "object"
+                        }
+                    },
+                    "type": "object"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "name"
             ],
             "type": "object"
         },
