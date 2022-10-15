@@ -77,4 +77,12 @@ export const RouteKeys = {
   shareNamespace: 'POST /shared/namespace',
   revokeUserAccessFromNamespace: 'DELETE /shared/namespace',
   getUsersOfSharedNamespace: 'GET /shared/namespace/{id}/users',
+
+  // Reminders
+  getReminderByID: 'GET /{entityId}',
+  createReminder: 'POST /',
+  deleteReminderByID: 'DELETE /{entityId}',
+  getAllRemindersOfNode: 'GET /all/node/{nodeId}',
+  deleteAllRemindersOfNode: 'DELETE /all/node/{nodeId}',
+  getAllRemindersOfWorkspace: 'GET /all/workspace',
 };

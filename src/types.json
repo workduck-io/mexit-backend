@@ -1286,6 +1286,21 @@
             ],
             "type": "object"
         },
+        "Reminder": {
+            "properties": {
+                "entityId": {
+                    "type": "string"
+                },
+                "nodeId": {
+                    "type": "string"
+                },
+                "properties": {}
+            },
+            "required": [
+                "entityId"
+            ],
+            "type": "object"
+        },
         "RevokeAccessFromNamespace": {
             "properties": {
                 "namespaceID": {
