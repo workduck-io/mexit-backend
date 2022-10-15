@@ -1,8 +1,10 @@
 import express, { NextFunction, Request, Response } from 'express';
+import { CacheType } from '../interfaces/Config';
+import { NodeResponse } from '../interfaces/Response';
 import container from '../inversify.config';
+import { Cache } from '../libs/CacheClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
-import { NodeResponse } from '../interfaces/Response';
 import { SnippetManager } from '../managers/SnippetManager';
 import { initializeSnippetRoutes } from '../routes/SnippetRoutes';
 class SnippetController {
@@ -11,6 +13,11 @@ class SnippetController {
   public _snippetManager: SnippetManager =
     container.get<SnippetManager>(SnippetManager);
   public _transformer: Transformer = container.get<Transformer>(Transformer);
+  private _userAccessCache: Cache = container.get<Cache>(CacheType.UserAccess);
+  private _snippetCache: Cache = container.get<Cache>(CacheType.Snippet);
+  private _SnippetLabel = 'SNIPPET';
+  private _UserAccessLabel = 'USERACCESS_SNIPPET';
+  private _PublicSnippetMockWorkspace = 'PUBLIC';
 
   constructor() {
     initializeSnippetRoutes(this);
@@ -23,7 +30,8 @@ class SnippetController {
   ): Promise<void> => {
     try {
       const createNextVersion = request.query.createNextVersion === 'true';
-
+      //TODO: update cache instead of deleting it
+      this._snippetCache.del(request.body.id, this._SnippetLabel);
       const snippetResult = await this._snippetManager.createSnippet(
         response.locals.workspaceID,
         response.locals.idToken,
@@ -45,12 +53,25 @@ class SnippetController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = (await this._snippetManager.getSnippet(
-        request.params.snippetId,
-        response.locals.workspaceID,
-        response.locals.idToken
-      )) as NodeResponse;
-
+      const snippetId = request.params.snippetId;
+      const userSpecificNodeKey = response.locals.userID + snippetId;
+      const result = await this._snippetCache.getOrSet<NodeResponse>(
+        snippetId,
+        this._SnippetLabel,
+        async () =>
+          await this._snippetManager.getSnippet(
+            snippetId,
+            response.locals.workspaceID,
+            response.locals.idToken
+          ),
+        //Force get if user permission is not cached
+        !this._userAccessCache.has(userSpecificNodeKey, this._UserAccessLabel)
+      );
+      this._userAccessCache.set(
+        userSpecificNodeKey,
+        this._UserAccessLabel,
+        true
+      );
       const convertedResponse = this._transformer.genericNodeConverter(result);
 
       response.status(statusCodes.OK).json(convertedResponse);
@@ -65,12 +86,27 @@ class SnippetController {
     next: NextFunction
   ): Promise<void> => {
     try {
+      //TODO: Use cache.mGet to fetch only the snippets not in the cache
       const rawSnippets: any[] = await this._snippetManager.bulkGetSnippet(
         request.body['ids'],
         response.locals.workspaceID,
         response.locals.idToken
       );
+      this._snippetCache.mset(
+        rawSnippets.map(rs => ({
+          key: rs.id,
+          payload: rs,
+        })),
+        this._SnippetLabel
+      );
 
+      this._userAccessCache.mset(
+        rawSnippets.map(rs => ({
+          key: response.locals.workspaceID + rs.id,
+          payload: rs,
+        })),
+        this._SnippetLabel
+      );
       const result = rawSnippets.map(snippet =>
         this._transformer.genericNodeConverter(snippet)
       );
@@ -126,12 +162,16 @@ class SnippetController {
     try {
       const snippetId = request.params.id;
       const version = request.params.version;
-
       await this._snippetManager.makeSnippetPublic(
         snippetId,
         version,
         response.locals.workspaceID,
         response.locals.idToken
+      );
+      this._userAccessCache.set(
+        this._PublicSnippetMockWorkspace + request.params.id,
+        this._SnippetLabel,
+        true
       );
 
       response.status(statusCodes.OK).send();
@@ -154,7 +194,10 @@ class SnippetController {
         response.locals.workspaceID,
         response.locals.idToken
       );
-
+      this._userAccessCache.del(
+        this._PublicSnippetMockWorkspace + snippetId,
+        this._SnippetLabel
+      );
       response.status(statusCodes.OK).send();
     } catch (error) {
       next(error);
@@ -169,13 +212,22 @@ class SnippetController {
     try {
       const snippetId = request.params.snippetId;
       const version = request.params.version;
-
-      const result = (await this._snippetManager.getPublicSnippet(
+      const result = await this._snippetCache.getOrSet<NodeResponse>(
         snippetId,
-        version,
-        response.locals.workspaceID,
-        response.locals.idToken
-      )) as NodeResponse;
+        this._SnippetLabel,
+        async () =>
+          await this._snippetManager.getPublicSnippet(
+            snippetId,
+            version,
+            response.locals.workspaceID,
+            response.locals.idToken
+          ),
+        //Force get if user permission is not cached
+        !this._userAccessCache.has(
+          this._PublicSnippetMockWorkspace + snippetId,
+          this._UserAccessLabel
+        )
+      );
 
       const convertedResponse = this._transformer.genericNodeConverter(result);
 
