@@ -1,10 +1,10 @@
 import express, { NextFunction, Request, Response } from 'express';
-import { initializeViewRoutes } from '../routes/ViewRoutes';
 import container from '../inversify.config';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
 import { RequestClass } from '../libs/RequestClass';
 import { ReminderManager } from '../managers/ReminderManager';
+import { initializeReminderRoutes } from '../routes/ReminderRoutes';
 
 class ReminderController {
   public _urlPath = '/reminder';
@@ -15,7 +15,7 @@ class ReminderController {
   public _transformer: Transformer = container.get<Transformer>(Transformer);
 
   constructor() {
-    initializeViewRoutes(this);
+    initializeReminderRoutes(this);
   }
 
   getReminder = async (
@@ -42,10 +42,11 @@ class ReminderController {
     next: NextFunction
   ): Promise<void> => {
     try {
+      const data = new RequestClass(request, 'Reminder').data;
       const result = await this._reminderManager.createReminder(
         response.locals.workspaceID,
         response.locals.idToken,
-        request.body
+        data
       );
 
       response.status(statusCodes.OK).json(result);

@@ -135,3 +135,9 @@ export interface ShortenLink {
   properties?: any;
   tags?: string[];
 }
+
+export interface Reminder {
+  nodeId?: string;
+  entityId: string;
+  properties?: any;
+}

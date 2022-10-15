@@ -57,7 +57,8 @@ export class ReminderManager {
           routeKey: RouteKeys.createReminder,
           payload: data,
           headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
-        }
+        },
+        true
       );
 
       return result;

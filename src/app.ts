@@ -25,6 +25,7 @@ import HealthCheckController from './controllers/HealthCheckController';
 import { wdRequestIdExpressParser } from '@workduck-io/wd-request-id-parser';
 import NamespaceController from './controllers/NamespaceController';
 import ViewController from './controllers/ViewController';
+import ReminderController from './controllers/ReminderController';
 
 class App {
   public _app: express.Application;
@@ -85,6 +86,7 @@ const application = new App([
   new TagController(),
   new UserController(),
   new NamespaceController(),
+  new ReminderController(),
   new ViewController(),
 ]);
 
