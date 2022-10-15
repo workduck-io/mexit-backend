@@ -13,6 +13,7 @@ import { SnippetManager } from './managers/SnippetManager';
 import { TagManager } from './managers/TagManager';
 import { UserManager } from './managers/UserManager';
 import { ViewManager } from './managers/ViewManager';
+import { ReminderManager } from './managers/ReminderManager';
 
 const container = new Container();
 
@@ -47,4 +48,8 @@ container
   .to(NamespaceManager)
   .inSingletonScope();
 container.bind<ViewManager>(ViewManager).to(ViewManager).inSingletonScope();
+container
+  .bind<ReminderManager>(ReminderManager)
+  .to(ReminderManager)
+  .inSingletonScope();
 export default container;
