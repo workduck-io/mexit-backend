@@ -73,7 +73,7 @@ export class NamespaceManager {
     namespaceDetail: { name: string }
   ): Promise<any> {
     try {
-      const result = await this._lambda.invoke(
+      const result = await this._lambda.invokeAndCheck(
         this._namespaceLambdaFunctionName,
         this._lambdaInvocationType,
         {
