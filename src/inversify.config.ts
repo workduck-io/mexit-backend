@@ -5,10 +5,10 @@ import { GotClient } from './libs/GotClientClass';
 import { Lambda } from './libs/LambdaClass';
 import { Transformer } from './libs/TransformerClass';
 import { BookmarkManager } from './managers/BookmarkManager';
+import { LinkManager } from './managers/LinkManager';
 import { NamespaceManager } from './managers/NamespaceManager';
 import { NodeManager } from './managers/NodeManager';
 import { SharedManager } from './managers/SharedManager';
-import { LinkManager } from './managers/LinkManager';
 import { SnippetManager } from './managers/SnippetManager';
 import { TagManager } from './managers/TagManager';
 import { UserManager } from './managers/UserManager';
@@ -36,6 +36,7 @@ container
   .inSingletonScope();
 container.bind<Cache>(CacheType.Node).to(Cache).inSingletonScope();
 container.bind<Cache>(CacheType.UserAccess).to(Cache).inSingletonScope();
+container.bind<Cache>(CacheType.Snippet).to(Cache).inSingletonScope();
 container.bind<Lambda>(Lambda).to(Lambda).inSingletonScope();
 container
   .bind<BookmarkManager>(BookmarkManager)
