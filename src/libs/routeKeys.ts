@@ -60,7 +60,7 @@ export const RouteKeys = {
   makeNamespacePublic: 'PATCH /namespace/makePublic/{id}',
   makeNamespacePrivate: 'PATCH /namespace/makePrivate/{id}',
   getAllNamespaceHierarchy: 'GET /namespace/all/hierarchy',
-  getAllNamespaces: 'GET /namespace/all',
+  getAllNamespaces: 'GET /v2/namespace/all',
 
   // Views - CRUD Operations
   getAllViews: 'GET /view/all/workspace',
