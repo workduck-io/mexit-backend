@@ -29,6 +29,41 @@ export class Cache {
       this._cache.get(this._transformer.encodeCacheKey(entity, key))
     );
   }
+  has(key: string, entity: string) {
+    return this._cache.has(this._transformer.encodeCacheKey(entity, key));
+  }
+
+  del(key: string, entity: string) {
+    if (this._cache.has(this._transformer.encodeCacheKey(entity, key)))
+      this._cache.del(this._transformer.encodeCacheKey(entity, key));
+  }
+
+  mget(keys: string[], entity: string) {
+    return this._cache.mget(
+      keys.map(key => this._transformer.encodeCacheKey(entity, key))
+    );
+  }
+
+  mdel(keys: string[], entity: string) {
+    this._cache.del(
+      keys.map(key => this._transformer.encodeCacheKey(entity, key))
+    );
+  }
+
+  mset(
+    items: {
+      key: string;
+      payload: string;
+    }[],
+    entity: string
+  ) {
+    this._cache.mset(
+      items.map(item => ({
+        key: this._transformer.encodeCacheKey(entity, item.key),
+        val: item.payload,
+      }))
+    );
+  }
 
   async getOrSet<T>(
     key: string,
@@ -54,14 +89,5 @@ export class Cache {
       this._cache.del(this._transformer.encodeCacheKey(entity, key));
 
     this._cache.set(this._transformer.encodeCacheKey(entity, key), value);
-  }
-
-  has(key: string, entity: string) {
-    return this._cache.has(this._transformer.encodeCacheKey(entity, key));
-  }
-
-  del(key: string, entity: string) {
-    if (this._cache.has(this._transformer.encodeCacheKey(entity, key)))
-      this._cache.del(this._transformer.encodeCacheKey(entity, key));
   }
 }
