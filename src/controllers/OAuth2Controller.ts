@@ -1,11 +1,9 @@
 import express, { Request, Response } from 'express';
 import { statusCodes } from '../libs/statusCodes';
-import { google } from 'googleapis';
 import { IS_DEV } from '../env';
 import { GotClient } from '../libs/GotClientClass';
 import container from '../inversify.config';
 import { RequestClass } from '../libs/RequestClass';
-// eslint-disable-next-line node/no-extraneous-import
 import { OAuth2Client } from 'google-auth-library';
 import { initializeOAuth2Routes } from '../routes/OAuth2Routes';
 
@@ -32,13 +30,11 @@ class OAuth2Controller {
     if (!process.env.client_secret)
       throw new Error('Client Secret Not Provided');
 
-    this._oauth2Client = new google.auth.OAuth2({
+    this._oauth2Client = new OAuth2Client({
       clientId: process.env.client_id,
       clientSecret: process.env.client_secret,
       redirectUri: OAuth2Controller.redirectUri,
     });
-
-    google.options({ auth: this._oauth2Client });
   }
 
   getNewAccessToken = async (
