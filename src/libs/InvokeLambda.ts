@@ -1,4 +1,8 @@
-import LambdaClient from 'aws-sdk/clients/lambda';
+import {
+  LambdaClient,
+  InvocationRequest,
+  InvokeCommand,
+} from '@aws-sdk/client-lambda';
 
 const lambdaClient = new LambdaClient({
   region: 'us-east-1',
@@ -10,6 +14,8 @@ const lambdaClient = new LambdaClient({
 });
 
 export default {
-  invokeLambdaClient: (params: LambdaClient.InvocationRequest) =>
-    lambdaClient.invoke(params).promise(),
+  invokeLambdaClient: async (params: InvocationRequest) => {
+    const command = new InvokeCommand(params);
+    return await lambdaClient.send(command);
+  },
 };

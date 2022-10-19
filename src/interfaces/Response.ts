@@ -36,16 +36,6 @@ export interface NodeDataResponse {
   updatedAt: number;
 }
 
-export interface LinkChildrenType {
-  type: string;
-  url: string;
-  children: TextType[];
-}
-
-export interface TextType {
-  text: string;
-}
-
 export interface ContentResponse extends ContentNode {
   createdAt: number;
   updatedAt: number;
