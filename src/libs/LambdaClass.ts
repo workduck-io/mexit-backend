@@ -1,6 +1,9 @@
+import { fromUtf8, toUtf8 } from '@aws-sdk/util-utf8-node';
+
 import { injectable } from 'inversify';
 import LambdaConfig from './InvokeLambda';
 import { WDError } from '@workduck-io/wderror';
+
 export type InvocationType = 'RequestResponse' | 'Event';
 export type InvocationSource = 'Direct' | 'APIGateway';
 
@@ -23,36 +26,40 @@ export class Lambda {
     invocationSource: InvocationSource = 'APIGateway'
   ) {
     return JSON.parse(
-      (
-        await LambdaConfig.invokeLambdaClient({
-          FunctionName: functionName,
-          Payload: JSON.stringify(
-            invocationSource === 'Direct'
-              ? options.payload
-              : {
-                  ...(options.pathParameters && {
-                    pathParameters: options.pathParameters,
-                  }),
-                  ...(options.payload && {
-                    body: sendRawBody
-                      ? options.payload
-                      : JSON.stringify(options.payload),
-                  }),
-                  routeKey: options.routeKey,
-                  ...(options.queryStringParameters && {
-                    queryStringParameters: options.queryStringParameters,
-                  }),
-                  ...(options.headers && {
-                    headers: options.headers,
-                  }),
-                  ...(options.httpMethod && {
-                    httpMethod: options.httpMethod,
-                  }),
-                }
-          ),
-          InvocationType: invocationType,
-        })
-      ).Payload as string
+      toUtf8(
+        (
+          await LambdaConfig.invokeLambdaClient({
+            FunctionName: functionName,
+            Payload: fromUtf8(
+              JSON.stringify(
+                invocationSource === 'Direct'
+                  ? options.payload
+                  : {
+                      ...(options.pathParameters && {
+                        pathParameters: options.pathParameters,
+                      }),
+                      ...(options.payload && {
+                        body: sendRawBody
+                          ? options.payload
+                          : JSON.stringify(options.payload),
+                      }),
+                      routeKey: options.routeKey,
+                      ...(options.queryStringParameters && {
+                        queryStringParameters: options.queryStringParameters,
+                      }),
+                      ...(options.headers && {
+                        headers: options.headers,
+                      }),
+                      ...(options.httpMethod && {
+                        httpMethod: options.httpMethod,
+                      }),
+                    }
+              )
+            ),
+            InvocationType: invocationType,
+          })
+        ).Payload
+      )
     );
   }
 

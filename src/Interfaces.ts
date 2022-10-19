@@ -1,4 +1,3 @@
-import { TextType } from 'aws-sdk/clients/polly';
 import { AuthorizeRefreshTokenType, AuthorizeType } from './interfaces/Auth';
 import { GenericObjectType, GenericType } from './interfaces/Generics';
 import { GoogleAuthRefreshToken } from './interfaces/GoogleService';
@@ -54,7 +53,6 @@ import {
   ActivityNodeResponse,
   ClientNodeResponse,
   ContentResponse,
-  LinkChildrenType,
   NodeDataResponse,
   NodeResponse,
 } from './interfaces/Response';
@@ -94,8 +92,6 @@ export default class Interfaces implements Definitions {
   ClientNodeContent: ClientNodeContent;
   ClientNodeContentChildren: ClientNodeContentChildren;
   ClientNodeResponse: ClientNodeResponse;
-  LinkChildrenType: LinkChildrenType;
-  TextType: TextType;
   NodeMetadata: NodeMetadata;
   ContentBlock: ContentBlock;
   ActivityNodeDetail: ActivityNodeDetail;
