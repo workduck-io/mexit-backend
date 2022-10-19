@@ -1,7 +1,6 @@
 import { statusCodes } from './../libs/statusCodes';
 import { ErrorRequestHandler, Request, Response, NextFunction } from 'express';
 import logger from '../libs/logger';
-import geoip from 'geoip-lite';
 import { WDError } from '@workduck-io/wderror';
 
 const responseErrorHandler: ErrorRequestHandler = (
@@ -16,22 +15,21 @@ const responseErrorHandler: ErrorRequestHandler = (
   const clientIp =
     request.headers['x-forwarded-for']?.toString().split(',')[0] ||
     request.socket.remoteAddress;
-  const clientLocation = geoip.lookup(clientIp);
 
   if (statusCode >= 400 && statusCode < 500) {
     logger.warn(
-      `HTTP [${request.method}] ${request.url} - ${statusCode} ${message} | client IP ${clientIp} | LatLong ${clientLocation?.ll} | ${clientLocation?.city}, ${clientLocation?.region}, ${clientLocation?.country}`
+      `HTTP [${request.method}] ${request.url} - ${statusCode} ${message} | client IP ${clientIp}`
     );
   } else if (statusCode >= 500) {
     const workspaceId = request.headers['mex-workspace-id'];
 
     if (workspaceId)
       logger.info(
-        `HTTP [${request.method}] ${request.url} | ${workspaceId} | client IP ${clientIp} | LatLong ${clientLocation?.ll} | ${clientLocation?.city}, ${clientLocation?.region}, ${clientLocation?.country}`
+        `HTTP [${request.method}] ${request.url} | ${workspaceId} | client IP ${clientIp}`
       );
     else
       logger.error(
-        `HTTP [${request.method}] ${request.url} - ${statusCode} ${message} | client IP ${clientIp} | LatLong ${clientLocation?.ll} | ${clientLocation?.city}, ${clientLocation?.region}, ${clientLocation?.country}`
+        `HTTP [${request.method}] ${request.url} - ${statusCode} ${message} | client IP ${clientIp}`
       );
 
     logger.error(`Call Stack ${error.response?.stackTrace ?? error.stack}`);
