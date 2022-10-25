@@ -1,16 +1,15 @@
 import { injectable } from 'inversify';
 
-import { errorlib } from '../libs/errorlib';
-import { statusCodes } from '../libs/statusCodes';
-import container from '../inversify.config';
-import { Lambda, InvocationType } from '../libs/LambdaClass';
 import { STAGE } from '../env';
-import { RouteKeys } from '../libs/routeKeys';
+import container from '../inversify.config';
+import { errorlib } from '../libs/errorlib';
+import { InvocationType, Lambda } from '../libs/LambdaClass';
+import { statusCodes } from '../libs/statusCodes';
 
 @injectable()
 export class ViewManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
-  private _taskViewLambdaNameBase = `task-${STAGE}`;
+  private _taskViewLambdaName = `task-${STAGE}-view`;
 
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
@@ -21,7 +20,7 @@ export class ViewManager {
   ): Promise<any> {
     try {
       const result = await this._lambda.invokeAndCheck(
-        `${this._taskViewLambdaNameBase}-getView`,
+        this._taskViewLambdaName,
         this._lambdaInvocationType,
         {
           httpMethod: 'GET',
@@ -48,7 +47,7 @@ export class ViewManager {
   async getAllViews(workspaceID: string, idToken: string): Promise<any> {
     try {
       const result = await this._lambda.invokeAndCheck(
-        `${this._taskViewLambdaNameBase}-getAllViewsOfWorkspace`,
+        this._taskViewLambdaName,
         this._lambdaInvocationType,
         {
           httpMethod: 'GET',
@@ -78,7 +77,7 @@ export class ViewManager {
   ): Promise<any> {
     try {
       const result = await this._lambda.invokeAndCheck(
-        `${this._taskViewLambdaNameBase}-delView`,
+        this._taskViewLambdaName,
         this._lambdaInvocationType,
         {
           httpMethod: 'DELETE',
@@ -109,7 +108,7 @@ export class ViewManager {
   ): Promise<any> {
     try {
       const result = this._lambda.invokeAndCheck(
-        `${this._taskViewLambdaNameBase}-postView`,
+        this._taskViewLambdaName,
         this._lambdaInvocationType,
         {
           httpMethod: 'POST',
