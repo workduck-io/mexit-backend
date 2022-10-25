@@ -4,6 +4,7 @@ import { STAGE } from '../env';
 import container from '../inversify.config';
 import { errorlib } from '../libs/errorlib';
 import { InvocationType, Lambda } from '../libs/LambdaClass';
+import { RouteKeys } from '../libs/routeKeys';
 import { statusCodes } from '../libs/statusCodes';
 
 @injectable()
@@ -24,6 +25,7 @@ export class ViewManager {
         this._lambdaInvocationType,
         {
           httpMethod: 'GET',
+          routeKey: RouteKeys.getView,
           pathParameters: { entityId: viewID },
           headers: {
             'mex-workspace-id': workspaceID,
@@ -51,6 +53,7 @@ export class ViewManager {
         this._lambdaInvocationType,
         {
           httpMethod: 'GET',
+          routeKey: RouteKeys.getAllViews,
           headers: {
             'mex-workspace-id': workspaceID,
             authorization: idToken,
@@ -81,6 +84,7 @@ export class ViewManager {
         this._lambdaInvocationType,
         {
           httpMethod: 'DELETE',
+          routeKey: RouteKeys.deleteView,
           pathParameters: { entityId: viewID },
           headers: {
             'mex-workspace-id': workspaceID,
@@ -112,6 +116,7 @@ export class ViewManager {
         this._lambdaInvocationType,
         {
           httpMethod: 'POST',
+          routeKey: RouteKeys.saveView,
           payload: data,
           headers: {
             'mex-workspace-id': workspaceID,
