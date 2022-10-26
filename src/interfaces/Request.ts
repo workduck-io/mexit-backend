@@ -141,3 +141,22 @@ export interface Reminder {
   entityId: string;
   properties?: any;
 }
+
+export interface Reaction {
+  nodeId: string;
+  blockId: string;
+  reaction: {
+    type: string;
+    value: string;
+  };
+  action: 'ADD' | 'DELETE';
+}
+
+export interface Comment {
+  nodeId: string;
+  blockId: string;
+  threadId?: string;
+  entityId: string;
+  properties?: any;
+  content: any[];
+}

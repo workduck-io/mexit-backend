@@ -64,8 +64,8 @@ export const RouteKeys = {
 
   // Views - CRUD Operations
   getAllViews: 'GET /view/all/workspace',
-  getView: 'GET /view/{id}',
-  deleteView: 'DELETE /view/{id}',
+  getView: 'GET /view/{entityId}',
+  deleteView: 'DELETE /view/{entityId}',
   saveView: 'POST /view',
 
   // Public Namespace, Node and Snippet Ops
@@ -85,4 +85,23 @@ export const RouteKeys = {
   getAllRemindersOfNode: 'GET /all/node/{nodeId}',
   deleteAllRemindersOfNode: 'DELETE /all/node/{nodeId}',
   getAllRemindersOfWorkspace: 'GET /all/workspace',
+
+  // Reminders
+  getCommentByID: 'GET /{entityId}',
+  createComment: 'POST /',
+  deleteCommentByID: 'DELETE /{entityId}',
+  getAllCommentsOfNode: 'GET /all/node/{nodeId}',
+  getAllCommentsOfBlock: 'GET /all/node/{nodeId}/block/{blockId}',
+  getAllCommentsOfThread:
+    'GET /all/node/{nodeId}/block/{blockId}/thread/{threadId}',
+  deleteAllCommentsOfNode: 'DELETE /all/node/{nodeId}',
+  deleteAllCommentsOfBlock: 'DELETE /all/node/{nodeId}/block/{blockId}',
+  deleteAllCommentsOfThread:
+    'DELETE /all/node/{nodeId}/block/{blockId}/thread/{threadId}',
+
+  // Reactions - CRUD Operations
+  getAllReactionsOfNode: 'GET /node/{nodeId}',
+  getAllReactionsOfBlock: 'GET /node/{nodeId}/block/{blockId}',
+  getReactionDetailsOfBlock: 'GET /node/{nodeId}/block/{blockId}/details',
+  toggleReaction: 'POST /',
 };

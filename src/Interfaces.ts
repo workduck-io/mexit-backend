@@ -1,68 +1,70 @@
 import { TextType } from 'aws-sdk/clients/polly';
 import { AuthorizeRefreshTokenType, AuthorizeType } from './interfaces/Auth';
-import { GoogleAuthRefreshToken } from './interfaces/GoogleService';
 import { GenericObjectType, GenericType } from './interfaces/Generics';
-import { GotResponse, GotClientType } from './interfaces/GotClient';
+import { GoogleAuthRefreshToken } from './interfaces/GoogleService';
+import { GotClientType, GotResponse } from './interfaces/GotClient';
 import {
-  NodeDetail,
-  NodeChildData,
-  NodeData,
-  Block,
-  MetaTag,
-  UserTag,
-  ContentNode,
-  ClientNodeContentChildren,
-  ClientNodeContent,
-  ClientNode,
-  NodeMetadata,
-  ContentBlock,
   ActivityNodeDetail,
-  QueryStringParameters,
+  ArchiveNodeDetail,
+  Block,
+  ClientNode,
+  ClientNodeContent,
+  ClientNodeContentChildren,
+  ContentBlock,
+  ContentNode,
   CopyOrMoveBlock,
   ILink,
-  ArchiveNodeDetail,
-  ShareNodeDetail,
+  MetaTag,
   NodeAccessType,
+  NodeChildData,
+  NodeData,
+  NodeDetail,
+  NodeMetadata,
+  QueryStringParameters,
+  ShareNodeDetail,
   UpdateAccessTypeForSharedNodeDetail,
   UpdateShareNodeDetail,
+  UserTag,
 } from './interfaces/Node';
 import {
   AppendBlockRequest,
+  BulkCreateNode,
+  Comment,
   ContentNodeRequest,
   CopyOrMoveBlockRequest,
-  SnippetUpdateVersionRequest,
-  RefactorRequest,
-  NodePath,
-  BulkCreateNode,
-  RegisterUserRequest,
-  PostView,
-  FilterJoin,
-  Filter,
-  FilterType,
-  GlobalFilterJoin,
-  FilterValue,
   CreateNamespace,
-  UpdateNamespace,
-  ShareNamespace,
-  RevokeAccessFromNamespace,
-  ShortenLink,
+  Filter,
+  FilterJoin,
+  FilterType,
+  FilterValue,
+  GlobalFilterJoin,
+  NodePath,
+  PostView,
+  Reaction,
+  RefactorRequest,
+  RegisterUserRequest,
   Reminder,
+  RevokeAccessFromNamespace,
+  ShareNamespace,
+  ShortenLink,
+  SnippetUpdateVersionRequest,
+  UpdateNamespace,
 } from './interfaces/Request';
 import {
-  NodeResponse,
-  NodeDataResponse,
-  ContentResponse,
-  ClientNodeResponse,
-  LinkChildrenType,
   ActivityNodeResponse,
+  ClientNodeResponse,
+  ContentResponse,
+  LinkChildrenType,
+  NodeDataResponse,
+  NodeResponse,
 } from './interfaces/Response';
 import { UserPreference } from './interfaces/User';
 import { WDErrorType } from './interfaces/WDError';
 import { errorCodes } from './libs/errorCodes';
 import { statusCodes } from './libs/statusCodes';
 
-import schema from './types.json';
 import { SnippetUpdate } from './interfaces/Snippet';
+import schema from './types.json';
 
 type SchemaType = typeof schema.definitions;
 type Definitions = { [x in keyof SchemaType]: unknown };
@@ -128,4 +130,6 @@ export default class Interfaces implements Definitions {
   RevokeAccessFromNamespace: RevokeAccessFromNamespace;
   ShortenLink: ShortenLink;
   Reminder: Reminder;
+  Reaction: Reaction;
+  Comment: Comment;
 }
