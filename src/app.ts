@@ -1,31 +1,33 @@
-import express from 'express';
+import compression from 'compression';
 import cors from 'cors';
 import 'dotenv/config';
+import express from 'express';
 import 'reflect-metadata';
-import compression from 'compression';
 
-import { jsonErrorHandler } from './middlewares/jsonerrorhandler';
+import { IS_DEV } from './env';
 import { errorCodes } from './libs/errorCodes';
-import { LogRequest } from './middlewares/logrequest';
 import logger from './libs/logger';
 import expressListRoutes, { COLORS, colorText } from './libs/routeList';
-import { IS_DEV } from './env';
+import { jsonErrorHandler } from './middlewares/jsonerrorhandler';
+import { LogRequest } from './middlewares/logrequest';
 
-import OAuth2Controller from './controllers/OAuth2Controller';
+import { wdRequestIdExpressParser } from '@workduck-io/wd-request-id-parser';
 import BookmarkController from './controllers/BookmarkController';
+import CommentController from './controllers/CommentController';
+import HealthCheckController from './controllers/HealthCheckController';
 import LinkController from './controllers/LinkController';
+import NamespaceController from './controllers/NamespaceController';
 import NodeController from './controllers/NodeController';
+import OAuth2Controller from './controllers/OAuth2Controller';
 import PublicController from './controllers/PublicController';
+import ReactionController from './controllers/ReactionController';
+import ReminderController from './controllers/ReminderController';
 import SharedController from './controllers/SharedController';
 import SnippetController from './controllers/SnippetController';
 import TagController from './controllers/TagController';
 import UserController from './controllers/UserController';
-import responseErrorHandler from './middlewares/responseErrorHandler';
-import HealthCheckController from './controllers/HealthCheckController';
-import { wdRequestIdExpressParser } from '@workduck-io/wd-request-id-parser';
-import NamespaceController from './controllers/NamespaceController';
 import ViewController from './controllers/ViewController';
-import ReminderController from './controllers/ReminderController';
+import responseErrorHandler from './middlewares/responseErrorHandler';
 
 class App {
   public _app: express.Application;
@@ -88,6 +90,8 @@ const application = new App([
   new NamespaceController(),
   new ReminderController(),
   new ViewController(),
+  new ReactionController(),
+  new CommentController(),
 ]);
 
 application.build();
