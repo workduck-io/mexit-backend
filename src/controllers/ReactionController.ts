@@ -80,12 +80,12 @@ class ReactionController {
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'Reaction');
-      const result = await this._reactionManager.toggleReaction(
+      await this._reactionManager.toggleReaction(
         response.locals.workspaceID,
         response.locals.idToken,
         requestDetail.data
       );
-      response.status(statusCodes.OK).json(result);
+      response.status(statusCodes.NO_CONTENT);
     } catch (error) {
       next(error);
     }

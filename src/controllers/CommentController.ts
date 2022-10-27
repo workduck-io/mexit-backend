@@ -61,13 +61,13 @@ class CommentController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._commentManager.deleteCommentByID(
+      await this._commentManager.deleteCommentByID(
         response.locals.workspaceID,
         response.locals.idToken,
         request.params.entityID
       );
 
-      response.status(statusCodes.OK).json(result);
+      response.status(statusCodes.NO_CONTENT);
     } catch (error) {
       next(error);
     }
