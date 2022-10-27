@@ -1,10 +1,10 @@
 import express, { NextFunction, Request, Response } from 'express';
-import { initializeViewRoutes } from '../routes/ViewRoutes';
 import container from '../inversify.config';
+import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
 import { ViewManager } from '../managers/ViewManager';
-import { RequestClass } from '../libs/RequestClass';
+import { initializeViewRoutes } from '../routes/ViewRoutes';
 
 class ViewController {
   public _urlPath = '/view';
@@ -57,13 +57,13 @@ class ViewController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._viewManager.deleteView(
+      await this._viewManager.deleteView(
         response.locals.workspaceID,
         response.locals.idToken,
         request.params.viewID
       );
 
-      response.status(statusCodes.OK).json(result);
+      response.status(statusCodes.NO_CONTENT);
     } catch (error) {
       next(error);
     }
