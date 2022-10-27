@@ -2,12 +2,11 @@ import { injectable } from 'inversify';
 import container from '../inversify.config';
 
 import { errorlib } from '../libs/errorlib';
-import { errorCodes } from '../libs/errorCodes';
 import { statusCodes } from '../libs/statusCodes';
 
-import { Lambda, InvocationType } from '../libs/LambdaClass';
-import { RouteKeys } from '../libs/routeKeys';
 import { STAGE } from '../env';
+import { InvocationType, Lambda } from '../libs/LambdaClass';
+import { RouteKeys } from '../libs/routeKeys';
 
 @injectable()
 export class BookmarkManager {
