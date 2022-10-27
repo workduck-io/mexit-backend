@@ -5,15 +5,17 @@ import { GotClient } from './libs/GotClientClass';
 import { Lambda } from './libs/LambdaClass';
 import { Transformer } from './libs/TransformerClass';
 import { BookmarkManager } from './managers/BookmarkManager';
+import { CommentManager } from './managers/CommentManager';
 import { LinkManager } from './managers/LinkManager';
 import { NamespaceManager } from './managers/NamespaceManager';
 import { NodeManager } from './managers/NodeManager';
+import { ReactionManager } from './managers/ReactionManager';
+import { ReminderManager } from './managers/ReminderManager';
 import { SharedManager } from './managers/SharedManager';
 import { SnippetManager } from './managers/SnippetManager';
 import { TagManager } from './managers/TagManager';
 import { UserManager } from './managers/UserManager';
 import { ViewManager } from './managers/ViewManager';
-import { ReminderManager } from './managers/ReminderManager';
 
 const container = new Container();
 
@@ -39,10 +41,7 @@ container.bind<Cache>(CacheType.Node).to(Cache).inSingletonScope();
 container.bind<Cache>(CacheType.UserAccess).to(Cache).inSingletonScope();
 container.bind<Cache>(CacheType.Snippet).to(Cache).inSingletonScope();
 container.bind<Lambda>(Lambda).to(Lambda).inSingletonScope();
-container
-  .bind<BookmarkManager>(BookmarkManager)
-  .to(BookmarkManager)
-  .inSingletonScope();
+
 container
   .bind<NamespaceManager>(NamespaceManager)
   .to(NamespaceManager)
@@ -52,4 +51,18 @@ container
   .bind<ReminderManager>(ReminderManager)
   .to(ReminderManager)
   .inSingletonScope();
+
+container
+  .bind<CommentManager>(CommentManager)
+  .to(CommentManager)
+  .inSingletonScope();
+container
+  .bind<ReactionManager>(ReactionManager)
+  .to(ReactionManager)
+  .inSingletonScope();
+container
+  .bind<BookmarkManager>(BookmarkManager)
+  .to(BookmarkManager)
+  .inSingletonScope();
+
 export default container;
