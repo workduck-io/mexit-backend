@@ -78,7 +78,6 @@ class App {
 
 const application = new App([
   new HealthCheckController(),
-  new BookmarkController(),
   new LinkController(),
   new NodeController(),
   new OAuth2Controller(),
@@ -92,6 +91,7 @@ const application = new App([
   new ViewController(),
   new ReactionController(),
   new CommentController(),
+  new BookmarkController(),
 ]);
 
 application.build();

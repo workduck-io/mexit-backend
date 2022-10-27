@@ -1,7 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express';
-import { BookmarkManager } from '../managers/BookmarkManager';
 import container from '../inversify.config';
 import { statusCodes } from '../libs/statusCodes';
+import { BookmarkManager } from '../managers/BookmarkManager';
 import { initializeBookmarkRoutes } from '../routes/BookmarkRoutes';
 
 class BookmarkController {

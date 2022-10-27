@@ -317,6 +317,34 @@
             ],
             "type": "object"
         },
+        "Comment": {
+            "properties": {
+                "blockId": {
+                    "type": "string"
+                },
+                "content": {
+                    "items": {},
+                    "type": "array"
+                },
+                "entityId": {
+                    "type": "string"
+                },
+                "nodeId": {
+                    "type": "string"
+                },
+                "properties": {},
+                "threadId": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "blockId",
+                "content",
+                "entityId",
+                "nodeId"
+            ],
+            "type": "object"
+        },
         "ContentBlock": {
             "properties": {
                 "id": {
@@ -1233,6 +1261,45 @@
                 "blockSize",
                 "getMetaDataOfNode",
                 "getReverseOrder"
+            ],
+            "type": "object"
+        },
+        "Reaction": {
+            "properties": {
+                "action": {
+                    "enum": [
+                        "ADD",
+                        "DELETE"
+                    ],
+                    "type": "string"
+                },
+                "blockId": {
+                    "type": "string"
+                },
+                "nodeId": {
+                    "type": "string"
+                },
+                "reaction": {
+                    "properties": {
+                        "type": {
+                            "type": "string"
+                        },
+                        "value": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "value"
+                    ],
+                    "type": "object"
+                }
+            },
+            "required": [
+                "action",
+                "blockId",
+                "nodeId",
+                "reaction"
             ],
             "type": "object"
         },
