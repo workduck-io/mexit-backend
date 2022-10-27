@@ -1,0 +1,60 @@
+name: Deploy to mexit-backend-test-ecs-cluster on push to branch release
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy-ecs:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+      YARN_TOKEN: ${{ secrets.YARN_TOKEN }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: "us-east-1"
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          aws-region: us-east-1
+
+      - name: Install Gettext Tools for envsubst
+        run: apt update && apt install gettext-base
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: mexit-backend
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          envsubst < .npmrc > .npmrc.values
+          docker build --secret id=npmrc,src=.npmrc.values -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          rm .npmrc.values
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+      - name: Render Amazon ECS task definition
+        id: render-task-definition
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: deploy/taskdef-test.json
+          container-name: mexit-backend-test-container
+          image: ${{ steps.build-image.outputs.image }}
+
+      - name: Print New Task Definition
+        run: echo ${{ steps.task-def.outputs.task-definition }}
