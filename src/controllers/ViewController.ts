@@ -63,7 +63,7 @@ class ViewController {
         request.params.viewID
       );
 
-      response.status(statusCodes.NO_CONTENT);
+      response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
       next(error);
     }
