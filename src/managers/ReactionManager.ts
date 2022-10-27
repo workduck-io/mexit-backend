@@ -1,7 +1,6 @@
 import { injectable } from 'inversify';
 
 import { STAGE } from '../env';
-import { PostView } from '../interfaces/Request';
 import container from '../inversify.config';
 import { errorlib } from '../libs/errorlib';
 import { InvocationType, Lambda } from '../libs/LambdaClass';
@@ -9,25 +8,25 @@ import { RouteKeys } from '../libs/routeKeys';
 import { statusCodes } from '../libs/statusCodes';
 
 @injectable()
-export class ViewManager {
+export class ReactionManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
-  private _taskViewLambdaName = `task-${STAGE}-view`;
+  private _reactionLambdaName = `reaction-${STAGE}-main`;
 
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
-  async getView(
+  async getReactionsOfNode(
     workspaceID: string,
     idToken: string,
-    viewID: string
+    nodeID: string
   ): Promise<any> {
     try {
       const result = await this._lambda.invokeAndCheck(
-        this._taskViewLambdaName,
+        this._reactionLambdaName,
         this._lambdaInvocationType,
         {
           httpMethod: 'GET',
-          routeKey: RouteKeys.getView,
-          pathParameters: { entityId: viewID },
+          routeKey: RouteKeys.getAllReactionsOfNode,
+          pathParameters: { nodeId: nodeID },
           headers: {
             'mex-workspace-id': workspaceID,
             authorization: idToken,
@@ -47,46 +46,20 @@ export class ViewManager {
     }
   }
 
-  async getAllViews(workspaceID: string, idToken: string): Promise<any> {
-    try {
-      const result = await this._lambda.invokeAndCheck(
-        this._taskViewLambdaName,
-        this._lambdaInvocationType,
-        {
-          httpMethod: 'GET',
-          routeKey: RouteKeys.getAllViews,
-          headers: {
-            'mex-workspace-id': workspaceID,
-            authorization: idToken,
-            'mex-api-ver': 'v2',
-          },
-        }
-      );
-      return result;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
-  }
-
-  async deleteView(
+  async getReactionsOfBlock(
     workspaceID: string,
     idToken: string,
-    viewID: string
+    nodeId: string,
+    blockId: string
   ): Promise<any> {
     try {
       const result = await this._lambda.invokeAndCheck(
-        this._taskViewLambdaName,
+        this._reactionLambdaName,
         this._lambdaInvocationType,
         {
-          httpMethod: 'DELETE',
-          routeKey: RouteKeys.deleteView,
-          pathParameters: { entityId: viewID },
+          httpMethod: 'GET',
+          routeKey: RouteKeys.getAllReactionsOfBlock,
+          pathParameters: { nodeId, blockId },
           headers: {
             'mex-workspace-id': workspaceID,
             authorization: idToken,
@@ -106,18 +79,51 @@ export class ViewManager {
     }
   }
 
-  async saveView(
+  async getReactionDetailsOfBlock(
     workspaceID: string,
     idToken: string,
-    data: PostView
+    nodeId: string,
+    blockId: string
+  ): Promise<any> {
+    try {
+      const result = await this._lambda.invokeAndCheck(
+        this._reactionLambdaName,
+        this._lambdaInvocationType,
+        {
+          httpMethod: 'GET',
+          routeKey: RouteKeys.getReactionDetailsOfBlock,
+          pathParameters: { nodeId, blockId },
+          headers: {
+            'mex-workspace-id': workspaceID,
+            authorization: idToken,
+            'mex-api-ver': 'v2',
+          },
+        }
+      );
+      return result;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+
+  async toggleReaction(
+    workspaceID: string,
+    idToken: string,
+    data: any
   ): Promise<any> {
     try {
       const result = this._lambda.invokeAndCheck(
-        this._taskViewLambdaName,
+        this._reactionLambdaName,
         this._lambdaInvocationType,
         {
           httpMethod: 'POST',
-          routeKey: RouteKeys.saveView,
+          routeKey: RouteKeys.toggleReaction,
           payload: data,
           headers: {
             'mex-workspace-id': workspaceID,
