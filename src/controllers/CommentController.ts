@@ -67,7 +67,7 @@ class CommentController {
         request.params.entityID
       );
 
-      response.status(statusCodes.NO_CONTENT);
+      response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
       next(error);
     }
