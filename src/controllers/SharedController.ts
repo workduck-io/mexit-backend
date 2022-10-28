@@ -15,7 +15,11 @@ class SharedController {
     container.get<SharedManager>(SharedManager);
   public _transformer: Transformer = container.get<Transformer>(Transformer);
   private _userAccessCache: Cache = container.get<Cache>(CacheType.UserAccess);
+  private _userAccessTypeCache: Cache = container.get<Cache>(
+    CacheType.UserAccessType
+  );
   private _UserAccessLabel = 'USERACCESS';
+  private _UserAccessTypeLabel = 'USERACCESSTYPE';
 
   constructor() {
     initializeSharedRoutes(this);
@@ -40,6 +44,10 @@ class SharedController {
           true
         );
       });
+      this._userAccessTypeCache.del(
+        requestDetail.data.nodeID,
+        this._UserAccessTypeLabel
+      );
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -69,6 +77,10 @@ class SharedController {
           true
         );
       });
+      this._userAccessTypeCache.del(
+        requestDetail.data.nodeID,
+        this._UserAccessTypeLabel
+      );
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -94,6 +106,10 @@ class SharedController {
           this._UserAccessLabel
         );
       });
+      this._userAccessTypeCache.del(
+        requestDetail.data.nodeID,
+        this._UserAccessTypeLabel
+      );
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -145,11 +161,17 @@ class SharedController {
   ): Promise<void> => {
     try {
       const nodeId = request.params.nodeId;
-      const result = await this._sharedManager.getUserWithNodesShared(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        nodeId
+      const result = this._userAccessTypeCache.getOrSet(
+        nodeId,
+        this._UserAccessTypeLabel,
+        async () =>
+          await this._sharedManager.getUserWithNodesShared(
+            response.locals.workspaceID,
+            response.locals.idToken,
+            nodeId
+          )
       );
+
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
