@@ -40,6 +40,7 @@ container
 container.bind<Cache>(CacheType.Node).to(Cache).inSingletonScope();
 container.bind<Cache>(CacheType.UserAccess).to(Cache).inSingletonScope();
 container.bind<Cache>(CacheType.Snippet).to(Cache).inSingletonScope();
+container.bind<Cache>(CacheType.UserAccessType).to(Cache).inSingletonScope();
 container.bind<Lambda>(Lambda).to(Lambda).inSingletonScope();
 
 container
