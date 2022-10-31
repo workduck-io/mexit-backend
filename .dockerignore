@@ -1,1 +1,14 @@
-node_modules
+**/node_modules/
+.npmrc
+**/.git
+**/README.md
+**/LICENSE
+**/.vscode
+**/npm-debug.log
+**/coverage
+**/.env
+**/.editorconfig
+**/.aws
+**/dist
+
+src/__tests__/**
