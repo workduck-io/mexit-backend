@@ -1,0 +1,84 @@
+{
+  "family": "staging-mexit-backend-td",
+  "cpu": "768",
+  "memory": "1536",
+  "requiresCompatibilities": ["EC2"],
+  "containerDefinitions": [
+    {
+      "name": "app",
+      "image": "418506370286.dkr.ecr.us-east-1.amazonaws.com/staging-mexit-backend:latest",
+      "cpu": 512,
+      "memoryReservation": 1024,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/staging-mexit-backend-td",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "environment": [
+        {
+          "name": "MEXIT_BACKEND_CLIENT_ID",
+          "value": "6pvqt64p0l2kqkk2qafgdh13qe"
+        },
+        {
+          "name": "MEXIT_BACKEND_GOOGLE_CLIENT_ID",
+          "value": "<mexit_backend_google_client_id>"
+        },
+        {
+          "name": "MEXIT_BACKEND_GOOGLE_CLIENT_SECRET",
+          "value": "<mexit_backend_google_client_secret>"
+        },
+        {
+          "name": "MEXIT_BACKEND_REFRESH_TOKEN",
+          "value": "<mexit_backend_refresh_token>"
+        },
+        {
+          "name": "MEXIT_BACKEND_USER_ID",
+          "value": "<mexit_backend_user_id><mexit_backend_user_id>"
+        },
+        {
+          "name": "MEXIT_BACKEND_WORKSPACE_ID",
+          "value": "<mexit_backend_workspace_id>"
+        },
+        {
+          "name": "NODE_ENV",
+          "value": "production"
+        },
+        {
+          "name": "STAGE",
+          "value": "test"
+        }
+      ]
+    },
+    {
+      "name": "nginx-container",
+      "image": "418506370286.dkr.ecr.us-east-1.amazonaws.com/nginx-mexit-backend:latest",
+      "cpu": 256,
+      "memoryReservation": 512,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "protocol": "tcp",
+          "containerPort": 80
+        }
+      ],
+      "dependsOn": [
+        {
+          "containerName": "app",
+          "condition": "START"
+        }
+      ],
+      "links": ["app"],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/staging-mexit-backend-td",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}
