@@ -1,0 +1,96 @@
+name: Deploy to staging-mexit-backend-ecs-cluster on push to branch release
+
+on:
+  push:
+    branches: [release]
+
+jobs:
+  build-and-deploy-ecs:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+      YARN_TOKEN: ${{ secrets.YARN_TOKEN }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: "us-east-1"
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          aws-region: us-east-1
+
+      - name: Install Gettext Tools for envsubst
+        run: apt update && apt install gettext-base
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          MEXIT_BACKEND_ECR_REPOSITORY: staging-mexit-backend
+          NGINX_ECR_REPOSITORY: nginx-mexit-backend
+          IMAGE_TAG: ${{ github.sha }}
+
+        run: |
+          envsubst < .npmrc > .npmrc.values
+          docker build --secret id=npmrc,src=.npmrc.values -t $ECR_REGISTRY/$MEXIT_BACKEND_ECR_REPOSITORY:$IMAGE_TAG .
+          rm .npmrc.values
+          docker tag $ECR_REGISTRY/$MEXIT_BACKEND_ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$MEXIT_BACKEND_ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$MEXIT_BACKEND_ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$MEXIT_BACKEND_ECR_REPOSITORY:latest
+
+          docker build -t $ECR_REGISTRY/$NGINX_ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile.nginx .
+          docker tag $ECR_REGISTRY/$NGINX_ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$NGINX_ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$NGINX_ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$NGINX_ECR_REPOSITORY:latest
+
+          echo "::set-output name=backend_image::$ECR_REGISTRY/$MEXIT_BACKEND_ECR_REPOSITORY:$IMAGE_TAG"
+          echo "::set-output name=nginx_image::$ECR_REGISTRY/$NGINX_ECR_REPOSITORY:$IMAGE_TAG"
+
+      - name: Add secrets to Task Definition
+        run: |
+          sed -i "s/<mexit_backend_google_client_id>/$MEXIT_BACKEND_GOOGLE_CLIENT_ID/g" deploy/staging-taskdef.json
+          sed -i "s/<mexit_backend_google_client_secret>/$MEXIT_BACKEND_GOOGLE_CLIENT_SECRET/g" deploy/staging-taskdef.json
+          sed -i "s/<mexit_backend_refresh_token>/$MEXIT_BACKEND_REFRESH_TOKEN/g" deploy/staging-taskdef.json
+          sed -i "s/<mexit_backend_user_id>/$MEXIT_BACKEND_USER_ID/g" deploy/staging-taskdef.json
+          sed -i "s/<mexit_backend_workspace_id>/$MEXIT_BACKEND_WORKSPACE_ID/g" deploy/staging-taskdef.json
+        env:
+          MEXIT_BACKEND_GOOGLE_CLIENT_ID: ${{ secrets.MEXIT_BACKEND_GOOGLE_CLIENT_ID }}
+          MEXIT_BACKEND_GOOGLE_CLIENT_SECRET: ${{ secrets.MEXIT_BACKEND_GOOGLE_CLIENT_SECRET }}
+          MEXIT_BACKEND_REFRESH_TOKEN: ${{ secrets.MEXIT_BACKEND_REFRESH_TOKEN }}
+          MEXIT_BACKEND_USER_ID: ${{ secrets.MEXIT_BACKEND_USER_ID }}
+          MEXIT_BACKEND_WORKSPACE_ID: ${{ secrets.MEXIT_BACKEND_WORKSPACE_ID }}
+
+      - name: Render Amazon ECS task definition for Mexit Backend Container
+        id: render-task-definition-app
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: deploy/staging-taskdef.json
+          container-name: app
+          image: ${{ steps.build-image.outputs.backend_image }}
+
+      - name: Render Amazon ECS task definition for Nginx Container
+        id: render-task-definition-nginx
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ steps.render-task-definition-app.outputs.task-definition }}
+          container-name: nginx-container
+          image: ${{ steps.build-image.outputs.nginx_image }}
+
+      - name: Deploy Task Definition to ECS Cluster
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1.4.10
+        with:
+          task-definition: ${{ steps.render-task-definition-nginx.outputs.task-definition }}
+          service: staging-mexit-backend-svc
+          cluster: staging-mexit-backend-ecs-cluster
+          wait-for-service-stability: false

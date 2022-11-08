@@ -907,28 +907,6 @@
             ],
             "type": "object"
         },
-        "LinkChildrenType": {
-            "properties": {
-                "children": {
-                    "items": {
-                        "$ref": "types#/definitions/TextType"
-                    },
-                    "type": "array"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "url": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "children",
-                "type",
-                "url"
-            ],
-            "type": "object"
-        },
         "MetaTag": {
             "properties": {
                 "name": {
@@ -1581,17 +1559,6 @@
                 "namespaceID",
                 "title",
                 "version"
-            ],
-            "type": "object"
-        },
-        "TextType": {
-            "properties": {
-                "text": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "text"
             ],
             "type": "object"
         },

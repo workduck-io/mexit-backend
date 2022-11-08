@@ -92,16 +92,16 @@ class NodeController {
       const userSpecificNodeKey =
         response.locals.userID + request.params.nodeId;
 
+      const managerResponse = await this._nodeManager.getNode(
+        request.params.nodeId,
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
+
       const result = await this._nodeCache.getOrSet<NodeResponse>(
         request.params.nodeId,
         this._NodeLabel,
-        async () =>
-          await this._nodeManager.getNode(
-            request.params.nodeId,
-            response.locals.workspaceID,
-            response.locals.idToken
-          ),
-        //Force get if user permission is not cached
+        managerResponse, //Force get if user permission is not cached
         !this._userAccessCache.has(userSpecificNodeKey, this._UserAccessLabel)
       );
       this._userAccessCache.set(

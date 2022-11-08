@@ -12,11 +12,11 @@ export function errorlib(params: WDErrorType) {
 
   if (errorObject && errorObject.response) {
     throw new WDError({
-      message: errorObject.response.message,
-      code: errorObject.response.code,
-      statusCode: errorObject.response.statusCode,
-      metadata: errorObject.response.metadata,
-      stackTrace: errorObject.stack,
+      message: errorObject.response?.message,
+      code: errorObject.response?.code,
+      statusCode: errorObject.response?.statusCode,
+      metadata: errorObject.response?.metadata,
+      stackTrace: errorObject?.stack,
     });
   }
   const stack = errorObject ? errorObject.stack : '';

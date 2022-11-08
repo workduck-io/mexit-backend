@@ -55,15 +55,17 @@ class SnippetController {
     try {
       const snippetId = request.params.snippetId;
       const userSpecificNodeKey = response.locals.userID + snippetId;
+
+      const managerResponse = await this._snippetManager.getSnippet(
+        snippetId,
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
+
       const result = await this._snippetCache.getOrSet<NodeResponse>(
         snippetId,
         this._SnippetLabel,
-        async () =>
-          await this._snippetManager.getSnippet(
-            snippetId,
-            response.locals.workspaceID,
-            response.locals.idToken
-          ),
+        managerResponse,
         //Force get if user permission is not cached
         !this._userAccessCache.has(userSpecificNodeKey, this._UserAccessLabel)
       );
@@ -212,16 +214,18 @@ class SnippetController {
     try {
       const snippetId = request.params.snippetId;
       const version = request.params.version;
+
+      const managerResponse = await this._snippetManager.getPublicSnippet(
+        snippetId,
+        version,
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
+
       const result = await this._snippetCache.getOrSet<NodeResponse>(
         snippetId,
         this._SnippetLabel,
-        async () =>
-          await this._snippetManager.getPublicSnippet(
-            snippetId,
-            version,
-            response.locals.workspaceID,
-            response.locals.idToken
-          ),
+        managerResponse,
         //Force get if user permission is not cached
         !this._userAccessCache.has(
           this._PublicSnippetMockWorkspace + snippetId,

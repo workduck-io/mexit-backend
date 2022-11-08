@@ -68,7 +68,7 @@ export class Cache {
   async getOrSet<T>(
     key: string,
     entity: string,
-    storeFunction,
+    storeValueOrFunc: any,
     forceGet = false
   ): Promise<T> {
     const value = await this._cache.get(
@@ -78,10 +78,18 @@ export class Cache {
       return Promise.resolve(value) as Promise<T>;
     }
 
-    return storeFunction().then(result => {
-      this._cache.set(this._transformer.encodeCacheKey(entity, key), result);
-      return result;
-    });
+    if (typeof storeValueOrFunc === 'function') {
+      return storeValueOrFunc().then(result => {
+        this._cache.set(this._transformer.encodeCacheKey(entity, key), result);
+        return result;
+      });
+    } else {
+      this._cache.set(
+        this._transformer.encodeCacheKey(entity, key),
+        storeValueOrFunc
+      );
+      return storeValueOrFunc;
+    }
   }
 
   replaceAndSet(key: string, entity: string, value: any) {
