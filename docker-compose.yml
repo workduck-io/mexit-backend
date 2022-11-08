@@ -1,0 +1,29 @@
+version: '3.6'
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    ports:
+      - 80:80
+    links:
+      - app
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      secrets:
+        - npmrc
+    environment:
+      - MEXIT_BACKEND_GOOGLE_CLIENT_ID
+      - MEXIT_BACKEND_GOOGLE_CLIENT_SECRET
+      - MEXIT_BACKEND_REFRESH_TOKEN
+      - MEXIT_BACKEND_CLIENT_ID
+      - MEXIT_BACKEND_WORKSPACE_ID
+      - MEXIT_BACKEND_USER_ID
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+secrets:
+  npmrc:
+    file: $HOME/.npmrc

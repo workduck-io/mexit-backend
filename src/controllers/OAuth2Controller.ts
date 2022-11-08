@@ -1,11 +1,9 @@
 import express, { Request, Response } from 'express';
 import { statusCodes } from '../libs/statusCodes';
-import { google } from 'googleapis';
 import { IS_DEV } from '../env';
 import { GotClient } from '../libs/GotClientClass';
 import container from '../inversify.config';
 import { RequestClass } from '../libs/RequestClass';
-// eslint-disable-next-line node/no-extraneous-import
 import { OAuth2Client } from 'google-auth-library';
 import { initializeOAuth2Routes } from '../routes/OAuth2Routes';
 
@@ -28,17 +26,16 @@ class OAuth2Controller {
   }
 
   initializeGoogleOAuthClient(): void {
-    if (!process.env.client_id) throw new Error('Client Id Not Provided');
-    if (!process.env.client_secret)
+    if (!process.env.MEXIT_BACKEND_GOOGLE_CLIENT_ID)
+      throw new Error('Client Id Not Provided');
+    if (!process.env.MEXIT_BACKEND_GOOGLE_CLIENT_SECRET)
       throw new Error('Client Secret Not Provided');
 
-    this._oauth2Client = new google.auth.OAuth2({
-      clientId: process.env.client_id,
-      clientSecret: process.env.client_secret,
+    this._oauth2Client = new OAuth2Client({
+      clientId: process.env.MEXIT_BACKEND_GOOGLE_CLIENT_ID,
+      clientSecret: process.env.MEXIT_BACKEND_GOOGLE_CLIENT_SECRET,
       redirectUri: OAuth2Controller.redirectUri,
     });
-
-    google.options({ auth: this._oauth2Client });
   }
 
   getNewAccessToken = async (
@@ -48,8 +45,8 @@ class OAuth2Controller {
     try {
       const requestDetail = new RequestClass(request, 'GoogleAuthRefreshToken');
       const payload = {
-        client_id: process.env.client_id,
-        client_secret: process.env.client_secret,
+        client_id: process.env.MEXIT_BACKEND_GOOGLE_CLIENT_ID,
+        client_secret: process.env.MEXIT_BACKEND_GOOGLE_CLIENT_SECRET,
         refresh_token: requestDetail.data.refreshToken,
         grant_type: 'refresh_token',
       };

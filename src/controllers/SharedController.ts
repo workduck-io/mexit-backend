@@ -93,23 +93,17 @@ class SharedController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const requestDetail = new RequestClass(request, 'ShareNodeDetail');
+      const body = request.body;
 
       const result = await this._sharedManager.revokeNodeAccessForUsers(
         response.locals.workspaceID,
         response.locals.idToken,
-        requestDetail.data
+        body
       );
-      requestDetail.data.userIDs.forEach(userID => {
-        this._userAccessCache.del(
-          userID + requestDetail.data.nodeID,
-          this._UserAccessLabel
-        );
+      body.userIDs.forEach(userID => {
+        this._userAccessCache.del(userID + body.nodeID, this._UserAccessLabel);
       });
-      this._userAccessTypeCache.del(
-        requestDetail.data.nodeID,
-        this._UserAccessTypeLabel
-      );
+      this._userAccessTypeCache.del(body.nodeID, this._UserAccessTypeLabel);
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -161,15 +155,22 @@ class SharedController {
   ): Promise<void> => {
     try {
       const nodeId = request.params.nodeId;
+
+      if (nodeId === '__null__') {
+        response.status(statusCodes.BAD_REQUEST).send();
+        return;
+      }
+
+      const managerResponse = await this._sharedManager.getUserWithNodesShared(
+        response.locals.workspaceID,
+        response.locals.idToken,
+        nodeId
+      );
+
       const result = this._userAccessTypeCache.getOrSet(
         nodeId,
         this._UserAccessTypeLabel,
-        async () =>
-          await this._sharedManager.getUserWithNodesShared(
-            response.locals.workspaceID,
-            response.locals.idToken,
-            nodeId
-          )
+        managerResponse
       );
 
       response.status(statusCodes.OK).json(result);
