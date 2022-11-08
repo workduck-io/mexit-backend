@@ -155,15 +155,22 @@ class SharedController {
   ): Promise<void> => {
     try {
       const nodeId = request.params.nodeId;
+
+      if (nodeId === '__null__') {
+        response.status(statusCodes.BAD_REQUEST).send();
+        return;
+      }
+
+      const managerResponse = await this._sharedManager.getUserWithNodesShared(
+        response.locals.workspaceID,
+        response.locals.idToken,
+        nodeId
+      );
+
       const result = this._userAccessTypeCache.getOrSet(
         nodeId,
         this._UserAccessTypeLabel,
-        async () =>
-          await this._sharedManager.getUserWithNodesShared(
-            response.locals.workspaceID,
-            response.locals.idToken,
-            nodeId
-          )
+        managerResponse
       );
 
       response.status(statusCodes.OK).json(result);
