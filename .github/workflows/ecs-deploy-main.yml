@@ -1,8 +1,8 @@
-name: Deploy to staging-mexit-backend-ecs-cluster on push to branch release
+name: Deploy to test-mexit-backend-ecs-cluster on push to branch main
 
 on:
   push:
-    branches: [release]
+    branches: [main]
 
 jobs:
   build-and-deploy-ecs:
@@ -37,7 +37,7 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          MEXIT_BACKEND_ECR_REPOSITORY: staging-mexit-backend
+          MEXIT_BACKEND_ECR_REPOSITORY: test-mexit-backend
           NGINX_ECR_REPOSITORY: nginx-mexit-backend
           IMAGE_TAG: ${{ github.sha }}
 
@@ -59,11 +59,11 @@ jobs:
 
       - name: Add secrets to Task Definition
         run: |
-          sed -i "s/<mexit_backend_google_client_id>/$MEXIT_BACKEND_GOOGLE_CLIENT_ID/g" deploy/staging-taskdef.json
-          sed -i "s/<mexit_backend_google_client_secret>/$MEXIT_BACKEND_GOOGLE_CLIENT_SECRET/g" deploy/staging-taskdef.json
-          sed -i "s/<mexit_backend_refresh_token>/$MEXIT_BACKEND_REFRESH_TOKEN/g" deploy/staging-taskdef.json
-          sed -i "s/<mexit_backend_user_id>/$MEXIT_BACKEND_USER_ID/g" deploy/staging-taskdef.json
-          sed -i "s/<mexit_backend_workspace_id>/$MEXIT_BACKEND_WORKSPACE_ID/g" deploy/staging-taskdef.json
+          sed -i "s/<mexit_backend_google_client_id>/$MEXIT_BACKEND_GOOGLE_CLIENT_ID/g" deploy/test-taskdef.json
+          sed -i "s/<mexit_backend_google_client_secret>/$MEXIT_BACKEND_GOOGLE_CLIENT_SECRET/g" deploy/test-taskdef.json
+          sed -i "s/<mexit_backend_refresh_token>/$MEXIT_BACKEND_REFRESH_TOKEN/g" deploy/test-taskdef.json
+          sed -i "s/<mexit_backend_user_id>/$MEXIT_BACKEND_USER_ID/g" deploy/test-taskdef.json
+          sed -i "s/<mexit_backend_workspace_id>/$MEXIT_BACKEND_WORKSPACE_ID/g" deploy/test-taskdef.json
         env:
           MEXIT_BACKEND_GOOGLE_CLIENT_ID: ${{ secrets.MEXIT_BACKEND_GOOGLE_CLIENT_ID }}
           MEXIT_BACKEND_GOOGLE_CLIENT_SECRET: ${{ secrets.MEXIT_BACKEND_GOOGLE_CLIENT_SECRET }}
@@ -75,7 +75,7 @@ jobs:
         id: render-task-definition-app
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: deploy/staging-taskdef.json
+          task-definition: deploy/test-taskdef.json
           container-name: app
           image: ${{ steps.build-image.outputs.backend_image }}
 
@@ -91,6 +91,6 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1.4.10
         with:
           task-definition: ${{ steps.render-task-definition-nginx.outputs.task-definition }}
-          service: staging-mexit-backend-svc
-          cluster: staging-mexit-backend-ecs-cluster
+          service: test-mexit-backend-svc
+          cluster: test-mexit-backend-ecs-cluster
           wait-for-service-stability: false
