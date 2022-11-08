@@ -1,20 +1,18 @@
-FROM node:16-slim AS builder
-ARG YARN_TOKEN
+FROM node:16-alpine AS builder
 WORKDIR /usr/src/app
-COPY package.json yarn.lock .npmrc ./
-RUN yarn install
+COPY package.json yarn.lock ./
+RUN --mount=type=secret,id=npmrc,dst=.npmrc yarn install --frozen-lockfile && yarn cache clean
 COPY . .
 RUN yarn build
 
-FROM node:16-slim AS server
-USER node
-ARG YARN_TOKEN 
-# RUN apk add dumb-init
+FROM node:16-alpine AS server
+RUN apk add dumb-init
+ENV NODE_ENV=production
 
 WORKDIR /usr/src/app
-COPY package.json yarn.lock .npmrc ./
-RUN yarn install --prod
+COPY package.json yarn.lock ./
+RUN --mount=type=secret,id=npmrc,dst=.npmrc yarn install --production=true --frozen-lockfile && yarn cache clean
 COPY --from=builder ./usr/src/app/dist dist/
 
 EXPOSE 5000
-CMD ["node", "dist/app.js"]
+CMD ["dumb-init", "node", "dist/app.js"]
