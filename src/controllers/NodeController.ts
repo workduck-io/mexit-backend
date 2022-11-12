@@ -6,9 +6,9 @@ import { Cache } from '../libs/CacheClass';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
+import { LinkManager } from '../managers/LinkManager';
 import { NamespaceManager } from '../managers/NamespaceManager';
 import { NodeManager } from '../managers/NodeManager';
-import { LinkManager } from '../managers/LinkManager';
 import { initializeNodeRoutes } from '../routes/NodeRoutes';
 
 class NodeController {
@@ -90,7 +90,7 @@ class NodeController {
   ): Promise<void> => {
     try {
       const userSpecificNodeKey =
-        response.locals.userID + request.params.nodeId;
+        response.locals.userId + request.params.nodeId;
 
       const managerResponse = await this._nodeManager.getNode(
         request.params.nodeId,
@@ -110,6 +110,67 @@ class NodeController {
         true
       );
       response.status(statusCodes.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getMultipleNode = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const requestDetail = new RequestClass(request, 'GetMultipleNode');
+      const cachedUserAcess = this._userAccessCache.mget(
+        requestDetail.data.ids.map(id => response.locals.userId + id),
+        this._UserAccessLabel
+      );
+      const cachedHits = Object.entries(
+        this._nodeCache.mget(requestDetail.data.ids, this._NodeLabel)
+      );
+      const verifiedCachedHits = cachedHits
+        .filter(
+          ([k, _]) =>
+            Object.keys(cachedUserAcess)
+              .map(key => this._transformer.decodeCacheKey(key)[1])
+              .includes(
+                response.locals.userId + this._transformer.decodeCacheKey(k)[1]
+              ) //Checking if user has acess
+        )
+        .map(([_, v]) => v as any);
+      const nonCachedIds = requestDetail.data.ids.filter(
+        id =>
+          verifiedCachedHits
+            .map(item => item.id)
+            .filter(cachedId => id === cachedId).length === 0
+      ); //Fetch only non-cached ids in the next step
+
+      const managerResponse =
+        nonCachedIds.length > 0
+          ? await this._nodeManager.getMultipleNode(
+              nonCachedIds,
+              response.locals.workspaceID,
+              response.locals.idToken
+            )
+          : [];
+      this._nodeCache.mset(
+        managerResponse.map(node => ({
+          key: node.id,
+          payload: node,
+        })),
+        this._NodeLabel
+      );
+      this._userAccessCache.mset(
+        managerResponse.map(node => ({
+          key: response.locals.userId + node.id,
+          payload: true,
+        })),
+        this._UserAccessLabel
+      );
+      response
+        .status(statusCodes.OK)
+        .json([...managerResponse, ...verifiedCachedHits]);
     } catch (error) {
       next(error);
     }

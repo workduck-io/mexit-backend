@@ -54,7 +54,7 @@ class SnippetController {
   ): Promise<void> => {
     try {
       const snippetId = request.params.snippetId;
-      const userSpecificNodeKey = response.locals.userID + snippetId;
+      const userSpecificNodeKey = response.locals.userId + snippetId;
 
       const managerResponse = await this._snippetManager.getSnippet(
         snippetId,
