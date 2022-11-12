@@ -279,4 +279,62 @@ export class SnippetManager {
       });
     }
   }
+
+  async deleteVersionOfSnippet(
+    snippetID: string,
+    workspaceID: string,
+    idToken: string,
+    version?: number
+  ): Promise<any> {
+    try {
+      const response = await this._lambda.invokeAndCheck(
+        this._snippetLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.deleteVersionOfSnippet,
+          headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
+          pathParameters: { id: snippetID },
+          ...(version && { queryStringParameters: { version: version } }),
+        }
+      );
+
+      return response;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+
+  async deleteAllVersionsOfSnippet(
+    snippetID: string,
+    workspaceID: string,
+    idToken: string
+  ): Promise<any> {
+    try {
+      const response = await this._lambda.invokeAndCheck(
+        this._snippetLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.deleteAllVersionsOfSnippet,
+          headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
+          pathParameters: { id: snippetID },
+        }
+      );
+
+      return response;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
 }

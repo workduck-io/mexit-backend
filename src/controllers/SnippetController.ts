@@ -262,6 +262,52 @@ class SnippetController {
       next(error);
     }
   };
+
+  deleteVersionOfSnippet = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const snippetID = request.params.id;
+
+      // If a version is not passed in query parameters, it deletes the latest version
+      const version = request.query['version']
+        ? parseInt(request.query['version'] as string)
+        : undefined;
+
+      await this._snippetManager.deleteVersionOfSnippet(
+        snippetID,
+        response.locals.workspaceID,
+        response.locals.idToken,
+        version
+      );
+
+      response.status(statusCodes.NO_CONTENT).send();
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  deleteAllVersionsOfSnippet = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const snippetID = request.params.id;
+
+      await this._snippetManager.deleteAllVersionsOfSnippet(
+        snippetID,
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
+
+      response.status(statusCodes.NO_CONTENT).send();
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 export default SnippetController;
