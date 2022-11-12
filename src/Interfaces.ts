@@ -36,6 +36,7 @@ import {
   FilterJoin,
   FilterType,
   FilterValue,
+  GetMultipleNode,
   GlobalFilterJoin,
   NodePath,
   PostView,
@@ -87,6 +88,7 @@ export default class Interfaces implements Definitions {
   NodeDataResponse: NodeDataResponse;
   ContentNode: ContentNode;
   ContentNodeRequest: ContentNodeRequest;
+  GetMultipleNode: GetMultipleNode;
   ContentResponse: ContentResponse;
   ClientNode: ClientNode;
   ClientNodeContent: ClientNodeContent;

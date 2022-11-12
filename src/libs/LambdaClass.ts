@@ -1,8 +1,8 @@
 import { fromUtf8, toUtf8 } from '@aws-sdk/util-utf8-node';
 
+import { WDError } from '@workduck-io/wderror';
 import { injectable } from 'inversify';
 import LambdaConfig from './InvokeLambda';
-import { WDError } from '@workduck-io/wderror';
 
 export type InvocationType = 'RequestResponse' | 'Event';
 export type InvocationSource = 'Direct' | 'APIGateway';

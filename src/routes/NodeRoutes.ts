@@ -9,6 +9,11 @@ export const initializeNodeRoutes = (
     [AuthRequest],
     nodeControllerObject.createNode
   );
+  nodeControllerObject._router.post(
+    `${nodeControllerObject._urlPath}/ids`,
+    [AuthRequest],
+    nodeControllerObject.getMultipleNode
+  );
 
   nodeControllerObject._router.get(
     `${nodeControllerObject._urlPath}/:nodeId`,

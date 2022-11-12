@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { injectable } from 'inversify';
-import { ArchiveNodeDetail, CopyOrMoveBlock } from '../interfaces/Node';
-import { errorlib } from '../libs/errorlib';
-import { statusCodes } from '../libs/statusCodes';
-import container from '../inversify.config';
-import { Lambda, InvocationType } from '../libs/LambdaClass';
-import { RouteKeys } from '../libs/routeKeys';
 import { STAGE } from '../env';
-import logger from '../libs/logger';
+import { ArchiveNodeDetail, CopyOrMoveBlock } from '../interfaces/Node';
+import container from '../inversify.config';
+import { errorlib } from '../libs/errorlib';
+import { InvocationType, Lambda } from '../libs/LambdaClass';
+import { RouteKeys } from '../libs/routeKeys';
+import { statusCodes } from '../libs/statusCodes';
 
 @injectable()
 export class NodeManager {
@@ -58,6 +57,33 @@ export class NodeManager {
           pathParameters: { id: nodeId },
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
           ...(queryParams && { queryStringParameters: queryParams }),
+        }
+      );
+      return result;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+
+  async getMultipleNode(
+    nodeids: string[],
+    workspaceId: string,
+    idToken: string
+  ): Promise<any> {
+    try {
+      const result = await this._lambda.invokeAndCheck(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.getMultipleNode,
+          payload: { ids: nodeids },
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
       return result;
