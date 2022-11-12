@@ -13,8 +13,6 @@ export class UserManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
   private _userLambdaFunctionName = 'workduck-user-service-dev-user';
   private _userMexBackendLambdaFunctionName = `mex-backend-${STAGE}-User`;
-  private _initializeWorkspaceLambdaName =
-    'initialize-workspace-test-initializeWorkspace';
 
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
@@ -139,30 +137,6 @@ export class UserManager {
           headers: { 'mex-workspace-id': '', authorization: idToken },
         }
       );
-      return response;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
-  }
-  // eslint-disable-next-line
-  async initializeWorkspace(payload: any): Promise<any> {
-    try {
-      const response = await this._lambda.invokeAndCheck(
-        this._initializeWorkspaceLambdaName,
-        this._lambdaInvocationType,
-        {
-          payload: payload,
-        },
-        false,
-        'Direct'
-      );
-
       return response;
     } catch (error) {
       errorlib({
