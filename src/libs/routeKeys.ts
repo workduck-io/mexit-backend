@@ -42,6 +42,8 @@ export const RouteKeys = {
   makeSnippetPublic: 'PATCH /snippet/makePublic/{id}/{version}',
   makeSnippetPrivate: 'PATCH /snippet/makePrivate/{id}/{version}',
   clonePublicSnippet: 'POST /snippet/clone/{id}/{version}',
+  deleteVersionOfSnippet: 'DELETE /snippet/{id}',
+  deleteAllVersionsOfSnippet: 'DELETE /snippet/{id}/all',
 
   // User Star (Bookmark) Endpoints
   createBookmark: 'POST /userStar/{id}',
