@@ -1,10 +1,10 @@
 import express, { Request, Response } from 'express';
-import { statusCodes } from '../libs/statusCodes';
-import { IS_DEV } from '../env';
-import { GotClient } from '../libs/GotClientClass';
-import container from '../inversify.config';
-import { RequestClass } from '../libs/RequestClass';
 import { OAuth2Client } from 'google-auth-library';
+import { IS_DEV } from '../env';
+import container from '../inversify.config';
+import { GotClient } from '../libs/GotClientClass';
+import { RequestClass } from '../libs/RequestClass';
+import { statusCodes } from '../libs/statusCodes';
 import { initializeOAuth2Routes } from '../routes/OAuth2Routes';
 
 class OAuth2Controller {

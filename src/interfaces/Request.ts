@@ -4,6 +4,10 @@ export interface ContentNodeRequest extends ContentNode {
   createdBy?: string;
 }
 
+export interface GetMultipleNode {
+  ids: string[]; //Array of nodeids
+}
+
 export interface SnippetUpdateVersionRequest extends ContentNode {
   version: number;
 }
