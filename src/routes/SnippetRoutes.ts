@@ -51,4 +51,16 @@ export const initializeSnippetRoutes = (
     [AuthRequest],
     snippetObject.bulkGetSnippet
   );
+
+  snippetObject._router.delete(
+    `${snippetObject._urlPath}/:id/all`,
+    [AuthRequest],
+    snippetObject.deleteAllVersionsOfSnippet
+  );
+
+  snippetObject._router.delete(
+    `${snippetObject._urlPath}/:id`,
+    [AuthRequest],
+    snippetObject.deleteVersionOfSnippet
+  );
 };
