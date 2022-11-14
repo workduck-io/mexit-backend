@@ -1,8 +1,10 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { CacheType } from '../interfaces/Config';
+import { GenericObjectType } from '../interfaces/Generics';
 import { NodeResponse } from '../interfaces/Response';
 import container from '../inversify.config';
 import { Cache } from '../libs/CacheClass';
+import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
 import { SnippetManager } from '../managers/SnippetManager';
@@ -56,7 +58,7 @@ class SnippetController {
       const snippetId = request.params.snippetId;
       const userSpecificNodeKey = response.locals.userId + snippetId;
 
-      const managerResponse = await this._snippetManager.getSnippet(
+      const managerResponse = this._snippetManager.getSnippet(
         snippetId,
         response.locals.workspaceID,
         response.locals.idToken
@@ -88,12 +90,32 @@ class SnippetController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      //TODO: Use cache.mGet to fetch only the snippets not in the cache
-      const rawSnippets: any[] = await this._snippetManager.bulkGetSnippet(
-        request.body['ids'],
-        response.locals.workspaceID,
-        response.locals.idToken
+      const requestDetail = new RequestClass(request, 'GetMultipleNode');
+      console.log(response.locals.userId);
+      const cachedUserAcess = this._userAccessCache.mget(
+        requestDetail.data.ids.map(id => response.locals.userId + id),
+        this._UserAccessLabel
       );
+      const verifiedSnippets = requestDetail.data.ids.filter(id =>
+        Object.keys(cachedUserAcess)
+          .map(key => this._transformer.decodeCacheKey(key)[1])
+          .includes(response.locals.userId + id)
+      ); //Checking if user has acess)
+      const cachedHits = Object.values(
+        this._snippetCache.mget(verifiedSnippets, this._SnippetLabel)
+      ) as GenericObjectType[];
+
+      const nonCachedIds = requestDetail.data.ids.filter(
+        id => !cachedHits.map(item => item.id).includes(id)
+      );
+      const rawSnippets: any[] =
+        nonCachedIds.length > 0
+          ? await this._snippetManager.bulkGetSnippet(
+              nonCachedIds,
+              response.locals.workspaceID,
+              response.locals.idToken
+            )
+          : [];
       this._snippetCache.mset(
         rawSnippets.map(rs => ({
           key: rs.id,
@@ -104,12 +126,12 @@ class SnippetController {
 
       this._userAccessCache.mset(
         rawSnippets.map(rs => ({
-          key: response.locals.workspaceID + rs.id,
+          key: response.locals.userId + rs.id,
           payload: rs,
         })),
-        this._SnippetLabel
+        this._UserAccessLabel
       );
-      const result = rawSnippets.map(snippet =>
+      const result = [...rawSnippets, ...cachedHits].map(snippet =>
         this._transformer.genericNodeConverter(snippet)
       );
 
@@ -215,7 +237,7 @@ class SnippetController {
       const snippetId = request.params.snippetId;
       const version = request.params.version;
 
-      const managerResponse = await this._snippetManager.getPublicSnippet(
+      const managerResponse = this._snippetManager.getPublicSnippet(
         snippetId,
         version,
         response.locals.workspaceID,
