@@ -1,8 +1,8 @@
+import { WDError } from '@workduck-io/wderror';
+import { validate } from '@workduck-io/workspace-validator';
 import { NextFunction, Request, Response } from 'express';
 import { statusCodes } from '../libs/statusCodes';
 import { TokenHandler } from '../libs/tokenvalidator';
-import { WDError } from '@workduck-io/wderror';
-import { validate } from '@workduck-io/workspace-validator';
 // Authenticates the user for accessing
 // the endpoint routes.
 async function AuthRequest(
@@ -28,9 +28,16 @@ async function AuthRequest(
       res.locals.idToken = req.headers.authorization;
 
       const headerNeeded = () => {
-        const noHeaderPaths = ['/user/register', '/public', '/oauth2'];
+        const noHeaderPaths = [
+          '/user/linkedin',
+          '/user/email',
+          '/user/register',
+          '/public',
+          '/oauth2',
+        ];
+        const headerBlacklist = ['/user/'];
         const url = req.url;
-
+        if (headerBlacklist.includes(url)) return false;
         for (const path of noHeaderPaths) {
           if (url.includes(path)) return false;
         }

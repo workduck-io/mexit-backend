@@ -1,8 +1,8 @@
 import express, { NextFunction, Request, Response } from 'express';
 import container from '../inversify.config';
+import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { UserManager } from '../managers/UserManager';
-import { RequestClass } from '../libs/RequestClass';
 import { initializeUserRoutes } from '../routes/UserRoutes';
 import { Transformer } from './../libs/TransformerClass';
 class UserController {
@@ -35,7 +35,9 @@ class UserController {
 
     try {
       const result = await this._userManager.updateUserPreference(
-        requestDetail.data
+        requestDetail.data,
+        response.locals.workspaceID,
+        response.locals.idToken
       );
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -61,6 +63,18 @@ class UserController {
   ): Promise<any> => {
     try {
       const result = await this._userManager.getById(request.params.id);
+      response.status(statusCodes.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+  getByMail = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<any> => {
+    try {
+      const result = await this._userManager.getByMail(request.params.mail);
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
