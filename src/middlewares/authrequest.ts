@@ -28,16 +28,10 @@ async function AuthRequest(
       res.locals.idToken = req.headers.authorization;
 
       const headerNeeded = () => {
-        const noHeaderPaths = [
-          '/user/linkedin',
-          '/user/email',
-          '/user/register',
-          '/public',
-          '/oauth2',
-        ];
-        const headerBlacklist = ['/user/'];
+        const noHeaderPaths = ['/user', '/public', '/oauth2'];
+        const headerWhitelist = ['/user/update'];
         const url = req.url;
-        if (headerBlacklist.includes(url)) return false;
+        if (headerWhitelist.includes(url)) return true;
         for (const path of noHeaderPaths) {
           if (url.includes(path)) return false;
         }
