@@ -25,6 +25,7 @@ export class Lambda {
     sendRawBody = false,
     invocationSource: InvocationSource = 'APIGateway'
   ) {
+    if (!options.headers) options.headers = {};
     return JSON.parse(
       toUtf8(
         (
@@ -47,9 +48,9 @@ export class Lambda {
                       ...(options.queryStringParameters && {
                         queryStringParameters: options.queryStringParameters,
                       }),
-                      ...(options.headers && {
+                      ...{
                         headers: options.headers,
-                      }),
+                      },
                       ...(options.httpMethod && {
                         httpMethod: options.httpMethod,
                       }),
