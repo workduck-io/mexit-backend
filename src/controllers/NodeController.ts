@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { CacheType } from '../interfaces/Config';
+import { GenericObjectType } from '../interfaces/Generics';
 import { NodeResponse } from '../interfaces/Response';
 import container from '../inversify.config';
 import { Cache } from '../libs/CacheClass';
@@ -92,7 +93,7 @@ class NodeController {
       const userSpecificNodeKey =
         response.locals.userId + request.params.nodeId;
 
-      const managerResponse = await this._nodeManager.getNode(
+      const managerResponse = this._nodeManager.getNode(
         request.params.nodeId,
         response.locals.workspaceID,
         response.locals.idToken
@@ -126,25 +127,18 @@ class NodeController {
         requestDetail.data.ids.map(id => response.locals.userId + id),
         this._UserAccessLabel
       );
-      const cachedHits = Object.entries(
-        this._nodeCache.mget(requestDetail.data.ids, this._NodeLabel)
-      );
-      const verifiedCachedHits = cachedHits
-        .filter(
-          ([k, _]) =>
-            Object.keys(cachedUserAcess)
-              .map(key => this._transformer.decodeCacheKey(key)[1])
-              .includes(
-                response.locals.userId + this._transformer.decodeCacheKey(k)[1]
-              ) //Checking if user has acess
-        )
-        .map(([_, v]) => v as any);
+      const verifiedSnippets = requestDetail.data.ids.filter(id =>
+        Object.keys(cachedUserAcess)
+          .map(key => this._transformer.decodeCacheKey(key)[1])
+          .includes(response.locals.userId + id)
+      ); //Checking if user has acess)
+      const cachedHits = Object.values(
+        this._nodeCache.mget(verifiedSnippets, this._NodeLabel)
+      ) as GenericObjectType[];
+
       const nonCachedIds = requestDetail.data.ids.filter(
-        id =>
-          verifiedCachedHits
-            .map(item => item.id)
-            .filter(cachedId => id === cachedId).length === 0
-      ); //Fetch only non-cached ids in the next step
+        id => !cachedHits.map(item => item.id).includes(id)
+      );
 
       const managerResponse =
         nonCachedIds.length > 0
@@ -168,9 +162,7 @@ class NodeController {
         })),
         this._UserAccessLabel
       );
-      response
-        .status(statusCodes.OK)
-        .json([...managerResponse, ...verifiedCachedHits]);
+      response.status(statusCodes.OK).json([...managerResponse, ...cachedHits]);
     } catch (error) {
       next(error);
     }
