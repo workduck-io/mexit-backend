@@ -1,5 +1,5 @@
-import { AuthRequest } from '../middlewares/authrequest';
 import UserController from '../controllers/UserController';
+import { AuthRequest } from '../middlewares/authrequest';
 
 export const initializeUserRoutes = (userObject: UserController): void => {
   userObject._router.post(
@@ -15,7 +15,13 @@ export const initializeUserRoutes = (userObject: UserController): void => {
   );
 
   userObject._router.get(
-    `${userObject._urlPath}`,
+    `${userObject._urlPath}/email/:mail`,
+    [AuthRequest],
+    userObject.getByMail
+  );
+
+  userObject._router.get(
+    `${userObject._urlPath}/`,
     [AuthRequest],
     userObject.get
   );
@@ -26,7 +32,7 @@ export const initializeUserRoutes = (userObject: UserController): void => {
     userObject.getByGroupId
   );
 
-  userObject._router.post(
+  userObject._router.put(
     `${userObject._urlPath}/update`,
     [AuthRequest],
     userObject.updateUser

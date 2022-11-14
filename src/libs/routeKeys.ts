@@ -17,13 +17,14 @@ export const RouteKeys = {
   deleteArchivedNode: 'POST /node/archive/delete',
 
   // User Ops
-  registerUser: 'POST /user/register',
-  getById: 'GET /user/{userId}',
-  getUser: 'GET /user',
-  getByGroupId: 'GET /user/group/{groupId}',
-  updateUserPreference: 'POST /user/update',
-  createUserPreference: 'POST /user',
-  getUserByLinkedin: 'POST /user/linkedin',
+  registerUser: 'POST /register',
+  getById: 'GET /{userId}',
+  getByEmail: 'GET /email/{email}',
+  getUser: 'GET /',
+  getByGroupId: 'GET /group/{groupId}',
+  updateUserPreference: 'PUT /info',
+  createUserPreference: 'POST ',
+  getUserByLinkedin: 'POST /linkedin',
 
   // Shared Note Ops
   shareNode: 'POST /shared/node',
