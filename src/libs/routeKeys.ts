@@ -17,7 +17,7 @@ export const RouteKeys = {
   deleteArchivedNode: 'POST /node/archive/delete',
 
   // User Ops
-  registerUser: 'POST /register',
+  registerUser: 'POST /user/register',
   getById: 'GET /{userId}',
   getByEmail: 'GET /email/{email}',
   getUser: 'GET /',
