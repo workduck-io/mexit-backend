@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { injectable } from 'inversify';
-import { errorlib } from '../libs/errorlib';
-import { statusCodes } from '../libs/statusCodes';
-import container from '../inversify.config';
-import { Lambda, InvocationType } from '../libs/LambdaClass';
-import { RouteKeys } from '../libs/routeKeys';
 import { STAGE } from '../env';
+import container from '../inversify.config';
+import { errorlib } from '../libs/errorlib';
+import { InvocationType, Lambda } from '../libs/LambdaClass';
+import { RouteKeys } from '../libs/routeKeys';
+import { statusCodes } from '../libs/statusCodes';
 
 @injectable()
 export class SnippetManager {
@@ -82,7 +82,7 @@ export class SnippetManager {
           this._lambdaInvocationType,
           {
             routeKey: RouteKeys.getSnippet,
-            pathParameters: { id: id },
+            pathParameters: { id },
             headers: {
               'mex-workspace-id': workspaceId,
               authorization: idToken,
