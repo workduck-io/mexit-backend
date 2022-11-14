@@ -68,27 +68,18 @@ export class Cache {
   async getOrSet<T>(
     key: string,
     entity: string,
-    storeValueOrFunc: any,
+    fetchData: Promise<T>,
     forceGet = false
   ): Promise<T> {
-    const value = await this._cache.get(
+    const value = await this._cache.get<T>(
       this._transformer.encodeCacheKey(entity, key)
     );
     if (value && !forceGet) {
-      return Promise.resolve(value) as Promise<T>;
-    }
-
-    if (typeof storeValueOrFunc === 'function') {
-      return storeValueOrFunc().then(result => {
-        this._cache.set(this._transformer.encodeCacheKey(entity, key), result);
-        return result;
-      });
+      return value as Promise<T>;
     } else {
-      this._cache.set(
-        this._transformer.encodeCacheKey(entity, key),
-        storeValueOrFunc
-      );
-      return storeValueOrFunc;
+      const value = await fetchData;
+      this._cache.set(this._transformer.encodeCacheKey(entity, key), value);
+      return value;
     }
   }
 
