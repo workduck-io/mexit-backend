@@ -27,6 +27,7 @@ const productionLogger = () =>
       new winston.transports.File({ filename: 'combined.log' }),
       new WinstonCloudWatch({
         logGroupName: 'mexit-backend-prod',
+        retentionInDays: 7,
         logStreamName: function () {
           // Spread log streams across dates as the server stays up
           let date = new Date().toISOString().split('T')[0];
