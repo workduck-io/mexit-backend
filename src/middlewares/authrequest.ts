@@ -28,12 +28,12 @@ async function AuthRequest(
       res.locals.idToken = req.headers.authorization;
 
       const headerNeeded = () => {
-        const noHeaderPaths = ['/user', '/public', '/oauth2'];
+        const noHeaderPaths = ['/user/', '/public', '/oauth2'];
         const headerWhitelist = ['/user/update'];
         const url = req.url;
         if (headerWhitelist.includes(url)) return true;
         for (const path of noHeaderPaths) {
-          if (url.includes(path)) return false;
+          if (url.startsWith(path)) return false;
         }
         return true;
       };
