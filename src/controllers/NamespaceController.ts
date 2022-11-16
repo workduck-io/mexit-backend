@@ -1,7 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express';
-import { CacheType } from '../interfaces/Config';
 import container from '../inversify.config';
-import { Cache } from '../libs/CacheClass';
+import { Redis } from '../libs/RedisClass';
+import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import {
   ParsedNamespaceHierarchy,
@@ -9,7 +9,6 @@ import {
 } from '../libs/TransformerClass';
 import { NamespaceManager } from '../managers/NamespaceManager';
 import { initializeNamespaceRoutes } from '../routes/NamespaceRoutes';
-import { RequestClass } from '../libs/RequestClass';
 
 class NamespaceController {
   public _urlPath = '/namespace';
@@ -17,7 +16,7 @@ class NamespaceController {
   public _namespaceManager: NamespaceManager =
     container.get<NamespaceManager>(NamespaceManager);
   public _transformer: Transformer = container.get<Transformer>(Transformer);
-  public _cache: Cache = container.get<Cache>(CacheType.NamespaceHierarchy);
+  public _cache: Redis = container.get<Redis>(Redis);
   private _NSHierarchyLabel = 'NSHIERARCHY';
 
   constructor() {
@@ -168,7 +167,12 @@ class NamespaceController {
       let parsedNamespaceHierarchy: Record<string, ParsedNamespaceHierarchy>;
 
       if (
-        this._cache.has(response.locals.userId, this._NSHierarchyLabel) &&
+        this._cache.has(
+          this._transformer.encodeCacheKey(
+            this._NSHierarchyLabel,
+            response.locals.userId
+          )
+        ) &&
         !forceRefresh
       ) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -192,8 +196,10 @@ class NamespaceController {
           );
 
         this._cache.set(
-          response.locals.userId,
-          this._NSHierarchyLabel,
+          this._transformer.encodeCacheKey(
+            this._NSHierarchyLabel,
+            response.locals.userId
+          ),
           parsedNamespaceHierarchy
         );
       }
