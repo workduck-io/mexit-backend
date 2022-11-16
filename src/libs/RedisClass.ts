@@ -1,6 +1,5 @@
 import { injectable } from 'inversify';
 import { createClient, RedisClientType } from 'redis';
-import { ArrayX, parseReviver } from '../utils/ArrayX';
 
 @injectable()
 export class Redis {
@@ -56,7 +55,7 @@ export class Redis {
       try {
         const result = await this.client.get(key);
         if (result) {
-          resolve(JSON.parse(result, parseReviver));
+          resolve(JSON.parse(result));
         } else {
           resolve(defaultValue);
         }
@@ -93,9 +92,9 @@ export class Redis {
     return this.client.del(key);
   }
 
-  async mget(keys: string[]): Promise<ArrayX<any>> {
-    if (keys.length > 0) return new ArrayX(...(await this.client.mGet(keys)));
-    return new ArrayX();
+  async mget(keys: string[]) {
+    if (keys.length > 0) return await this.client.mGet(keys);
+    return [];
   }
 
   async mdel(keys: string[]) {

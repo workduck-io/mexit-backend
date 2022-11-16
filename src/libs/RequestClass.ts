@@ -1,5 +1,4 @@
 import Interfaces from '../Interfaces';
-import { parseReviver } from '../utils/ArrayX';
 import { schemaValidator } from './schemavalidator';
 export class RequestClass<T extends keyof Interfaces> {
   data?: Interfaces[T];
@@ -9,7 +8,7 @@ export class RequestClass<T extends keyof Interfaces> {
   constructor(req: any, type?: T) {
     if (req.body) {
       if (type) this.data = schemaValidator<T>(req.body, type);
-      else this.data = JSON.parse(req.body, parseReviver);
+      else this.data = JSON.parse(req.body);
     }
     this.params = req.params ? req.params : {};
     this.query = req.query ? req.query : {};
