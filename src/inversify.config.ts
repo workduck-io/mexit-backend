@@ -1,6 +1,4 @@
 import { Container } from 'inversify';
-import { CacheType } from './interfaces/Config';
-import { Cache } from './libs/CacheClass';
 import { GotClient } from './libs/GotClientClass';
 import { Lambda } from './libs/LambdaClass';
 import { Redis } from './libs/RedisClass';
@@ -30,10 +28,7 @@ container.bind<TagManager>(TagManager).to(TagManager);
 container.bind<SharedManager>(SharedManager).to(SharedManager);
 
 container.bind<UserManager>(UserManager).to(UserManager);
-container.bind<Cache>(CacheType.NamespaceHierarchy).to(Cache);
-container.bind<Cache>(CacheType.UserAccess).to(Cache);
-container.bind<Cache>(CacheType.Snippet).to(Cache);
-container.bind<Cache>(CacheType.UserAccessType).to(Cache);
+
 container.bind<Redis>(Redis).to(Redis);
 container.bind<Lambda>(Lambda).to(Lambda);
 

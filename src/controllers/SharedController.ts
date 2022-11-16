@@ -1,7 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
-import { CacheType } from '../interfaces/Config';
 import container from '../inversify.config';
-import { Cache } from '../libs/CacheClass';
+import { Redis } from '../libs/RedisClass';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
@@ -14,10 +13,8 @@ class SharedController {
   public _sharedManager: SharedManager =
     container.get<SharedManager>(SharedManager);
   public _transformer: Transformer = container.get<Transformer>(Transformer);
-  private _userAccessCache: Cache = container.get<Cache>(CacheType.UserAccess);
-  private _userAccessTypeCache: Cache = container.get<Cache>(
-    CacheType.UserAccessType
-  );
+  private _redisCache: Redis = container.get<Redis>(Redis);
+
   private _UserAccessLabel = 'USERACCESS';
   private _UserAccessTypeLabel = 'USERACCESSTYPE';
 
@@ -38,15 +35,20 @@ class SharedController {
         requestDetail.data
       );
       requestDetail.data.userIDs.forEach(userID => {
-        this._userAccessCache.set(
-          userID + requestDetail.data.nodeID,
-          this._UserAccessLabel,
-          true
+        this._redisCache.set(
+          this._transformer.encodeCacheKey(
+            this._UserAccessLabel,
+            userID,
+            requestDetail.data.nodeID
+          ),
+          userID
         );
       });
-      this._userAccessTypeCache.del(
-        requestDetail.data.nodeID,
-        this._UserAccessTypeLabel
+      this._redisCache.del(
+        this._transformer.encodeCacheKey(
+          this._UserAccessTypeLabel,
+          requestDetail.data.nodeID
+        )
       );
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -71,15 +73,19 @@ class SharedController {
         requestDetail.data
       );
       Object.keys(requestDetail.data.userIDToAccessTypeMap).forEach(userID => {
-        this._userAccessCache.set(
-          userID + requestDetail.data.nodeID,
-          this._UserAccessLabel,
-          true
+        this._redisCache.set(
+          this._transformer.encodeCacheKey(
+            this._UserAccessLabel,
+            userID,
+            requestDetail.data.nodeID
+          ),
+          userID
         );
       });
-      this._userAccessTypeCache.del(
-        requestDetail.data.nodeID,
-        this._UserAccessTypeLabel
+      this._redisCache.del(
+        this._transformer.encodeCacheKey(
+          this._UserAccessTypeLabel + requestDetail.data.nodeID
+        )
       );
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -100,10 +106,18 @@ class SharedController {
         response.locals.idToken,
         body
       );
-      body.userIDs.forEach(userID => {
-        this._userAccessCache.del(userID + body.nodeID, this._UserAccessLabel);
+      body.userIDs.forEach((userID: string) => {
+        this._redisCache.del(
+          this._transformer.encodeCacheKey(
+            this._UserAccessLabel,
+            userID,
+            body.nodeID
+          )
+        );
       });
-      this._userAccessTypeCache.del(body.nodeID, this._UserAccessTypeLabel);
+      this._redisCache.del(
+        this._transformer.encodeCacheKey(this._UserAccessTypeLabel, body.nodeID)
+      );
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -167,10 +181,14 @@ class SharedController {
         nodeId
       );
 
-      const result = this._userAccessTypeCache.getOrSet(
-        nodeId,
-        this._UserAccessTypeLabel,
-        managerResponse
+      const result = this._redisCache.getOrSet(
+        {
+          key: this._transformer.encodeCacheKey(
+            this._UserAccessTypeLabel,
+            nodeId
+          ),
+        },
+        () => managerResponse
       );
 
       response.status(statusCodes.OK).json(result);
