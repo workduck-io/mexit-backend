@@ -91,7 +91,6 @@ class SnippetController {
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'GetMultipleNode');
-      console.log(response.locals.userId);
       const cachedUserAcess = this._userAccessCache.mget(
         requestDetail.data.ids.map(id => response.locals.userId + id),
         this._UserAccessLabel
