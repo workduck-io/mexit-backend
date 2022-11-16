@@ -27,7 +27,10 @@ import SnippetController from './controllers/SnippetController';
 import TagController from './controllers/TagController';
 import UserController from './controllers/UserController';
 import ViewController from './controllers/ViewController';
+import container from './inversify.config';
+import { Redis } from './libs/RedisClass';
 import responseErrorHandler from './middlewares/responseErrorHandler';
+import { parseReviver } from './utils/ArrayX';
 
 class App {
   public _app: express.Application;
@@ -49,7 +52,7 @@ class App {
   private initializeMiddlewares() {
     this._app.use(compression());
     this._app.use(cors());
-    this._app.use(express.json());
+    this._app.use(express.json({ reviver: parseReviver }));
     this._app.use(LogRequest);
     this._app.use(wdRequestIdExpressParser);
   }
@@ -75,7 +78,7 @@ class App {
     this._app.use(responseErrorHandler);
   }
 }
-
+const redisCache: Redis = container.get<Redis>(Redis);
 const application = new App([
   new HealthCheckController(),
   new LinkController(),
@@ -95,7 +98,8 @@ const application = new App([
 ]);
 
 application.build();
-application._app.listen(application._port, () => {
+application._app.listen(application._port, async () => {
+  await redisCache.client.connect();
   if (IS_DEV) {
     console.log(
       colorText(
@@ -106,4 +110,9 @@ application._app.listen(application._port, () => {
     expressListRoutes(application._app);
   }
   return;
+});
+
+process.on('SIGINT', async () => {
+  await redisCache.client.disconnect();
+  throw new Error();
 });

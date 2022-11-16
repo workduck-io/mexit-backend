@@ -1,9 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express';
-import { CacheType } from '../interfaces/Config';
-import { GenericObjectType } from '../interfaces/Generics';
 import { NodeResponse } from '../interfaces/Response';
 import container from '../inversify.config';
-import { Cache } from '../libs/CacheClass';
+import { Redis } from '../libs/RedisClass';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
@@ -11,6 +9,7 @@ import { LinkManager } from '../managers/LinkManager';
 import { NamespaceManager } from '../managers/NamespaceManager';
 import { NodeManager } from '../managers/NodeManager';
 import { initializeNodeRoutes } from '../routes/NodeRoutes';
+import { ArrayX, parseReviver } from '../utils/ArrayX';
 
 class NodeController {
   public _urlPath = '/node';
@@ -18,14 +17,12 @@ class NodeController {
   public _nodeManager: NodeManager = container.get<NodeManager>(NodeManager);
   public _linkManager: LinkManager = container.get<LinkManager>(LinkManager);
   public _transformer: Transformer = container.get<Transformer>(Transformer);
-  private _iLinkCache: Cache = container.get<Cache>(
-    CacheType.NamespaceHierarchy
-  );
-  private _nodeCache: Cache = container.get<Cache>(CacheType.Node);
-  private _userAccessCache: Cache = container.get<Cache>(CacheType.UserAccess);
+  private _redisCache: Redis = container.get<Redis>(Redis);
+
   private _NSHierarchyLabel = 'NSHIERARCHY';
   private _NodeLabel = 'NODE';
   private _UserAccessLabel = 'USERACCESS';
+
   private _nsManager: NamespaceManager =
     container.get<NamespaceManager>(NamespaceManager);
 
@@ -48,13 +45,14 @@ class NodeController {
     const parsedNamespaceHierarchy =
       this._transformer.allNamespacesHierarchyParser(hierarchy, nodesMetadata);
 
-    this._iLinkCache.replaceAndSet(
-      userId,
-      this._NSHierarchyLabel,
+    await this._redisCache.set(
+      this._transformer.encodeCacheKey(this._NSHierarchyLabel, userId),
       parsedNamespaceHierarchy
     );
 
-    return this._iLinkCache.get(userId, this._NSHierarchyLabel);
+    return this._redisCache.get(
+      this._transformer.encodeCacheKey(this._NSHierarchyLabel, userId)
+    );
   };
 
   createNode = async (
@@ -65,7 +63,9 @@ class NodeController {
     try {
       const requestDetail = new RequestClass(request, 'ContentNodeRequest');
       //TODO: update cache instead of deleting it
-      this._nodeCache.del(requestDetail.data.id, this._NodeLabel);
+      this._redisCache.del(
+        this._transformer.encodeCacheKey(this._NodeLabel, requestDetail.data.id)
+      );
 
       const nodeResult = await this._nodeManager.createNode(
         response.locals.workspaceID,
@@ -90,26 +90,26 @@ class NodeController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const userSpecificNodeKey =
-        response.locals.userId + request.params.nodeId;
-
+      const userSpecificNodeKey = this._transformer.encodeCacheKey(
+        this._UserAccessLabel,
+        response.locals.userId,
+        request.params.nodeId
+      );
       const managerResponse = this._nodeManager.getNode(
         request.params.nodeId,
         response.locals.workspaceID,
         response.locals.idToken
       );
 
-      const result = await this._nodeCache.getOrSet<NodeResponse>(
-        request.params.nodeId,
-        this._NodeLabel,
-        managerResponse, //Force get if user permission is not cached
-        !this._userAccessCache.has(userSpecificNodeKey, this._UserAccessLabel)
+      const result = await this._redisCache.getOrSet<NodeResponse>(
+        {
+          key: request.params.nodeId,
+          force: !this._redisCache.has(userSpecificNodeKey),
+        },
+        async () => await managerResponse
       );
-      this._userAccessCache.set(
-        userSpecificNodeKey,
-        this._UserAccessLabel,
-        true
-      );
+
+      this._redisCache.set(userSpecificNodeKey, request.params.nodeId);
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -124,46 +124,48 @@ class NodeController {
     try {
       const requestDetail = new RequestClass(request, 'GetMultipleNode');
       const namespaceID = request.query['namespaceID'] as string;
-
-      const cachedUserAcess = this._userAccessCache.mget(
-        requestDetail.data.ids.map(id => response.locals.userId + id),
-        this._UserAccessLabel
-      );
-      const verifiedNodes = requestDetail.data.ids.filter(id =>
-        Object.keys(cachedUserAcess)
-          .map(key => this._transformer.decodeCacheKey(key)[1])
-          .includes(response.locals.userId + id)
-      ); //Checking if user has acess)
-      const cachedHits = Object.values(
-        this._nodeCache.mget(verifiedNodes, this._NodeLabel)
-      ) as GenericObjectType[];
-
-      const nonCachedIds = requestDetail.data.ids.filter(
-        id => !cachedHits.map(item => item.id).includes(id)
+      const ids = requestDetail.data.ids;
+      const cachedUserAccess = await this._redisCache.mget(
+        ids.map(id =>
+          this._transformer.encodeCacheKey(
+            this._UserAccessLabel,
+            response.locals.userId,
+            id
+          )
+        )
       );
 
-      const managerResponse =
-        nonCachedIds.length > 0
-          ? await this._nodeManager.getMultipleNode(
-              nonCachedIds,
-              response.locals.workspaceID,
-              response.locals.idToken,
-              namespaceID
-            )
-          : { successful: [], failed: [] };
-      this._nodeCache.mset(
-        managerResponse.successful.map(node => ({
-          key: node.id,
-          payload: node,
-        })),
-        this._NodeLabel
+      const verifiedNodes = ids.intersection(cachedUserAccess); //Checking if user has acess)
+
+      const cachedHits = (await this._redisCache.mget(verifiedNodes))
+        .filterEmpty()
+        .map(hits => JSON.parse(hits, parseReviver));
+
+      const nonCachedIds = ids.minus(cachedHits.map(item => item.id));
+
+      const managerResponse = !nonCachedIds.isEmpty()
+        ? await this._nodeManager.getMultipleNode(
+            nonCachedIds,
+            response.locals.workspaceID,
+            response.locals.idToken,
+            namespaceID
+          )
+        : new ArrayX();
+
+      await this._redisCache.mset(
+        managerResponse.toObject({ key: 'id', value: JSON.stringify })
       );
-      this._userAccessCache.mset(
-        managerResponse.successful.map(node => ({
-          key: response.locals.userId + node.id,
-          payload: true,
-        })),
-        this._UserAccessLabel
+
+      this._redisCache.mset(
+        managerResponse.toObject({
+          key: val =>
+            this._transformer.encodeCacheKey(
+              this._UserAccessLabel,
+              response.locals.userId,
+              val.id
+            ),
+          value: val => val.id,
+        })
       );
       response.status(statusCodes.OK).json({
         failed: managerResponse.failed,
@@ -180,7 +182,7 @@ class NodeController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      this._nodeCache.del(request.params.nodeId, this._NodeLabel);
+      this._redisCache.del(request.params.nodeId);
       const blockDetail = new RequestClass(request, 'AppendBlockRequest').data;
       const result = await this._nodeManager.appendNode(
         request.params.nodeId,
@@ -203,11 +205,8 @@ class NodeController {
     try {
       const requestDetail = new RequestClass(request, 'CopyOrMoveBlockRequest');
 
-      this._nodeCache.del(requestDetail.data.sourceNodeId, this._NodeLabel);
-      this._nodeCache.del(
-        requestDetail.data.destinationNodeId,
-        this._NodeLabel
-      );
+      this._redisCache.del(requestDetail.data.sourceNodeId);
+      this._redisCache.del(requestDetail.data.destinationNodeId);
 
       await this._nodeManager.moveBlocks(
         requestDetail.data.blockId,

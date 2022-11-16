@@ -1,3 +1,4 @@
+import { ArrayX } from '../utils/ArrayX';
 import { ContentNode } from './Node';
 
 export interface ContentNodeRequest extends ContentNode {
@@ -5,7 +6,7 @@ export interface ContentNodeRequest extends ContentNode {
 }
 
 export interface GetMultipleNode {
-  ids: string[]; //Array of nodeids
+  ids: ArrayX<string>; //Array of nodeids
 }
 
 export interface SnippetUpdateVersionRequest extends ContentNode {
