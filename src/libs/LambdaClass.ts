@@ -2,7 +2,6 @@ import { fromUtf8, toUtf8 } from '@aws-sdk/util-utf8-node';
 
 import { WDError } from '@workduck-io/wderror';
 import { injectable } from 'inversify';
-import { parseReviver } from '../utils/ArrayX';
 import LambdaConfig from './InvokeLambda';
 
 export type InvocationType = 'RequestResponse' | 'Event';
@@ -80,9 +79,7 @@ export class Lambda {
       invocationSource
     );
 
-    const body = response.body
-      ? JSON.parse(response.body, parseReviver)
-      : undefined;
+    const body = response.body ? JSON.parse(response.body) : undefined;
     if (response.statusCode !== 200 && response.statusCode !== 204) {
       throw new WDError({
         statusCode: response.statusCode,

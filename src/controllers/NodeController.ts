@@ -1,4 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
+
 import { NodeResponse } from '../interfaces/Response';
 import container from '../inversify.config';
 import { Redis } from '../libs/RedisClass';
@@ -9,8 +10,6 @@ import { LinkManager } from '../managers/LinkManager';
 import { NamespaceManager } from '../managers/NamespaceManager';
 import { NodeManager } from '../managers/NodeManager';
 import { initializeNodeRoutes } from '../routes/NodeRoutes';
-import { ArrayX, parseReviver } from '../utils/ArrayX';
-
 class NodeController {
   public _urlPath = '/node';
   public _router = express.Router();
@@ -139,7 +138,7 @@ class NodeController {
 
       const cachedHits = (await this._redisCache.mget(verifiedNodes))
         .filterEmpty()
-        .map(hits => JSON.parse(hits, parseReviver));
+        .map(hits => JSON.parse(hits));
 
       const nonCachedIds = ids.minus(cachedHits.map(item => item.id));
 
@@ -150,7 +149,7 @@ class NodeController {
             response.locals.idToken,
             namespaceID
           )
-        : new ArrayX();
+        : [];
 
       await this._redisCache.mset(
         managerResponse.toObject({ key: 'id', value: JSON.stringify })
