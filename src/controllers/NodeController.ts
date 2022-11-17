@@ -123,6 +123,8 @@ class NodeController {
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'GetMultipleNode');
+      const namespaceID = request.query['namespaceID'] as string;
+
       const cachedUserAcess = this._userAccessCache.mget(
         requestDetail.data.ids.map(id => response.locals.userId + id),
         this._UserAccessLabel
@@ -145,7 +147,8 @@ class NodeController {
           ? await this._nodeManager.getMultipleNode(
               nonCachedIds,
               response.locals.workspaceID,
-              response.locals.idToken
+              response.locals.idToken,
+              namespaceID
             )
           : { successful: [], failed: [] };
       this._nodeCache.mset(

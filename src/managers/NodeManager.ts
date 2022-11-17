@@ -75,7 +75,8 @@ export class NodeManager {
   async getMultipleNode(
     nodeids: string[],
     workspaceId: string,
-    idToken: string
+    idToken: string,
+    namespaceID?: string
   ): Promise<BulkResponse<any>> {
     try {
       const result = await this._lambda.invokeAndCheck(
@@ -85,8 +86,12 @@ export class NodeManager {
           routeKey: RouteKeys.getMultipleNode,
           payload: { ids: nodeids },
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+          ...(namespaceID && {
+            queryStringParameters: { namespaceID: namespaceID },
+          }),
         }
       );
+
       const fetchedIDs = new Set(result.map(node => node.id));
       const failedIDs = nodeids.filter(id => !fetchedIDs.has(id));
 
