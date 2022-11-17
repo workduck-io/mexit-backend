@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { injectable } from 'inversify';
+import { BulkResponse } from '../interfaces/Response';
 import { STAGE } from '../env';
 import container from '../inversify.config';
 import { errorlib } from '../libs/errorlib';
@@ -74,7 +75,7 @@ export class SnippetManager {
     snippetIDs: string[],
     workspaceId: string,
     idToken: string
-  ): Promise<any> {
+  ): Promise<BulkResponse<any>> {
     try {
       const lambdaPromises = snippetIDs.map(id =>
         this._lambda.invokeAndCheck(
@@ -92,10 +93,11 @@ export class SnippetManager {
       );
 
       const promiseResponses = await Promise.allSettled(lambdaPromises);
-
-      const result = promiseResponses
-        .filter(snippet => snippet.status === 'fulfilled')
-        .map((item: PromiseFulfilledResult<any>) => item.value);
+      const result = { successful: [], failed: [] };
+      promiseResponses.forEach((prom, index) => {
+        if (prom.status === 'fulfilled') result.successful.push(prom.value);
+        else result.failed.push(snippetIDs[index]);
+      });
 
       return result;
     } catch (error) {

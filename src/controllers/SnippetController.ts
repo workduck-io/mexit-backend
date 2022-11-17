@@ -108,16 +108,16 @@ class SnippetController {
       const nonCachedIds = requestDetail.data.ids.filter(
         id => !cachedHits.map(item => item.id).includes(id)
       );
-      const rawSnippets: any[] =
+      const { successful, failed } =
         nonCachedIds.length > 0
           ? await this._snippetManager.bulkGetSnippet(
               nonCachedIds,
               response.locals.workspaceID,
               response.locals.idToken
             )
-          : [];
+          : { successful: [], failed: [] };
       this._snippetCache.mset(
-        rawSnippets.map(rs => ({
+        successful.map(rs => ({
           key: rs.id,
           payload: rs,
         })),
@@ -125,17 +125,19 @@ class SnippetController {
       );
 
       this._userAccessCache.mset(
-        rawSnippets.map(rs => ({
+        successful.map(rs => ({
           key: response.locals.userId + rs.id,
           payload: rs,
         })),
         this._UserAccessLabel
       );
-      const result = [...rawSnippets, ...cachedHits].map(snippet =>
+      const result = [...successful, ...cachedHits].map(snippet =>
         this._transformer.genericNodeConverter(snippet)
       );
 
-      response.status(statusCodes.OK).json(result);
+      response
+        .status(statusCodes.OK)
+        .json({ successful: result, failed: failed });
     } catch (error) {
       next(error);
     }
