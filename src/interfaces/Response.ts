@@ -51,3 +51,8 @@ export interface ClientNodeResponse extends ClientNode {
   workspaceIdentifier: string;
   createdBy: string;
 }
+
+export interface BulkResponse<T> {
+  successful: Array<T>;
+  failed: Array<T>;
+}

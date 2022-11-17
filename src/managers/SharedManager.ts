@@ -13,6 +13,7 @@ import {
   UpdateShareNodeDetail,
 } from '../interfaces/Node';
 import { STAGE } from '../env';
+import { BulkResponse } from '../interfaces/Response';
 
 @injectable()
 export class SharedManager {
@@ -206,6 +207,49 @@ export class SharedManager {
         }
       );
       return response;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+
+  async bulkGetSharedNodes(
+    nodeIDs: string[],
+    workspaceID: string,
+    idToken: string
+  ): Promise<BulkResponse<any>> {
+    try {
+      const lambdaPromises = nodeIDs.map(id =>
+        this._lambda.invokeAndCheck(
+          this._nodeLambdaFunctionName,
+          this._lambdaInvocationType,
+          {
+            routeKey: RouteKeys.getNodeSharedWithUser,
+            pathParameters: { nodeID: id },
+            headers: {
+              'mex-workspace-id': workspaceID,
+              authorization: idToken,
+            },
+          }
+        )
+      );
+
+      const promiseResponse = await Promise.allSettled(lambdaPromises);
+      const result = { successful: [], failed: [] };
+      promiseResponse.forEach((prom, index) => {
+        if (prom.status === 'fulfilled') result.successful.push(prom.value);
+        else {
+          console.log('Failure because: ', prom.reason);
+          result.failed.push(nodeIDs[index]);
+        }
+      });
+
+      return result;
     } catch (error) {
       errorlib({
         message: error.message,

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { injectable } from 'inversify';
+import { BulkResponse } from '../interfaces/Response';
 import { STAGE } from '../env';
 import { ArchiveNodeDetail, CopyOrMoveBlock } from '../interfaces/Node';
 import container from '../inversify.config';
@@ -75,7 +76,7 @@ export class NodeManager {
     nodeids: string[],
     workspaceId: string,
     idToken: string
-  ): Promise<any> {
+  ): Promise<BulkResponse<any>> {
     try {
       const result = await this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
@@ -86,7 +87,10 @@ export class NodeManager {
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
-      return result;
+      const fetchedIDs = new Set(result.map(node => node.id));
+      const failedIDs = nodeids.filter(id => !fetchedIDs.has(id));
+
+      return { successful: result, failed: failedIDs };
     } catch (error) {
       errorlib({
         message: error.message,

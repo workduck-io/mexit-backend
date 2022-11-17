@@ -127,13 +127,13 @@ class NodeController {
         requestDetail.data.ids.map(id => response.locals.userId + id),
         this._UserAccessLabel
       );
-      const verifiedSnippets = requestDetail.data.ids.filter(id =>
+      const verifiedNodes = requestDetail.data.ids.filter(id =>
         Object.keys(cachedUserAcess)
           .map(key => this._transformer.decodeCacheKey(key)[1])
           .includes(response.locals.userId + id)
       ); //Checking if user has acess)
       const cachedHits = Object.values(
-        this._nodeCache.mget(verifiedSnippets, this._NodeLabel)
+        this._nodeCache.mget(verifiedNodes, this._NodeLabel)
       ) as GenericObjectType[];
 
       const nonCachedIds = requestDetail.data.ids.filter(
@@ -147,22 +147,25 @@ class NodeController {
               response.locals.workspaceID,
               response.locals.idToken
             )
-          : [];
+          : { successful: [], failed: [] };
       this._nodeCache.mset(
-        managerResponse.map(node => ({
+        managerResponse.successful.map(node => ({
           key: node.id,
           payload: node,
         })),
         this._NodeLabel
       );
       this._userAccessCache.mset(
-        managerResponse.map(node => ({
+        managerResponse.successful.map(node => ({
           key: response.locals.userId + node.id,
           payload: true,
         })),
         this._UserAccessLabel
       );
-      response.status(statusCodes.OK).json([...managerResponse, ...cachedHits]);
+      response.status(statusCodes.OK).json({
+        failed: managerResponse.failed,
+        successful: [...managerResponse.successful, ...cachedHits],
+      });
     } catch (error) {
       next(error);
     }
