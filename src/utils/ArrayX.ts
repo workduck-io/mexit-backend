@@ -1,3 +1,5 @@
+import { get } from 'dot-prop';
+
 Object.defineProperty(Array.prototype, 'filterEmpty', {
   value: function () {
     return this.filter(item => item);
@@ -23,17 +25,14 @@ Object.defineProperty(Array.prototype, 'minus', {
 });
 
 Object.defineProperty(Array.prototype, 'toObject', {
-  value: function ({
-    key,
-    value = item => item,
-  }: {
-    key: string | ((a) => string);
-    value?: (item: any) => any;
-  }): any {
+  value: function (
+    key: string | ((a) => string),
+    value = (item: any) => item
+  ): any {
     return this.reduce((acc, val) => {
       return {
         ...acc,
-        [typeof key === 'string' ? val[key] : key(val)]: value(val),
+        [typeof key === 'string' ? get<string>(val,key) : key(val)]: value(val),
       };
     }, {});
   },

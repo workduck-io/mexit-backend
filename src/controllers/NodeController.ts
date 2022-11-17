@@ -152,19 +152,19 @@ class NodeController {
         : [];
 
       await this._redisCache.mset(
-        managerResponse.toObject({ key: 'id', value: JSON.stringify })
+        managerResponse.toObject('id', JSON.stringify)
       );
 
       this._redisCache.mset(
-        managerResponse.toObject({
-          key: val =>
+        managerResponse.toObject(
+          val =>
             this._transformer.encodeCacheKey(
               this._UserAccessLabel,
               response.locals.userId,
               val.id
             ),
-          value: val => val.id,
-        })
+          val => val.id
+        )
       );
       response.status(statusCodes.OK).json({
         failed: managerResponse.failed,
