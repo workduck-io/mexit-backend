@@ -5,10 +5,10 @@ declare global {
   type ValueModifierFunc<T> = (val: T) => any;
   interface Array<T> extends Array<T> {
     removeLast(): T[];
-    toObject(params: {
-      key: KeyModifierFunc<T>;
-      value: ValueModifierFunc<T>;
-    }): { [key: string]: any };
+    toObject(
+      key: KeyModifierFunc<T>,
+      value: ValueModifierFunc<T>
+    ): { [key: string]: any };
     isEmpty(): boolean;
     filterEmpty(): T[];
     minus(arr: T[]): T[];

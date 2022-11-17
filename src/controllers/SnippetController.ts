@@ -115,20 +115,18 @@ class SnippetController {
           )
         : [];
 
-      await this._redisCache.mset(
-        successful.toObject({ key: 'id', value: JSON.stringify })
-      );
+      await this._redisCache.mset(successful.toObject('id', JSON.stringify));
 
       this._redisCache.mset(
-        successful.toObject({
-          key: val =>
+        successful.toObject(
+          val =>
             this._transformer.encodeCacheKey(
               this._UserAccessLabel,
               response.locals.userId,
               val.id
             ),
-          value: val => val.id,
-        })
+          val => val.id
+        )
       );
       const result = [...successful, ...cachedHits].map(snippet =>
         this._transformer.genericNodeConverter(snippet)
