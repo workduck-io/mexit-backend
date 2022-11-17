@@ -53,7 +53,7 @@ export class Cache {
   mset(
     items: {
       key: string;
-      payload: string;
+      payload: string | boolean;
     }[],
     entity: string
   ) {

@@ -194,6 +194,25 @@ class SharedController {
       next(error);
     }
   };
+
+  getBulkSharedNodes = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const data = new RequestClass(request, 'GetMultipleNode').data;
+      const result = await this._sharedManager.bulkGetSharedNodes(
+        data.ids,
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
+
+      response.status(statusCodes.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 export default SharedController;

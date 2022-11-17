@@ -10,6 +10,12 @@ export const initializeSnippetRoutes = (
     snippetObject.getAllSnippetsOfWorkspace
   );
 
+  snippetObject._router.post(
+    `${snippetObject._urlPath}/ids`,
+    [AuthRequest],
+    snippetObject.bulkGetSnippet
+  );
+
   snippetObject._router.get(
     `${snippetObject._urlPath}/:snippetId`,
     [AuthRequest],
@@ -44,12 +50,6 @@ export const initializeSnippetRoutes = (
     `${snippetObject._urlPath}/clone/:id/:version`,
     [AuthRequest],
     snippetObject.clonePublicSnippet
-  );
-
-  snippetObject._router.post(
-    `${snippetObject._urlPath}/bulk`,
-    [AuthRequest],
-    snippetObject.bulkGetSnippet
   );
 
   snippetObject._router.delete(
