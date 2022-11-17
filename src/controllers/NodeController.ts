@@ -149,14 +149,14 @@ class NodeController {
             response.locals.idToken,
             namespaceID
           )
-        : [];
+        : { successful: [], failed: [] };
 
       await this._redisCache.mset(
-        managerResponse.toObject('id', JSON.stringify)
+        managerResponse.successful.toObject('id', JSON.stringify)
       );
 
       this._redisCache.mset(
-        managerResponse.toObject(
+        managerResponse.successful.toObject(
           val =>
             this._transformer.encodeCacheKey(
               this._UserAccessLabel,

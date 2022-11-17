@@ -113,7 +113,7 @@ class SnippetController {
             response.locals.workspaceID,
             response.locals.idToken
           )
-        : [];
+        : { successful: [], failed: [] };
 
       await this._redisCache.mset(successful.toObject('id', JSON.stringify));
 
