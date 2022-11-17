@@ -10,8 +10,8 @@ export const initializeSnippetRoutes = (
     snippetObject.getAllSnippetsOfWorkspace
   );
 
-  snippetObject._router.get(
-    `${snippetObject._urlPath}/bulk`,
+  snippetObject._router.post(
+    `${snippetObject._urlPath}/ids`,
     [AuthRequest],
     snippetObject.bulkGetSnippet
   );
