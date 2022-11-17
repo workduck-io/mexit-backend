@@ -29,6 +29,12 @@ export const initializeSharedRoutes = (
   );
 
   sharedControllerObject._router.get(
+    `${sharedControllerObject._urlPath}/bulk`,
+    [AuthRequest],
+    sharedControllerObject.getBulkSharedNodes
+  );
+
+  sharedControllerObject._router.get(
     `${sharedControllerObject._urlPath}/:nodeId`,
     [AuthRequest],
     sharedControllerObject.getNodeSharedWithUser
