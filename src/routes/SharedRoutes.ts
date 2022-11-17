@@ -28,8 +28,8 @@ export const initializeSharedRoutes = (
     sharedControllerObject.revokeNodeAccessForUsers
   );
 
-  sharedControllerObject._router.get(
-    `${sharedControllerObject._urlPath}/bulk`,
+  sharedControllerObject._router.post(
+    `${sharedControllerObject._urlPath}/ids`,
     [AuthRequest],
     sharedControllerObject.getBulkSharedNodes
   );
