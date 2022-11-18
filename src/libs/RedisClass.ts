@@ -35,7 +35,6 @@ export class Redis {
     callback: () => Promise<T>
   ): Promise<T> {
     const cache = params.force ? undefined : await this.get<T>(params.key);
-    console.log({ cache });
     if (!cache) {
       try {
         const result = await callback();
