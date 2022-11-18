@@ -6,16 +6,14 @@ import { Redis } from '../libs/RedisClass';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
-import { LinkManager } from '../managers/LinkManager';
 import { NamespaceManager } from '../managers/NamespaceManager';
 import { NodeManager } from '../managers/NodeManager';
 import { initializeNodeRoutes } from '../routes/NodeRoutes';
 class NodeController {
   public _urlPath = '/node';
   public _router = express.Router();
-  public _nodeManager: NodeManager = container.get<NodeManager>(NodeManager);
-  public _linkManager: LinkManager = container.get<LinkManager>(LinkManager);
-  public _transformer: Transformer = container.get<Transformer>(Transformer);
+  private _nodeManager: NodeManager = container.get<NodeManager>(NodeManager);
+  private _transformer: Transformer = container.get<Transformer>(Transformer);
   private _redisCache: Redis = container.get<Redis>(Redis);
 
   private _NSHierarchyLabel = 'NSHIERARCHY';
@@ -121,7 +119,7 @@ class NodeController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const requestDetail = new RequestClass(request, 'GetMultipleNode');
+      const requestDetail = new RequestClass(request, 'GetMultipleIds');
       const namespaceID = request.query['namespaceID'] as string;
       const ids = requestDetail.data.ids;
       const cachedUserAccess = await this._redisCache.mget(

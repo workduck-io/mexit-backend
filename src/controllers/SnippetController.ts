@@ -87,7 +87,7 @@ class SnippetController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const requestDetail = new RequestClass(request, 'GetMultipleNode');
+      const requestDetail = new RequestClass(request, 'GetMultipleIds');
       const ids = requestDetail.data.ids;
       const cachedUserAccess = await this._redisCache.mget(
         ids.map(id =>

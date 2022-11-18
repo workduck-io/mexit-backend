@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
 import container from '../inversify.config';
+import { Redis } from '../libs/RedisClass';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
@@ -10,9 +11,12 @@ class CommentController {
   public _urlPath = '/comment';
   public _router = express.Router();
 
-  public _commentManager: CommentManager =
+  private _commentManager: CommentManager =
     container.get<CommentManager>(CommentManager);
-  public _transformer: Transformer = container.get<Transformer>(Transformer);
+  private _transformer: Transformer = container.get<Transformer>(Transformer);
+  private _cache: Redis = container.get<Redis>(Redis);
+  private _UserAccessLabel = 'USERACCESS';
+  private _CommentBlockLabel = 'COMMENTBLOCK';
 
   constructor() {
     initializeCommentRoutes(this);
@@ -29,7 +33,6 @@ class CommentController {
         response.locals.idToken,
         request.params.entityID
       );
-
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -43,6 +46,9 @@ class CommentController {
   ): Promise<void> => {
     try {
       const data = new RequestClass(request, 'Comment').data;
+      this._cache.del(
+        this._transformer.encodeCacheKey(this._CommentBlockLabel, data.blockId)
+      );
       const result = await this._commentManager.createComment(
         response.locals.workspaceID,
         response.locals.idToken,
@@ -97,14 +103,89 @@ class CommentController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._commentManager.getAllCommentsOfBlock(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.nodeID,
-        request.params.blockID
+      const userSpecificNodeKey = this._transformer.encodeCacheKey(
+        this._UserAccessLabel,
+        response.locals.userId,
+        request.params.nodeID
+      );
+      const result = await this._cache.getOrSet(
+        {
+          key: this._transformer.encodeCacheKey(
+            this._CommentBlockLabel,
+            request.params.blockID
+          ),
+          force: !this._cache.has(userSpecificNodeKey),
+        },
+        () =>
+          this._commentManager.getAllCommentsOfBlock(
+            response.locals.workspaceID,
+            response.locals.idToken,
+            request.params.nodeID,
+            request.params.blockID
+          )
       );
 
       response.status(statusCodes.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getAllCommentsOfBlocks = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const requestDetail = new RequestClass(request, 'GetMultipleIds');
+      const ids = requestDetail.data.ids;
+      const cachedUserAccess = await this._cache.get(
+        this._transformer.encodeCacheKey(
+          this._UserAccessLabel,
+          response.locals.userId,
+          request.params.nodeID
+        )
+      );
+      const cachedHits = (
+        await this._cache.mget(
+          ids.map(id =>
+            this._transformer.encodeCacheKey(this._CommentBlockLabel, id)
+          )
+        )
+      )
+        .filterEmpty()
+        .map(hits => JSON.parse(hits));
+
+      const nonCachedIds = ids.minus(cachedHits.map(item => item.blockId));
+
+      const managerResponse = !nonCachedIds.isEmpty()
+        ? await this._commentManager.getAllCommentsOfBlocks(
+            response.locals.workspaceID,
+            response.locals.idToken,
+            request.params.nodeID,
+            cachedUserAccess ? nonCachedIds : ids
+          )
+        : { successful: [], failed: [] };
+
+      await this._cache.mset(
+        managerResponse.successful.toObject(
+          item =>
+            this._transformer.encodeCacheKey(
+              this._CommentBlockLabel,
+              item.blockId
+            ),
+          JSON.stringify
+        )
+      );
+
+      response.status(statusCodes.OK).json(
+        cachedUserAccess
+          ? {
+              failed: managerResponse.failed,
+              successful: [...managerResponse.successful, ...cachedHits],
+            }
+          : managerResponse
+      );
     } catch (error) {
       next(error);
     }
@@ -154,6 +235,12 @@ class CommentController {
     next: NextFunction
   ): Promise<void> => {
     try {
+      this._cache.del(
+        this._transformer.encodeCacheKey(
+          this._CommentBlockLabel,
+          request.params.blockID
+        )
+      );
       const result = await this._commentManager.deleteAllCommentsOfBlock(
         response.locals.workspaceID,
         response.locals.idToken,

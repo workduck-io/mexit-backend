@@ -4,7 +4,7 @@ export interface ContentNodeRequest extends ContentNode {
   createdBy?: string;
 }
 
-export interface GetMultipleNode {
+export interface GetMultipleIds {
   ids: Array<string>; //Array of nodeids
 }
 
