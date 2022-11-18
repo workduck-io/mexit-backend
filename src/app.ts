@@ -114,4 +114,5 @@ application._app.listen(application._port, async () => {
 
 process.on('SIGINT', async () => {
   await redisCache.client.disconnect();
+  throw new Error();
 });

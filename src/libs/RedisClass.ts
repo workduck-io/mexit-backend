@@ -6,7 +6,12 @@ export class Redis {
   client: RedisClientType;
 
   constructor() {
-    this.client = createClient();
+    this.client = createClient({
+      socket: {
+        host: process.env.REDIS_HOST,
+        port: +process.env.REDIS_PORT,
+      },
+    });
   }
   /**
    * Returns a promise that resolve with cache or concrete data from a given callback function
@@ -30,6 +35,7 @@ export class Redis {
     callback: () => Promise<T>
   ): Promise<T> {
     const cache = params.force ? undefined : await this.get<T>(params.key);
+    console.log({ cache });
     if (!cache) {
       try {
         const result = await callback();
