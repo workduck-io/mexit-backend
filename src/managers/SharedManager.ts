@@ -243,7 +243,7 @@ export class SharedManager {
       promiseResponse.forEach((prom, index) => {
         if (prom.status === 'fulfilled') result.successful.push(prom.value);
         else {
-          console.log('Failure because: ', prom.reason);
+          console.error('Failure because: ', prom.reason);
           result.failed.push(nodeIDs[index]);
         }
       });

@@ -7,7 +7,7 @@ declare global {
     removeLast(): T[];
     toObject(
       key: KeyModifierFunc<T>,
-      value: ValueModifierFunc<T>
+      value?: ValueModifierFunc<T>
     ): { [key: string]: any };
     isEmpty(): boolean;
     filterEmpty(): T[];

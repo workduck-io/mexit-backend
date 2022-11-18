@@ -32,7 +32,9 @@ Object.defineProperty(Array.prototype, 'toObject', {
     return this.reduce((acc, val) => {
       return {
         ...acc,
-        [typeof key === 'string' ? get<string>(val,key) : key(val)]: value(val),
+        [typeof key === 'string' ? get<string>(val, key) : key(val)]: value
+          ? value(val)
+          : val,
       };
     }, {});
   },
