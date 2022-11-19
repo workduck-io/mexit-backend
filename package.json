@@ -14,7 +14,7 @@
     "start:prod": "tsc && NODE_ENV=production node dist/app.js",
     "start": "tsc && node dist/app.js",
     "build": "tsc",
-    "dev": "nodemon src/app.ts",
+    "dev": "nodemon --files src/app.ts",
     "debug": "export DEBUG=* && npm run start",
     "test-watch": "jest --watchAll --verbose --coverage",
     "test:unit": "jest ./src/__tests__/unit/*",
