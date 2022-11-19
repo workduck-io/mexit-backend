@@ -8,8 +8,8 @@ export class Redis {
   constructor() {
     this.client = createClient({
       socket: {
-        host: process.env.REDIS_HOST,
-        port: +process.env.REDIS_PORT,
+        host: process.env.MEXIT_BACKEND_REDIS_HOST,
+        port: +process.env.MEXIT_BACKEND_REDIS_PORT,
       },
     });
   }

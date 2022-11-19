@@ -43,6 +43,14 @@
           "value": "<mexit_backend_workspace_id>"
         },
         {
+          "name": "MEXIT_BACKEND_REDIS_HOST",
+          "value": "<mexit_backend_redis_host>"
+        },
+        {
+          "name": "MEXIT_BACKEND_REDIS_PORT",
+          "value": "<mexit_backend_redis_port>"
+        },
+        {
           "name": "NODE_ENV",
           "value": "production"
         },
