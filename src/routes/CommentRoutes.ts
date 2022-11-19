@@ -16,6 +16,12 @@ export const initializeCommentRoutes = (
     commentObject.getAllCommentsOfNode
   );
 
+  commentObject._router.post(
+    `${commentObject._urlPath}/node/:nodeID/block/ids`,
+    [AuthRequest],
+    commentObject.getAllCommentsOfBlocks
+  );
+
   commentObject._router.get(
     `${commentObject._urlPath}/node/:nodeID/block/:blockID`,
     [AuthRequest],

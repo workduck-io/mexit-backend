@@ -846,7 +846,7 @@
                 }
             ]
         },
-        "GetMultipleNode": {
+        "GetMultipleIds": {
             "properties": {
                 "ids": {
                     "items": {

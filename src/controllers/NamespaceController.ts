@@ -1,15 +1,11 @@
 import express, { NextFunction, Request, Response } from 'express';
-import { CacheType } from '../interfaces/Config';
 import container from '../inversify.config';
-import { Cache } from '../libs/CacheClass';
+import { Redis } from '../libs/RedisClass';
+import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
-import {
-  ParsedNamespaceHierarchy,
-  Transformer,
-} from '../libs/TransformerClass';
+import { Transformer } from '../libs/TransformerClass';
 import { NamespaceManager } from '../managers/NamespaceManager';
 import { initializeNamespaceRoutes } from '../routes/NamespaceRoutes';
-import { RequestClass } from '../libs/RequestClass';
 
 class NamespaceController {
   public _urlPath = '/namespace';
@@ -17,7 +13,7 @@ class NamespaceController {
   public _namespaceManager: NamespaceManager =
     container.get<NamespaceManager>(NamespaceManager);
   public _transformer: Transformer = container.get<Transformer>(Transformer);
-  public _cache: Cache = container.get<Cache>(CacheType.NamespaceHierarchy);
+  public _cache: Redis = container.get<Redis>(Redis);
   private _NSHierarchyLabel = 'NSHIERARCHY';
 
   constructor() {
@@ -129,13 +125,16 @@ class NamespaceController {
         response.locals.idToken
       );
 
-      const transformedResult = result.reduce(
-        (obj, item) => ((obj[item.namespaceID] = item), obj),
-        {}
-      );
+      const transformedResult = result.toObject('namespaceID');
 
-      const ids = Object.keys(transformedResult);
-      const promises = ids.map(id =>
+      const ids = result.map(item => item.namespaceID);
+      const cachedHits = (await this._cache.mget(ids))
+        .filterEmpty()
+        .map(hits => JSON.parse(hits));
+
+      const nonCachedIds = ids.minus(cachedHits.map(item => item.id));
+
+      const promises = nonCachedIds.map(id =>
         this._namespaceManager.getNamespace(
           response.locals.workspaceID,
           response.locals.idToken,
@@ -144,13 +143,17 @@ class NamespaceController {
       );
 
       const allNamespacesResults = await Promise.all(promises);
-      allNamespacesResults.forEach(ns => {
+      await this._cache.mset(
+        allNamespacesResults.toObject('id', JSON.stringify)
+      );
+      const allResults = [...cachedHits, ...allNamespacesResults].map(ns => {
         ns.nodeHierarchy = this._transformer.hierarchyParser(ns.nodeHierarchy);
         ns.accessType = transformedResult[ns.id].accessType;
         ns.granterID = transformedResult[ns.id].granterID;
+        return ns;
       });
 
-      response.status(statusCodes.OK).json(allNamespacesResults);
+      response.status(statusCodes.OK).json(allResults);
     } catch (error) {
       next(error);
     }
@@ -165,40 +168,34 @@ class NamespaceController {
       const forceRefresh = !!request.query['forceRefresh'];
       const getMetadata = !!request.query['getMetadata'];
 
-      let parsedNamespaceHierarchy: Record<string, ParsedNamespaceHierarchy>;
-
-      if (
-        this._cache.has(response.locals.userId, this._NSHierarchyLabel) &&
-        !forceRefresh
-      ) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        //@ts-ignore
-        parsedNamespaceHierarchy = (await this._cache.get(
-          response.locals.userId,
-          this._NSHierarchyLabel
-        )) as any;
-      } else {
-        const result = await this._namespaceManager.getAllNamespaceHierarchy(
-          response.locals.workspaceID,
-          response.locals.idToken,
-          getMetadata
-        );
-        const namespaceInfo = getMetadata ? result.hierarchy : result;
-        const nodesMetadata = getMetadata ? result.nodesMetadata : undefined;
-        parsedNamespaceHierarchy =
-          this._transformer.allNamespacesHierarchyParser(
-            namespaceInfo,
-            nodesMetadata
+      const parsedNamespaceHierarchy = (await this._cache.getOrSet(
+        {
+          key: this._transformer.encodeCacheKey(
+            this._NSHierarchyLabel,
+            response.locals.userId
+          ),
+          force: forceRefresh,
+        },
+        async () => {
+          const result = await this._namespaceManager.getAllNamespaceHierarchy(
+            response.locals.workspaceID,
+            response.locals.idToken,
+            getMetadata
           );
+          const namespaceInfo = getMetadata ? result.hierarchy : result;
+          const nodesMetadata = getMetadata ? result.nodesMetadata : undefined;
+          return JSON.stringify(
+            this._transformer.allNamespacesHierarchyParser(
+              namespaceInfo,
+              nodesMetadata
+            )
+          );
+        }
+      )) as any;
 
-        this._cache.set(
-          response.locals.userId,
-          this._NSHierarchyLabel,
-          parsedNamespaceHierarchy
-        );
-      }
-
-      response.status(statusCodes.OK).json(parsedNamespaceHierarchy);
+      response
+        .status(statusCodes.OK)
+        .json(JSON.parse(parsedNamespaceHierarchy));
     } catch (error) {
       next(error);
     }
@@ -253,7 +250,7 @@ class NamespaceController {
   ): Promise<void> => {
     try {
       const body = new RequestClass(request, 'RevokeAccessFromNamespace').data;
-      const result = await this._namespaceManager.revokeAccessFromNamespace(
+      await this._namespaceManager.revokeAccessFromNamespace(
         response.locals.workspaceID,
         response.locals.idToken,
         body
