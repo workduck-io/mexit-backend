@@ -92,8 +92,6 @@ export const serializeContent = (content: any[]) => {
       nl.children = serializeContent(el.children);
     }
 
-    // console.log('Process: ', nl, el)
-
     return nl;
   });
 };

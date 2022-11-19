@@ -1,0 +1,12 @@
+FROM node:16-alpine AS builder
+WORKDIR /usr/src/app
+RUN apk add dumb-init
+
+COPY package.json yarn.lock ./
+RUN --mount=type=secret,id=npmrc,dst=.npmrc yarn install --frozen-lockfile && yarn cache clean
+
+COPY . .
+
+EXPOSE 5002
+
+CMD ["dumb-init", "./node_modules/nodemon/bin/nodemon.js", "--files", "src/app.ts"]

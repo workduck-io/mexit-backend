@@ -1,6 +1,7 @@
 import { injectable } from 'inversify';
 
 import { STAGE } from '../env';
+import { Comment } from '../interfaces/Request';
 import container from '../inversify.config';
 import { errorlib } from '../libs/errorlib';
 import { InvocationType, Lambda } from '../libs/LambdaClass';
@@ -46,7 +47,7 @@ export class CommentManager {
   async createComment(
     workspaceID: string,
     idToken: string,
-    data: any
+    data: Comment
   ): Promise<any> {
     try {
       const result = await this._lambda.invokeAndCheck(
@@ -149,6 +150,42 @@ export class CommentManager {
         }
       );
 
+      return result;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+
+  async getAllCommentsOfBlocks(
+    workspaceID: string,
+    idToken: string,
+    nodeId: string,
+    blockIds: string[]
+  ): Promise<any> {
+    try {
+      const requests = blockIds.map(blockId =>
+        this._lambda.invokeAndCheck(
+          this._commentLambdaName,
+          this._lambdaInvocationType,
+          {
+            httpMethod: 'GET',
+            routeKey: RouteKeys.getAllCommentsOfBlock,
+            pathParameters: { nodeId, blockId },
+            headers: {
+              'mex-workspace-id': workspaceID,
+              authorization: idToken,
+            },
+          }
+        )
+      );
+      const result = await Promise.allSettled(requests);
+      console.error(result.filter(res => res.status === 'rejected'));
       return result;
     } catch (error) {
       errorlib({
