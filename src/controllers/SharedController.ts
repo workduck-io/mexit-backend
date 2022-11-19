@@ -219,7 +219,7 @@ class SharedController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const data = new RequestClass(request, 'GetMultipleNode').data;
+      const data = new RequestClass(request, 'GetMultipleIds').data;
       const result = await this._sharedManager.bulkGetSharedNodes(
         data.ids,
         response.locals.workspaceID,
