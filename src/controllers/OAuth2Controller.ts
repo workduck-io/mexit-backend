@@ -15,7 +15,7 @@ class OAuth2Controller {
   private _oauth2Client: OAuth2Client;
 
   private static readonly redirectUri = IS_DEV
-    ? 'http://localhost:5000/api/v1/oauth2/google'
+    ? 'http://localhost:5002/api/v1/oauth2/google'
     : 'https://mex-webapp-dev.workduck.io/api/v1/oauth2/google';
   private static readonly googleOAuthTokenUrl =
     'https://www.googleapis.com/oauth2/v4/token';

@@ -7,6 +7,6 @@ RUN --mount=type=secret,id=npmrc,dst=.npmrc yarn install --frozen-lockfile && ya
 
 COPY . .
 
-EXPOSE 5000
+EXPOSE 5002
 
-CMD ["dumb-init", "./node_modules/nodemon/bin/nodemon.js", "src/app.ts"]
+CMD ["dumb-init", "./node_modules/nodemon/bin/nodemon.js", "--files", "src/app.ts"]
