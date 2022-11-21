@@ -28,28 +28,16 @@ class NodeController {
   }
 
   updateILinkCache = async (
-    userId: string,
     workspaceId: string,
-    idToken: string
+    idToken: string,
+    namespaceID: string
   ): Promise<any> => {
-    const nsHierarchy = await this._nsManager.getAllNamespaceHierarchy(
+    const namespace = await this._nsManager.getNamespace(
       workspaceId,
       idToken,
-      true
+      namespaceID
     );
-
-    const { hierarchy, nodesMetadata } = nsHierarchy;
-    const parsedNamespaceHierarchy =
-      this._transformer.allNamespacesHierarchyParser(hierarchy, nodesMetadata);
-
-    await this._redisCache.set(
-      this._transformer.encodeCacheKey(this._NSHierarchyLabel, userId),
-      parsedNamespaceHierarchy
-    );
-
-    return this._redisCache.get(
-      this._transformer.encodeCacheKey(this._NSHierarchyLabel, userId)
-    );
+    await this._redisCache.set(namespaceID, namespace);
   };
 
   createNode = async (
@@ -72,9 +60,9 @@ class NodeController {
 
       response.status(statusCodes.OK).json(nodeResult);
       await this.updateILinkCache(
-        response.locals.userId,
         response.locals.workspaceID,
-        response.locals.idToken
+        response.locals.idToken,
+        requestDetail.data.namespaceID
       );
     } catch (error) {
       next(error);
@@ -272,9 +260,9 @@ class NodeController {
       response.status(statusCodes.OK).json(archiveNodeResult);
 
       await this.updateILinkCache(
-        response.locals.userId,
         response.locals.workspaceID,
-        response.locals.idToken
+        response.locals.idToken,
+        request.params.namespaceID
       );
     } catch (error) {
       next(error);
@@ -295,12 +283,6 @@ class NodeController {
         requestDetail.data
       );
       response.status(statusCodes.OK).json(archiveNodeResult);
-
-      await this.updateILinkCache(
-        response.locals.userId,
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
     } catch (error) {
       next(error);
     }
@@ -320,12 +302,6 @@ class NodeController {
         requestDetail.data
       );
       response.status(statusCodes.OK).json(archiveNodeResult);
-
-      await this.updateILinkCache(
-        response.locals.userId,
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
     } catch (error) {
       next(error);
     }
@@ -353,9 +329,14 @@ class NodeController {
         .json({ changedPaths: parsedChangedPathsRefactor });
 
       await this.updateILinkCache(
-        response.locals.userId,
         response.locals.workspaceID,
-        response.locals.idToken
+        response.locals.idToken,
+        requestDetail.data.existingNodePath.namespaceID
+      );
+      await this.updateILinkCache(
+        response.locals.workspaceID,
+        response.locals.idToken,
+        requestDetail.data.newNodePath.namespaceID
       );
     } catch (error) {
       next(error);
@@ -384,9 +365,9 @@ class NodeController {
         .json({ node, changedPaths: parsedChangedPathsRefactor });
 
       await this.updateILinkCache(
-        response.locals.userId,
         response.locals.workspaceID,
-        response.locals.idToken
+        response.locals.idToken,
+        requestDetail.data.nodePath.namespaceID
       );
     } catch (error) {
       next(error);

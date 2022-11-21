@@ -131,6 +131,7 @@ class NamespaceController {
       const cachedHits = (await this._cache.mget(ids))
         .filterEmpty()
         .map(hits => JSON.parse(hits));
+      console.log(cachedHits);
 
       const nonCachedIds = ids.minus(cachedHits.map(item => item.id));
 
