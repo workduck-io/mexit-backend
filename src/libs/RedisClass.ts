@@ -74,7 +74,7 @@ export class Redis {
    * @param key Key
    * @param value Value
    */
-  async set(key: any, value: any) {
+  async set(key: string, value: any) {
     this.client.set(key, JSON.stringify(value));
   }
   /**
