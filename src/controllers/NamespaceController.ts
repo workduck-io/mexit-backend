@@ -45,10 +45,16 @@ class NamespaceController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const namespace = await this._namespaceManager.getNamespace(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.namespaceID
+      const namespace = await this._cache.getOrSet(
+        {
+          key: request.params.namespaceID,
+        },
+        () =>
+          this._namespaceManager.getNamespace(
+            response.locals.workspaceID,
+            response.locals.idToken,
+            request.params.namespaceID
+          )
       );
 
       const parsedNS = this._transformer.namespaceHierarchyParser(namespace);
@@ -71,6 +77,7 @@ class NamespaceController {
         response.locals.idToken,
         body
       );
+      await this._cache.del(body.id);
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
@@ -89,6 +96,7 @@ class NamespaceController {
         response.locals.idToken,
         request.params.namespaceID
       );
+      await this._cache.del(request.params.namespaceID);
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
@@ -107,6 +115,7 @@ class NamespaceController {
         response.locals.idToken,
         request.params.namespaceID
       );
+      await this._cache.del(request.params.namespaceID);
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
