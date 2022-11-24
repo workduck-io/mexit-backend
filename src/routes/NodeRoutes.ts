@@ -22,6 +22,12 @@ export const initializeNodeRoutes = (
   );
 
   nodeControllerObject._router.patch(
+    `${nodeControllerObject._urlPath}/delete`,
+    [AuthRequest],
+    nodeControllerObject.deleteBlocks
+  );
+
+  nodeControllerObject._router.patch(
     `${nodeControllerObject._urlPath}/:nodeId`,
     [AuthRequest],
     nodeControllerObject.appendNode

@@ -3,6 +3,7 @@ import { fromUtf8, toUtf8 } from '@aws-sdk/util-utf8-node';
 import { WDError } from '@workduck-io/wderror';
 import { injectable } from 'inversify';
 import LambdaConfig from './InvokeLambda';
+import { statusCodes } from './statusCodes';
 
 export type InvocationType = 'RequestResponse' | 'Event';
 export type InvocationSource = 'Direct' | 'APIGateway';
@@ -80,11 +81,15 @@ export class Lambda {
     );
 
     const body = response.body ? JSON.parse(response.body) : undefined;
-    if (response.statusCode !== 200 && response.statusCode !== 204) {
+    console.log('Raw Response: ', { response, functionName, options });
+    if (
+      (response.statusCode !== 200 && response.statusCode !== 204) ||
+      !response.statusCode
+    ) {
       throw new WDError({
-        statusCode: response.statusCode,
-        message: body ? body.message : '',
-        code: response.statusCode,
+        statusCode: response.statusCode ?? statusCodes.INTERNAL_SERVER_ERROR,
+        message: body ? body.errorMessage : response.errorMessage,
+        code: response.statusCode ?? statusCodes.INTERNAL_SERVER_ERROR,
       });
     }
     return body;
