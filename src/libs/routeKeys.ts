@@ -4,6 +4,7 @@ export const RouteKeys = {
   getMultipleNode: 'GET /v1/node/ids',
   getNode: 'GET /node/{id}',
   appendNode: 'PATCH /node/{id}/append',
+  deleteBlocks: 'PATCH /node/{id}/delete/block',
   refactorHierarchy: 'POST /node/refactor',
   bulkCreateNode: 'POST /node/bulk',
   copyOrMoveBlock: 'PATCH /node/block/movement',
