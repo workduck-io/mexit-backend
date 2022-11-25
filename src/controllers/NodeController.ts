@@ -80,18 +80,20 @@ class NodeController {
         response.locals.userId,
         request.params.nodeId
       );
-      const managerResponse = this._nodeManager.getNode(
-        request.params.nodeId,
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
+      const managerResponse = this._nodeManager
+        .getNode(
+          request.params.nodeId,
+          response.locals.workspaceID,
+          response.locals.idToken
+        )
+        .catch(console.error);
 
       const result = await this._redisCache.getOrSet<NodeResponse>(
         {
           key: request.params.nodeId,
           force: !this._redisCache.has(userSpecificNodeKey),
         },
-        async () => await managerResponse
+        () => managerResponse
       );
 
       this._redisCache.set(userSpecificNodeKey, request.params.nodeId);
@@ -167,7 +169,6 @@ class NodeController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      this._redisCache.del(request.params.nodeId);
       const blockDetail = new RequestClass(request, 'AppendBlockRequest').data;
       const result = await this._nodeManager.appendNode(
         request.params.nodeId,
@@ -175,6 +176,27 @@ class NodeController {
         response.locals.idToken,
         blockDetail
       );
+      this._redisCache.del(request.params.nodeId);
+      response.status(statusCodes.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  deleteBlocks = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const nodeBlockMap = new RequestClass(request, 'DeleteBlocksRequest')
+        .data;
+      const result = await this._nodeManager.deleteBlocks(
+        response.locals.workspaceID,
+        response.locals.idToken,
+        nodeBlockMap
+      );
+      this._redisCache.mdel(Object.keys(nodeBlockMap));
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {

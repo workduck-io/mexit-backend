@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { injectable } from 'inversify';
-import { BulkResponse } from '../interfaces/Response';
 import { STAGE } from '../env';
 import { ArchiveNodeDetail, CopyOrMoveBlock } from '../interfaces/Node';
+import { BulkResponse } from '../interfaces/Response';
 import container from '../inversify.config';
 import { errorlib } from '../libs/errorlib';
 import { InvocationType, Lambda } from '../libs/LambdaClass';
@@ -125,6 +125,43 @@ export class NodeManager {
         }
       );
       return response;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+
+  async deleteBlocks(
+    workspaceId: string,
+    idToken: string,
+    nodeBlockMap: Record<string, string[]>
+  ) {
+    try {
+      const promises = Object.entries(nodeBlockMap).map(
+        ([nodeId, blockIds]) => {
+          return this._lambda.invokeAndCheck(
+            this._nodeLambdaFunctionName,
+            this._lambdaInvocationType,
+            {
+              routeKey: RouteKeys.deleteBlocks,
+              payload: { ids: blockIds },
+              pathParameters: { id: nodeId },
+              headers: {
+                'mex-workspace-id': workspaceId,
+                authorization: idToken,
+              },
+            }
+          );
+        }
+      );
+      const result = await Promise.allSettled(promises);
+      console.error(result.filter(res => res.status === 'rejected'));
+      return result;
     } catch (error) {
       errorlib({
         message: error.message,

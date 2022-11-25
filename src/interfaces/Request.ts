@@ -46,6 +46,9 @@ export interface RegisterUserRequest {
   workspaceName: string;
 }
 
+export interface DeleteBlocksRequest {
+  [nodeId: string]: string[]; //nodeId : List of blockIds
+}
 export interface AppendBlockRequest {
   elements: any[];
 }
