@@ -81,14 +81,13 @@ export class Lambda {
     );
 
     const body = response.body ? JSON.parse(response.body) : undefined;
-    console.log('Raw Response: ', { response, functionName, options });
     if (
       (response.statusCode !== 200 && response.statusCode !== 204) ||
       !response.statusCode
     ) {
       throw new WDError({
         statusCode: response.statusCode ?? statusCodes.INTERNAL_SERVER_ERROR,
-        message: body ? body.errorMessage : response.errorMessage,
+        message: body ? body.message : response.errorMessage,
         code: response.statusCode ?? statusCodes.INTERNAL_SERVER_ERROR,
       });
     }
