@@ -206,6 +206,27 @@
             ],
             "type": "object"
         },
+        "BulkResponse": {
+            "properties": {
+                "failed": {
+                    "items": {
+                        "$ref": "types#/definitions/T"
+                    },
+                    "type": "array"
+                },
+                "successful": {
+                    "items": {
+                        "$ref": "types#/definitions/T"
+                    },
+                    "type": "array"
+                }
+            },
+            "required": [
+                "failed",
+                "successful"
+            ],
+            "type": "object"
+        },
         "ClientNode": {
             "properties": {
                 "content": {
@@ -738,6 +759,15 @@
                 "id",
                 "name"
             ],
+            "type": "object"
+        },
+        "DeleteBlocksRequest": {
+            "additionalProperties": {
+                "items": {
+                    "type": "string"
+                },
+                "type": "array"
+            },
             "type": "object"
         },
         "Filter": {
@@ -1574,6 +1604,9 @@
                 "title",
                 "version"
             ],
+            "type": "object"
+        },
+        "T": {
             "type": "object"
         },
         "UpdateAccessTypeForSharedNodeDetail": {

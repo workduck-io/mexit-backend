@@ -36,17 +36,13 @@ export class Redis {
   ): Promise<T> {
     const cache = params.force ? undefined : await this.get<T>(params.key);
     if (!cache) {
-      try {
-        const result = await callback();
-        if (params.expires) {
-          this.setEx(params.key, result, params.expires);
-        } else {
-          this.set(params.key, result);
-        }
-        return result;
-      } catch (err) {
-        throw err;
+      const result = await callback();
+      if (params.expires) {
+        this.setEx(params.key, result, params.expires);
+      } else {
+        this.set(params.key, result);
       }
+      return result;
     }
     return cache;
   }

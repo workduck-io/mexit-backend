@@ -32,6 +32,7 @@ import {
   ContentNodeRequest,
   CopyOrMoveBlockRequest,
   CreateNamespace,
+  DeleteBlocksRequest,
   Filter,
   FilterJoin,
   FilterType,
@@ -116,6 +117,7 @@ export default class Interfaces implements Definitions {
   RegisterUserRequest: RegisterUserRequest;
   UpdateAccessTypeForSharedNodeDetail: UpdateAccessTypeForSharedNodeDetail;
   AppendBlockRequest: AppendBlockRequest;
+  DeleteBlocksRequest: DeleteBlocksRequest;
   PostView: PostView;
   FilterValue: FilterValue;
   Filter: Filter;
