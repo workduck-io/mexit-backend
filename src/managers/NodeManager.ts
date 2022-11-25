@@ -144,8 +144,6 @@ export class NodeManager {
     try {
       const promises = Object.entries(nodeBlockMap).map(
         ([nodeId, blockIds]) => {
-          console.log({ nodeId, blockIds });
-
           return this._lambda.invokeAndCheck(
             this._nodeLambdaFunctionName,
             this._lambdaInvocationType,
