@@ -52,7 +52,7 @@ export interface ClientNodeResponse extends ClientNode {
   createdBy: string;
 }
 
-export interface BulkResponse<T> {
+export interface BulkResponse<T = any> {
   successful: Array<T>;
   failed: Array<T>;
 }
