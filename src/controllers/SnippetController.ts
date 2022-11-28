@@ -192,7 +192,10 @@ class SnippetController {
         response.locals.idToken
       );
       this._redisCache.set(
-        this._PublicSnippetMockWorkspace + request.params.id,
+        this._transformer.encodeCacheKey(
+          this._PublicSnippetMockWorkspace,
+          request.params.id
+        ),
         snippetId
       );
 
