@@ -48,9 +48,7 @@ class NodeController {
     try {
       const requestDetail = new RequestClass(request, 'ContentNodeRequest');
       //TODO: update cache instead of deleting it
-      this._redisCache.del(
-        this._transformer.encodeCacheKey(this._NodeLabel, requestDetail.data.id)
-      );
+      this._redisCache.del(requestDetail.data.id);
 
       const nodeResult = await this._nodeManager.createNode(
         response.locals.workspaceID,

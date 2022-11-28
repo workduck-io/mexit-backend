@@ -53,6 +53,7 @@ import {
 } from './interfaces/Request';
 import {
   ActivityNodeResponse,
+  BulkResponse,
   ClientNodeResponse,
   ContentResponse,
   NodeDataResponse,
@@ -102,6 +103,7 @@ export default class Interfaces implements Definitions {
   QueryStringParameters: QueryStringParameters;
   CopyOrMoveBlockRequest: CopyOrMoveBlockRequest;
   CopyOrMoveBlock: CopyOrMoveBlock;
+  BulkResponse: BulkResponse;
   UserPreference: UserPreference;
   GoogleAuthRefreshToken: GoogleAuthRefreshToken;
   ILink: ILink;
@@ -132,4 +134,5 @@ export default class Interfaces implements Definitions {
   Reminder: Reminder;
   Reaction: Reaction;
   Comment: Comment;
+  T: any;
 }
