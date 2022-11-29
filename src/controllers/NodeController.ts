@@ -78,13 +78,11 @@ class NodeController {
         response.locals.userId,
         request.params.nodeId
       );
-      const managerResponse = this._nodeManager
-        .getNode(
-          request.params.nodeId,
-          response.locals.workspaceID,
-          response.locals.idToken
-        )
-        .catch(console.error);
+      const managerResponse = this._nodeManager.getNode(
+        request.params.nodeId,
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
 
       const result = await this._redisCache.getOrSet<NodeResponse>(
         {
@@ -136,7 +134,6 @@ class NodeController {
             namespaceID
           )
         : { successful: [], failed: [] };
-
       await this._redisCache.mset(
         managerResponse.successful.toObject('id', JSON.stringify)
       );
