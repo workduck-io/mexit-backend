@@ -34,17 +34,21 @@ export class Redis {
     params: { key: string; expires?: number; force?: boolean },
     callback: () => Promise<T>
   ): Promise<T> {
-    const cache = params.force ? undefined : await this.get<T>(params.key);
-    if (!cache) {
-      const result = await callback();
-      if (params.expires) {
-        this.setEx(params.key, result, params.expires);
-      } else {
-        this.set(params.key, result);
+    try {
+      const cache = params.force ? undefined : await this.get<T>(params.key);
+      if (!cache) {
+        const result = await callback();
+        if (params.expires) {
+          this.setEx(params.key, result, params.expires);
+        } else {
+          this.set(params.key, result);
+        }
+        return result;
       }
-      return result;
+      return cache;
+    } catch (error) {
+      throw error;
     }
-    return cache;
   }
   /**
    * Get a value from a key in redis using GET command
