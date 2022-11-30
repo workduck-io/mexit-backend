@@ -11,6 +11,7 @@ import { NodeManager } from './managers/NodeManager';
 import { ReactionManager } from './managers/ReactionManager';
 import { ReminderManager } from './managers/ReminderManager';
 import { SharedManager } from './managers/SharedManager';
+import { SmartCaptureManager } from './managers/SmartCaptureManager';
 import { SnippetManager } from './managers/SnippetManager';
 import { TagManager } from './managers/TagManager';
 import { UserManager } from './managers/UserManager';
@@ -27,6 +28,9 @@ container.bind<LinkManager>(LinkManager).to(LinkManager);
 container.bind<TagManager>(TagManager).to(TagManager);
 container.bind<SharedManager>(SharedManager).to(SharedManager);
 
+container
+  .bind<SmartCaptureManager>(SmartCaptureManager)
+  .to(SmartCaptureManager);
 container.bind<UserManager>(UserManager).to(UserManager);
 
 container.bind<Redis>(Redis).to(Redis);
