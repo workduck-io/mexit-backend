@@ -29,7 +29,7 @@ class SmartCaptureController {
         response.locals.workspaceID,
         response.locals.idToken
       );
-      const result = this._cache.getOrSet(
+      const result = await this._cache.getOrSet(
         {
           key: this._PublicCaptureLabel,
           expires: 24 * 60 * 60 * 60, // 24 hours
