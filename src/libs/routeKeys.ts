@@ -109,4 +109,7 @@ export const RouteKeys = {
   getAllReactionsOfBlock: 'GET /node/{nodeId}/block/{blockId}',
   getReactionDetailsOfBlock: 'GET /node/{nodeId}/block/{blockId}/details',
   toggleReaction: 'POST /',
+
+  //SmartCapture
+  getPublicCaptureConfig: 'GET /config/all/public',
 };
