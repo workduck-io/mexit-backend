@@ -36,8 +36,10 @@ class SnippetController {
         request.body,
         createNextVersion
       );
-      const deserialisedContent =
-        this._transformer.genericNodeConverter(snippetResult);
+      const deserialisedContent = this._transformer.genericNodeConverter(
+        snippetResult,
+        false
+      );
 
       response.status(statusCodes.OK).json(deserialisedContent);
     } catch (error) {
