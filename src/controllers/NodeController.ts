@@ -55,8 +55,8 @@ class NodeController {
         response.locals.idToken,
         requestDetail.data
       );
-
-      response.status(statusCodes.OK).json(nodeResult);
+      const { data, ...rest } = nodeResult; //Dont relay data to frontend
+      response.status(statusCodes.OK).json(rest);
       await this.updateILinkCache(
         response.locals.workspaceID,
         response.locals.idToken,
@@ -374,12 +374,14 @@ class NodeController {
         requestDetail.data
       );
       const { node, changedPaths } = bulkCreateResp;
+      //TODO: Make part of TransformClass
+      const { data, dataOrder, ...rest } = node; //Dont relay data to frontend
       const parsedChangedPathsRefactor =
         this._transformer.refactoredPathsHierarchyParser(changedPaths);
 
       response
         .status(statusCodes.OK)
-        .json({ node, changedPaths: parsedChangedPathsRefactor });
+        .json({ node: rest, changedPaths: parsedChangedPathsRefactor });
 
       await this.updateILinkCache(
         response.locals.workspaceID,

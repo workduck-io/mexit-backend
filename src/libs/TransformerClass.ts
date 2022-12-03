@@ -1,14 +1,12 @@
 import { injectable } from 'inversify';
 
-import { ContentNode, ILink } from '../interfaces/Node';
+import { ContentNode, ILink, NodeMetadata } from '../interfaces/Node';
 import { NodeResponse } from '../interfaces/Response';
-import { NodeMetadata } from '../interfaces/Node';
 import { deserializeContent } from './serialize';
 
-
 interface IconMetadata {
-  type: string
-  value: string
+  type: string;
+  value: string;
 }
 
 interface ILinkNodeMetadata {
@@ -44,11 +42,18 @@ interface ILinkWithMetadata extends ILink {
 export interface ParsedNamespaceHierarchy {
   name: string;
   nodeHierarchy: ILinkWithMetadata[];
-  namespaceMetadata?: { icon: IconMetadata }
+  namespaceMetadata?: { icon: IconMetadata };
 }
 
 export type AllNamespaceHierarchyResponse = {
-  namespaceInfo: Record<string, { name: string; nodeHierarchy: string[], namespaceMetadata?: { icon: IconMetadata } }>;
+  namespaceInfo: Record<
+    string,
+    {
+      name: string;
+      nodeHierarchy: string[];
+      namespaceMetadata?: { icon: IconMetadata };
+    }
+  >;
 };
 export type ParsedAllNamespacesHierarchy = Record<
   string,
@@ -197,7 +202,7 @@ export class Transformer {
           reject(new Error('Invalid linkdata input'));
 
         let cumulativePath: string;
-        for (let index = 0; index < delimitedStrings.length;) {
+        for (let index = 0; index < delimitedStrings.length; ) {
           if (!cumulativePath) cumulativePath = delimitedStrings[index];
           else
             cumulativePath = cumulativePath.concat(
@@ -230,14 +235,17 @@ export class Transformer {
     return encodedCacheKey.split(this.CACHE_KEY_DELIMITER).slice(0, -1);
   };
 
-  genericNodeConverter = (nodeResponse: NodeResponse) => {
+  genericNodeConverter = (nodeResponse: NodeResponse, returnData = true) => {
     if (
       nodeResponse.id.startsWith(this.CAPTURES.NODE) ||
       nodeResponse.id.startsWith(this.CAPTURES.SNIPPET)
     )
-      return this.convertNodeToContentFormat(nodeResponse);
+      return this.convertNodeToContentFormat(nodeResponse, returnData);
   };
-  convertNodeToContentFormat = (nodeResponse: NodeResponse): ContentNode => {
+  convertNodeToContentFormat = (
+    nodeResponse: NodeResponse,
+    returnData = true
+  ): ContentNode => {
     const content = deserializeContent(nodeResponse.data);
     const metadata: NodeMetadata = {
       createdAt: nodeResponse.createdAt,
@@ -251,7 +259,7 @@ export class Transformer {
       id: nodeResponse.id,
       title: nodeResponse.title,
       namespaceID: nodeResponse.namespaceID,
-      content: content,
+      content: returnData ? content : undefined,
       metadata: metadata,
       ...(nodeResponse.id.startsWith(this.CAPTURES.SNIPPET) && {
         template: nodeResponse.template,
@@ -276,7 +284,7 @@ export class Transformer {
         parsedNSHierarchy[namespaceID] = {
           name: namespaceValue.name,
           nodeHierarchy: nHierarchy,
-          namespaceMetadata: namespaceValue.namespaceMetadata
+          namespaceMetadata: namespaceValue.namespaceMetadata,
         };
       }
     );
