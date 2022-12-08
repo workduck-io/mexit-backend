@@ -70,7 +70,7 @@ export const initializeNodeRoutes = (
   );
 
   nodeControllerObject._router.put(
-    `${nodeControllerObject._urlPath}/archive/:namespaceID`,
+    `${nodeControllerObject._urlPath}/archive`,
     [AuthRequest],
     nodeControllerObject.archiveNode
   );

@@ -302,7 +302,7 @@ export class NodeManager {
         {
           routeKey: RouteKeys.archiveNode,
           payload: archivePayload,
-          pathParameters: { id: namespaceID },
+          queryStringParameters: { namespaceID: namespaceID },
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
@@ -322,7 +322,8 @@ export class NodeManager {
   async unArchiveNode(
     workspaceId: string,
     idToken: string,
-    unArchivePayload: ArchiveNodeDetail
+    unArchivePayload: ArchiveNodeDetail,
+    namespaceID: string
   ): Promise<any> {
     try {
       const result = await this._lambda.invokeAndCheck(
@@ -331,6 +332,7 @@ export class NodeManager {
         {
           routeKey: RouteKeys.unArchiveNode,
           payload: unArchivePayload,
+          queryStringParameters: { namespaceID: namespaceID },
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );

@@ -13,7 +13,7 @@ export const RouteKeys = {
 
   // Node Archive Operations
   getArchivedNodes: 'GET /node/archive',
-  archiveNode: 'PUT /node/archive/{id}',
+  archiveNode: 'PUT /node/archive',
   unArchiveNode: 'PUT /node/unarchive',
   deleteArchivedNode: 'POST /node/archive/delete',
 
