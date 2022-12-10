@@ -49,6 +49,7 @@ import {
   ShareNamespace,
   ShortenLink,
   SnippetUpdateVersionRequest,
+  UpdateMetadata,
   UpdateNamespace,
 } from './interfaces/Request';
 import {
@@ -135,4 +136,5 @@ export default class Interfaces implements Definitions {
   Reaction: Reaction;
   Comment: Comment;
   T: any;
+  UpdateMetadata: UpdateMetadata;
 }

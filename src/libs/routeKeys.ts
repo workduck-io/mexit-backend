@@ -10,6 +10,7 @@ export const RouteKeys = {
   copyOrMoveBlock: 'PATCH /node/block/movement',
   makeNodePublic: 'PATCH /node/makePublic/{id}',
   makeNodePrivate: 'PATCH /node/makePrivate/{id}',
+  updateNodeMetadata: 'PATCH /node/metadata/{id}',
 
   // Node Archive Operations
   getArchivedNodes: 'GET /node/archive',
@@ -46,6 +47,7 @@ export const RouteKeys = {
   clonePublicSnippet: 'POST /snippet/clone/{id}/{version}',
   deleteVersionOfSnippet: 'DELETE /snippet/{id}',
   deleteAllVersionsOfSnippet: 'DELETE /snippet/{id}/all',
+  updateSnippetMetadata: 'PATCH /v1/snippet/metadata/{id}',
 
   // User Star (Bookmark) Endpoints
   createBookmark: 'POST /userStar/{id}',
