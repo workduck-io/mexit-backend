@@ -339,4 +339,34 @@ export class SnippetManager {
       });
     }
   }
+
+  async updateSnippetMetadata(
+    workspaceID: string,
+    idToken: string,
+    snippetID: string,
+    payload: any
+  ): Promise<any> {
+    try {
+      const result = await this._lambda.invokeAndCheck(
+        this._snippetLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.updateSnippetMetadata,
+          pathParameters: { id: snippetID },
+          headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
+          payload: { ...payload, type: 'MetadataRequest' },
+        }
+      );
+
+      return result;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
 }
