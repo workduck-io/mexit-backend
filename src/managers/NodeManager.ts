@@ -302,7 +302,7 @@ export class NodeManager {
         {
           routeKey: RouteKeys.archiveNode,
           payload: archivePayload,
-          pathParameters: { id: namespaceID },
+          queryStringParameters: { namespaceID: namespaceID },
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
@@ -322,7 +322,8 @@ export class NodeManager {
   async unArchiveNode(
     workspaceId: string,
     idToken: string,
-    unArchivePayload: ArchiveNodeDetail
+    unArchivePayload: ArchiveNodeDetail,
+    namespaceID: string
   ): Promise<any> {
     try {
       const result = await this._lambda.invokeAndCheck(
@@ -331,6 +332,7 @@ export class NodeManager {
         {
           routeKey: RouteKeys.unArchiveNode,
           payload: unArchivePayload,
+          queryStringParameters: { namespaceID: namespaceID },
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
@@ -429,6 +431,36 @@ export class NodeManager {
         {
           routeKey: RouteKeys.getArchivedNodes,
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        }
+      );
+
+      return result;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+
+  async updateNodeMetadata(
+    workspaceID: string,
+    idToken: string,
+    nodeID: string,
+    payload: any
+  ): Promise<any> {
+    try {
+      const result = await this._lambda.invokeAndCheck(
+        this._nodeLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.updateNodeMetadata,
+          pathParameters: { id: nodeID },
+          headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
+          payload: { ...payload, type: 'MetadataRequest' },
         }
       );
 

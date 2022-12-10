@@ -268,11 +268,19 @@ class NodeController {
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'ArchiveNodeDetail');
+      const namespaceID = request.query['namespaceID'];
+
+      if (!namespaceID) {
+        response
+          .status(statusCodes.BAD_REQUEST)
+          .json({ message: 'NamespaceID missing in query parameters' });
+      }
+
       const archiveNodeResult = await this._nodeManager.archiveNode(
         response.locals.workspaceID,
         response.locals.idToken,
         requestDetail.data,
-        request.params.namespaceID
+        namespaceID as string
       );
       response.status(statusCodes.OK).json(archiveNodeResult);
 
@@ -312,11 +320,18 @@ class NodeController {
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'ArchiveNodeDetail');
+      const namespaceID = request.query['namespaceID'];
 
+      if (!namespaceID) {
+        response
+          .status(statusCodes.BAD_REQUEST)
+          .json({ message: 'NamespaceID missing in query parameters' });
+      }
       const archiveNodeResult = await this._nodeManager.unArchiveNode(
         response.locals.workspaceID,
         response.locals.idToken,
-        requestDetail.data
+        requestDetail.data,
+        namespaceID as string
       );
       response.status(statusCodes.OK).json(archiveNodeResult);
     } catch (error) {
@@ -405,6 +420,27 @@ class NodeController {
       );
 
       response.status(statusCodes.OK).json(getArchiveResp);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  updateNodeMetadata = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const body = new RequestClass(request, 'UpdateMetadata').data;
+
+      const result = await this._nodeManager.updateNodeMetadata(
+        response.locals.workspaceID,
+        response.locals.idToken,
+        request.params.id,
+        body
+      );
+
+      response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
       next(error);
     }

@@ -155,6 +155,9 @@ class NamespaceController {
         allNamespacesResults.toObject('id', JSON.stringify)
       );
       const allResults = [...cachedHits, ...allNamespacesResults].map(ns => {
+        ns.archiveNodeHierarchy = this._transformer.hierarchyParser(
+          ns.archiveNodeHierarchy
+        );
         ns.nodeHierarchy = this._transformer.hierarchyParser(ns.nodeHierarchy);
         ns.accessType = transformedResult[ns.id].accessType;
         ns.granterID = transformedResult[ns.id].granterID;
