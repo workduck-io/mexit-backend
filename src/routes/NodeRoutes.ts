@@ -4,6 +4,12 @@ import { AuthRequest } from '../middlewares/authrequest';
 export const initializeNodeRoutes = (
   nodeControllerObject: NodeController
 ): void => {
+  nodeControllerObject._router.patch(
+    `${nodeControllerObject._urlPath}/metadata/:id`,
+    [AuthRequest],
+    nodeControllerObject.updateNodeMetadata
+  );
+
   nodeControllerObject._router.post(
     nodeControllerObject._urlPath,
     [AuthRequest],

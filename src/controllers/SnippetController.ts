@@ -338,6 +338,27 @@ class SnippetController {
       next(error);
     }
   };
+
+  updateSnippetMetadata = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const body = new RequestClass(request, 'UpdateMetadata').data;
+
+      const result = await this._snippetManager.updateSnippetMetadata(
+        response.locals.workspaceID,
+        response.locals.idToken,
+        request.params.id,
+        body
+      );
+
+      response.status(statusCodes.NO_CONTENT).send();
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 export default SnippetController;

@@ -1627,6 +1627,23 @@
             ],
             "type": "object"
         },
+        "UpdateMetadata": {
+            "properties": {
+                "metadata": {
+                    "properties": {
+                        "icon": {},
+                        "templateID": {
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                }
+            },
+            "required": [
+                "metadata"
+            ],
+            "type": "object"
+        },
         "UpdateNamespace": {
             "properties": {
                 "id": {

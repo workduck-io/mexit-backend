@@ -167,3 +167,10 @@ export interface Comment {
   properties?: any;
   content: any[];
 }
+
+export interface UpdateMetadata {
+  metadata: {
+    templateID?: string;
+    icon?: any;
+  };
+}
