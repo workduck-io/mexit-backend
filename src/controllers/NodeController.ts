@@ -433,13 +433,13 @@ class NodeController {
     try {
       const body = new RequestClass(request, 'UpdateMetadata').data;
 
-      const result = await this._nodeManager.updateNodeMetadata(
+      await this._nodeManager.updateNodeMetadata(
         response.locals.workspaceID,
         response.locals.idToken,
         request.params.id,
         body
       );
-
+      this._redisCache.del(request.params.id);
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
       next(error);
