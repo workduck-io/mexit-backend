@@ -27,6 +27,7 @@ export const RouteKeys = {
   updateUserPreference: 'PUT /info',
   createUserPreference: 'POST ',
   getUserByLinkedin: 'POST /linkedin',
+  getAllUsernames: 'POST /all',
 
   // Shared Note Ops
   shareNode: 'POST /shared/node',
