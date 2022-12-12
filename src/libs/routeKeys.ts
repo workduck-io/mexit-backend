@@ -14,8 +14,8 @@ export const RouteKeys = {
 
   // Node Archive Operations
   getArchivedNodes: 'GET /node/archive',
-  archiveNode: 'PUT /node/archive',
-  unArchiveNode: 'PUT /node/unarchive',
+  archiveNode: 'PUT /node/archive/middleware',
+  unArchiveNode: 'PUT /v1/node/unarchive',
   deleteArchivedNode: 'POST /node/archive/delete',
 
   // User Ops
