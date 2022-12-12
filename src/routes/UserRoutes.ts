@@ -43,4 +43,9 @@ export const initializeUserRoutes = (userObject: UserController): void => {
     [AuthRequest],
     userObject.getUserByLinkedin
   );
+  userObject._router.post(
+    `${userObject._urlPath}/all`,
+    [AuthRequest],
+    userObject.getAllUsernames
+  );
 };

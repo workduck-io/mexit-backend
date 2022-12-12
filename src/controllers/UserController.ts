@@ -111,6 +111,20 @@ class UserController {
     }
   };
 
+  getAllUsernames = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<any> => {
+    try {
+      const result = await this._userManager.getAllUsernames(request.body);
+
+      response.status(statusCodes.OK).send(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   registerUser = async (
     request: Request,
     response: Response,
