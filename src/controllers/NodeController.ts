@@ -268,7 +268,7 @@ class NodeController {
   ): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'ArchiveNodeDetail');
-      const namespaceID = request.query['namespaceID'];
+      const namespaceID = request.query['namespaceID'] as string;
 
       if (!namespaceID) {
         response
@@ -280,14 +280,14 @@ class NodeController {
         response.locals.workspaceID,
         response.locals.idToken,
         requestDetail.data,
-        namespaceID as string
+        namespaceID
       );
       response.status(statusCodes.OK).json(archiveNodeResult);
 
       await this.updateILinkCache(
         response.locals.workspaceID,
         response.locals.idToken,
-        request.params.namespaceID
+        namespaceID
       );
     } catch (error) {
       next(error);
