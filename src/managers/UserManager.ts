@@ -159,14 +159,19 @@ export class UserManager {
       });
     }
   }
-  // eslint-disable-next-line
-  async getAllUsernames(payload: any): Promise<any> {
+  async getAllUsernames(
+    // eslint-disable-next-line
+    payload: any,
+    workspaceId: string,
+    idToken: string
+  ): Promise<any> {
     try {
       const response = await this._lambda.invokeAndCheck(
         this._userLambdaFunctionName,
         this._lambdaInvocationType,
         {
           routeKey: RouteKeys.getAllUsernames,
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
           payload: payload,
           httpMethod: 'POST',
         },
