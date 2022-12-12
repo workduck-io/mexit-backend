@@ -117,7 +117,11 @@ class UserController {
     next: NextFunction
   ): Promise<any> => {
     try {
-      const result = await this._userManager.getAllUsernames(request.body);
+      const result = await this._userManager.getAllUsernames(
+        request.body,
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
 
       response.status(statusCodes.OK).send(result);
     } catch (error) {
