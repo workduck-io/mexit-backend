@@ -236,7 +236,7 @@ class NodeController {
         response.locals.idToken
       );
 
-      response.status(statusCodes.OK).json(result);
+      response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
       next(error);
     }
@@ -255,7 +255,7 @@ class NodeController {
         response.locals.workspaceID,
         response.locals.idToken
       );
-      response.status(statusCodes.OK).json(result);
+      response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
       next(error);
     }
