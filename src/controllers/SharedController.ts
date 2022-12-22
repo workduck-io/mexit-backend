@@ -50,7 +50,7 @@ class SharedController {
           requestDetail.data.nodeID
         )
       );
-      response.status(statusCodes.OK).json(result);
+      response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
       next(error);
     }
@@ -118,7 +118,7 @@ class SharedController {
       this._redisCache.del(
         this._transformer.encodeCacheKey(this._UserAccessTypeLabel, body.nodeID)
       );
-      response.status(statusCodes.OK).json(result);
+      response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
       next(error);
     }
