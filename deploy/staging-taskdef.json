@@ -35,12 +35,12 @@
           "value": "<MEX_DEFAULT_USER_REFRESH_TOKEN>"
         },
         {
-          "name": "MEXIT_BACKEND_USER_ID",
-          "value": "<mexit_backend_user_id><mexit_backend_user_id>"
+          "name": "MEX_DEFAULT_USER_ID",
+          "value": "<MEX_DEFAULT_USER_ID><MEX_DEFAULT_USER_ID>"
         },
         {
-          "name": "MEXIT_BACKEND_WORKSPACE_ID",
-          "value": "<mexit_backend_workspace_id>"
+          "name": "MEX_DEFAULT_WORKSPACE_ID",
+          "value": "<MEX_DEFAULT_WORKSPACE_ID>"
         },
         {
           "name": "MEXIT_BACKEND_REDIS_HOST",
