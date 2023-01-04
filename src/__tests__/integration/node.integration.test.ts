@@ -7,7 +7,7 @@ import 'dotenv/config';
 // eslint-disable-next-line
 
 const WORKSPACE_ID = process.env.MEXIT_BACKEND_WORKSPACE_ID;
-const REFRESH_TOKEN = process.env.MEXIT_BACKEND_REFRESH_TOKEN;
+const REFRESH_TOKEN = process.env.MEX_DEFAULT_USER_REFRESH_TOKEN;
 const CLIENT_ID = process.env.MEXIT_BACKEND_CLIENT_ID;
 
 if (!(WORKSPACE_ID && REFRESH_TOKEN && CLIENT_ID)) {
