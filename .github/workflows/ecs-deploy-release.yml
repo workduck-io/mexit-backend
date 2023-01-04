@@ -65,7 +65,7 @@ jobs:
         run: |
           sed -i "s/<mexit_backend_google_client_id>/$MEXIT_BACKEND_GOOGLE_CLIENT_ID/g" deploy/staging-taskdef.json
           sed -i "s/<mexit_backend_google_client_secret>/$MEXIT_BACKEND_GOOGLE_CLIENT_SECRET/g" deploy/staging-taskdef.json
-          sed -i "s/<mexit_backend_refresh_token>/$MEXIT_BACKEND_REFRESH_TOKEN/g" deploy/staging-taskdef.json
+          sed -i "s/<MEX_DEFAULT_USER_REFRESH_TOKEN>/$MEX_DEFAULT_USER_REFRESH_TOKEN/g" deploy/staging-taskdef.json
           sed -i "s/<mexit_backend_user_id>/$MEXIT_BACKEND_USER_ID/g" deploy/staging-taskdef.json
           sed -i "s/<mexit_backend_workspace_id>/$MEXIT_BACKEND_WORKSPACE_ID/g" deploy/staging-taskdef.json
           sed -i "s/<mexit_backend_redis_host>/$MEXIT_BACKEND_REDIS_HOST/g" deploy/staging-taskdef.json
@@ -74,7 +74,7 @@ jobs:
         env:
           MEXIT_BACKEND_GOOGLE_CLIENT_ID: ${{ secrets.MEXIT_BACKEND_GOOGLE_CLIENT_ID }}
           MEXIT_BACKEND_GOOGLE_CLIENT_SECRET: ${{ secrets.MEXIT_BACKEND_GOOGLE_CLIENT_SECRET }}
-          MEXIT_BACKEND_REFRESH_TOKEN: ${{ secrets.MEXIT_BACKEND_REFRESH_TOKEN }}
+          MEX_DEFAULT_USER_REFRESH_TOKEN: ${{ secrets.MEX_DEFAULT_USER_REFRESH_TOKEN }}
           MEXIT_BACKEND_USER_ID: ${{ secrets.MEXIT_BACKEND_USER_ID }}
           MEXIT_BACKEND_WORKSPACE_ID: ${{ secrets.MEXIT_BACKEND_WORKSPACE_ID }}
           MEXIT_BACKEND_REDIS_HOST: ${{ secrets.MEXIT_BACKEND_STAGING_REDIS_HOST }}

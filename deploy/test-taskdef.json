@@ -31,8 +31,8 @@
           "value": "<mexit_backend_google_client_secret>"
         },
         {
-          "name": "MEXIT_BACKEND_REFRESH_TOKEN",
-          "value": "<mexit_backend_refresh_token>"
+          "name": "MEX_DEFAULT_USER_REFRESH_TOKEN",
+          "value": "<MEX_DEFAULT_USER_REFRESH_TOKEN>"
         },
         {
           "name": "MEXIT_BACKEND_USER_ID",
