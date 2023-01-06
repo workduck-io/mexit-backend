@@ -25,8 +25,8 @@ jobs:
       - name: Create .env file
         run: |
           touch .env
-          echo MEXIT_BACKEND_WORKSPACE_ID=${{ secrets.MEXIT_BACKEND_WORKSPACE_ID }} >> .env
-          echo MEXIT_BACKEND_REFRESH_TOKEN=${{ secrets.MEXIT_BACKEND_REFRESH_TOKEN }} >> .env
+          echo MEX_DEFAULT_WORKSPACE_ID=${{ secrets.MEX_DEFAULT_WORKSPACE_ID }} >> .env
+          echo MEX_DEFAULT_USER_REFRESH_TOKEN=${{ secrets.MEX_DEFAULT_USER_REFRESH_TOKEN }} >> .env
           echo MEXIT_BACKEND_CLIENT_ID=${{ secrets.MEXIT_BACKEND_CLIENT_ID }} >> .env
       - name: Run Tests
         run: yarn test
