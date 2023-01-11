@@ -80,14 +80,22 @@ export class Lambda {
       invocationSource
     );
 
-    const body = response.body ? JSON.parse(response.body) : undefined;
+    const body = response.body
+      ? typeof response.body === 'object'
+        ? JSON.parse(response.body)
+        : response.body
+      : undefined;
     if (
       (response.statusCode !== 200 && response.statusCode !== 204) ||
       !response.statusCode
     ) {
       throw new WDError({
         statusCode: response.statusCode ?? statusCodes.INTERNAL_SERVER_ERROR,
-        message: body ? body.message : response.errorMessage,
+        message: body
+          ? body?.message
+            ? body.message
+            : body
+          : response.errorMessage,
         code: response.statusCode ?? statusCodes.INTERNAL_SERVER_ERROR,
       });
     }

@@ -11,7 +11,7 @@ import { statusCodes } from '../libs/statusCodes';
 @injectable()
 export class UserManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
-  private _userLambdaFunctionName = 'workduck-user-service-dev-user';
+  private _userLambdaFunctionName = 'workduck-user-service-test-user';
   private _getUserLambdaFunctionName = 'workduck-user-service-dev-getUser';
   private _userMexBackendLambdaFunctionName = `mex-backend-${STAGE}-User`;
 
@@ -57,6 +57,9 @@ export class UserManager {
           httpMethod: 'GET',
         }
       );
+
+      console.log('Response: ', response);
+
       return response;
     } catch (error) {
       errorlib({
