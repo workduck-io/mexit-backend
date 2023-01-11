@@ -51,7 +51,7 @@ interface Claim {
   username: string;
 }
 
-const cognitoPoolId = 'us-east-1_Zu7FAh7hj';
+const cognitoPoolId = 'us-east-1_O5YTlVrCd';
 if (!cognitoPoolId) {
   throw new Error('env var required for cognito pool');
 }
