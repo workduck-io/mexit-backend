@@ -1344,37 +1344,6 @@
             ],
             "type": "object"
         },
-        "RegisterUserRequest": {
-            "properties": {
-                "user": {
-                    "properties": {
-                        "email": {
-                            "type": "string"
-                        },
-                        "id": {
-                            "type": "string"
-                        },
-                        "name": {
-                            "type": "string"
-                        }
-                    },
-                    "required": [
-                        "email",
-                        "id",
-                        "name"
-                    ],
-                    "type": "object"
-                },
-                "workspaceName": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "user",
-                "workspaceName"
-            ],
-            "type": "object"
-        },
         "Reminder": {
             "properties": {
                 "entityId": {
