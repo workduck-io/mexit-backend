@@ -81,7 +81,7 @@ export class Lambda {
     );
 
     const body = response.body
-      ? typeof response.body === 'object'
+      ? typeof response.body === 'string'
         ? JSON.parse(response.body)
         : response.body
       : undefined;
