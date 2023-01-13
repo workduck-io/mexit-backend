@@ -19,7 +19,6 @@ export const RouteKeys = {
   deleteArchivedNode: 'POST /node/archive/delete',
 
   // User Ops
-  registerUser: 'POST /user/register',
   getById: 'GET /{userId}',
   getByEmail: 'GET /email/{email}',
   getUser: 'GET /',
@@ -28,6 +27,7 @@ export const RouteKeys = {
   createUserPreference: 'POST ',
   getUserByLinkedin: 'POST /linkedin',
   getAllUsernames: 'POST /all',
+  registerStatus: 'GET /status',
 
   // Shared Note Ops
   shareNode: 'POST /shared/node',

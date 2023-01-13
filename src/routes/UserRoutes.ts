@@ -2,10 +2,10 @@ import UserController from '../controllers/UserController';
 import { AuthRequest } from '../middlewares/authrequest';
 
 export const initializeUserRoutes = (userObject: UserController): void => {
-  userObject._router.post(
-    `${userObject._urlPath}/register`,
+  userObject._router.get(
+    `${userObject._urlPath}/status`,
     [AuthRequest],
-    userObject.registerUser
+    userObject.registerStatus
   );
 
   userObject._router.get(
