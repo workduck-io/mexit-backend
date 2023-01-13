@@ -37,15 +37,6 @@ export interface BulkCreateNode {
   tags?: any[];
 }
 
-export interface RegisterUserRequest {
-  user: {
-    id: string;
-    name: string;
-    email: string;
-  };
-  workspaceName: string;
-}
-
 export interface DeleteBlocksRequest {
   [nodeId: string]: string[]; //nodeId : List of blockIds
 }

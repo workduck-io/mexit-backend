@@ -43,7 +43,6 @@ import {
   PostView,
   Reaction,
   RefactorRequest,
-  RegisterUserRequest,
   Reminder,
   RevokeAccessFromNamespace,
   ShareNamespace,
@@ -117,7 +116,6 @@ export default class Interfaces implements Definitions {
   NodePath: NodePath;
   RefactorRequest: RefactorRequest;
   BulkCreateNode: BulkCreateNode;
-  RegisterUserRequest: RegisterUserRequest;
   UpdateAccessTypeForSharedNodeDetail: UpdateAccessTypeForSharedNodeDetail;
   AppendBlockRequest: AppendBlockRequest;
   DeleteBlocksRequest: DeleteBlocksRequest;

@@ -11,9 +11,10 @@ import { statusCodes } from '../libs/statusCodes';
 @injectable()
 export class UserManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
-  private _userLambdaFunctionName = 'workduck-user-service-dev-user';
+  private _userLambdaFunctionName = `workduck-user-service-dev-user`;
   private _getUserLambdaFunctionName = 'workduck-user-service-dev-getUser';
   private _userMexBackendLambdaFunctionName = `mex-backend-${STAGE}-User`;
+  private _registerStatusLambdaFunctionName = `workduck-user-service-dev-registerStatus`;
 
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
@@ -57,6 +58,7 @@ export class UserManager {
           httpMethod: 'GET',
         }
       );
+
       return response;
     } catch (error) {
       errorlib({
@@ -189,17 +191,16 @@ export class UserManager {
       });
     }
   }
-  // eslint-disable-next-line
-  async registerUser(idToken: string, payload: any): Promise<any> {
+
+  async registerStatus(idToken: string): Promise<any> {
     try {
       const response = await this._lambda.invokeAndCheck(
-        this._userMexBackendLambdaFunctionName,
+        this._registerStatusLambdaFunctionName,
         this._lambdaInvocationType,
         {
-          routeKey: RouteKeys.registerUser,
-          payload: { ...payload, type: 'RegisterUserRequest' },
-          headers: { 'mex-workspace-id': '', authorization: idToken },
-          httpMethod: 'POST',
+          routeKey: RouteKeys.registerStatus,
+          httpMethod: 'GET',
+          headers: { authorization: idToken },
         }
       );
       return response;

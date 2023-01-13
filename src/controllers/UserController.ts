@@ -5,6 +5,7 @@ import { statusCodes } from '../libs/statusCodes';
 import { UserManager } from '../managers/UserManager';
 import { initializeUserRoutes } from '../routes/UserRoutes';
 import { Transformer } from './../libs/TransformerClass';
+
 class UserController {
   public _urlPath = '/user';
   public _router = express.Router();
@@ -129,21 +130,17 @@ class UserController {
     }
   };
 
-  registerUser = async (
+  registerStatus = async (
     request: Request,
     response: Response,
     next: NextFunction
   ): Promise<void> => {
     try {
-      const requestDetail = new RequestClass(request, 'RegisterUserRequest');
-      const idToken = response.locals.idToken;
-
-      const registerResp = await this._userManager.registerUser(
-        idToken,
-        requestDetail.data
+      const registerStatus = await this._userManager.registerStatus(
+        response.locals.idToken
       );
 
-      response.status(statusCodes.OK).json(registerResp);
+      response.status(statusCodes.OK).send(registerStatus);
     } catch (error) {
       next(error);
     }
