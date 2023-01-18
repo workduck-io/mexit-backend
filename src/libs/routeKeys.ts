@@ -117,4 +117,11 @@ export const RouteKeys = {
 
   //SmartCapture
   getPublicCaptureConfig: 'GET /config/all/public',
+
+  //Highlights
+  getHighlightByID: 'GET /{entityId}',
+  createHighlight: 'POST /',
+  deleteHighlightByID: 'DELETE /{entityId}',
+  getHighlightByIDs: 'GET /multiple',
+  getAllHighlightsOfWorkspace: 'GET /all',
 };
