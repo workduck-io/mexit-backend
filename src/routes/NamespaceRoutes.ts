@@ -34,6 +34,12 @@ export const initializeNamespaceRoutes = (
   );
 
   nsObject._router.get(
+    `${nsObject._urlPath}/:namespaceID/path/:path`,
+    [AuthRequest],
+    nsObject.getNodeIDFromPath
+  );
+
+  nsObject._router.get(
     `${nsObject._urlPath}/:namespaceID`,
     [AuthRequest],
     nsObject.getNamespace

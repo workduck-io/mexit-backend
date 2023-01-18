@@ -289,6 +289,35 @@ class NamespaceController {
       next(error);
     }
   };
+
+  getNodeIDFromPath = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const result: string = await this._namespaceManager.getNodeIDFromPath(
+        response.locals.workspaceID,
+        response.locals.idToken,
+        request.params.namespaceID,
+        request.params.path,
+        request.query['nodeID'] as string
+      );
+
+      if (result.length === 0) {
+        response
+          .status(statusCodes.BAD_REQUEST)
+          .json({
+            message: 'Invalid Path or NamespaceID. Node not found',
+            statusCode: statusCodes.BAD_REQUEST,
+          });
+      } else {
+        response.status(statusCodes.OK).json(result);
+      }
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 export default NamespaceController;
