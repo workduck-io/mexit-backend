@@ -69,6 +69,7 @@ export const RouteKeys = {
   makeNamespacePrivate: 'PATCH /namespace/makePrivate/{id}',
   getAllNamespaceHierarchy: 'GET /namespace/all/hierarchy',
   getAllNamespaces: 'GET /v2/namespace/all',
+  getNodeIDFromPath: 'GET /namespace/{namespaceID}/path/{path}',
 
   // Views - CRUD Operations
   getAllViews: 'GET /view/all/workspace',
