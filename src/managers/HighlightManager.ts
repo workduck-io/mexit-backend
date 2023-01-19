@@ -105,7 +105,7 @@ export class HighlightManager {
   async deleteHighlight(
     workspaceID: string,
     idToken: string,
-    url: string
+    id: string
   ): Promise<any> {
     try {
       const result = await this._lambda.invokeAndCheck(
@@ -115,7 +115,7 @@ export class HighlightManager {
           routeKey: RouteKeys.getHighlightByID,
           httpMethod: 'DELETE',
           headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
-          pathParameters: { url: url },
+          pathParameters: { entityId: id },
         },
         true
       );

@@ -95,8 +95,9 @@ class HighlightController {
       const result = await this._highlightManager.deleteHighlight(
         response.locals.workspaceID,
         response.locals.idToken,
-        request.params.url
+        request.params.entityId
       );
+      this._redisCache.del(request.params.entityId);
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
