@@ -305,15 +305,32 @@ class NamespaceController {
       );
 
       if (result.length === 0) {
-        response
-          .status(statusCodes.BAD_REQUEST)
-          .json({
-            message: 'Invalid Path or NamespaceID. Node not found',
-            statusCode: statusCodes.BAD_REQUEST,
-          });
+        response.status(statusCodes.BAD_REQUEST).json({
+          message: 'Invalid Path or NamespaceID. Node not found',
+          statusCode: statusCodes.BAD_REQUEST,
+        });
       } else {
         response.status(statusCodes.OK).json(result);
       }
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  deleteNamespace = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      await this._namespaceManager.deleteNamespace(
+        response.locals.workspaceID,
+        response.locals.idToken,
+        request.params.namespaceID,
+        request.query['successorNamespaceID'] as string
+      );
+
+      response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
       next(error);
     }
