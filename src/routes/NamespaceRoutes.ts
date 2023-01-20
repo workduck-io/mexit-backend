@@ -17,6 +17,12 @@ export const initializeNamespaceRoutes = (
   );
 
   nsObject._router.post(
+    `${nsObject._urlPath}/delete`,
+    [AuthRequest],
+    nsObject.deleteNamespace
+  );
+
+  nsObject._router.post(
     `${nsObject._urlPath}/share`,
     [AuthRequest],
     nsObject.shareNamespace
@@ -31,6 +37,12 @@ export const initializeNamespaceRoutes = (
     `${nsObject._urlPath}/shared/:namespaceID/users`,
     [AuthRequest],
     nsObject.getUsersInvitedToNamespace
+  );
+
+  nsObject._router.get(
+    `${nsObject._urlPath}/:namespaceID/path/:path`,
+    [AuthRequest],
+    nsObject.getNodeIDFromPath
   );
 
   nsObject._router.get(

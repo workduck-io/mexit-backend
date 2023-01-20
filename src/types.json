@@ -770,6 +770,20 @@
             },
             "type": "object"
         },
+        "DeleteNamespace": {
+            "properties": {
+                "namespaceID": {
+                    "type": "string"
+                },
+                "successorNamespaceID": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "namespaceID"
+            ],
+            "type": "object"
+        },
         "Filter": {
             "properties": {
                 "id": {
