@@ -20,6 +20,19 @@ class NamespaceController {
     initializeNamespaceRoutes(this);
   }
 
+  updateILinkCache = async (
+    workspaceId: string,
+    idToken: string,
+    namespaceID: string
+  ): Promise<any> => {
+    const namespace = await this._namespaceManager.getNamespace(
+      workspaceId,
+      idToken,
+      namespaceID
+    );
+    await this._cache.set(namespaceID, namespace);
+  };
+
   createNamespace = async (
     request: Request,
     response: Response,
@@ -285,6 +298,66 @@ class NamespaceController {
         request.params.namespaceID
       );
       response.status(statusCodes.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getNodeIDFromPath = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const result: string = await this._namespaceManager.getNodeIDFromPath(
+        response.locals.workspaceID,
+        response.locals.idToken,
+        request.params.namespaceID,
+        request.params.path,
+        request.query['nodeID'] as string
+      );
+
+      if (result.length === 0) {
+        response.status(statusCodes.BAD_REQUEST).json({
+          message: 'Invalid Path or NamespaceID. Node not found',
+          statusCode: statusCodes.BAD_REQUEST,
+        });
+      } else {
+        response.status(statusCodes.OK).json(result);
+      }
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  deleteNamespace = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const { namespaceID, successorNamespaceID } = new RequestClass(
+        request,
+        'DeleteNamespace'
+      ).data;
+
+      await this._namespaceManager.deleteNamespace(
+        response.locals.workspaceID,
+        response.locals.idToken,
+        namespaceID,
+        successorNamespaceID
+      );
+
+      response.status(statusCodes.NO_CONTENT).send();
+
+      await this._cache.del(namespaceID);
+      if (successorNamespaceID) {
+        await this.updateILinkCache(
+          response.locals.workspaceID,
+          response.locals.idToken,
+          successorNamespaceID
+        );
+      }
     } catch (error) {
       next(error);
     }

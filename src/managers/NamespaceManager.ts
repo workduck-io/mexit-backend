@@ -302,4 +302,68 @@ export class NamespaceManager {
       });
     }
   }
+
+  async getNodeIDFromPath(
+    workspaceID: string,
+    idToken: string,
+    namespaceID: string,
+    path: string,
+    nodeID?: string
+  ): Promise<any> {
+    try {
+      const result = await this._lambda.invokeAndCheck(
+        this._namespaceLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.getNodeIDFromPath,
+          headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
+          pathParameters: { namespaceID: namespaceID, path: path },
+          ...(nodeID && { queryStringParameters: { nodeID: nodeID } }),
+        }
+      );
+
+      return result;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+
+  async deleteNamespace(
+    workspaceID: string,
+    idToken: string,
+    namespaceID: string,
+    successorNamespaceID?: string
+  ): Promise<any> {
+    try {
+      const result = await this._lambda.invokeAndCheck(
+        this._namespaceLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.deleteNamespace,
+          headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
+          pathParameters: { id: namespaceID },
+          ...(successorNamespaceID && {
+            queryStringParameters: {
+              successorNamespaceID: successorNamespaceID,
+            },
+          }),
+        }
+      );
+      return result;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
 }

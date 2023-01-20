@@ -33,6 +33,7 @@ import {
   CopyOrMoveBlockRequest,
   CreateNamespace,
   DeleteBlocksRequest,
+  DeleteNamespace,
   Filter,
   FilterJoin,
   FilterType,
@@ -135,4 +136,5 @@ export default class Interfaces implements Definitions {
   Comment: Comment;
   T: any;
   UpdateMetadata: UpdateMetadata;
+  DeleteNamespace: DeleteNamespace;
 }
