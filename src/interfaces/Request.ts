@@ -165,3 +165,8 @@ export interface UpdateMetadata {
     icon?: any;
   };
 }
+
+export interface DeleteNamespace {
+  namespaceID: string;
+  successorNamespaceID?: string;
+}
