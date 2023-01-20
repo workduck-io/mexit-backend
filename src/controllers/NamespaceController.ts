@@ -20,6 +20,19 @@ class NamespaceController {
     initializeNamespaceRoutes(this);
   }
 
+  updateILinkCache = async (
+    workspaceId: string,
+    idToken: string,
+    namespaceID: string
+  ): Promise<any> => {
+    const namespace = await this._namespaceManager.getNamespace(
+      workspaceId,
+      idToken,
+      namespaceID
+    );
+    await this._cache.set(namespaceID, namespace);
+  };
+
   createNamespace = async (
     request: Request,
     response: Response,
@@ -323,14 +336,28 @@ class NamespaceController {
     next: NextFunction
   ): Promise<void> => {
     try {
+      const namespaceID = request.params.namespaceID;
+      const successorNamespaceID = request.query[
+        'successorNamespaceID'
+      ] as string;
+
       await this._namespaceManager.deleteNamespace(
         response.locals.workspaceID,
         response.locals.idToken,
-        request.params.namespaceID,
-        request.query['successorNamespaceID'] as string
+        namespaceID,
+        successorNamespaceID
       );
 
       response.status(statusCodes.NO_CONTENT).send();
+
+      await this._cache.del(namespaceID);
+      if (successorNamespaceID) {
+        await this.updateILinkCache(
+          response.locals.workspaceID,
+          response.locals.idToken,
+          successorNamespaceID
+        );
+      }
     } catch (error) {
       next(error);
     }
