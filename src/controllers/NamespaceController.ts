@@ -336,10 +336,10 @@ class NamespaceController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const namespaceID = request.params.namespaceID;
-      const successorNamespaceID = request.query[
-        'successorNamespaceID'
-      ] as string;
+      const { namespaceID, successorNamespaceID } = new RequestClass(
+        request,
+        'DeleteNamespace'
+      ).data;
 
       await this._namespaceManager.deleteNamespace(
         response.locals.workspaceID,
