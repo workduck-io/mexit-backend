@@ -17,7 +17,7 @@ export const initializeHighlightRoutes = (
   );
 
   highlightObject._router.delete(
-    `${highlightObject._urlPath}/:id`,
+    `${highlightObject._urlPath}/:entityId`,
     [AuthRequest],
     highlightObject.deleteHighlight
   );

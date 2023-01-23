@@ -95,14 +95,14 @@ class HighlightController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._highlightManager.deleteHighlight(
+      await this._highlightManager.deleteHighlight(
         response.locals.workspaceID,
         response.locals.idToken,
         request.params.entityId
       );
       this._redisCache.del(request.params.entityId);
 
-      response.status(statusCodes.OK).json(result);
+      response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
       next(error);
     }
