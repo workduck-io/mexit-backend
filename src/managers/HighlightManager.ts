@@ -112,7 +112,7 @@ export class HighlightManager {
         this._highlightServiceLambdaName,
         this._lambdaInvocationType,
         {
-          routeKey: RouteKeys.getHighlightByID,
+          routeKey: RouteKeys.deleteHighlightByID,
           httpMethod: 'DELETE',
           headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
           pathParameters: { entityId: id },
