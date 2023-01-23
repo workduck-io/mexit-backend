@@ -336,10 +336,11 @@ class NamespaceController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const { namespaceID, successorNamespaceID } = new RequestClass(
+      const { successorNamespaceID } = new RequestClass(
         request,
         'DeleteNamespace'
       ).data;
+      const namespaceID = request.params.namespaceID;
 
       await this._namespaceManager.deleteNamespace(
         response.locals.workspaceID,
@@ -352,11 +353,7 @@ class NamespaceController {
 
       await this._cache.del(namespaceID);
       if (successorNamespaceID) {
-        await this.updateILinkCache(
-          response.locals.workspaceID,
-          response.locals.idToken,
-          successorNamespaceID
-        );
+        await this._cache.del(successorNamespaceID);
       }
     } catch (error) {
       next(error);

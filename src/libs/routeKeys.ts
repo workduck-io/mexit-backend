@@ -70,7 +70,7 @@ export const RouteKeys = {
   getAllNamespaceHierarchy: 'GET /namespace/all/hierarchy',
   getAllNamespaces: 'GET /v2/namespace/all',
   getNodeIDFromPath: 'GET /namespace/{namespaceID}/path/{path}',
-  deleteNamespace: 'DELETE /namespace/{id}',
+  deleteNamespace: 'POST /namespace/{id}',
 
   // Views - CRUD Operations
   getAllViews: 'GET /view/all/workspace',
