@@ -15,6 +15,7 @@ import { wdRequestIdExpressParser } from '@workduck-io/wd-request-id-parser';
 import BookmarkController from './controllers/BookmarkController';
 import CommentController from './controllers/CommentController';
 import HealthCheckController from './controllers/HealthCheckController';
+import HighlightController from './controllers/HighlightController';
 import LinkController from './controllers/LinkController';
 import NamespaceController from './controllers/NamespaceController';
 import NodeController from './controllers/NodeController';
@@ -97,6 +98,7 @@ const application = new App([
   new CommentController(),
   new BookmarkController(),
   new SmartCaptureController(),
+  new HighlightController(),
 ]);
 
 application.build();

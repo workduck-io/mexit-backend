@@ -16,8 +16,6 @@ class NodeController {
   private _transformer: Transformer = container.get<Transformer>(Transformer);
   private _redisCache: Redis = container.get<Redis>(Redis);
 
-  private _NSHierarchyLabel = 'NSHIERARCHY';
-  private _NodeLabel = 'NODE';
   private _UserAccessLabel = 'USERACCESS';
 
   private _nsManager: NamespaceManager =
