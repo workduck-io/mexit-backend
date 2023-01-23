@@ -17,7 +17,7 @@ export const initializeNamespaceRoutes = (
   );
 
   nsObject._router.post(
-    `${nsObject._urlPath}/delete`,
+    `${nsObject._urlPath}/delete/:namespaceID`,
     [AuthRequest],
     nsObject.deleteNamespace
   );

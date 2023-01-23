@@ -349,8 +349,10 @@ export class NamespaceManager {
           headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
           pathParameters: { id: namespaceID },
           ...(successorNamespaceID && {
-            queryStringParameters: {
+            payload: {
+              type: 'SuccessorNamespaceRequest',
               successorNamespaceID: successorNamespaceID,
+              action: 'delete',
             },
           }),
         }
