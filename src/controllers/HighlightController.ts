@@ -60,7 +60,9 @@ class HighlightController {
           )
         : [];
 
-      this._redisCache.mset(managerResponse.toObject(val => val.entityId));
+      this._redisCache.mset(
+        managerResponse.toObject('entityId', JSON.stringify)
+      );
 
       response.status(statusCodes.OK).json([...managerResponse, ...cachedHits]);
     } catch (error) {
@@ -78,7 +80,8 @@ class HighlightController {
         response.locals.workspaceID,
         response.locals.idToken
       );
-      this._redisCache.mset(result.Items.toObject(val => val.entityId));
+
+      this._redisCache.mset(result.Items.toObject('entityId', JSON.stringify));
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
