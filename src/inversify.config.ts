@@ -5,6 +5,7 @@ import { Redis } from './libs/RedisClass';
 import { Transformer } from './libs/TransformerClass';
 import { BookmarkManager } from './managers/BookmarkManager';
 import { CommentManager } from './managers/CommentManager';
+import { HighlightManager } from './managers/HighlightManager';
 import { LinkManager } from './managers/LinkManager';
 import { NamespaceManager } from './managers/NamespaceManager';
 import { NodeManager } from './managers/NodeManager';
@@ -37,6 +38,7 @@ container.bind<Redis>(Redis).to(Redis);
 container.bind<Lambda>(Lambda).to(Lambda);
 
 container.bind<NamespaceManager>(NamespaceManager).to(NamespaceManager);
+container.bind<HighlightManager>(HighlightManager).to(HighlightManager);
 
 container.bind<ViewManager>(ViewManager).to(ViewManager);
 container.bind<ReminderManager>(ReminderManager).to(ReminderManager);
