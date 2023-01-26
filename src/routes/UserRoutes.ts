@@ -27,25 +27,26 @@ export const initializeUserRoutes = (userObject: UserController): void => {
   );
 
   userObject._router.get(
-    `${userObject._urlPath}/group/:groupId`,
+    `${userObject._urlPath}/all`,
     [AuthRequest],
-    userObject.getByGroupId
+    userObject.getUsersOfWorkspace
   );
 
   userObject._router.put(
-    `${userObject._urlPath}/update`,
+    `${userObject._urlPath}/info`,
     [AuthRequest],
     userObject.updateUser
+  );
+
+  userObject._router.put(
+    `${userObject._urlPath}/preference`,
+    [AuthRequest],
+    userObject.updateUserPreference
   );
 
   userObject._router.post(
     `${userObject._urlPath}/linkedin`,
     [AuthRequest],
     userObject.getUserByLinkedin
-  );
-  userObject._router.post(
-    `${userObject._urlPath}/all`,
-    [AuthRequest],
-    userObject.getAllUsernames
   );
 };
