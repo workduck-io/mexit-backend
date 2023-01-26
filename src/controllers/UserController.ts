@@ -23,9 +23,8 @@ class UserController {
     next: NextFunction
   ): Promise<any> => {
     const userId = response.locals.userIdRaw;
-    const requestDetail = new RequestClass(request, 'UserPreference');
+    const requestDetail = new RequestClass(request, 'User');
     requestDetail.data.id = userId;
-    if (!requestDetail.data.tag) requestDetail.data.tag = 'MEX';
 
     if (requestDetail.data.linkedinURL) {
       requestDetail.data.linkedinURL = requestDetail.data.linkedinURL.replace(
@@ -33,6 +32,27 @@ class UserController {
         ''
       );
     }
+
+    try {
+      const result = await this._userManager.updateUserDetails(
+        requestDetail.data,
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
+      response.status(statusCodes.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  updateUserPreference = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<any> => {
+    const userId = response.locals.userIdRaw;
+    const requestDetail = new RequestClass(request, 'UserPreference');
+    requestDetail.data.id = userId;
 
     try {
       const result = await this._userManager.updateUserPreference(
@@ -81,14 +101,15 @@ class UserController {
       next(error);
     }
   };
-  getByGroupId = async (
+  getUsersOfWorkspace = async (
     request: Request,
     response: Response,
     next: NextFunction
   ): Promise<any> => {
     try {
-      const result = await this._userManager.getByGroupId(
-        request.params.groupId
+      const result = await this._userManager.getUsersOfWorkspace(
+        response.locals.workspaceID,
+        response.locals.idToken
       );
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -107,24 +128,6 @@ class UserController {
       response.status(statusCodes.OK).json({
         mex_user: result.length > 0 ? true : false,
       });
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  getAllUsernames = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<any> => {
-    try {
-      const result = await this._userManager.getAllUsernames(
-        request.body,
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
-
-      response.status(statusCodes.OK).send(result);
     } catch (error) {
       next(error);
     }

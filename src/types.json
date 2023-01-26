@@ -1352,6 +1352,14 @@
             ],
             "type": "object"
         },
+        "RegistrationStatus": {
+            "enum": [
+                "ERROR",
+                "PROGRESS",
+                "SUCCESS"
+            ],
+            "type": "string"
+        },
         "Reminder": {
             "properties": {
                 "entityId": {
@@ -1681,9 +1689,12 @@
             ],
             "type": "object"
         },
-        "UserPreference": {
+        "User": {
             "properties": {
-                "group": {
+                "alias": {
+                    "type": "string"
+                },
+                "email": {
                     "type": "string"
                 },
                 "id": {
@@ -1692,12 +1703,65 @@
                 "linkedinURL": {
                     "type": "string"
                 },
-                "metadata": {},
+                "metadata": {
+                    "$ref": "types#/definitions/UserMetadata"
+                },
                 "name": {
                     "type": "string"
                 },
-                "properties": {},
-                "tag": {
+                "picture": {
+                    "type": "string"
+                },
+                "properties": {
+                    "$ref": "types#/definitions/UserProperties"
+                },
+                "status": {
+                    "$ref": "types#/definitions/RegistrationStatus"
+                }
+            },
+            "required": [
+                "alias",
+                "id",
+                "name"
+            ],
+            "type": "object"
+        },
+        "UserMetadata": {
+            "additionalProperties": {},
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "UserPreference": {
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "preference": {},
+                "workspaceId": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "preference",
+                "workspaceId"
+            ],
+            "type": "object"
+        },
+        "UserProperties": {
+            "additionalProperties": {},
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 }
             },

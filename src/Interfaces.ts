@@ -60,7 +60,13 @@ import {
   NodeDataResponse,
   NodeResponse,
 } from './interfaces/Response';
-import { UserPreference } from './interfaces/User';
+import {
+  RegistrationStatus,
+  User,
+  UserMetadata,
+  UserPreference,
+  UserProperties,
+} from './interfaces/User';
 import { WDErrorType } from './interfaces/WDError';
 import { errorCodes } from './libs/errorCodes';
 import { statusCodes } from './libs/statusCodes';
@@ -106,6 +112,7 @@ export default class Interfaces implements Definitions {
   CopyOrMoveBlock: CopyOrMoveBlock;
   BulkResponse: BulkResponse;
   UserPreference: UserPreference;
+  User: User;
   GoogleAuthRefreshToken: GoogleAuthRefreshToken;
   ILink: ILink;
   SnippetUpdate: SnippetUpdate;
@@ -130,6 +137,9 @@ export default class Interfaces implements Definitions {
   UpdateNamespace: UpdateNamespace;
   ShareNamespace: ShareNamespace;
   RevokeAccessFromNamespace: RevokeAccessFromNamespace;
+  RegistrationStatus: RegistrationStatus;
+  UserMetadata: UserMetadata;
+  UserProperties: UserProperties;
   ShortenLink: ShortenLink;
   Reminder: Reminder;
   Reaction: Reaction;

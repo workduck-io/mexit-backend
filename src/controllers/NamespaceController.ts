@@ -349,12 +349,11 @@ class NamespaceController {
         successorNamespaceID
       );
 
-      response.status(statusCodes.NO_CONTENT).send();
-
-      await this._cache.del(namespaceID);
+      this._cache.del(namespaceID);
       if (successorNamespaceID) {
-        await this._cache.del(successorNamespaceID);
+        this._cache.del(successorNamespaceID);
       }
+      response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
       next(error);
     }
