@@ -366,6 +366,33 @@
             ],
             "type": "object"
         },
+        "ConnectToLochService": {
+            "properties": {
+                "mexId": {
+                    "type": "string"
+                },
+                "namespaceId": {
+                    "type": "string"
+                },
+                "parentNodeId": {
+                    "type": "string"
+                },
+                "serviceId": {
+                    "type": "string"
+                },
+                "serviceType": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "mexId",
+                "namespaceId",
+                "parentNodeId",
+                "serviceId",
+                "serviceType"
+            ],
+            "type": "object"
+        },
         "ContentBlock": {
             "properties": {
                 "id": {
@@ -1675,6 +1702,29 @@
             "required": [
                 "id",
                 "name"
+            ],
+            "type": "object"
+        },
+        "UpdateParentNodeForLochService": {
+            "properties": {
+                "namespaceId": {
+                    "type": "string"
+                },
+                "parentNodeId": {
+                    "type": "string"
+                },
+                "serviceId": {
+                    "type": "string"
+                },
+                "serviceType": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "namespaceId",
+                "parentNodeId",
+                "serviceId",
+                "serviceType"
             ],
             "type": "object"
         },

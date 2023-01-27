@@ -129,4 +129,10 @@ export const RouteKeys = {
   deleteHighlightByID: 'DELETE /{entityId}',
   getHighlightByIDs: 'GET /multiple',
   getAllHighlightsOfWorkspace: 'GET /all',
+
+  // Mex Loch
+  getAllServices: 'GET /connect/all',
+  getConnectedServices: 'GET /connect',
+  connectToService: 'POST /connect',
+  updateParentNodeOfService: 'PUT /connect',
 };
