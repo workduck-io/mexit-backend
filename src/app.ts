@@ -33,6 +33,7 @@ import container from './inversify.config';
 import { Redis } from './libs/RedisClass';
 import responseErrorHandler from './middlewares/responseErrorHandler';
 import { parseReviver } from './utils/ArrayX';
+import LochController from './controllers/LochController';
 
 class App {
   public _app: express.Application;
@@ -99,6 +100,7 @@ const application = new App([
   new BookmarkController(),
   new SmartCaptureController(),
   new HighlightController(),
+  new LochController(),
 ]);
 
 application.build();
