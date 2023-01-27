@@ -101,18 +101,17 @@ export const RouteKeys = {
   deleteAllRemindersOfNode: 'DELETE /all/node/{nodeId}',
   getAllRemindersOfWorkspace: 'GET /all/workspace',
 
-  // Reminders
-  getCommentByID: 'GET /{entityId}',
+  // Comments
+  getCommentByID: 'GET /{nodeId}/{entityId}',
   createComment: 'POST /',
-  deleteCommentByID: 'DELETE /{entityId}',
-  getAllCommentsOfNode: 'GET /all/node/{nodeId}',
-  getAllCommentsOfBlock: 'GET /all/node/{nodeId}/block/{blockId}',
-  getAllCommentsOfThread:
-    'GET /all/node/{nodeId}/block/{blockId}/thread/{threadId}',
-  deleteAllCommentsOfNode: 'DELETE /all/node/{nodeId}',
-  deleteAllCommentsOfBlock: 'DELETE /all/node/{nodeId}/block/{blockId}',
+  deleteCommentByID: 'DELETE /{nodeId}/{entityId}',
+  getAllCommentsOfNode: 'GET /all/{nodeId}',
+  getAllCommentsOfBlock: 'GET /all/{nodeId}/block/{blockId}',
+  getAllCommentsOfThread: 'GET /all/{nodeId}/block/{blockId}/thread/{threadId}',
+  deleteAllCommentsOfNode: 'DELETE /all/{nodeId}',
+  deleteAllCommentsOfBlock: 'DELETE /all/{nodeId}/block/{blockId}',
   deleteAllCommentsOfThread:
-    'DELETE /all/node/{nodeId}/block/{blockId}/thread/{threadId}',
+    'DELETE /all/{nodeId}/block/{blockId}/thread/{threadId}',
 
   // Reactions - CRUD Operations
   getAllReactionsOfNode: 'GET /node/{nodeId}',
@@ -129,4 +128,10 @@ export const RouteKeys = {
   deleteHighlightByID: 'DELETE /{entityId}',
   getHighlightByIDs: 'GET /multiple',
   getAllHighlightsOfWorkspace: 'GET /all',
+
+  // Mex Loch
+  getAllServices: 'GET /connect/all',
+  getConnectedServices: 'GET /connect',
+  connectToService: 'POST /connect',
+  updateParentNodeOfService: 'PUT /connect',
 };
