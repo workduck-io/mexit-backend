@@ -31,6 +31,7 @@ class CommentController {
       const result = await this._commentManager.getCommentByID(
         response.locals.workspaceID,
         response.locals.idToken,
+        request.params.nodeID,
         request.params.entityID
       );
       response.status(statusCodes.OK).json(result);
@@ -70,6 +71,7 @@ class CommentController {
       await this._commentManager.deleteCommentByID(
         response.locals.workspaceID,
         response.locals.idToken,
+        request.params.nodeID,
         request.params.entityID
       );
 
@@ -223,7 +225,7 @@ class CommentController {
         request.params.nodeID
       );
 
-      response.status(statusCodes.OK).json(result);
+      response.status(statusCodes.NO_CONTENT).json(result);
     } catch (error) {
       next(error);
     }

@@ -101,10 +101,10 @@ export const RouteKeys = {
   deleteAllRemindersOfNode: 'DELETE /all/node/{nodeId}',
   getAllRemindersOfWorkspace: 'GET /all/workspace',
 
-  // Reminders
-  getCommentByID: 'GET /{entityId}',
+  // Comments
+  getCommentByID: 'GET /{nodeId}/{entityId}',
   createComment: 'POST /',
-  deleteCommentByID: 'DELETE /{entityId}',
+  deleteCommentByID: 'DELETE /{nodeId}/{entityId}',
   getAllCommentsOfNode: 'GET /all/{nodeId}',
   getAllCommentsOfBlock: 'GET /all/{nodeId}/block/{blockId}',
   getAllCommentsOfThread: 'GET /all/{nodeId}/block/{blockId}/thread/{threadId}',

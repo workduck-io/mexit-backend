@@ -18,6 +18,7 @@ export class CommentManager {
   async getCommentByID(
     workspaceID: string,
     idToken: string,
+    nodeId: string,
     entityId: string
   ): Promise<any> {
     try {
@@ -27,7 +28,7 @@ export class CommentManager {
         {
           httpMethod: 'GET',
           routeKey: RouteKeys.getCommentByID,
-          pathParameters: { entityId: entityId },
+          pathParameters: { entityId: entityId, nodeId: nodeId },
           headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
         }
       );
@@ -77,6 +78,7 @@ export class CommentManager {
   async deleteCommentByID(
     workspaceID: string,
     idToken: string,
+    nodeId: string,
     entityId: string
   ): Promise<any> {
     try {
@@ -86,7 +88,7 @@ export class CommentManager {
         {
           httpMethod: 'DELETE',
           routeKey: RouteKeys.deleteCommentByID,
-          pathParameters: { entityId: entityId },
+          pathParameters: { entityId: entityId, nodeId: nodeId },
           headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
         }
       );
@@ -119,8 +121,6 @@ export class CommentManager {
           headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
         }
       );
-
-      console.log('Result: ', result);
 
       return result;
     } catch (error) {
@@ -187,8 +187,13 @@ export class CommentManager {
         )
       );
       const result = await Promise.allSettled(requests);
-      console.error(result.filter(res => res.status === 'rejected'));
-      return result;
+
+      return {
+        successful: result
+          .filter(p => p.status === 'fulfilled')
+          .map((p: PromiseFulfilledResult<any>) => p.value),
+        failed: result.filter(p => p.status === 'rejected'),
+      };
     } catch (error) {
       errorlib({
         message: error.message,
