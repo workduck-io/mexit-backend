@@ -29,3 +29,9 @@ export interface User {
   email?: string;
   linkedinURL?: string;
 }
+
+export interface InviteProperties {
+  inviteeId?: string;
+  permission?: string;
+  domain?: string;
+}
