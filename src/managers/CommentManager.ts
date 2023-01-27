@@ -120,6 +120,8 @@ export class CommentManager {
         }
       );
 
+      console.log('Result: ', result);
+
       return result;
     } catch (error) {
       errorlib({
