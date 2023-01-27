@@ -35,7 +35,7 @@ export const initializeCommentRoutes = (
   );
 
   commentObject._router.get(
-    `${commentObject._urlPath}/:entityID`,
+    `${commentObject._urlPath}/:nodeID/:entityID`,
     [AuthRequest],
     commentObject.getComment
   );
@@ -58,7 +58,7 @@ export const initializeCommentRoutes = (
     commentObject.deleteAllCommentsOfThread
   );
   commentObject._router.delete(
-    `${commentObject._urlPath}/:entityID`,
+    `${commentObject._urlPath}/:nodeID/:entityID`,
     [AuthRequest],
     commentObject.deleteComment
   );
