@@ -163,7 +163,10 @@ class NamespaceController {
         )
       );
 
-      const allNamespacesResults = await Promise.all(promises);
+      const allNamespacesResults = await (await Promise.allSettled(promises))
+        .filter(p => p.status === 'fulfilled')
+        .map((p: PromiseFulfilledResult<any>) => p.value);
+
       await this._cache.mset(
         allNamespacesResults.toObject('id', JSON.stringify)
       );
