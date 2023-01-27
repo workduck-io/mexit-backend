@@ -14,7 +14,7 @@ export class UserManager {
   private _userLambdaFunctionName = `workduck-user-service-${STAGE}-user`;
   private _getUserLambdaFunctionName = `workduck-user-service-${STAGE}-getUser`;
   private _userMexBackendLambdaFunctionName = `mex-backend-${STAGE}-User`;
-  private _registerStatusLambdaFunctionName = `workduck-user-service-dev-registerStatus`;
+  private _registerStatusLambdaFunctionName = `workduck-user-service-${STAGE}-registerStatus`;
 
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
