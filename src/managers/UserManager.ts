@@ -1,7 +1,7 @@
 import { injectable } from 'inversify';
 
 import { STAGE } from '../env';
-import { UserPreference } from '../interfaces/User';
+import { User, UserPreference } from '../interfaces/User';
 import container from '../inversify.config';
 import { errorlib } from '../libs/errorlib';
 import { InvocationType, Lambda } from '../libs/LambdaClass';
@@ -11,12 +11,42 @@ import { statusCodes } from '../libs/statusCodes';
 @injectable()
 export class UserManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
-  private _userLambdaFunctionName = `workduck-user-service-dev-user`;
-  private _getUserLambdaFunctionName = 'workduck-user-service-dev-getUser';
+  private _userLambdaFunctionName = `workduck-user-service-${STAGE}-user`;
+  private _getUserLambdaFunctionName = `workduck-user-service-${STAGE}-getUser`;
   private _userMexBackendLambdaFunctionName = `mex-backend-${STAGE}-User`;
-  private _registerStatusLambdaFunctionName = `workduck-user-service-dev-registerStatus`;
+  private _registerStatusLambdaFunctionName = `workduck-user-service-${STAGE}-registerStatus`;
 
   private _lambda: Lambda = container.get<Lambda>(Lambda);
+
+  async updateUserDetails(
+    userDetails: User,
+    workspaceId: string,
+    idToken: string
+  ): Promise<any> {
+    try {
+      const response = await this._lambda.invokeAndCheck(
+        this._userLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.updateUserDetails,
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+
+          payload: userDetails,
+          httpMethod: 'PUT',
+        },
+        true
+      );
+      return response;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
 
   async updateUserPreference(
     userPreference: UserPreference,
@@ -32,7 +62,7 @@ export class UserManager {
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
 
           payload: userPreference,
-          httpMethod: 'POST',
+          httpMethod: 'PUT',
         },
         true
       );
@@ -114,15 +144,18 @@ export class UserManager {
       });
     }
   }
-  async getByGroupId(groupId: string): Promise<any> {
+  async getUsersOfWorkspace(
+    workspaceId: string,
+    idToken: string
+  ): Promise<any> {
     try {
       const respone = await this._lambda.invokeAndCheck(
         this._userLambdaFunctionName,
         this._lambdaInvocationType,
         {
-          routeKey: RouteKeys.getByGroupId,
-          pathParameters: { groupId: groupId },
+          routeKey: RouteKeys.getUsersOfWorkspace,
           httpMethod: 'GET',
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
         }
       );
       return respone;
@@ -146,36 +179,6 @@ export class UserManager {
           routeKey: RouteKeys.getUserByLinkedin,
           payload: payload,
           httpMethod: 'GET',
-        },
-        true
-      );
-
-      return response;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
-  }
-  async getAllUsernames(
-    // eslint-disable-next-line
-    payload: any,
-    workspaceId: string,
-    idToken: string
-  ): Promise<any> {
-    try {
-      const response = await this._lambda.invokeAndCheck(
-        this._userLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.getAllUsernames,
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-          payload: payload,
-          httpMethod: 'POST',
         },
         true
       );

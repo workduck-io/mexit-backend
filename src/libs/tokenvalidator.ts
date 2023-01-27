@@ -2,6 +2,7 @@ import { promisify } from 'util';
 import * as jsonwebtoken from 'jsonwebtoken';
 import jwkToPem from 'jwk-to-pem';
 import got from 'got';
+import { COGNITO_POOL_ID } from '../env';
 
 export interface ClaimVerifyRequest {
   readonly token?: string;
@@ -51,11 +52,10 @@ interface Claim {
   username: string;
 }
 
-const cognitoPoolId = 'us-east-1_Zu7FAh7hj';
-if (!cognitoPoolId) {
+if (!COGNITO_POOL_ID) {
   throw new Error('env var required for cognito pool');
 }
-const cognitoIssuer = `https://cognito-idp.us-east-1.amazonaws.com/${cognitoPoolId}`;
+const cognitoIssuer = `https://cognito-idp.us-east-1.amazonaws.com/${COGNITO_POOL_ID}`;
 
 let cacheKeys: MapOfKidToPublicKey | undefined;
 const getPublicKeys = async (): Promise<MapOfKidToPublicKey> => {

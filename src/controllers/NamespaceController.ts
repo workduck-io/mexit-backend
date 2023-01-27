@@ -163,7 +163,10 @@ class NamespaceController {
         )
       );
 
-      const allNamespacesResults = await Promise.all(promises);
+      const allNamespacesResults = await (await Promise.allSettled(promises))
+        .filter(p => p.status === 'fulfilled')
+        .map((p: PromiseFulfilledResult<any>) => p.value);
+
       await this._cache.mset(
         allNamespacesResults.toObject('id', JSON.stringify)
       );
@@ -349,12 +352,11 @@ class NamespaceController {
         successorNamespaceID
       );
 
-      response.status(statusCodes.NO_CONTENT).send();
-
-      await this._cache.del(namespaceID);
+      this._cache.del(namespaceID);
       if (successorNamespaceID) {
-        await this._cache.del(successorNamespaceID);
+        this._cache.del(successorNamespaceID);
       }
+      response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
       next(error);
     }
