@@ -22,11 +22,11 @@ export const RouteKeys = {
   getById: 'GET /{userId}',
   getByEmail: 'GET /email/{email}',
   getUser: 'GET /',
-  getByGroupId: 'GET /group/{groupId}',
-  updateUserPreference: 'PUT /info',
+  getUsersOfWorkspace: 'GET /all',
+  updateUserDetails: 'PUT /info',
+  updateUserPreference: 'PUT /preference',
   createUserPreference: 'POST ',
   getUserByLinkedin: 'POST /linkedin',
-  getAllUsernames: 'POST /all',
   registerStatus: 'GET /status',
 
   // Shared Note Ops
