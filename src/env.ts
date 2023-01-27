@@ -4,7 +4,7 @@ export const STAGE = process.env.STAGE ?? 'staging';
 
 const COGNITO_POOL_ID_MAP = {
   staging: 'us-east-1_Zu7FAh7hj',
-  test: 'us-east-1_Zu7FAh7hj',
+  test: 'us-east-1_O5YTlVrCd',
 };
 
 const COGNITO_CLIENT_ID_MAP = {

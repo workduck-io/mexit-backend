@@ -9,12 +9,6 @@ export const initializeUserRoutes = (userObject: UserController): void => {
   );
 
   userObject._router.get(
-    `${userObject._urlPath}/:id`,
-    [AuthRequest],
-    userObject.getById
-  );
-
-  userObject._router.get(
     `${userObject._urlPath}/email/:mail`,
     [AuthRequest],
     userObject.getByMail
@@ -24,6 +18,30 @@ export const initializeUserRoutes = (userObject: UserController): void => {
     `${userObject._urlPath}/`,
     [AuthRequest],
     userObject.get
+  );
+
+  userObject._router.get(
+    `${userObject._urlPath}/invite`,
+    [AuthRequest],
+    userObject.getInvitesOfWorkspace
+  );
+
+  userObject._router.get(
+    `${userObject._urlPath}/invite/:inviteId`,
+    [AuthRequest],
+    userObject.getInvite
+  );
+
+  userObject._router.delete(
+    `${userObject._urlPath}/invite/:inviteId`,
+    [AuthRequest],
+    userObject.deleteInvite
+  );
+
+  userObject._router.post(
+    `${userObject._urlPath}/invite`,
+    [AuthRequest],
+    userObject.createInvite
   );
 
   userObject._router.get(
@@ -48,5 +66,11 @@ export const initializeUserRoutes = (userObject: UserController): void => {
     `${userObject._urlPath}/linkedin`,
     [AuthRequest],
     userObject.getUserByLinkedin
+  );
+
+  userObject._router.get(
+    `${userObject._urlPath}/:id`,
+    [AuthRequest],
+    userObject.getById
   );
 };

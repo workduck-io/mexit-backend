@@ -77,6 +77,73 @@ class UserController {
       next(error);
     }
   };
+
+  getInvite = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<any> => {
+    try {
+      const inviteId = request.params.inviteId;
+      const result = await this._userManager.getInvite(inviteId);
+      response.status(statusCodes.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  deleteInvite = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<any> => {
+    try {
+      const inviteId = request.params.inviteId;
+      const result = await this._userManager.deleteInvite(
+        response.locals.workspaceID,
+        response.locals.idToken,
+        inviteId
+      );
+      response.status(statusCodes.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getInvitesOfWorkspace = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<any> => {
+    try {
+      const result = await this._userManager.getInvitesOfWorkspace(
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
+      response.status(statusCodes.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  createInvite = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<any> => {
+    try {
+      const payload = new RequestClass(request, 'InviteProperties').data;
+      const result = await this._userManager.createInvite(
+        response.locals.workspaceID,
+        response.locals.idToken,
+        payload
+      );
+      response.status(statusCodes.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   getById = async (
     request: Request,
     response: Response,

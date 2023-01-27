@@ -28,6 +28,11 @@ export const RouteKeys = {
   createUserPreference: 'POST ',
   getUserByLinkedin: 'POST /linkedin',
   registerStatus: 'GET /status',
+  //User Invite
+  getInvite: 'GET /invite/{inviteId}',
+  getAllInviteOfWorkspace: 'GET /invite',
+  createInvite: 'POST /invite',
+  deleteInvite: 'DELETE /invite/{inviteId}',
 
   // Shared Note Ops
   shareNode: 'POST /shared/node',
