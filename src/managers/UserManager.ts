@@ -15,6 +15,7 @@ export class UserManager {
   private _getUserLambdaFunctionName = `workduck-user-service-${STAGE}-getUser`;
   private _userMexBackendLambdaFunctionName = `mex-backend-${STAGE}-User`;
   private _registerStatusLambdaFunctionName = `workduck-user-service-${STAGE}-registerStatus`;
+  private _inviteUserLambdaFunctionName = `workduck-user-service-${STAGE}-invite`;
 
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
@@ -30,7 +31,6 @@ export class UserManager {
         {
           routeKey: RouteKeys.updateUserDetails,
           headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-
           payload: userDetails,
           httpMethod: 'PUT',
         },
@@ -100,6 +100,116 @@ export class UserManager {
       });
     }
   }
+
+  async getInvite(inviteId: string): Promise<any> {
+    try {
+      const response = await this._lambda.invokeAndCheck(
+        this._inviteUserLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.getInvite,
+          pathParameters: { inviteId },
+          httpMethod: 'GET',
+        }
+      );
+
+      return response;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+
+  async deleteInvite(
+    workspaceID: string,
+    idToken: string,
+    inviteId: string
+  ): Promise<any> {
+    try {
+      const response = await this._lambda.invokeAndCheck(
+        this._inviteUserLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.deleteInvite,
+          pathParameters: { inviteId },
+          headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
+          httpMethod: 'DELETE',
+        }
+      );
+
+      return response;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+
+  async getInvitesOfWorkspace(
+    workspaceID: string,
+    idToken: string
+  ): Promise<any> {
+    try {
+      const response = await this._lambda.invokeAndCheck(
+        this._inviteUserLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.getAllInviteOfWorkspace,
+          headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
+          httpMethod: 'GET',
+        }
+      );
+
+      return response;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+
+  async createInvite(
+    workspaceID: string,
+    idToken: string,
+    payload
+  ): Promise<any> {
+    try {
+      const response = await this._lambda.invokeAndCheck(
+        this._inviteUserLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.createInvite,
+          headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
+          payload,
+          httpMethod: 'POST',
+        }
+      );
+
+      return response;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+  }
+
   async getById(userId: string): Promise<any> {
     try {
       const response = await this._lambda.invokeAndCheck(

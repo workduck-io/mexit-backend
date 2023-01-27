@@ -959,6 +959,20 @@
             ],
             "type": "object"
         },
+        "InviteProperties": {
+            "properties": {
+                "domain": {
+                    "type": "string"
+                },
+                "inviteeId": {
+                    "type": "string"
+                },
+                "permission": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "MetaTag": {
             "properties": {
                 "name": {
