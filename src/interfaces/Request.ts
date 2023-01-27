@@ -169,3 +169,18 @@ export interface UpdateMetadata {
 export interface DeleteNamespace {
   successorNamespaceID?: string;
 }
+
+export interface ConnectToLochService {
+  serviceId: string;
+  serviceType: string;
+  mexId: string;
+  parentNodeId: string;
+  namespaceId: string;
+}
+
+export interface UpdateParentNodeForLochService {
+  serviceId: string;
+  serviceType: string;
+  parentNodeId: string;
+  namespaceId: string;
+}

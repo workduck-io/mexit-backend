@@ -7,6 +7,7 @@ import { BookmarkManager } from './managers/BookmarkManager';
 import { CommentManager } from './managers/CommentManager';
 import { HighlightManager } from './managers/HighlightManager';
 import { LinkManager } from './managers/LinkManager';
+import { LochManager } from './managers/LochManager';
 import { NamespaceManager } from './managers/NamespaceManager';
 import { NodeManager } from './managers/NodeManager';
 import { ReactionManager } from './managers/ReactionManager';
@@ -48,5 +49,6 @@ container.bind<CommentManager>(CommentManager).to(CommentManager);
 container.bind<ReactionManager>(ReactionManager).to(ReactionManager);
 
 container.bind<BookmarkManager>(BookmarkManager).to(BookmarkManager);
+container.bind<LochManager>(LochManager).to(LochManager);
 
 export default container;

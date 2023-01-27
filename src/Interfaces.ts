@@ -51,6 +51,8 @@ import {
   SnippetUpdateVersionRequest,
   UpdateMetadata,
   UpdateNamespace,
+  ConnectToLochService,
+  UpdateParentNodeForLochService,
 } from './interfaces/Request';
 import {
   ActivityNodeResponse,
@@ -149,4 +151,6 @@ export default class Interfaces implements Definitions {
   T: any;
   UpdateMetadata: UpdateMetadata;
   DeleteNamespace: DeleteNamespace;
+  ConnectToLochService: ConnectToLochService;
+  UpdateParentNodeForLochService: UpdateParentNodeForLochService;
 }
