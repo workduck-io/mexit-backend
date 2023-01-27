@@ -105,14 +105,13 @@ export const RouteKeys = {
   getCommentByID: 'GET /{entityId}',
   createComment: 'POST /',
   deleteCommentByID: 'DELETE /{entityId}',
-  getAllCommentsOfNode: 'GET /all/node/{nodeId}',
-  getAllCommentsOfBlock: 'GET /all/node/{nodeId}/block/{blockId}',
-  getAllCommentsOfThread:
-    'GET /all/node/{nodeId}/block/{blockId}/thread/{threadId}',
-  deleteAllCommentsOfNode: 'DELETE /all/node/{nodeId}',
-  deleteAllCommentsOfBlock: 'DELETE /all/node/{nodeId}/block/{blockId}',
+  getAllCommentsOfNode: 'GET /all/{nodeId}',
+  getAllCommentsOfBlock: 'GET /all/{nodeId}/block/{blockId}',
+  getAllCommentsOfThread: 'GET /all/{nodeId}/block/{blockId}/thread/{threadId}',
+  deleteAllCommentsOfNode: 'DELETE /all/{nodeId}',
+  deleteAllCommentsOfBlock: 'DELETE /all/{nodeId}/block/{blockId}',
   deleteAllCommentsOfThread:
-    'DELETE /all/node/{nodeId}/block/{blockId}/thread/{threadId}',
+    'DELETE /all/{nodeId}/block/{blockId}/thread/{threadId}',
 
   // Reactions - CRUD Operations
   getAllReactionsOfNode: 'GET /node/{nodeId}',

@@ -4,16 +4,16 @@ import { AuthRequest } from '../middlewares/authrequest';
 export const initializeCommentRoutes = (
   commentObject: CommentController
 ): void => {
-  commentObject._router.post(
-    `${commentObject._urlPath}`,
-    [AuthRequest],
-    commentObject.createComment
-  );
-
   commentObject._router.get(
     `${commentObject._urlPath}/node/:nodeID`,
     [AuthRequest],
     commentObject.getAllCommentsOfNode
+  );
+
+  commentObject._router.post(
+    `${commentObject._urlPath}`,
+    [AuthRequest],
+    commentObject.createComment
   );
 
   commentObject._router.post(
