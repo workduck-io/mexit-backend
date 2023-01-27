@@ -61,6 +61,7 @@ import {
   NodeResponse,
 } from './interfaces/Response';
 import {
+  InviteProperties,
   RegistrationStatus,
   User,
   UserMetadata,
@@ -113,6 +114,7 @@ export default class Interfaces implements Definitions {
   BulkResponse: BulkResponse;
   UserPreference: UserPreference;
   User: User;
+  InviteProperties: InviteProperties;
   GoogleAuthRefreshToken: GoogleAuthRefreshToken;
   ILink: ILink;
   SnippetUpdate: SnippetUpdate;

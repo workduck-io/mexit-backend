@@ -2,6 +2,7 @@ import { fromUtf8, toUtf8 } from '@aws-sdk/util-utf8-node';
 
 import { WDError } from '@workduck-io/wderror';
 import { injectable } from 'inversify';
+import { JSONX } from '../utils/JSONX';
 import LambdaConfig from './InvokeLambda';
 import { statusCodes } from './statusCodes';
 
@@ -27,13 +28,13 @@ export class Lambda {
     invocationSource: InvocationSource = 'APIGateway'
   ) {
     if (!options.headers) options.headers = {};
-    return JSON.parse(
+    return JSONX.parse(
       toUtf8(
         (
           await LambdaConfig.invokeLambdaClient({
             FunctionName: functionName,
             Payload: fromUtf8(
-              JSON.stringify(
+              JSONX.stringify(
                 invocationSource === 'Direct'
                   ? options.payload
                   : {
@@ -43,7 +44,7 @@ export class Lambda {
                       ...(options.payload && {
                         body: sendRawBody
                           ? options.payload
-                          : JSON.stringify(options.payload),
+                          : JSONX.stringify(options.payload),
                       }),
                       routeKey: options.routeKey,
                       ...(options.queryStringParameters && {
@@ -80,11 +81,8 @@ export class Lambda {
       invocationSource
     );
 
-    const body = response.body
-      ? typeof response.body === 'string'
-        ? JSON.parse(response.body)
-        : response.body
-      : undefined;
+    const body = JSONX.parse(response.body);
+
     if (
       (response.statusCode !== 200 && response.statusCode !== 204) ||
       !response.statusCode

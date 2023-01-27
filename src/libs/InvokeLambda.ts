@@ -1,7 +1,7 @@
 import {
-  LambdaClient,
   InvocationRequest,
   InvokeCommand,
+  LambdaClient,
 } from '@aws-sdk/client-lambda';
 
 const lambdaClient = new LambdaClient({
