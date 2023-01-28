@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
 import container from '../inversify.config';
+import { Redis } from '../libs/RedisClass';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { ActionManager } from '../managers/ActionManager';
@@ -8,6 +9,7 @@ import { initializeActionRoutes } from '../routes/ActionRoutes';
 class ActionController {
   public _urlPath = '/actiongroup';
   public _router = express.Router();
+  private _redisCache: Redis = container.get<Redis>(Redis);
 
   public _actionManager: ActionManager =
     container.get<ActionManager>(ActionManager);
@@ -22,11 +24,18 @@ class ActionController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._actionManager.getAction(
+      const managerResponse = this._actionManager.getAction(
         response.locals.workspaceID,
         response.locals.idToken,
         request.params.groupId,
         request.params.actionId
+      );
+
+      const result = await this._redisCache.getOrSet(
+        {
+          key: request.params.actionId,
+        },
+        () => managerResponse
       );
 
       response.status(statusCodes.OK).json(result);
@@ -41,10 +50,16 @@ class ActionController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._actionManager.getAllActions(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.groupId
+      const result = await this._redisCache.getOrSet(
+        {
+          key: request.params.groupId,
+        },
+        async () =>
+          await this._actionManager.getAllActions(
+            response.locals.workspaceID,
+            response.locals.idToken,
+            request.params.groupId
+          )
       );
 
       response.status(statusCodes.OK).json(result);
