@@ -29,9 +29,16 @@ async function AuthRequest(
 
       const headerNeeded = () => {
         const noHeaderPaths = ['/public', '/oauth2', '/user/'];
-        const headerWhitelist = ['/user/info', '/user/all', '/user/preference'];
+        const headerWhitelist = [
+          '/user/info',
+          '/user/all',
+          '/user/preference',
+          '/user/invite',
+        ];
         const url = req.url;
-        if (headerWhitelist.includes(url)) return true;
+        for (const path of headerWhitelist) {
+          if (url.startsWith(path)) return true;
+        }
         for (const path of noHeaderPaths) {
           if (url.startsWith(path)) return false;
         }
