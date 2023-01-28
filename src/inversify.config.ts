@@ -3,6 +3,7 @@ import { GotClient } from './libs/GotClientClass';
 import { Lambda } from './libs/LambdaClass';
 import { Redis } from './libs/RedisClass';
 import { Transformer } from './libs/TransformerClass';
+import { ActionManager } from './managers/ActionManager';
 import { BookmarkManager } from './managers/BookmarkManager';
 import { CommentManager } from './managers/CommentManager';
 import { HighlightManager } from './managers/HighlightManager';
@@ -50,5 +51,6 @@ container.bind<ReactionManager>(ReactionManager).to(ReactionManager);
 
 container.bind<BookmarkManager>(BookmarkManager).to(BookmarkManager);
 container.bind<LochManager>(LochManager).to(LochManager);
+container.bind<ActionManager>(ActionManager).to(ActionManager);
 
 export default container;
