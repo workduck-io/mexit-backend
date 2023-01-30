@@ -50,13 +50,13 @@ class UserController {
     response: Response,
     next: NextFunction
   ): Promise<any> => {
-    const userId = response.locals.userIdRaw;
-    const requestDetail = new RequestClass(request, 'UserPreference');
-    requestDetail.data.id = userId;
-
     try {
+      const userId = response.locals.userIdRaw;
+      const requestDetail = new RequestClass(request, 'UserPreference').data;
+      requestDetail.id = userId;
+
       const result = await this._userManager.updateUserPreference(
-        requestDetail.data,
+        requestDetail,
         response.locals.workspaceID,
         response.locals.idToken
       );

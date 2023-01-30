@@ -13,8 +13,8 @@ export interface UserMetadata {
 }
 
 export interface UserPreference {
-  id: string;
-  workspaceId: string;
+  id?: string;
+  workspaceId?: string;
   preference: any;
 }
 
