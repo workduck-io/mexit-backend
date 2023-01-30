@@ -1813,9 +1813,7 @@
                 }
             },
             "required": [
-                "id",
-                "preference",
-                "workspaceId"
+                "preference"
             ],
             "type": "object"
         },
