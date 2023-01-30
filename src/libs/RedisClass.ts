@@ -47,7 +47,7 @@ export class Redis {
       }
       return cache;
     } catch (error) {
-      throw error;
+      return Promise.reject(error)
     }
   }
   /**

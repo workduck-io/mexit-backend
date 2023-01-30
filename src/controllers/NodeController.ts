@@ -76,18 +76,18 @@ class NodeController {
         response.locals.userId,
         request.params.nodeId
       );
-      const managerResponse = this._nodeManager.getNode(
-        request.params.nodeId,
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
 
       const result = await this._redisCache.getOrSet<NodeResponse>(
         {
           key: request.params.nodeId,
           force: !this._redisCache.has(userSpecificNodeKey),
         },
-        () => managerResponse
+        () =>
+          this._nodeManager.getNode(
+            request.params.nodeId,
+            response.locals.workspaceID,
+            response.locals.idToken
+          )
       );
 
       this._redisCache.set(userSpecificNodeKey, request.params.nodeId);
@@ -248,7 +248,7 @@ class NodeController {
     try {
       const nodeId = request.params.id;
 
-      const result = await this._nodeManager.makeNodePrivate(
+      await this._nodeManager.makeNodePrivate(
         nodeId,
         response.locals.workspaceID,
         response.locals.idToken

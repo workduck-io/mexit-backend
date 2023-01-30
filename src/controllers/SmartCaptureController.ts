@@ -25,16 +25,16 @@ class SmartCaptureController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const managerResponse = this._smartCaptureManager.getPublicConfig(
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
       const result = await this._cache.getOrSet(
         {
           key: this._PublicCaptureLabel,
           expires: 24 * 60 * 60 * 60, // 24 hours
         },
-        () => managerResponse
+        () =>
+          this._smartCaptureManager.getPublicConfig(
+            response.locals.workspaceID,
+            response.locals.idToken
+          )
       );
       response.status(statusCodes.OK).json(result);
     } catch (error) {
