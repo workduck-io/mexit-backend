@@ -175,12 +175,6 @@ class SharedController {
         return;
       }
 
-      const managerResponse = this._sharedManager.getUserWithNodesShared(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        nodeId
-      );
-
       const result = await this._redisCache.getOrSet(
         {
           key: this._transformer.encodeCacheKey(
@@ -188,7 +182,12 @@ class SharedController {
             nodeId
           ),
         },
-        () => managerResponse
+        () =>
+          this._sharedManager.getUserWithNodesShared(
+            response.locals.workspaceID,
+            response.locals.idToken,
+            nodeId
+          )
       );
 
       response.status(statusCodes.OK).json(result);

@@ -60,19 +60,18 @@ class SnippetController {
         snippetId
       );
 
-      const managerResponse = this._snippetManager.getSnippet(
-        snippetId,
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
-
       const result = await this._redisCache.getOrSet<NodeResponse>(
         {
           key: snippetId,
           //Force get if user permission is not cached
           force: !this._redisCache.has(userSpecificNodeKey),
         },
-        () => managerResponse
+        () =>
+          this._snippetManager.getSnippet(
+            snippetId,
+            response.locals.workspaceID,
+            response.locals.idToken
+          )
       );
       this._redisCache.set(userSpecificNodeKey, snippetId);
       const convertedResponse = this._transformer.genericNodeConverter(result);
@@ -242,13 +241,6 @@ class SnippetController {
       const snippetId = request.params.snippetId;
       const version = request.params.version;
 
-      const managerResponse = this._snippetManager.getPublicSnippet(
-        snippetId,
-        version,
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
-
       const result = await this._redisCache.getOrSet<NodeResponse>(
         {
           key: snippetId,
@@ -260,7 +252,13 @@ class SnippetController {
             )
           ),
         },
-        () => managerResponse
+        () =>
+          this._snippetManager.getPublicSnippet(
+            snippetId,
+            version,
+            response.locals.workspaceID,
+            response.locals.idToken
+          )
       );
 
       const convertedResponse = this._transformer.genericNodeConverter(result);

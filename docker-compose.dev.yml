@@ -14,7 +14,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
       secrets:
         - npmrc
     environment:
@@ -28,6 +28,9 @@ services:
       - AWS_SECRET_ACCESS_KEY
       - MEXIT_BACKEND_REDIS_HOST=redis
       - MEXIT_BACKEND_REDIS_PORT=6379
+
+    volumes:
+      - ./:/usr/src/app
     ports:
       - 5002:5002
 
@@ -39,7 +42,13 @@ services:
     command: redis-server
     ports:
      - "6379:6379"
+    volumes:
+      - cache:/data
 
 secrets:
   npmrc:
     file: $HOME/.npmrc
+
+volumes:
+  cache:
+    driver: local
