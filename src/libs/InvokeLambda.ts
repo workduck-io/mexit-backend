@@ -4,13 +4,18 @@ import {
   LambdaClient,
 } from '@aws-sdk/client-lambda';
 
+let credentials;
+
+if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
+  credentials = {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  };
+}
+
 const lambdaClient = new LambdaClient({
   region: 'us-east-1',
-  // endpoint: 'http://localhost:3002',
-  // sslEnabled: false,
-  // apiVersion: '2015-03-31',
-  // accessKeyId: 'any',
-  // secretAccessKey: 'any',
+  ...(credentials && { credentials: credentials }),
 });
 
 export default {
