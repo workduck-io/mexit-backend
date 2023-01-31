@@ -71,7 +71,10 @@ class UserController {
     next: NextFunction
   ): Promise<any> => {
     try {
-      const result = await this._userManager.get(response.locals.idToken);
+      const result = await this._userManager.get(
+        response.locals.workspaceID,
+        response.locals.idToken
+      );
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
