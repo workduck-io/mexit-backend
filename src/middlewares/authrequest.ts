@@ -40,7 +40,7 @@ async function AuthRequest(
           if (url.startsWith(path)) return true;
         }
         for (const path of noHeaderPaths) {
-          res.locals.workspaceID = req.headers['mex-workspace-id'].toString();
+          res.locals.workspaceID = req.headers['mex-workspace-id']?.toString();
           if (url.startsWith(path)) return false;
         }
         return true;
