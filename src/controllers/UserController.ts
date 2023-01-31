@@ -99,12 +99,12 @@ class UserController {
   ): Promise<any> => {
     try {
       const inviteId = request.params.inviteId;
-      const result = await this._userManager.deleteInvite(
+      await this._userManager.deleteInvite(
         response.locals.workspaceID,
         response.locals.idToken,
         inviteId
       );
-      response.status(statusCodes.OK).json(result);
+      response.status(statusCodes.NO_CONTENT).json();
     } catch (error) {
       next(error);
     }
