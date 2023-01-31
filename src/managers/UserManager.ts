@@ -77,14 +77,14 @@ export class UserManager {
       });
     }
   }
-  async get(idToken: string): Promise<any> {
+  async get(workspaceId: string, idToken: string): Promise<any> {
     try {
       const response = await this._lambda.invokeAndCheck(
         this._getUserLambdaFunctionName,
         this._lambdaInvocationType,
         {
           routeKey: RouteKeys.getUser,
-          headers: { authorization: idToken },
+          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
           httpMethod: 'GET',
         }
       );
