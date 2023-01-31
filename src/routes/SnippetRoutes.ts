@@ -65,7 +65,7 @@ export const initializeSnippetRoutes = (
   );
 
   snippetObject._router.patch(
-    `${snippetObject}/metadata/:id`,
+    `${snippetObject._urlPath}/metadata/:id`,
     [AuthRequest],
     snippetObject.updateSnippetMetadata
   );

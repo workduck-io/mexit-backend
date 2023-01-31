@@ -63,12 +63,13 @@ async function AuthRequest(
           });
       }
       next();
-    } else
+    } else {
       throw new WDError({
         statusCode: statusCodes.UNAUTHORIZED,
         message: result.error,
         code: statusCodes.UNAUTHORIZED,
       });
+    }
   } catch (error) {
     next(error);
   }
