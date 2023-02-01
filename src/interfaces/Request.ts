@@ -52,6 +52,9 @@ const FilterTypeArray = [
   'date', // Does item have date TODO: Use updated and created will need before after and range
   'state', // Does item have a specific
 
+  'status',
+  'priority',
+
   // TODO: Determine whether it will be a single select or not
   'has', // Does item have a specific data property
   // For reminders, has is used to determine if the reminder has a todo attached
@@ -61,7 +64,7 @@ const FilterTypeArray = [
 ] as const;
 
 // Produces a union type of the values of FilterTypeArray
-export type FilterType = typeof FilterTypeArray[number];
+export type FilterType = (typeof FilterTypeArray)[number];
 
 const FilterJoinArray = [
   'all', // All values should match
@@ -71,7 +74,7 @@ const FilterJoinArray = [
 ] as const;
 
 // How to join the values of a single filter
-export type FilterJoin = typeof FilterJoinArray[number];
+export type FilterJoin = (typeof FilterJoinArray)[number];
 
 export interface FilterValue {
   id: string;
@@ -90,11 +93,7 @@ export interface Filter {
 
 export interface PostView {
   workspaceId: string;
-  properties: {
-    title: string;
-    description: string;
-    globalJoin: GlobalFilterJoin;
-  };
+  properties: { [key: string]: any };
   entityId: string;
   filters: Filter[];
 }

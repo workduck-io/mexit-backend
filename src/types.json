@@ -857,8 +857,10 @@
                 "has",
                 "mention",
                 "note",
+                "priority",
                 "space",
                 "state",
+                "status",
                 "tag"
             ],
             "type": "string"
@@ -1283,22 +1285,7 @@
                     "type": "array"
                 },
                 "properties": {
-                    "properties": {
-                        "description": {
-                            "type": "string"
-                        },
-                        "globalJoin": {
-                            "$ref": "types#/definitions/GlobalFilterJoin"
-                        },
-                        "title": {
-                            "type": "string"
-                        }
-                    },
-                    "required": [
-                        "description",
-                        "globalJoin",
-                        "title"
-                    ],
+                    "additionalProperties": {},
                     "type": "object"
                 },
                 "workspaceId": {
