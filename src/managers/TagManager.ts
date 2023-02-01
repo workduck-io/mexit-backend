@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { injectable } from 'inversify';
 
-import { errorlib } from '../libs/errorlib';
-import { statusCodes } from '../libs/statusCodes';
-import container from '../inversify.config';
-import { Lambda, InvocationType } from '../libs/LambdaClass';
-import { RouteKeys } from '../libs/routeKeys';
 import { STAGE } from '../env';
+import container from '../inversify.config';
+import { InvocationType, Lambda } from '../libs/LambdaClass';
+import { RouteKeys } from '../libs/routeKeys';
+import { BubbleUnexpectedError } from '../utils/decorators';
 
 @injectable()
 export class TagManager {
@@ -14,54 +13,37 @@ export class TagManager {
   private _tagLambdaFunctionName = `mex-backend-${STAGE}-Tag`;
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
+  @BubbleUnexpectedError()
   async getAllTagsOfWorkspace(
     workspaceId: string,
     idToken: string
   ): Promise<any> {
-    try {
-      const response = await this._lambda.invokeAndCheck(
-        this._tagLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.getAllTagsOfWorkspace,
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-        }
-      );
-      return response;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    const response = await this._lambda.invokeAndCheck(
+      this._tagLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.getAllTagsOfWorkspace,
+        headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+      }
+    );
+    return response;
   }
+
+  @BubbleUnexpectedError()
   async getNodeWithTag(
     workspaceId: string,
     idToken: string,
     tagName: string
   ): Promise<any> {
-    try {
-      const response = await this._lambda.invokeAndCheck(
-        this._tagLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.getNodeWithTag,
-          pathParameters: { tagName: tagName },
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-        }
-      );
-      return response;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    const response = await this._lambda.invokeAndCheck(
+      this._tagLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.getNodeWithTag,
+        pathParameters: { tagName: tagName },
+        headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+      }
+    );
+    return response;
   }
 }

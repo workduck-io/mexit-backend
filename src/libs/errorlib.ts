@@ -1,7 +1,7 @@
+import { WDError } from '@workduck-io/wderror';
 import { WDErrorType } from 'src/interfaces/WDError';
 import { errorCodes } from './errorCodes';
 import { statusCodes } from './statusCodes';
-import { WDError } from '@workduck-io/wderror';
 
 export function errorlib(params: WDErrorType) {
   const { message, errorObject, errorCode, statusCode, metaData } = params;
@@ -29,3 +29,13 @@ export function errorlib(params: WDErrorType) {
     stackTrace: stack,
   });
 }
+
+export const UnexpectedError = (error: any) => {
+  errorlib({
+    message: error.message,
+    errorCode: error.statusCode,
+    errorObject: error,
+    statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+    metaData: error.message,
+  });
+};

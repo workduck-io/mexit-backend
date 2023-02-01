@@ -28,7 +28,7 @@ async function AuthRequest(
       res.locals.idToken = req.headers.authorization;
 
       const headerNeeded = () => {
-        const noHeaderPaths = ['/public', '/oauth2', '/user/'];
+        const noHeaderPaths = ['/oauth2', '/user/'];
         const headerWhitelist = [
           '/user/info',
           '/user/all',
