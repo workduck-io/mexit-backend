@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { injectable } from 'inversify';
-import { BulkResponse } from '../interfaces/Response';
 import { STAGE } from '../env';
+import { BulkResponse } from '../interfaces/Response';
 import container from '../inversify.config';
-import { errorlib } from '../libs/errorlib';
 import { InvocationType, Lambda } from '../libs/LambdaClass';
 import { RouteKeys } from '../libs/routeKeys';
-import { statusCodes } from '../libs/statusCodes';
+import { BubbleUnexpectedError } from '../utils/decorators';
 
 @injectable()
 export class SnippetManager {
@@ -14,359 +13,251 @@ export class SnippetManager {
   private _snippetLambdaFunctionName = `mex-backend-${STAGE}-Snippet`;
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
+  @BubbleUnexpectedError()
   async createSnippet(
     workspaceId: string,
     idToken: string,
     snippetDetail: any,
     createNextVersion = false
   ): Promise<any> {
-    try {
-      const result = await this._lambda.invokeAndCheck(
-        this._snippetLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.createSnippet,
-          payload: snippetDetail,
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-          queryStringParameters: { createNextVersion },
-        }
-      );
-      return result;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    const result = await this._lambda.invokeAndCheck(
+      this._snippetLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.createSnippet,
+        payload: snippetDetail,
+        headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        queryStringParameters: { createNextVersion },
+      }
+    );
+    return result;
   }
 
+  @BubbleUnexpectedError()
   async getSnippet(
     snippetId: string,
     workspaceId: string,
     idToken: string
   ): Promise<any> {
-    try {
-      const response = await this._lambda.invokeAndCheck(
-        this._snippetLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.getSnippet,
-          pathParameters: { id: snippetId },
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-        }
-      );
+    const response = await this._lambda.invokeAndCheck(
+      this._snippetLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.getSnippet,
+        pathParameters: { id: snippetId },
+        headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+      }
+    );
 
-      return response;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    return response;
   }
 
+  @BubbleUnexpectedError()
   async bulkGetSnippet(
     snippetIDs: string[],
     workspaceId: string,
     idToken: string
   ): Promise<BulkResponse<any>> {
-    try {
-      const lambdaPromises = snippetIDs.map(id =>
-        this._lambda.invokeAndCheck(
-          this._snippetLambdaFunctionName,
-          this._lambdaInvocationType,
-          {
-            routeKey: RouteKeys.getSnippet,
-            pathParameters: { id },
-            headers: {
-              'mex-workspace-id': workspaceId,
-              authorization: idToken,
-            },
-          }
-        )
-      );
+    const lambdaPromises = snippetIDs.map(id =>
+      this._lambda.invokeAndCheck(
+        this._snippetLambdaFunctionName,
+        this._lambdaInvocationType,
+        {
+          routeKey: RouteKeys.getSnippet,
+          pathParameters: { id },
+          headers: {
+            'mex-workspace-id': workspaceId,
+            authorization: idToken,
+          },
+        }
+      )
+    );
 
-      const promiseResponses = await Promise.allSettled(lambdaPromises);
-      const result = { successful: [], failed: [] };
-      promiseResponses.forEach((prom, index) => {
-        if (prom.status === 'fulfilled') result.successful.push(prom.value);
-        else result.failed.push(snippetIDs[index]);
-      });
+    const promiseResponses = await Promise.allSettled(lambdaPromises);
+    const result = { successful: [], failed: [] };
+    promiseResponses.forEach((prom, index) => {
+      if (prom.status === 'fulfilled') result.successful.push(prom.value);
+      else result.failed.push(snippetIDs[index]);
+    });
 
-      return result;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    return result;
   }
 
+  @BubbleUnexpectedError()
   async getAllVersionsOfSnippet(
     snippetId: string,
     workspaceId: string,
     idToken: string
   ): Promise<any> {
-    try {
-      const response = await this._lambda.invokeAndCheck(
-        this._snippetLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.getAllVersionsOfSnippet,
-          pathParameters: { id: snippetId },
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-        }
-      );
-      return response;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    const response = await this._lambda.invokeAndCheck(
+      this._snippetLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.getAllVersionsOfSnippet,
+        pathParameters: { id: snippetId },
+        headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+      }
+    );
+    return response;
   }
 
+  @BubbleUnexpectedError()
   async getAllSnippetsOfWorkspace(
     workspaceId: string,
     idToken: string,
     getData = false
   ): Promise<any> {
-    try {
-      const response = await this._lambda.invokeAndCheck(
-        this._snippetLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.getAllSnippetsOfWorkspace,
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-          queryStringParameters: { getData },
-        }
-      );
+    const response = await this._lambda.invokeAndCheck(
+      this._snippetLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.getAllSnippetsOfWorkspace,
+        headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        queryStringParameters: { getData },
+      }
+    );
 
-      response.forEach(item => {
-        item.template = !!(item.template === 'true');
-      });
+    response.forEach(item => {
+      item.template = !!(item.template === 'true');
+    });
 
-      return response;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    return response;
   }
 
+  @BubbleUnexpectedError()
   async makeSnippetPublic(
     snippetId: string,
     version: string,
     workspaceId: string,
     idToken: string
   ): Promise<any> {
-    try {
-      const response = await this._lambda.invokeAndCheck(
-        this._snippetLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.makeSnippetPublic,
-          pathParameters: { id: snippetId, version },
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-        }
-      );
-      return response;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    const response = await this._lambda.invokeAndCheck(
+      this._snippetLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.makeSnippetPublic,
+        pathParameters: { id: snippetId, version },
+        headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+      }
+    );
+    return response;
   }
 
+  @BubbleUnexpectedError()
   async makeSnippetPrivate(
     snippetId: string,
     version: string,
     workspaceId: string,
     idToken: string
   ): Promise<any> {
-    try {
-      const response = await this._lambda.invokeAndCheck(
-        this._snippetLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.makeSnippetPrivate,
-          pathParameters: { id: snippetId, version },
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-        }
-      );
-      return response;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    const response = await this._lambda.invokeAndCheck(
+      this._snippetLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.makeSnippetPrivate,
+        pathParameters: { id: snippetId, version },
+        headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+      }
+    );
+    return response;
   }
 
+  @BubbleUnexpectedError()
   async getPublicSnippet(
     snippetId: string,
     version: string,
     workspaceId: string,
     idToken: string
   ): Promise<any> {
-    try {
-      const response = await this._lambda.invokeAndCheck(
-        this._snippetLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.getPublicSnippet,
-          pathParameters: { id: snippetId, version },
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-        }
-      );
-      return response;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    const response = await this._lambda.invokeAndCheck(
+      this._snippetLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.getPublicSnippet,
+        pathParameters: { id: snippetId, version },
+        headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+      }
+    );
+    return response;
   }
 
+  @BubbleUnexpectedError()
   async clonePublicSnippet(
     snippetId: string,
     version: string,
     workspaceId: string,
     idToken: string
   ): Promise<any> {
-    try {
-      const response = await this._lambda.invokeAndCheck(
-        this._snippetLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.clonePublicSnippet,
-          pathParameters: { id: snippetId, version },
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-        }
-      );
-      return response;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    const response = await this._lambda.invokeAndCheck(
+      this._snippetLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.clonePublicSnippet,
+        pathParameters: { id: snippetId, version },
+        headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+      }
+    );
+    return response;
   }
 
+  @BubbleUnexpectedError()
   async deleteVersionOfSnippet(
     snippetID: string,
     workspaceID: string,
     idToken: string,
     version?: number
   ): Promise<any> {
-    try {
-      const response = await this._lambda.invokeAndCheck(
-        this._snippetLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.deleteVersionOfSnippet,
-          headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
-          pathParameters: { id: snippetID },
-          ...(version && { queryStringParameters: { version: version } }),
-        }
-      );
+    const response = await this._lambda.invokeAndCheck(
+      this._snippetLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.deleteVersionOfSnippet,
+        headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
+        pathParameters: { id: snippetID },
+        ...(version && { queryStringParameters: { version: version } }),
+      }
+    );
 
-      return response;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    return response;
   }
 
+  @BubbleUnexpectedError()
   async deleteAllVersionsOfSnippet(
     snippetID: string,
     workspaceID: string,
     idToken: string
   ): Promise<any> {
-    try {
-      const response = await this._lambda.invokeAndCheck(
-        this._snippetLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.deleteAllVersionsOfSnippet,
-          headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
-          pathParameters: { id: snippetID },
-        }
-      );
+    const response = await this._lambda.invokeAndCheck(
+      this._snippetLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.deleteAllVersionsOfSnippet,
+        headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
+        pathParameters: { id: snippetID },
+      }
+    );
 
-      return response;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    return response;
   }
 
+  @BubbleUnexpectedError()
   async updateSnippetMetadata(
     workspaceID: string,
     idToken: string,
     snippetID: string,
     payload: any
   ): Promise<any> {
-    try {
-      const result = await this._lambda.invokeAndCheck(
-        this._snippetLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.updateSnippetMetadata,
-          pathParameters: { id: snippetID },
-          headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
-          payload: { ...payload, type: 'MetadataRequest' },
-        }
-      );
+    const result = await this._lambda.invokeAndCheck(
+      this._snippetLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.updateSnippetMetadata,
+        pathParameters: { id: snippetID },
+        headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
+        payload: { ...payload, type: 'MetadataRequest' },
+      }
+    );
 
-      return result;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    return result;
   }
 }

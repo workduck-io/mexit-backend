@@ -1,11 +1,10 @@
 import { injectable } from 'inversify';
 
-import { errorlib } from '../libs/errorlib';
-import { statusCodes } from '../libs/statusCodes';
-import container from '../inversify.config';
-import { Lambda, InvocationType } from '../libs/LambdaClass';
-import { RouteKeys } from '../libs/routeKeys';
 import { STAGE } from '../env';
+import container from '../inversify.config';
+import { InvocationType, Lambda } from '../libs/LambdaClass';
+import { RouteKeys } from '../libs/routeKeys';
+import { BubbleUnexpectedError } from '../utils/decorators';
 
 @injectable()
 export class NamespaceManager {
@@ -13,296 +12,198 @@ export class NamespaceManager {
   private _namespaceLambdaFunctionName = `mex-backend-${STAGE}-Namespace`;
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
+  @BubbleUnexpectedError()
   async createNamespace(
     workspaceId: string,
     idToken: string,
     namespaceDetail: { name: string }
   ): Promise<any> {
-    try {
-      const result = await this._lambda.invokeAndCheck(
-        this._namespaceLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.createNamespace,
-          payload: { ...namespaceDetail, type: 'NamespaceRequest' },
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-        }
-      );
-      return result;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    const result = await this._lambda.invokeAndCheck(
+      this._namespaceLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.createNamespace,
+        payload: { ...namespaceDetail, type: 'NamespaceRequest' },
+        headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+      }
+    );
+    return result;
   }
 
+  @BubbleUnexpectedError()
   async getNamespace(
     workspaceId: string,
     idToken: string,
     namespaceId: string
   ): Promise<any> {
-    try {
-      const result = await this._lambda.invokeAndCheck(
-        this._namespaceLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.getNamespace,
-          pathParameters: { id: namespaceId },
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-        }
-      );
-      return result;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    const result = await this._lambda.invokeAndCheck(
+      this._namespaceLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.getNamespace,
+        pathParameters: { id: namespaceId },
+        headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+      }
+    );
+    return result;
   }
 
+  @BubbleUnexpectedError()
   async updateNamespace(
     workspaceId: string,
     idToken: string,
     namespaceDetail: { name: string }
   ): Promise<any> {
-    try {
-      const result = await this._lambda.invokeAndCheck(
-        this._namespaceLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.updateNamespace,
-          payload: { ...namespaceDetail, type: 'NamespaceRequest' },
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-        }
-      );
-      return result;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    const result = await this._lambda.invokeAndCheck(
+      this._namespaceLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.updateNamespace,
+        payload: { ...namespaceDetail, type: 'NamespaceRequest' },
+        headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+      }
+    );
+    return result;
   }
 
+  @BubbleUnexpectedError()
   async makeNamespacePublic(
     workspaceId: string,
     idToken: string,
     namespaceId: string
   ): Promise<any> {
-    try {
-      const result = await this._lambda.invokeAndCheck(
-        this._namespaceLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.makeNamespacePublic,
-          pathParameters: { id: namespaceId },
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-        }
-      );
-      return result;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    const result = await this._lambda.invokeAndCheck(
+      this._namespaceLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.makeNamespacePublic,
+        pathParameters: { id: namespaceId },
+        headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+      }
+    );
+    return result;
   }
 
+  @BubbleUnexpectedError()
   async makeNamespacePrivate(
     workspaceId: string,
     idToken: string,
     namespaceId: string
   ): Promise<any> {
-    try {
-      const result = await this._lambda.invokeAndCheck(
-        this._namespaceLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.makeNamespacePrivate,
-          pathParameters: { id: namespaceId },
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-        }
-      );
-      return result;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    const result = await this._lambda.invokeAndCheck(
+      this._namespaceLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.makeNamespacePrivate,
+        pathParameters: { id: namespaceId },
+        headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+      }
+    );
+    return result;
   }
 
+  @BubbleUnexpectedError()
   async getPublicNamespace(idToken: string, namespaceId: string): Promise<any> {
-    try {
-      const result = await this._lambda.invokeAndCheck(
-        this._namespaceLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.getPublicNamespace,
-          pathParameters: { id: namespaceId },
-          headers: { 'mex-workspace-id': '', authorization: idToken },
-        }
-      );
-      return result;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    const result = await this._lambda.invokeAndCheck(
+      this._namespaceLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.getPublicNamespace,
+        pathParameters: { id: namespaceId },
+        headers: { 'mex-workspace-id': '', authorization: idToken },
+      }
+    );
+    return result;
   }
 
+  @BubbleUnexpectedError()
   async getAllNamespaces(workspaceID: string, idToken: string): Promise<any> {
-    try {
-      const result = await this._lambda.invokeAndCheck(
-        this._namespaceLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.getAllNamespaces,
-          headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
-        }
-      );
+    const result = await this._lambda.invokeAndCheck(
+      this._namespaceLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.getAllNamespaces,
+        headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
+      }
+    );
 
-      return result;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    return result;
   }
 
+  @BubbleUnexpectedError()
   async getAllNamespaceHierarchy(
     workspaceId: string,
     idToken: string,
     getMetadata = false
   ): Promise<any> {
-    try {
-      const result = await this._lambda.invokeAndCheck(
-        this._namespaceLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.getAllNamespaceHierarchy,
-          headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
-          queryStringParameters: { getMetadata: getMetadata },
-        }
-      );
-      return result;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    const result = await this._lambda.invokeAndCheck(
+      this._namespaceLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.getAllNamespaceHierarchy,
+        headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
+        queryStringParameters: { getMetadata: getMetadata },
+      }
+    );
+    return result;
   }
 
+  @BubbleUnexpectedError()
   async shareNamespace(
     workspaceID: string,
     idToken: string,
     body: any
   ): Promise<any> {
-    try {
-      const result = await this._lambda.invokeAndCheck(
-        this._namespaceLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.shareNamespace,
-          payload: { ...body, type: 'SharedNamespaceRequest' },
-          headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
-        }
-      );
-      return result;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    const result = await this._lambda.invokeAndCheck(
+      this._namespaceLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.shareNamespace,
+        payload: { ...body, type: 'SharedNamespaceRequest' },
+        headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
+      }
+    );
+    return result;
   }
 
+  @BubbleUnexpectedError()
   async revokeAccessFromNamespace(
     workspaceID: string,
     idToken: string,
     body: any
   ): Promise<any> {
-    try {
-      const result = await this._lambda.invokeAndCheck(
-        this._namespaceLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.revokeUserAccessFromNamespace,
-          payload: { ...body, type: 'SharedNamespaceRequest' },
-          headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
-        }
-      );
-      return result;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    const result = await this._lambda.invokeAndCheck(
+      this._namespaceLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.revokeUserAccessFromNamespace,
+        payload: { ...body, type: 'SharedNamespaceRequest' },
+        headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
+      }
+    );
+    return result;
   }
 
+  @BubbleUnexpectedError()
   async getUsersOfSharedNamespace(
     workspaceID: string,
     idToken: string,
     namespaceID: string
   ): Promise<any> {
-    try {
-      const result = await this._lambda.invokeAndCheck(
-        this._namespaceLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.getUsersOfSharedNamespace,
-          pathParameters: { id: namespaceID },
-          headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
-        }
-      );
+    const result = await this._lambda.invokeAndCheck(
+      this._namespaceLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.getUsersOfSharedNamespace,
+        pathParameters: { id: namespaceID },
+        headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
+      }
+    );
 
-      return result;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    return result;
   }
 
+  @BubbleUnexpectedError()
   async getNodeIDFromPath(
     workspaceID: string,
     idToken: string,
@@ -310,62 +211,43 @@ export class NamespaceManager {
     path: string,
     nodeID?: string
   ): Promise<any> {
-    try {
-      const result = await this._lambda.invokeAndCheck(
-        this._namespaceLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.getNodeIDFromPath,
-          headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
-          pathParameters: { namespaceID: namespaceID, path: path },
-          ...(nodeID && { queryStringParameters: { nodeID: nodeID } }),
-        }
-      );
+    const result = await this._lambda.invokeAndCheck(
+      this._namespaceLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.getNodeIDFromPath,
+        headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
+        pathParameters: { namespaceID: namespaceID, path: path },
+        ...(nodeID && { queryStringParameters: { nodeID: nodeID } }),
+      }
+    );
 
-      return result;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    return result;
   }
 
+  @BubbleUnexpectedError()
   async deleteNamespace(
     workspaceID: string,
     idToken: string,
     namespaceID: string,
     successorNamespaceID?: string
   ): Promise<any> {
-    try {
-      const result = await this._lambda.invokeAndCheck(
-        this._namespaceLambdaFunctionName,
-        this._lambdaInvocationType,
-        {
-          routeKey: RouteKeys.deleteNamespace,
-          headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
-          pathParameters: { id: namespaceID },
-          ...(successorNamespaceID && {
-            payload: {
-              type: 'SuccessorNamespaceRequest',
-              successorNamespaceID: successorNamespaceID,
-              action: 'delete',
-            },
-          }),
-        }
-      );
-      return result;
-    } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
-    }
+    const result = await this._lambda.invokeAndCheck(
+      this._namespaceLambdaFunctionName,
+      this._lambdaInvocationType,
+      {
+        routeKey: RouteKeys.deleteNamespace,
+        headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
+        pathParameters: { id: namespaceID },
+        ...(successorNamespaceID && {
+          payload: {
+            type: 'SuccessorNamespaceRequest',
+            successorNamespaceID: successorNamespaceID,
+            action: 'delete',
+          },
+        }),
+      }
+    );
+    return result;
   }
 }

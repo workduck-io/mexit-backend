@@ -1,14 +1,17 @@
+import { DefaultAccessCreds } from '@workduck-io/mex-default-user-token';
+import { PublicAccessCreds } from '@workduck-io/mex-default-user-token/src/lib/types/accessCred';
 import { NextFunction, Request, Response } from 'express';
+import { COGNITO_CLIENT_ID } from '../env';
 import { errorCodes } from '../libs/errorCodes';
 import { statusCodes } from '../libs/statusCodes';
-import {
-  PublicAccessCreds,
-  initialPublicCreds,
-  refreshAccessCreds,
-} from '../libs/publicAccessToken';
 
-let accessCreds: PublicAccessCreds = initialPublicCreds();
-
+let accessCreds: PublicAccessCreds;
+const defaultAcessCreds = new DefaultAccessCreds(
+  process.env.MEX_DEFAULT_USER_REFRESH_TOKEN,
+  COGNITO_CLIENT_ID,
+  () => accessCreds,
+  cred => (accessCreds = cred)
+);
 // Middleware to supply a system token for accessing endpoints that are public
 async function PublicRequest(
   req: Request,
@@ -16,14 +19,9 @@ async function PublicRequest(
   next: NextFunction
 ): Promise<void> {
   try {
-    if (accessCreds.accessToken && Date.now() < accessCreds.expiry) {
-      req.headers.authorization = accessCreds.idToken;
-      next();
-    } else {
-      accessCreds = await refreshAccessCreds(accessCreds.refreshToken);
-      req.headers.authorization = accessCreds.idToken;
-      next();
-    }
+    const access_token = await defaultAcessCreds.getCred();
+    req.headers.authorization = access_token.idToken;
+    next();
   } catch (error) {
     res.status(statusCodes.INTERNAL_SERVER_ERROR).send({
       message: error.message,

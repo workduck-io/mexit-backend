@@ -1,12 +1,12 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 
-import container from '../inversify.config';
-import { NodeManager } from '../managers/NodeManager';
-import { statusCodes } from '../libs/statusCodes';
 import { NodeResponse } from '../interfaces/Response';
-import { initializePublicRoutes } from '../routes/PublicRoutes';
-import { NamespaceManager } from '../managers/NamespaceManager';
+import container from '../inversify.config';
+import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
+import { NamespaceManager } from '../managers/NamespaceManager';
+import { NodeManager } from '../managers/NodeManager';
+import { initializePublicRoutes } from '../routes/PublicRoutes';
 
 class PublicController {
   public _urlPath = '/public';
