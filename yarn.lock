@@ -1770,6 +1770,11 @@
     "@typescript-eslint/types" "4.33.0"
     eslint-visitor-keys "^2.0.0"
 
+"@workduck-io/mex-default-user-token@^0.0.1":
+  version "0.0.1"
+  resolved "https://npm.pkg.github.com/download/@workduck-io/mex-default-user-token/0.0.1/9cb05ed023d176c8e7251ec3bc54a553c3350a88#9cb05ed023d176c8e7251ec3bc54a553c3350a88"
+  integrity sha512-sTtqVpPoYgLS8Jb0dwWF116C51zDxGvL/YqcyiFRS29pKQz4FyltbwDEbBeEHFSDOW3h3plmMnTVYhadQKZ84w==
+
 "@workduck-io/wd-request-id-parser@^0.0.3":
   version "0.0.3"
   resolved "https://npm.pkg.github.com/download/@workduck-io/wd-request-id-parser/0.0.3/73fd2e5808b500e1e1c475113c2358745f1fbfdd#73fd2e5808b500e1e1c475113c2358745f1fbfdd"
