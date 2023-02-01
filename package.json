@@ -51,6 +51,7 @@
     "@aws-sdk/client-cloudwatch-logs": "^3.92.0",
     "@aws-sdk/client-lambda": "^3.190.0",
     "@aws-sdk/util-utf8-node": "^3.188.0",
+    "@workduck-io/mex-default-user-token": "^0.0.1",
     "@workduck-io/wd-request-id-parser": "^0.0.3",
     "@workduck-io/wderror": "^0.0.2",
     "@workduck-io/workspace-validator": "^0.0.7",
