@@ -1,4 +1,5 @@
 import Interfaces from '../Interfaces';
+import { JSONX } from '../utils/JSONX';
 import { schemaValidator } from './schemavalidator';
 export class RequestClass<T extends keyof Interfaces> {
   data?: Interfaces[T];
@@ -9,7 +10,7 @@ export class RequestClass<T extends keyof Interfaces> {
     if (req.body) {
       if (type) this.data = schemaValidator<T>(req.body, type);
       else {
-        this.data = JSON.parse(req.body);
+        this.data = JSONX.parse(req.body);
       }
     }
     this.params = req.params ? req.params : {};
