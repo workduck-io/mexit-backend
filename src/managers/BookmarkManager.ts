@@ -1,7 +1,7 @@
 import { injectable } from 'inversify';
 import container from '../inversify.config';
 
-import { errorlib } from '../libs/errorlib';
+import { errorlib, UnexpectedError } from '../libs/errorlib';
 import { statusCodes } from '../libs/statusCodes';
 
 import { STAGE } from '../env';
@@ -33,13 +33,7 @@ export class BookmarkManager {
 
       return result;
     } catch (error) {
-      errorlib({
-        message: error.message,
-        errorCode: error.statusCode,
-        errorObject: error,
-        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-        metaData: error.message,
-      });
+      UnexpectedError(error);
     }
   }
 
