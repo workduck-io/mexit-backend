@@ -12,11 +12,13 @@ import { jsonErrorHandler } from './middlewares/jsonerrorhandler';
 import { LogRequest } from './middlewares/logrequest';
 
 import { wdRequestIdExpressParser } from '@workduck-io/wd-request-id-parser';
+import ActionController from './controllers/ActionController';
 import BookmarkController from './controllers/BookmarkController';
 import CommentController from './controllers/CommentController';
 import HealthCheckController from './controllers/HealthCheckController';
 import HighlightController from './controllers/HighlightController';
 import LinkController from './controllers/LinkController';
+import LochController from './controllers/LochController';
 import NamespaceController from './controllers/NamespaceController';
 import NodeController from './controllers/NodeController';
 import OAuth2Controller from './controllers/OAuth2Controller';
@@ -33,7 +35,6 @@ import container from './inversify.config';
 import { Redis } from './libs/RedisClass';
 import responseErrorHandler from './middlewares/responseErrorHandler';
 import { parseReviver } from './utils/ArrayX';
-import LochController from './controllers/LochController';
 
 class App {
   public _app: express.Application;
@@ -101,6 +102,7 @@ const application = new App([
   new SmartCaptureController(),
   new HighlightController(),
   new LochController(),
+  new ActionController(),
 ]);
 
 application.build();

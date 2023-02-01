@@ -134,4 +134,14 @@ export const RouteKeys = {
   getConnectedServices: 'GET /connect',
   connectToService: 'POST /connect',
   updateParentNodeOfService: 'PUT /connect',
+
+  //Actions
+  getActionsOfActionGroup: 'GET /{actionGroupId}/helpers',
+  getAction: 'GET /{actionGroupId}/helpers/{actionId}',
+
+  //Action Auth
+  getAuth: 'GET /{authTypeId}',
+  getAllAuths: 'GET /all',
+  updateAuth: 'PUT /current/{authTypeId}',
+  refreshAuth: 'PUT /refresh/{source}',
 };
