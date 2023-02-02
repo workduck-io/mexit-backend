@@ -147,7 +147,7 @@ export const RouteKeys = {
 
   // Prompt
   getAllPrompts: 'GET /allUser',
-  generatePromptResult: 'POST /result/{promptId}',
+  generatePromptResult: 'POST /result/{id}',
   getUserAuthInfo: 'GET /userAuth',
   updateUserAuthInfo: 'POST /userAuth',
   getAllPromptProviders: 'GET /providers',

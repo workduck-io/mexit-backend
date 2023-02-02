@@ -35,6 +35,7 @@ import container from './inversify.config';
 import { Redis } from './libs/RedisClass';
 import responseErrorHandler from './middlewares/responseErrorHandler';
 import { parseReviver } from './utils/ArrayX';
+import PromptController from './controllers/PromptController';
 
 class App {
   public _app: express.Application;
@@ -103,6 +104,7 @@ const application = new App([
   new HighlightController(),
   new LochController(),
   new ActionController(),
+  new PromptController(),
 ]);
 
 application.build();
