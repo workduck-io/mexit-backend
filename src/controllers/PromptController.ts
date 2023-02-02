@@ -1,18 +1,15 @@
 import express, { NextFunction, Request, Response } from 'express';
-import container from '../inversify.config';
+import { STAGE } from '../env';
+import { InvocationType } from '../libs/LambdaClass';
 import { statusCodes } from '../libs/statusCodes';
-import { Transformer } from '../libs/TransformerClass';
-import { PromptManager } from '../managers/PromptManager';
 import { initializePromptRoutes } from '../routes/PromptRoutes';
 
 class PromptController {
   public _urlPath = '/prompt';
   public _router = express.Router();
 
-  public _promptManager: PromptManager =
-    container.get<PromptManager>(PromptManager);
-
-  public _transformer: Transformer = container.get<Transformer>(Transformer);
+  private _lambdaInvocationType: InvocationType = 'RequestResponse';
+  private _promptLambdaName = `gpt3Prompt-${STAGE}-main`;
 
   constructor() {
     initializePromptRoutes(this);
@@ -24,9 +21,10 @@ class PromptController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._promptManager.getAllPrompts(
-        response.locals.workspaceID,
-        response.locals.idToken
+      const result = await response.locals.invoker(
+        this._promptLambdaName,
+        this._lambdaInvocationType,
+        'getAllPrompts'
       );
 
       response.status(statusCodes.OK).json(result);
@@ -41,7 +39,11 @@ class PromptController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._promptManager.getUserAuthInfo(response.locals);
+      const result = await response.locals.invoker(
+        this._promptLambdaName,
+        this._lambdaInvocationType,
+        'getUserAuthInfo'
+      );
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -56,9 +58,11 @@ class PromptController {
   ): Promise<void> => {
     try {
       const data = request.body;
-      const result = await this._promptManager.updateUserAuthInfo(
-        response.locals,
-        data
+      const result = await response.locals.invoker(
+        this._promptLambdaName,
+        this._lambdaInvocationType,
+        'updateUserAuthInfo',
+        { payload: data }
       );
 
       response.status(statusCodes.OK).json(result);
@@ -73,8 +77,10 @@ class PromptController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._promptManager.getAllPromptProviders(
-        response.locals
+      const result = await response.locals.invoker(
+        this._promptLambdaName,
+        this._lambdaInvocationType,
+        'getAllPromptProviders'
       );
 
       response.status(statusCodes.OK).json(result);
@@ -90,10 +96,11 @@ class PromptController {
   ): Promise<void> => {
     try {
       const data = request.body;
-      const result = await this._promptManager.generatePromptResult(
-        response.locals,
-        request.params.promptID,
-        data
+      const result = await response.locals.invoker(
+        this._promptLambdaName,
+        this._lambdaInvocationType,
+        'generatePromptResult',
+        { payload: data, pathParameters: { id: request.params.promptID } }
       );
 
       response.status(statusCodes.OK).json(result);
