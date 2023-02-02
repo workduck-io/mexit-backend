@@ -144,4 +144,11 @@ export const RouteKeys = {
   getAllAuths: 'GET /all',
   updateAuth: 'PUT /current/{authTypeId}',
   refreshAuth: 'PUT /refresh/{source}',
+
+  // Prompt
+  getAllPrompts: 'GET /allUser',
+  generatePromptResult: 'POST /result/{id}',
+  getUserAuthInfo: 'GET /userAuth',
+  updateUserAuthInfo: 'POST /userAuth',
+  getAllPromptProviders: 'GET /providers',
 };
