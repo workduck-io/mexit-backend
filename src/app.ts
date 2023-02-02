@@ -36,6 +36,7 @@ import { Redis } from './libs/RedisClass';
 import responseErrorHandler from './middlewares/responseErrorHandler';
 import { parseReviver } from './utils/ArrayX';
 import PromptController from './controllers/PromptController';
+import { InvokeLambda } from './middlewares/invoker';
 
 class App {
   public _app: express.Application;
@@ -60,6 +61,7 @@ class App {
     this._app.use(express.json({ reviver: parseReviver }));
     this._app.use(LogRequest);
     this._app.use(wdRequestIdExpressParser);
+    this._app.use(InvokeLambda);
   }
 
   private initializeErrorHandlers() {

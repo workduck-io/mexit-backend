@@ -17,7 +17,6 @@ const lambdaClient = new LambdaClient({
   region: 'us-east-1',
   ...(credentials && { credentials: credentials }),
 });
-
 export default {
   invokeLambdaClient: async (params: InvocationRequest) => {
     const command = new InvokeCommand(params);

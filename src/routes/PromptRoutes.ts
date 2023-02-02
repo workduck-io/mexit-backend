@@ -29,7 +29,7 @@ export const initializePromptRoutes = (
   );
 
   promptControllerObject._router.post(
-    `${promptControllerObject._urlPath}/:promptID`,
+    `${promptControllerObject._urlPath}/result/:promptID`,
     [AuthRequest],
     promptControllerObject.generatePromptResult
   );
