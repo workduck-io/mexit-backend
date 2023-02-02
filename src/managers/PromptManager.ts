@@ -9,12 +9,12 @@ import { BubbleUnexpectedError } from '../utils/decorators';
 @injectable()
 export class PromptManager {
   private _lambdaInvocationType: InvocationType = 'RequestResponse';
-  private _promptLambdaName = `gpt3Prompt-${STAGE}`;
+  private _promptLambdaName = `gpt3Prompt-${STAGE}-main`;
 
   private _lambda: Lambda = container.get<Lambda>(Lambda);
 
   @BubbleUnexpectedError()
-  async getAllPromps(workspaceID: string, idToken: string): Promise<any> {
+  async getAllPrompts(workspaceID: string, idToken: string): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._promptLambdaName,
       this._lambdaInvocationType,
@@ -96,6 +96,7 @@ export class PromptManager {
   async generatePromptResult(
     workspaceID: string,
     idToken: string,
+    promptID: string,
     body: any
   ): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
@@ -104,6 +105,7 @@ export class PromptManager {
       {
         httpMethod: 'POST',
         routeKey: RouteKeys.generatePromptResult,
+        pathParameters: { id: promptID },
         headers: {
           'mex-workspace-id': workspaceID,
           authorization: idToken,
