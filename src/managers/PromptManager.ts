@@ -1,10 +1,12 @@
 import { injectable } from 'inversify';
 
 import { STAGE } from '../env';
+import { LocalsX } from '../interfaces/Locals';
 import container from '../inversify.config';
 import { InvocationType, Lambda } from '../libs/LambdaClass';
 import { RouteKeys } from '../libs/routeKeys';
 import { BubbleUnexpectedError } from '../utils/decorators';
+import { generateLambdaInvokePayload } from '../utils/lambda';
 
 @injectable()
 export class PromptManager {
@@ -31,87 +33,53 @@ export class PromptManager {
   }
 
   @BubbleUnexpectedError()
-  async getUserAuthInfo(workspaceID: string, idToken: string): Promise<any> {
+  async getUserAuthInfo(locals: LocalsX): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._promptLambdaName,
       this._lambdaInvocationType,
-      {
-        httpMethod: 'GET',
-        routeKey: RouteKeys.getUserAuthInfo,
-        headers: {
-          'mex-workspace-id': workspaceID,
-          authorization: idToken,
-        },
-      }
+      generateLambdaInvokePayload(locals, 'getUserAuthInfo')
     );
 
     return result;
   }
 
   @BubbleUnexpectedError()
-  async updateUserAuthInfo(
-    workspaceID: string,
-    idToken: string,
-    body: any
-  ): Promise<any> {
+  async updateUserAuthInfo<T = any>(locals: LocalsX, body: T): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._promptLambdaName,
       this._lambdaInvocationType,
-      {
-        httpMethod: 'POST',
-        routeKey: RouteKeys.updateUserAuthInfo,
-        headers: {
-          'mex-workspace-id': workspaceID,
-          authorization: idToken,
-        },
+      generateLambdaInvokePayload<T>(locals, 'updateUserAuthInfo', {
         payload: body,
-      }
+      })
     );
 
     return result;
   }
 
   @BubbleUnexpectedError()
-  async getAllPromptProviders(
-    workspaceID: string,
-    idToken: string
-  ): Promise<any> {
+  async getAllPromptProviders(locals: LocalsX): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._promptLambdaName,
       this._lambdaInvocationType,
-      {
-        httpMethod: 'GET',
-        routeKey: RouteKeys.getAllPromptProviders,
-        headers: {
-          'mex-workspace-id': workspaceID,
-          authorization: idToken,
-        },
-      }
+      generateLambdaInvokePayload(locals, 'getAllPromptProviders')
     );
 
     return result;
   }
 
   @BubbleUnexpectedError()
-  async generatePromptResult(
-    workspaceID: string,
-    idToken: string,
+  async generatePromptResult<T = any>(
+    locals: LocalsX,
     promptID: string,
-    body: any
+    body: T
   ): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._promptLambdaName,
       this._lambdaInvocationType,
-      {
-        httpMethod: 'POST',
-        routeKey: RouteKeys.generatePromptResult,
-        pathParameters: { id: promptID },
-        headers: {
-          'mex-workspace-id': workspaceID,
-          authorization: idToken,
-        },
+      generateLambdaInvokePayload<T>(locals, 'generatePromptResult', {
         payload: body,
-      }
+        pathParameters: { id: promptID },
+      })
     );
 
     return result;
