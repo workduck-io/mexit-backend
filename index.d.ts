@@ -1,3 +1,6 @@
+import 'express';
+import { LocalsX } from './src/interfaces/Locals';
+
 declare module 'stats-map';
 
 declare global {
@@ -13,6 +16,12 @@ declare global {
     filterEmpty(): T[];
     minus(arr: T[]): T[];
     intersection(arr: T[]): T[];
+  }
+}
+
+declare module 'express' {
+  export interface Response extends Response {
+    locals: LocalsX;
   }
 }
 

@@ -41,10 +41,7 @@ class PromptController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._promptManager.getUserAuthInfo(
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
+      const result = await this._promptManager.getUserAuthInfo(response.locals);
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -60,8 +57,7 @@ class PromptController {
     try {
       const data = request.body;
       const result = await this._promptManager.updateUserAuthInfo(
-        response.locals.workspaceID,
-        response.locals.idToken,
+        response.locals,
         data
       );
 
@@ -78,8 +74,7 @@ class PromptController {
   ): Promise<void> => {
     try {
       const result = await this._promptManager.getAllPromptProviders(
-        response.locals.workspaceID,
-        response.locals.idToken
+        response.locals
       );
 
       response.status(statusCodes.OK).json(result);
@@ -96,8 +91,7 @@ class PromptController {
     try {
       const data = request.body;
       const result = await this._promptManager.generatePromptResult(
-        response.locals.workspaceID,
-        response.locals.idToken,
+        response.locals,
         request.params.promptID,
         data
       );
