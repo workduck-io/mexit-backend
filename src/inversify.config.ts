@@ -11,6 +11,7 @@ import { LinkManager } from './managers/LinkManager';
 import { LochManager } from './managers/LochManager';
 import { NamespaceManager } from './managers/NamespaceManager';
 import { NodeManager } from './managers/NodeManager';
+import { PromptManager } from './managers/PromptManager';
 import { ReactionManager } from './managers/ReactionManager';
 import { ReminderManager } from './managers/ReminderManager';
 import { SharedManager } from './managers/SharedManager';
@@ -52,5 +53,6 @@ container.bind<ReactionManager>(ReactionManager).to(ReactionManager);
 container.bind<BookmarkManager>(BookmarkManager).to(BookmarkManager);
 container.bind<LochManager>(LochManager).to(LochManager);
 container.bind<ActionManager>(ActionManager).to(ActionManager);
+container.bind<PromptManager>(PromptManager).to(PromptManager);
 
 export default container;
