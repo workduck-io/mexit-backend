@@ -14,8 +14,18 @@
  */
 module.exports = {
   root: true,
+  parserOptions: {
+    sourceType: 'module',
+    warnOnUnsupportedTypeScriptVersion: false,
+  },
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint'],
+  plugins: [
+    '@typescript-eslint',
+    'unused-imports',
+    'simple-import-sort',
+    'import',
+  ],
+  env: { es6: true },
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
@@ -38,6 +48,43 @@ module.exports = {
     'node/prefer-promises/fs': 'error',
     '@typescript-eslint/no-explicit-any': 'off',
   },
+  overrides: [
+    {
+      files: ['*.ts', '*.js'],
+      rules: {
+        'unused-imports/no-unused-imports': 'warn',
+        'simple-import-sort/exports': 'warn',
+        'import/first': 'error',
+        'import/newline-after-import': 'error',
+        'import/no-duplicates': 'error',
+        'simple-import-sort/imports': [
+          'warn',
+          {
+            groups: [
+              // Side effect imports.
+              ['^\\u0000'],
+              // Third party @ packages first
+              ['^@?\\w'],
+              // Internal packages.
+              ['^(@workduck-io)(/.*|$)'],
+              // Parent imports. Put `..` last.
+              ['^\\.\\.(?!/?$)', '^\\.\\./?$'],
+              // Other relative imports. Put same-folder imports and `.` last.
+              ['^\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
+            ],
+          },
+        ],
+      },
+    },
+    {
+      files: ['*.ts', '*.tsx'],
+      rules: {
+        '@typescript-eslint/no-explicit-any': 'off',
+        '@typescript-eslint/no-unused-vars': 'off',
+        '@typescript-eslint/ban-ts-comment': 'off',
+      },
+    },
+  ],
   settings: {
     node: {
       tryExtensions: ['.js', '.json', '.node', '.ts', '.d.ts'],
