@@ -16,10 +16,10 @@ async function InvokeLambda(
   res.locals.invoker = async <T = any>(
     functionName: string,
     routeKey: keyof typeof RouteKeys,
-    options: LambdaInvokePayloadOptions<T>
+    options?: LambdaInvokePayloadOptions<T>
   ) => {
     try {
-      if (options.allSettled) {
+      if (options?.allSettled) {
         const promises = options.allSettled.ids.map(id => {
           const invokePayload = generateLambdaInvokePayload(
             res.locals,
