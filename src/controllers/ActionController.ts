@@ -1,7 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { STAGE } from '../env';
 import container from '../inversify.config';
-import { InvocationType } from '../libs/LambdaInvoker';
 import { Redis } from '../libs/RedisClass';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
@@ -12,8 +11,6 @@ class ActionController {
   public _router = express.Router();
   private _redisCache: Redis = container.get<Redis>(Redis);
 
-  private _lambdaInvocationType: InvocationType = 'RequestResponse';
-  private _linkServiceLambdaBase = `mex-url-shortner-${STAGE}`;
   private _lambdaName = {
     action: {
       getAll: `actionHelperService-${STAGE}-getAllActionGroups`,

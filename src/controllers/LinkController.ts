@@ -3,13 +3,11 @@ import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { initializeLinkRoutes } from '../routes/LinkRoutes';
 import { STAGE } from '../env';
-import { InvocationType } from '../libs/LambdaInvoker';
 
 class LinkController {
   public _urlPath = '/link';
   public _router = express.Router();
 
-  private _lambdaInvocationType: InvocationType = 'RequestResponse';
   private _linkServiceLambdaBase = `mex-url-shortner-${STAGE}`;
 
   constructor() {
