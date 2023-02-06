@@ -112,12 +112,7 @@ application.build();
 application._app.listen(application._port, async () => {
   await redisCache.client.connect();
   if (IS_DEV) {
-    console.log(
-      colorText(
-        COLORS.red,
-        `Express is listening at http://localhost:${application._port}`
-      )
-    );
+    console.log(colorText(COLORS.red, `Express is listening at http://localhost:${application._port}`));
     expressListRoutes(application._app);
   }
   return;

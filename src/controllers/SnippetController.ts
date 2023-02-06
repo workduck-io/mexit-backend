@@ -24,28 +24,17 @@ class SnippetController {
     initializeSnippetRoutes(this);
   }
 
-  createSnippet = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  createSnippet = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const createNextVersion = request.query.createNextVersion === 'true';
       //TODO: update cache instead of deleting it
       this._redisCache.del(request.body.id);
-      const snippetResult = await response.locals.invoker(
-        this._snippetLambdaFunctionName,
-        'createSnippet',
-        {
-          payload: request.body,
-          queryStringParameters: { createNextVersion: createNextVersion },
-        }
-      );
+      const snippetResult = await response.locals.invoker(this._snippetLambdaFunctionName, 'createSnippet', {
+        payload: request.body,
+        queryStringParameters: { createNextVersion: createNextVersion },
+      });
 
-      const deserialisedContent = this._transformer.genericNodeConverter(
-        snippetResult,
-        false
-      );
+      const deserialisedContent = this._transformer.genericNodeConverter(snippetResult, false);
 
       response.status(statusCodes.OK).json(deserialisedContent);
     } catch (error) {
@@ -53,11 +42,7 @@ class SnippetController {
     }
   };
 
-  getSnippet = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getSnippet = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const snippetId = request.params.snippetId;
       const userSpecificNodeKey = this._transformer.encodeCacheKey(
@@ -73,11 +58,7 @@ class SnippetController {
           force: !this._redisCache.has(userSpecificNodeKey),
         },
         () =>
-          response.locals.invoker(
-            this._snippetLambdaFunctionName,
-            'getSnippet',
-            { pathParameters: { id: snippetId } }
-          )
+          response.locals.invoker(this._snippetLambdaFunctionName, 'getSnippet', { pathParameters: { id: snippetId } })
       );
       this._redisCache.set(userSpecificNodeKey, snippetId);
       const convertedResponse = this._transformer.genericNodeConverter(result);
@@ -88,81 +69,50 @@ class SnippetController {
     }
   };
 
-  bulkGetSnippet = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  bulkGetSnippet = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'GetMultipleIds');
       const ids = requestDetail.data.ids;
       const cachedUserAccess = await this._redisCache.mget(
-        ids.map(id =>
-          this._transformer.encodeCacheKey(
-            this._UserAccessLabel,
-            response.locals.userId,
-            id
-          )
-        )
+        ids.map(id => this._transformer.encodeCacheKey(this._UserAccessLabel, response.locals.userId, id))
       );
 
       const verifiedSnippets = ids.intersection(cachedUserAccess); //Checking if user has acess)
 
-      const cachedHits = (await this._redisCache.mget(verifiedSnippets))
-        .filterEmpty()
-        .map(hits => JSON.parse(hits));
+      const cachedHits = (await this._redisCache.mget(verifiedSnippets)).filterEmpty().map(hits => JSON.parse(hits));
 
       const nonCachedIds = ids.minus(cachedHits.map(item => item.id));
 
       const { successful, failed } = !nonCachedIds.isEmpty()
-        ? await response.locals.invoker(
-            this._snippetLambdaFunctionName,
-            'getSnippet',
-            {
-              allSettled: {
-                ids: nonCachedIds,
-                key: 'id',
-              },
-            }
-          )
+        ? await response.locals.invoker(this._snippetLambdaFunctionName, 'getSnippet', {
+            allSettled: {
+              ids: nonCachedIds,
+              key: 'id',
+            },
+          })
         : { successful: [], failed: [] };
 
       await this._redisCache.mset(successful.toObject('id', JSON.stringify));
 
       this._redisCache.mset(
         successful.toObject(
-          val =>
-            this._transformer.encodeCacheKey(
-              this._UserAccessLabel,
-              response.locals.userId,
-              val.id
-            ),
+          val => this._transformer.encodeCacheKey(this._UserAccessLabel, response.locals.userId, val.id),
           val => val.id
         )
       );
-      const result = [...successful, ...cachedHits].map(snippet =>
-        this._transformer.genericNodeConverter(snippet)
-      );
+      const result = [...successful, ...cachedHits].map(snippet => this._transformer.genericNodeConverter(snippet));
 
-      response
-        .status(statusCodes.OK)
-        .json({ successful: result, failed: failed });
+      response.status(statusCodes.OK).json({ successful: result, failed: failed });
     } catch (error) {
       next(error);
     }
   };
 
-  getAllVersionsOfSnippets = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAllVersionsOfSnippets = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
-        this._snippetLambdaFunctionName,
-        'getAllVersionsOfSnippet',
-        { pathParameters: { id: request.params.snippetId } }
-      );
+      const result = await response.locals.invoker(this._snippetLambdaFunctionName, 'getAllVersionsOfSnippet', {
+        pathParameters: { id: request.params.snippetId },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -170,18 +120,12 @@ class SnippetController {
     }
   };
 
-  getAllSnippetsOfWorkspace = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAllSnippetsOfWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const getData = request.query.getData === 'true';
-      const result = await response.locals.invoker(
-        this._snippetLambdaFunctionName,
-        'getAllSnippetsOfWorkspace',
-        { queryStringParameters: { getData: getData } }
-      );
+      const result = await response.locals.invoker(this._snippetLambdaFunctionName, 'getAllSnippetsOfWorkspace', {
+        queryStringParameters: { getData: getData },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -189,25 +133,16 @@ class SnippetController {
     }
   };
 
-  makeSnippetPublic = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  makeSnippetPublic = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const snippetId = request.params.id;
       const version = request.params.version;
 
-      await response.locals.invoker(
-        this._snippetLambdaFunctionName,
-        'makeSnippetPublic',
-        { pathParameters: { id: snippetId, version: version } }
-      );
+      await response.locals.invoker(this._snippetLambdaFunctionName, 'makeSnippetPublic', {
+        pathParameters: { id: snippetId, version: version },
+      });
       this._redisCache.set(
-        this._transformer.encodeCacheKey(
-          this._PublicSnippetMockWorkspace,
-          request.params.id
-        ),
+        this._transformer.encodeCacheKey(this._PublicSnippetMockWorkspace, request.params.id),
         snippetId
       );
 
@@ -216,38 +151,23 @@ class SnippetController {
       next(error);
     }
   };
-  makeSnippetPrivate = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  makeSnippetPrivate = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const snippetId = request.params.id;
       const version = request.params.version;
 
-      await response.locals.invoker(
-        this._snippetLambdaFunctionName,
-        'makeSnippetPrivate',
-        { pathParameters: { id: snippetId, version: version } }
-      );
+      await response.locals.invoker(this._snippetLambdaFunctionName, 'makeSnippetPrivate', {
+        pathParameters: { id: snippetId, version: version },
+      });
 
-      this._redisCache.del(
-        this._transformer.encodeCacheKey(
-          this._PublicSnippetMockWorkspace,
-          snippetId
-        )
-      );
+      this._redisCache.del(this._transformer.encodeCacheKey(this._PublicSnippetMockWorkspace, snippetId));
       response.status(statusCodes.OK).send();
     } catch (error) {
       next(error);
     }
   };
 
-  getPublicSnippet = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getPublicSnippet = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const snippetId = request.params.snippetId;
       const version = request.params.version;
@@ -256,19 +176,12 @@ class SnippetController {
         {
           key: snippetId,
           //Force get if user permission is not cached
-          force: !this._redisCache.has(
-            this._transformer.encodeCacheKey(
-              this._PublicSnippetMockWorkspace,
-              snippetId
-            )
-          ),
+          force: !this._redisCache.has(this._transformer.encodeCacheKey(this._PublicSnippetMockWorkspace, snippetId)),
         },
         () =>
-          response.locals.invoker(
-            this._snippetLambdaFunctionName,
-            'getPublicSnippet',
-            { pathParameters: { id: snippetId, version: version } }
-          )
+          response.locals.invoker(this._snippetLambdaFunctionName, 'getPublicSnippet', {
+            pathParameters: { id: snippetId, version: version },
+          })
       );
 
       const convertedResponse = this._transformer.genericNodeConverter(result);
@@ -279,20 +192,14 @@ class SnippetController {
     }
   };
 
-  clonePublicSnippet = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  clonePublicSnippet = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const snippetId = request.params.id;
       const version = request.params.version;
 
-      const result = await response.locals.invoker(
-        this._snippetLambdaFunctionName,
-        'clonePublicSnippet',
-        { pathParameters: { id: snippetId, version: version } }
-      );
+      const result = await response.locals.invoker(this._snippetLambdaFunctionName, 'clonePublicSnippet', {
+        pathParameters: { id: snippetId, version: version },
+      });
 
       response.json(result);
     } catch (error) {
@@ -300,27 +207,17 @@ class SnippetController {
     }
   };
 
-  deleteVersionOfSnippet = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  deleteVersionOfSnippet = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const snippetID = request.params.id;
 
       // If a version is not passed in query parameters, it deletes the latest version
-      const version = request.query['version']
-        ? parseInt(request.query['version'] as string)
-        : undefined;
+      const version = request.query['version'] ? parseInt(request.query['version'] as string) : undefined;
 
-      await response.locals.invoker(
-        this._snippetLambdaFunctionName,
-        'deleteVersionOfSnippet',
-        {
-          pathParameters: { id: snippetID },
-          ...(version && { queryStringParameters: { version: version } }),
-        }
-      );
+      await response.locals.invoker(this._snippetLambdaFunctionName, 'deleteVersionOfSnippet', {
+        pathParameters: { id: snippetID },
+        ...(version && { queryStringParameters: { version: version } }),
+      });
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
@@ -328,19 +225,13 @@ class SnippetController {
     }
   };
 
-  deleteAllVersionsOfSnippet = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  deleteAllVersionsOfSnippet = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const snippetID = request.params.id;
 
-      await response.locals.invoker(
-        this._snippetLambdaFunctionName,
-        'deleteAllVersionsOfSnippet',
-        { pathParameters: { id: snippetID } }
-      );
+      await response.locals.invoker(this._snippetLambdaFunctionName, 'deleteAllVersionsOfSnippet', {
+        pathParameters: { id: snippetID },
+      });
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
@@ -348,22 +239,14 @@ class SnippetController {
     }
   };
 
-  updateSnippetMetadata = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  updateSnippetMetadata = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const body = new RequestClass(request, 'UpdateMetadata').data;
 
-      await response.locals.invoker(
-        this._snippetLambdaFunctionName,
-        'updateSnippetMetadata',
-        {
-          pathParameters: { id: request.params.id },
-          payload: { ...body, type: 'MetadataRequest' },
-        }
-      );
+      await response.locals.invoker(this._snippetLambdaFunctionName, 'updateSnippetMetadata', {
+        pathParameters: { id: request.params.id },
+        payload: { ...body, type: 'MetadataRequest' },
+      });
 
       this._redisCache.del(request.params.id);
       response.status(statusCodes.NO_CONTENT).send();

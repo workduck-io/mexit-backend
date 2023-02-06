@@ -1,20 +1,14 @@
 import CommentController from '../controllers/CommentController';
 import { AuthRequest } from '../middlewares/authrequest';
 
-export const initializeCommentRoutes = (
-  commentObject: CommentController
-): void => {
+export const initializeCommentRoutes = (commentObject: CommentController): void => {
   commentObject._router.get(
     `${commentObject._urlPath}/node/:nodeID`,
     [AuthRequest],
     commentObject.getAllCommentsOfNode
   );
 
-  commentObject._router.post(
-    `${commentObject._urlPath}`,
-    [AuthRequest],
-    commentObject.createComment
-  );
+  commentObject._router.post(`${commentObject._urlPath}`, [AuthRequest], commentObject.createComment);
 
   commentObject._router.post(
     `${commentObject._urlPath}/node/:nodeID/block/ids`,
@@ -34,11 +28,7 @@ export const initializeCommentRoutes = (
     commentObject.getAllCommentsOfThread
   );
 
-  commentObject._router.get(
-    `${commentObject._urlPath}/:nodeID/:entityID`,
-    [AuthRequest],
-    commentObject.getComment
-  );
+  commentObject._router.get(`${commentObject._urlPath}/:nodeID/:entityID`, [AuthRequest], commentObject.getComment);
 
   commentObject._router.delete(
     `${commentObject._urlPath}/node/:nodeID`,

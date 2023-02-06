@@ -1,14 +1,8 @@
 import ReminderController from '../controllers/ReminderController';
 import { AuthRequest } from '../middlewares/authrequest';
 
-export const initializeReminderRoutes = (
-  reminderObject: ReminderController
-): void => {
-  reminderObject._router.post(
-    `${reminderObject._urlPath}`,
-    [AuthRequest],
-    reminderObject.createReminder
-  );
+export const initializeReminderRoutes = (reminderObject: ReminderController): void => {
+  reminderObject._router.post(`${reminderObject._urlPath}`, [AuthRequest], reminderObject.createReminder);
 
   reminderObject._router.get(
     `${reminderObject._urlPath}/workspace`,
@@ -22,11 +16,7 @@ export const initializeReminderRoutes = (
     reminderObject.getAllRemindersOfNode
   );
 
-  reminderObject._router.get(
-    `${reminderObject._urlPath}/:entityID`,
-    [AuthRequest],
-    reminderObject.getReminder
-  );
+  reminderObject._router.get(`${reminderObject._urlPath}/:entityID`, [AuthRequest], reminderObject.getReminder);
 
   reminderObject._router.delete(
     `${reminderObject._urlPath}/node/:nodeID`,
@@ -34,9 +24,5 @@ export const initializeReminderRoutes = (
     reminderObject.deleteAllRemindersOfNode
   );
 
-  reminderObject._router.delete(
-    `${reminderObject._urlPath}/:entityID`,
-    [AuthRequest],
-    reminderObject.deleteReminder
-  );
+  reminderObject._router.delete(`${reminderObject._urlPath}/:entityID`, [AuthRequest], reminderObject.deleteReminder);
 };

@@ -1,8 +1,4 @@
-import {
-  InvocationRequest,
-  InvokeCommand,
-  LambdaClient,
-} from '@aws-sdk/client-lambda';
+import { InvocationRequest, InvokeCommand, LambdaClient } from '@aws-sdk/client-lambda';
 
 let credentials;
 

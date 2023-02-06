@@ -1,9 +1,7 @@
 import PromptController from '../controllers/PromptController';
 import { AuthRequest } from '../middlewares/authrequest';
 
-export const initializePromptRoutes = (
-  promptControllerObject: PromptController
-): void => {
+export const initializePromptRoutes = (promptControllerObject: PromptController): void => {
   promptControllerObject._router.get(
     `${promptControllerObject._urlPath}/all`,
     [AuthRequest],

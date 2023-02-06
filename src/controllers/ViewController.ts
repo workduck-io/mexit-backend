@@ -16,20 +16,12 @@ class ViewController {
     initializeViewRoutes(this);
   }
 
-  getView = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getView = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
-        this._taskViewLambdaName,
-        'getView',
-        {
-          pathParameters: { entityId: request.params.viewID },
-          additionalHeaders: this._additionalHeaders,
-        }
-      );
+      const result = await response.locals.invoker(this._taskViewLambdaName, 'getView', {
+        pathParameters: { entityId: request.params.viewID },
+        additionalHeaders: this._additionalHeaders,
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -37,17 +29,11 @@ class ViewController {
     }
   };
 
-  getAllViews = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAllViews = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
-        this._taskViewLambdaName,
-        'getAllViews',
-        { additionalHeaders: this._additionalHeaders }
-      );
+      const result = await response.locals.invoker(this._taskViewLambdaName, 'getAllViews', {
+        additionalHeaders: this._additionalHeaders,
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -55,11 +41,7 @@ class ViewController {
     }
   };
 
-  deleteView = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  deleteView = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       await response.locals.invoker(this._taskViewLambdaName, 'deleteView', {
         pathParameters: { entityId: request.params.viewID },
@@ -72,19 +54,14 @@ class ViewController {
     }
   };
 
-  postView = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  postView = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const data = new RequestClass(request, 'PostView').data;
 
-      const result = await response.locals.invoker(
-        this._taskViewLambdaName,
-        'saveView',
-        { additionalHeaders: this._additionalHeaders, payload: data }
-      );
+      const result = await response.locals.invoker(this._taskViewLambdaName, 'saveView', {
+        additionalHeaders: this._additionalHeaders,
+        payload: data,
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {

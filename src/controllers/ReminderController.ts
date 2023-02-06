@@ -15,17 +15,11 @@ class ReminderController {
     initializeReminderRoutes(this);
   }
 
-  getReminder = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getReminder = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
-        this._reminderLambdaName,
-        'getReminderByID',
-        { pathParameters: { entityId: request.params.entityID } }
-      );
+      const result = await response.locals.invoker(this._reminderLambdaName, 'getReminderByID', {
+        pathParameters: { entityId: request.params.entityID },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -33,18 +27,10 @@ class ReminderController {
     }
   };
 
-  createReminder = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  createReminder = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const body = new RequestClass(request, 'Reminder').data;
-      const result = await response.locals.invoker(
-        this._reminderLambdaName,
-        'createReminder',
-        { payload: body }
-      );
+      const result = await response.locals.invoker(this._reminderLambdaName, 'createReminder', { payload: body });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -52,17 +38,11 @@ class ReminderController {
     }
   };
 
-  deleteReminder = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  deleteReminder = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
-        this._reminderLambdaName,
-        'deleteReminderByID',
-        { pathParameters: { entityId: request.params.entityID } }
-      );
+      const result = await response.locals.invoker(this._reminderLambdaName, 'deleteReminderByID', {
+        pathParameters: { entityId: request.params.entityID },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -70,17 +50,11 @@ class ReminderController {
     }
   };
 
-  getAllRemindersOfNode = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAllRemindersOfNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
-        this._reminderLambdaName,
-        'getAllRemindersOfNode',
-        { pathParameters: { nodeId: request.params.nodeID } }
-      );
+      const result = await response.locals.invoker(this._reminderLambdaName, 'getAllRemindersOfNode', {
+        pathParameters: { nodeId: request.params.nodeID },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -88,17 +62,11 @@ class ReminderController {
     }
   };
 
-  deleteAllRemindersOfNode = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  deleteAllRemindersOfNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
-        this._reminderLambdaName,
-        'deleteAllRemindersOfNode',
-        { pathParameters: { nodeId: request.params.nodeID } }
-      );
+      const result = await response.locals.invoker(this._reminderLambdaName, 'deleteAllRemindersOfNode', {
+        pathParameters: { nodeId: request.params.nodeID },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -106,16 +74,9 @@ class ReminderController {
     }
   };
 
-  getAllRemindersOfWorkspace = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAllRemindersOfWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
-        this._reminderLambdaName,
-        'getAllRemindersOfWorkspace'
-      );
+      const result = await response.locals.invoker(this._reminderLambdaName, 'getAllRemindersOfWorkspace');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {

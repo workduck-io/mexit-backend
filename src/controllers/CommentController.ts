@@ -23,22 +23,14 @@ class CommentController {
     initializeCommentRoutes(this);
   }
 
-  getComment = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getComment = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
-        this._commentLambdaName,
-        'getCommentByID',
-        {
-          pathParameters: {
-            entityId: request.params.entityID,
-            nodeId: request.params.nodeId,
-          },
-        }
-      );
+      const result = await response.locals.invoker(this._commentLambdaName, 'getCommentByID', {
+        pathParameters: {
+          entityId: request.params.entityID,
+          nodeId: request.params.nodeId,
+        },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -46,21 +38,11 @@ class CommentController {
     }
   };
 
-  createComment = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  createComment = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const data = new RequestClass(request, 'Comment').data;
-      this._cache.del(
-        this._transformer.encodeCacheKey(this._CommentBlockLabel, data.blockId)
-      );
-      const result = await response.locals.invoker(
-        this._commentLambdaName,
-        'createComment',
-        { payload: data }
-      );
+      this._cache.del(this._transformer.encodeCacheKey(this._CommentBlockLabel, data.blockId));
+      const result = await response.locals.invoker(this._commentLambdaName, 'createComment', { payload: data });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -68,22 +50,14 @@ class CommentController {
     }
   };
 
-  deleteComment = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  deleteComment = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      await response.locals.invoker(
-        this._commentLambdaName,
-        'deleteCommentByID',
-        {
-          pathParameters: {
-            entityId: request.params.entityID,
-            nodeId: request.params.nodeID,
-          },
-        }
-      );
+      await response.locals.invoker(this._commentLambdaName, 'deleteCommentByID', {
+        pathParameters: {
+          entityId: request.params.entityID,
+          nodeId: request.params.nodeID,
+        },
+      });
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
@@ -91,19 +65,11 @@ class CommentController {
     }
   };
 
-  getAllCommentsOfNode = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAllCommentsOfNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
-        this._commentLambdaName,
-        'getAllCommentsOfNode',
-        {
-          pathParameters: { nodeId: request.params.nodeID },
-        }
-      );
+      const result = await response.locals.invoker(this._commentLambdaName, 'getAllCommentsOfNode', {
+        pathParameters: { nodeId: request.params.nodeID },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -111,11 +77,7 @@ class CommentController {
     }
   };
 
-  getAllCommentsOfBlock = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAllCommentsOfBlock = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const userSpecificNodeKey = this._transformer.encodeCacheKey(
         this._UserAccessLabel,
@@ -124,23 +86,16 @@ class CommentController {
       );
       const result = await this._cache.getOrSet(
         {
-          key: this._transformer.encodeCacheKey(
-            this._CommentBlockLabel,
-            request.params.blockID
-          ),
+          key: this._transformer.encodeCacheKey(this._CommentBlockLabel, request.params.blockID),
           force: !this._cache.has(userSpecificNodeKey),
         },
         () =>
-          response.locals.invoker(
-            this._commentLambdaName,
-            'getAllCommentsOfBlock',
-            {
-              pathParameters: {
-                nodeId: request.params.nodeID,
-                blockId: request.params.blockID,
-              },
-            }
-          )
+          response.locals.invoker(this._commentLambdaName, 'getAllCommentsOfBlock', {
+            pathParameters: {
+              nodeId: request.params.nodeID,
+              blockId: request.params.blockID,
+            },
+          })
       );
 
       response.status(statusCodes.OK).json(result);
@@ -149,27 +104,15 @@ class CommentController {
     }
   };
 
-  getAllCommentsOfBlocks = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAllCommentsOfBlocks = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'GetMultipleIds');
       const ids = requestDetail.data.ids;
       const cachedUserAccess = await this._cache.get(
-        this._transformer.encodeCacheKey(
-          this._UserAccessLabel,
-          response.locals.userId,
-          request.params.nodeID
-        )
+        this._transformer.encodeCacheKey(this._UserAccessLabel, response.locals.userId, request.params.nodeID)
       );
       const cachedHits = (
-        await this._cache.mget(
-          ids.map(id =>
-            this._transformer.encodeCacheKey(this._CommentBlockLabel, id)
-          )
-        )
+        await this._cache.mget(ids.map(id => this._transformer.encodeCacheKey(this._CommentBlockLabel, id)))
       )
         .filterEmpty()
         .map(hits => JSON.parse(hits));
@@ -177,26 +120,18 @@ class CommentController {
       const nonCachedIds = ids.minus(cachedHits.map(item => item.blockId));
 
       const lambdaResponse = !nonCachedIds.isEmpty()
-        ? await response.locals.invoker(
-            this._commentLambdaName,
-            'getAllCommentsOfBlock',
-            {
-              pathParameters: { nodeId: request.params.nodeID },
-              allSettled: {
-                ids: cachedUserAccess ? nonCachedIds : ids,
-                key: 'blockId',
-              },
-            }
-          )
+        ? await response.locals.invoker(this._commentLambdaName, 'getAllCommentsOfBlock', {
+            pathParameters: { nodeId: request.params.nodeID },
+            allSettled: {
+              ids: cachedUserAccess ? nonCachedIds : ids,
+              key: 'blockId',
+            },
+          })
         : { successful: [], failed: [] };
 
       await this._cache.mset(
         lambdaResponse.successful.toObject(
-          item =>
-            this._transformer.encodeCacheKey(
-              this._CommentBlockLabel,
-              item.blockId
-            ),
+          item => this._transformer.encodeCacheKey(this._CommentBlockLabel, item.blockId),
           JSON.stringify
         )
       );
@@ -214,23 +149,15 @@ class CommentController {
     }
   };
 
-  getAllCommentsOfThread = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAllCommentsOfThread = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
-        this._commentLambdaName,
-        'getAllCommentsOfThread',
-        {
-          pathParameters: {
-            nodeId: request.params.nodeID,
-            blockId: request.params.blockID,
-            threadId: request.params.threadID,
-          },
-        }
-      );
+      const result = await response.locals.invoker(this._commentLambdaName, 'getAllCommentsOfThread', {
+        pathParameters: {
+          nodeId: request.params.nodeID,
+          blockId: request.params.blockID,
+          threadId: request.params.threadID,
+        },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -238,21 +165,13 @@ class CommentController {
     }
   };
 
-  deleteAllCommentsOfNode = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  deleteAllCommentsOfNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
-        this._commentLambdaName,
-        'deleteAllCommentsOfNode',
-        {
-          pathParameters: {
-            nodeId: request.params.nodeID,
-          },
-        }
-      );
+      const result = await response.locals.invoker(this._commentLambdaName, 'deleteAllCommentsOfNode', {
+        pathParameters: {
+          nodeId: request.params.nodeID,
+        },
+      });
 
       response.status(statusCodes.NO_CONTENT).json(result);
     } catch (error) {
@@ -260,28 +179,15 @@ class CommentController {
     }
   };
 
-  deleteAllCommentsOfBlock = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  deleteAllCommentsOfBlock = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      this._cache.del(
-        this._transformer.encodeCacheKey(
-          this._CommentBlockLabel,
-          request.params.blockID
-        )
-      );
-      const result = await response.locals.invoker(
-        this._commentLambdaName,
-        'deleteAllCommentsOfBlock',
-        {
-          pathParameters: {
-            nodeId: request.params.nodeID,
-            blockId: request.params.blockID,
-          },
-        }
-      );
+      this._cache.del(this._transformer.encodeCacheKey(this._CommentBlockLabel, request.params.blockID));
+      const result = await response.locals.invoker(this._commentLambdaName, 'deleteAllCommentsOfBlock', {
+        pathParameters: {
+          nodeId: request.params.nodeID,
+          blockId: request.params.blockID,
+        },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -289,23 +195,15 @@ class CommentController {
     }
   };
 
-  deleteAllCommentsOfThread = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  deleteAllCommentsOfThread = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
-        this._commentLambdaName,
-        'deleteAllCommentsOfThread',
-        {
-          pathParameters: {
-            nodeId: request.params.nodeID,
-            blockId: request.params.blockID,
-            threadId: request.params.threadID,
-          },
-        }
-      );
+      const result = await response.locals.invoker(this._commentLambdaName, 'deleteAllCommentsOfThread', {
+        pathParameters: {
+          nodeId: request.params.nodeID,
+          blockId: request.params.blockID,
+          threadId: request.params.threadID,
+        },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {

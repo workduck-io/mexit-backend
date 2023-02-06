@@ -14,16 +14,9 @@ class BookmarkController {
     initializeBookmarkRoutes(this);
   }
 
-  getBookmarksForUser = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getBookmarksForUser = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
-        this._userStarLambdaFunctionName,
-        'getAllBookmarks'
-      );
+      const result = await response.locals.invoker(this._userStarLambdaFunctionName, 'getAllBookmarks');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -31,17 +24,11 @@ class BookmarkController {
     }
   };
 
-  createBookmark = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  createBookmark = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      await response.locals.invoker(
-        this._userStarLambdaFunctionName,
-        'createBookmark',
-        { pathParameters: { id: request.params.nodeID } }
-      );
+      await response.locals.invoker(this._userStarLambdaFunctionName, 'createBookmark', {
+        pathParameters: { id: request.params.nodeID },
+      });
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
@@ -49,17 +36,11 @@ class BookmarkController {
     }
   };
 
-  removeBookmark = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  removeBookmark = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      await response.locals.invoker(
-        this._userStarLambdaFunctionName,
-        'removeBookmark',
-        { pathParameters: { id: request.params.nodeID } }
-      );
+      await response.locals.invoker(this._userStarLambdaFunctionName, 'removeBookmark', {
+        pathParameters: { id: request.params.nodeID },
+      });
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
@@ -67,19 +48,11 @@ class BookmarkController {
     }
   };
 
-  batchCreateBookmarks = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  batchCreateBookmarks = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      await response.locals.invoker(
-        this._userStarLambdaFunctionName,
-        'batchCreateBookmark',
-        {
-          payload: request.body,
-        }
-      );
+      await response.locals.invoker(this._userStarLambdaFunctionName, 'batchCreateBookmark', {
+        payload: request.body,
+      });
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
@@ -87,17 +60,9 @@ class BookmarkController {
     }
   };
 
-  batchRemoveBookmarks = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  batchRemoveBookmarks = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      await response.locals.invoker(
-        this._userStarLambdaFunctionName,
-        'batchRemoveBookmark',
-        { payload: request.body }
-      );
+      await response.locals.invoker(this._userStarLambdaFunctionName, 'batchRemoveBookmark', { payload: request.body });
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {

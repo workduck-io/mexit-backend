@@ -19,19 +19,13 @@ class HighlightController {
     initializeHighlightRoutes(this);
   }
 
-  createHighlight = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  createHighlight = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const data = new RequestClass(request).data;
       this._redisCache.del(data.entityId);
-      const result = await response.locals.invoker(
-        this._highlightServiceLambdaName,
-        'createHighlight',
-        { payload: data }
-      );
+      const result = await response.locals.invoker(this._highlightServiceLambdaName, 'createHighlight', {
+        payload: data,
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -39,30 +33,20 @@ class HighlightController {
     }
   };
 
-  getMultipleHighlights = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getMultipleHighlights = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const data = new RequestClass(request).data;
-      const cachedHits = (await this._redisCache.mget(data.ids))
-        .filterEmpty()
-        .map(hits => JSON.parse(hits));
+      const cachedHits = (await this._redisCache.mget(data.ids)).filterEmpty().map(hits => JSON.parse(hits));
 
       const nonCachedIds = data.ids.minus(cachedHits.map(item => item.id));
 
       const lambdaResponse = !nonCachedIds.isEmpty()
-        ? await response.locals.invoker(
-            this._highlightServiceLambdaName,
-            'getHighlightByIDs',
-            { payload: { ids: nonCachedIds } }
-          )
+        ? await response.locals.invoker(this._highlightServiceLambdaName, 'getHighlightByIDs', {
+            payload: { ids: nonCachedIds },
+          })
         : [];
 
-      this._redisCache.mset(
-        lambdaResponse.toObject('entityId', JSON.stringify)
-      );
+      this._redisCache.mset(lambdaResponse.toObject('entityId', JSON.stringify));
 
       response.status(statusCodes.OK).json([...lambdaResponse, ...cachedHits]);
     } catch (error) {
@@ -70,16 +54,9 @@ class HighlightController {
     }
   };
 
-  getAllHighlightsOfWorkspace = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAllHighlightsOfWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
-        this._highlightServiceLambdaName,
-        'getAllHighlightsOfWorkspace'
-      );
+      const result = await response.locals.invoker(this._highlightServiceLambdaName, 'getAllHighlightsOfWorkspace');
 
       this._redisCache.mset(result.Items.toObject('entityId', JSON.stringify));
 
@@ -89,18 +66,12 @@ class HighlightController {
     }
   };
 
-  deleteHighlight = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  deleteHighlight = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const entityId = request.params.entityId;
-      await response.locals.invoker(
-        this._highlightServiceLambdaName,
-        'deleteHighlightByID',
-        { pathParameters: { entityId: entityId } }
-      );
+      await response.locals.invoker(this._highlightServiceLambdaName, 'deleteHighlightByID', {
+        pathParameters: { entityId: entityId },
+      });
 
       this._redisCache.del(entityId);
 

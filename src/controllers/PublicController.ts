@@ -18,18 +18,12 @@ class PublicController {
     initializePublicRoutes(this);
   }
 
-  getPublicNode = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getPublicNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const nodeId = request.params.nodeId;
-      const result = await response.locals.invoker(
-        this._nodeLambdaFunctionName,
-        'getPublicNode',
-        { pathParameters: { id: nodeId } }
-      );
+      const result = await response.locals.invoker(this._nodeLambdaFunctionName, 'getPublicNode', {
+        pathParameters: { id: nodeId },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -37,20 +31,13 @@ class PublicController {
     }
   };
 
-  getPublicNamespace = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getPublicNamespace = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const publicNamespace = await response.locals.invoker(
-        this._nsLambdaFunctionName,
-        'getPublicNamespace',
-        { pathParameters: { id: request.params.namespaceID } }
-      );
+      const publicNamespace = await response.locals.invoker(this._nsLambdaFunctionName, 'getPublicNamespace', {
+        pathParameters: { id: request.params.namespaceID },
+      });
 
-      const parsedPublicNS =
-        this._transformer.namespaceHierarchyParser(publicNamespace);
+      const parsedPublicNS = this._transformer.namespaceHierarchyParser(publicNamespace);
       response.status(statusCodes.OK).json(parsedPublicNS);
     } catch (error) {
       next(error);

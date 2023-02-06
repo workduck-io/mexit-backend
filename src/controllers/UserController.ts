@@ -24,11 +24,7 @@ class UserController {
     initializeUserRoutes(this);
   }
 
-  updateUser = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<any> => {
+  updateUser = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     const userId = response.locals.userIdRaw;
     const data = new RequestClass(request, 'User').data;
     data.id = userId;
@@ -38,34 +34,24 @@ class UserController {
     }
 
     try {
-      const result = await response.locals.invoker(
-        this._userLambdaFunctionName,
-        'updateUserDetails',
-        { payload: data }
-      );
+      const result = await response.locals.invoker(this._userLambdaFunctionName, 'updateUserDetails', {
+        payload: data,
+      });
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
     }
   };
 
-  updateUserPreference = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<any> => {
+  updateUserPreference = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
       const userId = response.locals.userIdRaw;
       const requestDetail = new RequestClass(request, 'UserPreference').data;
       requestDetail.id = userId;
 
-      const result = await response.locals.invoker(
-        this._userLambdaFunctionName,
-        'updateUserPreference',
-        {
-          payload: requestDetail,
-        }
-      );
+      const result = await response.locals.invoker(this._userLambdaFunctionName, 'updateUserPreference', {
+        payload: requestDetail,
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -73,16 +59,9 @@ class UserController {
     }
   };
 
-  get = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<any> => {
+  get = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
-      const result = await response.locals.invoker(
-        this._getUserLambdaFunctionName,
-        'getUser'
-      );
+      const result = await response.locals.invoker(this._getUserLambdaFunctionName, 'getUser');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -90,18 +69,12 @@ class UserController {
     }
   };
 
-  getInvite = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<any> => {
+  getInvite = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
       const inviteId = request.params.inviteId;
-      const result = await response.locals.invoker(
-        this._inviteUserLambdaFunctionName,
-        'getInvite',
-        { pathParameters: { inviteId: inviteId } }
-      );
+      const result = await response.locals.invoker(this._inviteUserLambdaFunctionName, 'getInvite', {
+        pathParameters: { inviteId: inviteId },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -109,20 +82,12 @@ class UserController {
     }
   };
 
-  deleteInvite = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<any> => {
+  deleteInvite = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
       const inviteId = request.params.inviteId;
-      await response.locals.invoker(
-        this._inviteUserLambdaFunctionName,
-        'deleteInvite',
-        {
-          pathParameters: { inviteId: inviteId },
-        }
-      );
+      await response.locals.invoker(this._inviteUserLambdaFunctionName, 'deleteInvite', {
+        pathParameters: { inviteId: inviteId },
+      });
 
       response.status(statusCodes.NO_CONTENT).json();
     } catch (error) {
@@ -130,16 +95,9 @@ class UserController {
     }
   };
 
-  getInvitesOfWorkspace = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<any> => {
+  getInvitesOfWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
-      const result = await response.locals.invoker(
-        this._inviteUserLambdaFunctionName,
-        'getAllInviteOfWorkspace'
-      );
+      const result = await response.locals.invoker(this._inviteUserLambdaFunctionName, 'getAllInviteOfWorkspace');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -147,18 +105,12 @@ class UserController {
     }
   };
 
-  createInvite = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<any> => {
+  createInvite = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
       const payload = new RequestClass(request, 'InviteProperties').data;
-      const result = await response.locals.invoker(
-        this._inviteUserLambdaFunctionName,
-        'createInvite',
-        { payload: payload }
-      );
+      const result = await response.locals.invoker(this._inviteUserLambdaFunctionName, 'createInvite', {
+        payload: payload,
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -166,71 +118,44 @@ class UserController {
     }
   };
 
-  getById = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<any> => {
+  getById = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
-      const result = await response.locals.invoker(
-        this._getUserLambdaFunctionName,
-        'getById',
-        {
-          pathParameters: { userId: request.params.id },
-        }
-      );
+      const result = await response.locals.invoker(this._getUserLambdaFunctionName, 'getById', {
+        pathParameters: { userId: request.params.id },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
     }
   };
-  getByMail = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<any> => {
+  getByMail = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
-      const result = await response.locals.invoker(
-        this._getUserLambdaFunctionName,
-        'getByEmail',
-        { pathParameters: { email: request.params.mail } }
-      );
+      const result = await response.locals.invoker(this._getUserLambdaFunctionName, 'getByEmail', {
+        pathParameters: { email: request.params.mail },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
     }
   };
-  getUsersOfWorkspace = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<any> => {
+  getUsersOfWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
-      const result = await response.locals.invoker(
-        this._userLambdaFunctionName,
-        'getUsersOfWorkspace'
-      );
+      const result = await response.locals.invoker(this._userLambdaFunctionName, 'getUsersOfWorkspace');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
     }
   };
-  getUserByLinkedin = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<any> => {
+  getUserByLinkedin = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
       const payload = request.body;
       payload.linkedinURL = payload.linkedinURL.replace(/\/+$/, '');
-      const result = await response.locals.invoker(
-        this._getUserLambdaFunctionName,
-        'getUserByLinkedin',
-        { payload: payload }
-      );
+      const result = await response.locals.invoker(this._getUserLambdaFunctionName, 'getUserByLinkedin', {
+        payload: payload,
+      });
 
       response.status(statusCodes.OK).json({
         mex_user: result.length > 0 ? true : false,
@@ -240,16 +165,9 @@ class UserController {
     }
   };
 
-  registerStatus = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  registerStatus = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const registerStatus = await response.locals.invoker(
-        this._registerStatusLambdaFunctionName,
-        'registerStatus'
-      );
+      const registerStatus = await response.locals.invoker(this._registerStatusLambdaFunctionName, 'registerStatus');
 
       response.status(statusCodes.OK).send(registerStatus);
     } catch (error) {

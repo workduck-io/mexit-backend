@@ -23,11 +23,7 @@ class SharedController {
     initializeSharedRoutes(this);
   }
 
-  shareNode = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  shareNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const body = new RequestClass(request, 'ShareNodeDetail').data;
       await response.locals.invoker(this._nodeLambdaFunctionName, 'shareNode', {
@@ -39,113 +35,62 @@ class SharedController {
       });
 
       body.userIDs.forEach(userID => {
-        this._redisCache.set(
-          this._transformer.encodeCacheKey(
-            this._UserAccessLabel,
-            userID,
-            body.nodeID
-          ),
-          userID
-        );
+        this._redisCache.set(this._transformer.encodeCacheKey(this._UserAccessLabel, userID, body.nodeID), userID);
       });
-      this._redisCache.del(
-        this._transformer.encodeCacheKey(this._UserAccessTypeLabel, body.nodeID)
-      );
+      this._redisCache.del(this._transformer.encodeCacheKey(this._UserAccessTypeLabel, body.nodeID));
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
       next(error);
     }
   };
 
-  updateAccessTypeForSharedNode = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  updateAccessTypeForSharedNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const body = new RequestClass(
-        request,
-        'UpdateAccessTypeForSharedNodeDetail'
-      ).data;
+      const body = new RequestClass(request, 'UpdateAccessTypeForSharedNodeDetail').data;
 
-      const result = await response.locals.invoker(
-        this._nodeLambdaFunctionName,
-        'updateAccessTypeForshareNode',
-        { payload: { ...body, type: 'UpdateAccessTypesRequest' } }
-      );
+      const result = await response.locals.invoker(this._nodeLambdaFunctionName, 'updateAccessTypeForshareNode', {
+        payload: { ...body, type: 'UpdateAccessTypesRequest' },
+      });
 
       Object.keys(body.userIDToAccessTypeMap).forEach(userID => {
-        this._redisCache.set(
-          this._transformer.encodeCacheKey(
-            this._UserAccessLabel,
-            userID,
-            body.nodeID
-          ),
-          userID
-        );
+        this._redisCache.set(this._transformer.encodeCacheKey(this._UserAccessLabel, userID, body.nodeID), userID);
       });
-      this._redisCache.del(
-        this._transformer.encodeCacheKey(
-          this._UserAccessTypeLabel + body.nodeID
-        )
-      );
+      this._redisCache.del(this._transformer.encodeCacheKey(this._UserAccessTypeLabel + body.nodeID));
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
     }
   };
 
-  revokeNodeAccessForUsers = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  revokeNodeAccessForUsers = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const body = request.body;
 
-      await response.locals.invoker(
-        this._nodeLambdaFunctionName,
-        'revokeNodeAccessForUsers',
-        {
-          payload: {
-            ...body,
-            nodeID: body.nodeID,
-            userIDs: body.userIDs,
-          },
-        }
-      );
+      await response.locals.invoker(this._nodeLambdaFunctionName, 'revokeNodeAccessForUsers', {
+        payload: {
+          ...body,
+          nodeID: body.nodeID,
+          userIDs: body.userIDs,
+        },
+      });
 
       body.userIDs.forEach((userID: string) => {
-        this._redisCache.del(
-          this._transformer.encodeCacheKey(
-            this._UserAccessLabel,
-            userID,
-            body.nodeID
-          )
-        );
+        this._redisCache.del(this._transformer.encodeCacheKey(this._UserAccessLabel, userID, body.nodeID));
       });
-      this._redisCache.del(
-        this._transformer.encodeCacheKey(this._UserAccessTypeLabel, body.nodeID)
-      );
+      this._redisCache.del(this._transformer.encodeCacheKey(this._UserAccessTypeLabel, body.nodeID));
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
       next(error);
     }
   };
 
-  getNodeSharedWithUser = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getNodeSharedWithUser = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const nodeID = request.params.nodeId;
 
-      const result = await response.locals.invoker(
-        this._nodeLambdaFunctionName,
-        'getNodeSharedWithUser',
-        { pathParameters: { nodeID: nodeID } }
-      );
+      const result = await response.locals.invoker(this._nodeLambdaFunctionName, 'getNodeSharedWithUser', {
+        pathParameters: { nodeID: nodeID },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -153,19 +98,13 @@ class SharedController {
     }
   };
 
-  updateSharedNode = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  updateSharedNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const body = new RequestClass(request, 'UpdateShareNodeDetail').data;
 
-      const result = await response.locals.invoker(
-        this._nodeLambdaFunctionName,
-        'updateSharedNode',
-        { payload: { ...body, type: 'UpdateSharedNodeRequest' } }
-      );
+      const result = await response.locals.invoker(this._nodeLambdaFunctionName, 'updateSharedNode', {
+        payload: { ...body, type: 'UpdateSharedNodeRequest' },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -173,11 +112,7 @@ class SharedController {
     }
   };
 
-  getUserWithNodesShared = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getUserWithNodesShared = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const nodeId = request.params.nodeId;
 
@@ -188,17 +123,12 @@ class SharedController {
 
       const result = await this._redisCache.getOrSet(
         {
-          key: this._transformer.encodeCacheKey(
-            this._UserAccessTypeLabel,
-            nodeId
-          ),
+          key: this._transformer.encodeCacheKey(this._UserAccessTypeLabel, nodeId),
         },
         () =>
-          response.locals.invoker(
-            this._nodeLambdaFunctionName,
-            'getUsersWithNodesShared',
-            { pathParameters: { id: nodeId } }
-          )
+          response.locals.invoker(this._nodeLambdaFunctionName, 'getUsersWithNodesShared', {
+            pathParameters: { id: nodeId },
+          })
       );
 
       response.status(statusCodes.OK).json(result);
@@ -207,16 +137,9 @@ class SharedController {
     }
   };
 
-  getAllNodesSharedForUser = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAllNodesSharedForUser = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
-        this._nodeLambdaFunctionName,
-        'getAllSharedNodeForUser'
-      );
+      const result = await response.locals.invoker(this._nodeLambdaFunctionName, 'getAllSharedNodeForUser');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -224,24 +147,16 @@ class SharedController {
     }
   };
 
-  getBulkSharedNodes = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getBulkSharedNodes = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const data = new RequestClass(request, 'GetMultipleIds').data;
 
-      const result = await response.locals.invoker(
-        this._nodeLambdaFunctionName,
-        'getNodeSharedWithUser',
-        {
-          allSettled: {
-            ids: data.ids,
-            key: 'nodeID',
-          },
-        }
-      );
+      const result = await response.locals.invoker(this._nodeLambdaFunctionName, 'getNodeSharedWithUser', {
+        allSettled: {
+          ids: data.ids,
+          key: 'nodeID',
+        },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
