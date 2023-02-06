@@ -1,22 +1,24 @@
 import express, { NextFunction, Request, Response } from 'express';
+import { STAGE } from '../env';
 import container from '../inversify.config';
+import { InvocationType } from '../libs/LambdaClass';
 import { Redis } from '../libs/RedisClass';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
-import { CommentManager } from '../managers/CommentManager';
 import { initializeCommentRoutes } from '../routes/CommentRoutes';
 
 class CommentController {
   public _urlPath = '/comment';
   public _router = express.Router();
 
-  private _commentManager: CommentManager =
-    container.get<CommentManager>(CommentManager);
   private _transformer: Transformer = container.get<Transformer>(Transformer);
   private _cache: Redis = container.get<Redis>(Redis);
   private _UserAccessLabel = 'USERACCESS';
   private _CommentBlockLabel = 'COMMENTBLOCK';
+
+  private _lambdaInvocationType: InvocationType = 'RequestResponse';
+  private _commentLambdaName = `comment-${STAGE}-main`;
 
   constructor() {
     initializeCommentRoutes(this);
@@ -28,12 +30,18 @@ class CommentController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._commentManager.getCommentByID(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.nodeID,
-        request.params.entityID
+      const result = await response.locals.invoker(
+        this._commentLambdaName,
+        this._lambdaInvocationType,
+        'getCommentByID',
+        {
+          pathParameters: {
+            entityId: request.params.entityID,
+            nodeId: request.params.nodeId,
+          },
+        }
       );
+
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -50,10 +58,11 @@ class CommentController {
       this._cache.del(
         this._transformer.encodeCacheKey(this._CommentBlockLabel, data.blockId)
       );
-      const result = await this._commentManager.createComment(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        data
+      const result = await response.locals.invoker(
+        this._commentLambdaName,
+        this._lambdaInvocationType,
+        'createComment',
+        { payload: data }
       );
 
       response.status(statusCodes.OK).json(result);
@@ -68,11 +77,16 @@ class CommentController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      await this._commentManager.deleteCommentByID(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.nodeID,
-        request.params.entityID
+      await response.locals.invoker(
+        this._commentLambdaName,
+        this._lambdaInvocationType,
+        'deleteCommentByID',
+        {
+          pathParameters: {
+            entityId: request.params.entityID,
+            nodeId: request.params.nodeID,
+          },
+        }
       );
 
       response.status(statusCodes.NO_CONTENT).send();
@@ -87,10 +101,13 @@ class CommentController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._commentManager.getAllCommentsOfNode(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.nodeID
+      const result = await response.locals.invoker(
+        this._commentLambdaName,
+        this._lambdaInvocationType,
+        'getAllCommentsOfNode',
+        {
+          pathParameters: { nodeId: request.params.nodeID },
+        }
       );
 
       response.status(statusCodes.OK).json(result);
@@ -119,11 +136,16 @@ class CommentController {
           force: !this._cache.has(userSpecificNodeKey),
         },
         () =>
-          this._commentManager.getAllCommentsOfBlock(
-            response.locals.workspaceID,
-            response.locals.idToken,
-            request.params.nodeID,
-            request.params.blockID
+          response.locals.invoker(
+            this._commentLambdaName,
+            this._lambdaInvocationType,
+            'getAllCommentsOfBlock',
+            {
+              pathParameters: {
+                nodeId: request.params.nodeID,
+                blockId: request.params.blockID,
+              },
+            }
           )
       );
 
@@ -160,17 +182,23 @@ class CommentController {
 
       const nonCachedIds = ids.minus(cachedHits.map(item => item.blockId));
 
-      const managerResponse = !nonCachedIds.isEmpty()
-        ? await this._commentManager.getAllCommentsOfBlocks(
-            response.locals.workspaceID,
-            response.locals.idToken,
-            request.params.nodeID,
-            cachedUserAccess ? nonCachedIds : ids
+      const lambdaResponse = !nonCachedIds.isEmpty()
+        ? await response.locals.invoker(
+            this._commentLambdaName,
+            this._lambdaInvocationType,
+            'getAllCommentsOfBlock',
+            {
+              pathParameters: { nodeId: request.params.nodeID },
+              allSettled: {
+                ids: cachedUserAccess ? nonCachedIds : ids,
+                key: 'blockId',
+              },
+            }
           )
         : { successful: [], failed: [] };
 
       await this._cache.mset(
-        managerResponse.successful.toObject(
+        lambdaResponse.successful.toObject(
           item =>
             this._transformer.encodeCacheKey(
               this._CommentBlockLabel,
@@ -183,10 +211,10 @@ class CommentController {
       response.status(statusCodes.OK).json(
         cachedUserAccess
           ? {
-              failed: managerResponse.failed,
-              successful: [...managerResponse.successful, ...cachedHits],
+              failed: lambdaResponse.failed,
+              successful: [...lambdaResponse.successful, ...cachedHits],
             }
-          : managerResponse
+          : lambdaResponse
       );
     } catch (error) {
       next(error);
@@ -199,12 +227,17 @@ class CommentController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._commentManager.getAllCommentsOfThread(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.nodeID,
-        request.params.blockID,
-        request.params.threadID
+      const result = await response.locals.invoker(
+        this._commentLambdaName,
+        this._lambdaInvocationType,
+        'getAllCommentsOfThread',
+        {
+          pathParameters: {
+            nodeId: request.params.nodeID,
+            blockId: request.params.blockID,
+            threadId: request.params.threadID,
+          },
+        }
       );
 
       response.status(statusCodes.OK).json(result);
@@ -219,10 +252,15 @@ class CommentController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._commentManager.deleteAllCommentsOfNode(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.nodeID
+      const result = await response.locals.invoker(
+        this._commentLambdaName,
+        this._lambdaInvocationType,
+        'deleteAllCommentsOfNode',
+        {
+          pathParameters: {
+            nodeId: request.params.nodeID,
+          },
+        }
       );
 
       response.status(statusCodes.NO_CONTENT).json(result);
@@ -243,11 +281,16 @@ class CommentController {
           request.params.blockID
         )
       );
-      const result = await this._commentManager.deleteAllCommentsOfBlock(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.nodeID,
-        request.params.blockID
+      const result = await response.locals.invoker(
+        this._commentLambdaName,
+        this._lambdaInvocationType,
+        'deleteAllCommentsOfBlock',
+        {
+          pathParameters: {
+            nodeId: request.params.nodeID,
+            blockId: request.params.blockID,
+          },
+        }
       );
 
       response.status(statusCodes.OK).json(result);
@@ -262,12 +305,17 @@ class CommentController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._commentManager.deleteAllCommentsOfThread(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.nodeID,
-        request.params.blockID,
-        request.params.threadID
+      const result = await response.locals.invoker(
+        this._commentLambdaName,
+        this._lambdaInvocationType,
+        'deleteAllCommentsOfThread',
+        {
+          pathParameters: {
+            nodeId: request.params.nodeID,
+            blockId: request.params.blockID,
+            threadId: request.params.threadID,
+          },
+        }
       );
 
       response.status(statusCodes.OK).json(result);

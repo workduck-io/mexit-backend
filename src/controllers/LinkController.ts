@@ -2,14 +2,16 @@ import express, { NextFunction, Request, Response } from 'express';
 import { RequestClass } from '../libs/RequestClass';
 import container from '../inversify.config';
 import { statusCodes } from '../libs/statusCodes';
-import { LinkManager } from '../managers/LinkManager';
 import { initializeLinkRoutes } from '../routes/LinkRoutes';
+import { STAGE } from '../env';
+import { InvocationType } from '../libs/LambdaClass';
 
 class LinkController {
   public _urlPath = '/link';
   public _router = express.Router();
 
-  public _linkManager: LinkManager = container.get<LinkManager>(LinkManager);
+  private _lambdaInvocationType: InvocationType = 'RequestResponse';
+  private _linkServiceLambdaBase = `mex-url-shortner-${STAGE}`;
 
   constructor() {
     initializeLinkRoutes(this);
@@ -22,10 +24,13 @@ class LinkController {
   ): Promise<void> => {
     try {
       const data = new RequestClass(request, 'ShortenLink').data;
-      const result = await this._linkManager.createNewShort(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        data
+      const result = await response.locals.invoker(
+        `${this._linkServiceLambdaBase}-shorten`,
+        this._lambdaInvocationType,
+        undefined,
+        {
+          payload: data,
+        }
       );
 
       response.status(statusCodes.OK).json(result);
@@ -40,9 +45,10 @@ class LinkController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._linkManager.getAllShortsOfWorkspace(
-        response.locals.workspaceID,
-        response.locals.idToken
+      const result = await response.locals.invoker(
+        `${this._linkServiceLambdaBase}-workspaceDetails`,
+        this._lambdaInvocationType,
+        undefined
       );
 
       response.status(statusCodes.OK).json(result);
@@ -57,10 +63,13 @@ class LinkController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._linkManager.deleteShort(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.url
+      const result = await response.locals.invoker(
+        `${this._linkServiceLambdaBase}-del`,
+        this._lambdaInvocationType,
+        undefined,
+        {
+          pathParameters: { url: request.params.url },
+        }
       );
 
       response.status(statusCodes.OK).json(result);
@@ -75,10 +84,13 @@ class LinkController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._linkManager.getStatsByURL(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.url
+      const result = await response.locals.invoker(
+        `${this._linkServiceLambdaBase}-stats`,
+        this._lambdaInvocationType,
+        undefined,
+        {
+          pathParameters: { url: request.params.url },
+        }
       );
 
       response.status(statusCodes.OK).json(result);

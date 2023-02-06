@@ -2,16 +2,23 @@ import express, { NextFunction, Request, Response } from 'express';
 import container from '../inversify.config';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
-import { UserManager } from '../managers/UserManager';
 import { initializeUserRoutes } from '../routes/UserRoutes';
 import { Transformer } from './../libs/TransformerClass';
+import { STAGE } from '../env';
+import { InvocationType } from '../libs/LambdaClass';
 
 class UserController {
   public _urlPath = '/user';
   public _router = express.Router();
 
-  public _userManager: UserManager = container.get<UserManager>(UserManager);
   public _transformer: Transformer = container.get<Transformer>(Transformer);
+
+  private _lambdaInvocationType: InvocationType = 'RequestResponse';
+  private _userLambdaFunctionName = `workduck-user-service-${STAGE}-user`;
+  private _getUserLambdaFunctionName = `workduck-user-service-${STAGE}-getUser`;
+  private _userMexBackendLambdaFunctionName = `mex-backend-${STAGE}-User`;
+  private _registerStatusLambdaFunctionName = `workduck-user-service-${STAGE}-registerStatus`;
+  private _inviteUserLambdaFunctionName = `workduck-user-service-${STAGE}-invite`;
 
   constructor() {
     initializeUserRoutes(this);
@@ -23,21 +30,19 @@ class UserController {
     next: NextFunction
   ): Promise<any> => {
     const userId = response.locals.userIdRaw;
-    const requestDetail = new RequestClass(request, 'User');
-    requestDetail.data.id = userId;
+    const data = new RequestClass(request, 'User').data;
+    data.id = userId;
 
-    if (requestDetail.data.linkedinURL) {
-      requestDetail.data.linkedinURL = requestDetail.data.linkedinURL.replace(
-        /\/+$/,
-        ''
-      );
+    if (data.linkedinURL) {
+      data.linkedinURL = data.linkedinURL.replace(/\/+$/, '');
     }
 
     try {
-      const result = await this._userManager.updateUserDetails(
-        requestDetail.data,
-        response.locals.workspaceID,
-        response.locals.idToken
+      const result = await response.locals.invoker(
+        this._userLambdaFunctionName,
+        this._lambdaInvocationType,
+        'updateUserDetails',
+        { payload: data }
       );
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -55,26 +60,33 @@ class UserController {
       const requestDetail = new RequestClass(request, 'UserPreference').data;
       requestDetail.id = userId;
 
-      const result = await this._userManager.updateUserPreference(
-        requestDetail,
-        response.locals.workspaceID,
-        response.locals.idToken
+      const result = await response.locals.invoker(
+        this._userLambdaFunctionName,
+        this._lambdaInvocationType,
+        'updateUserPreference',
+        {
+          payload: requestDetail,
+        }
       );
+
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
     }
   };
+
   get = async (
     request: Request,
     response: Response,
     next: NextFunction
   ): Promise<any> => {
     try {
-      const result = await this._userManager.get(
-        response.locals.workspaceID,
-        response.locals.idToken
+      const result = await response.locals.invoker(
+        this._getUserLambdaFunctionName,
+        this._lambdaInvocationType,
+        'getUser'
       );
+
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -88,7 +100,13 @@ class UserController {
   ): Promise<any> => {
     try {
       const inviteId = request.params.inviteId;
-      const result = await this._userManager.getInvite(inviteId);
+      const result = await response.locals.invoker(
+        this._inviteUserLambdaFunctionName,
+        this._lambdaInvocationType,
+        'getInvite',
+        { pathParameters: { inviteId: inviteId } }
+      );
+
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -102,11 +120,15 @@ class UserController {
   ): Promise<any> => {
     try {
       const inviteId = request.params.inviteId;
-      await this._userManager.deleteInvite(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        inviteId
+      await response.locals.invoker(
+        this._inviteUserLambdaFunctionName,
+        this._lambdaInvocationType,
+        'deleteInvite',
+        {
+          pathParameters: { inviteId: inviteId },
+        }
       );
+
       response.status(statusCodes.NO_CONTENT).json();
     } catch (error) {
       next(error);
@@ -119,10 +141,12 @@ class UserController {
     next: NextFunction
   ): Promise<any> => {
     try {
-      const result = await this._userManager.getInvitesOfWorkspace(
-        response.locals.workspaceID,
-        response.locals.idToken
+      const result = await response.locals.invoker(
+        this._inviteUserLambdaFunctionName,
+        this._lambdaInvocationType,
+        'getAllInviteOfWorkspace'
       );
+
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -136,11 +160,13 @@ class UserController {
   ): Promise<any> => {
     try {
       const payload = new RequestClass(request, 'InviteProperties').data;
-      const result = await this._userManager.createInvite(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        payload
+      const result = await response.locals.invoker(
+        this._inviteUserLambdaFunctionName,
+        this._lambdaInvocationType,
+        'createInvite',
+        { payload: payload }
       );
+
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -153,7 +179,15 @@ class UserController {
     next: NextFunction
   ): Promise<any> => {
     try {
-      const result = await this._userManager.getById(request.params.id);
+      const result = await response.locals.invoker(
+        this._getUserLambdaFunctionName,
+        this._lambdaInvocationType,
+        'getById',
+        {
+          pathParameters: { userId: request.params.id },
+        }
+      );
+
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -165,7 +199,13 @@ class UserController {
     next: NextFunction
   ): Promise<any> => {
     try {
-      const result = await this._userManager.getByMail(request.params.mail);
+      const result = await response.locals.invoker(
+        this._getUserLambdaFunctionName,
+        this._lambdaInvocationType,
+        'getByEmail',
+        { pathParameters: { email: request.params.mail } }
+      );
+
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -177,10 +217,12 @@ class UserController {
     next: NextFunction
   ): Promise<any> => {
     try {
-      const result = await this._userManager.getUsersOfWorkspace(
-        response.locals.workspaceID,
-        response.locals.idToken
+      const result = await response.locals.invoker(
+        this._userLambdaFunctionName,
+        this._lambdaInvocationType,
+        'getUsersOfWorkspace'
       );
+
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -192,8 +234,14 @@ class UserController {
     next: NextFunction
   ): Promise<any> => {
     try {
-      request.body.linkedinURL = request.body.linkedinURL.replace(/\/+$/, '');
-      const result = await this._userManager.getUserByLinkedin(request.body);
+      const payload = request.body;
+      payload.linkedinURL = payload.linkedinURL.replace(/\/+$/, '');
+      const result = await response.locals.invoker(
+        this._getUserLambdaFunctionName,
+        this._lambdaInvocationType,
+        'getUserByLinkedin',
+        { payload: payload }
+      );
 
       response.status(statusCodes.OK).json({
         mex_user: result.length > 0 ? true : false,
@@ -209,8 +257,10 @@ class UserController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const registerStatus = await this._userManager.registerStatus(
-        response.locals.idToken
+      const registerStatus = await response.locals.invoker(
+        this._registerStatusLambdaFunctionName,
+        this._lambdaInvocationType,
+        'registerStatus'
       );
 
       response.status(statusCodes.OK).send(registerStatus);

@@ -1,9 +1,10 @@
 import express, { NextFunction, Request, Response } from 'express';
+import { STAGE } from '../env';
 import container from '../inversify.config';
+import { InvocationType } from '../libs/LambdaClass';
 import { Redis } from '../libs/RedisClass';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
-import { ActionManager } from '../managers/ActionManager';
 import { initializeActionRoutes } from '../routes/ActionRoutes';
 
 class ActionController {
@@ -11,8 +12,20 @@ class ActionController {
   public _router = express.Router();
   private _redisCache: Redis = container.get<Redis>(Redis);
 
-  public _actionManager: ActionManager =
-    container.get<ActionManager>(ActionManager);
+  private _lambdaInvocationType: InvocationType = 'RequestResponse';
+  private _linkServiceLambdaBase = `mex-url-shortner-${STAGE}`;
+  private _lambdaName = {
+    action: {
+      getAll: `actionHelperService-${STAGE}-getAllActionGroups`,
+      get: `actionHelperService-${STAGE}-getAction`,
+    },
+    auth: {
+      get: `authService-${STAGE}-getAuth`,
+      getAll: `authService-${STAGE}-getAllAuths`,
+      update: `authService-${STAGE}-updateCurrentWorkspace`,
+      refresh: `authService-${STAGE}-refreshWorkspaceAuth`,
+    },
+  };
 
   constructor() {
     initializeActionRoutes(this);
@@ -24,11 +37,16 @@ class ActionController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const managerResponse = this._actionManager.getAction(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.groupId,
-        request.params.actionId
+      const managerResponse = response.locals.invoker(
+        this._lambdaName.action.get,
+        this._lambdaInvocationType,
+        'getAction',
+        {
+          pathParameters: {
+            actionGroupId: request.params.groupId,
+            actionId: request.params.actionId,
+          },
+        }
       );
 
       const result = await this._redisCache.getOrSet(
@@ -55,10 +73,13 @@ class ActionController {
           key: request.params.groupId,
         },
         async () =>
-          await this._actionManager.getAllActions(
-            response.locals.workspaceID,
-            response.locals.idToken,
-            request.params.groupId
+          await response.locals.invoker(
+            this._lambdaName.action.getAll,
+            this._lambdaInvocationType,
+            'getActionsOfActionGroup',
+            {
+              pathParameters: { actionGroupId: request.params.groupId },
+            }
           )
       );
 
@@ -74,9 +95,10 @@ class ActionController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._actionManager.getAllAuths(
-        response.locals.workspaceID,
-        response.locals.idToken
+      const result = await response.locals.invoker(
+        this._lambdaName.auth.getAll,
+        this._lambdaInvocationType,
+        'getAllAuths'
       );
 
       response.status(statusCodes.OK).json(result);
@@ -91,10 +113,11 @@ class ActionController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._actionManager.getAuth(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.authId
+      const result = await response.locals.invoker(
+        this._lambdaName.auth.get,
+        this._lambdaInvocationType,
+        'getAuth',
+        { pathParameters: { authTypeId: request.params.authId } }
       );
 
       response.status(statusCodes.OK).json(result);
@@ -109,10 +132,11 @@ class ActionController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._actionManager.refreshAuth(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.source
+      const result = await response.locals.invoker(
+        this._lambdaName.auth.refresh,
+        this._lambdaInvocationType,
+        'refreshAuth',
+        { pathParameters: { source: request.params.source } }
       );
 
       response.status(statusCodes.OK).json(result);
@@ -129,11 +153,13 @@ class ActionController {
     try {
       const data = new RequestClass(request).data;
 
-      const result = await this._actionManager.updateAuth(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.authId,
-        data
+      const result = await response.locals.invoker(
+        this._lambdaName.auth.update,
+        this._lambdaInvocationType,
+        'updateAuth',
+        {
+          pathParameters: { authTypeId: request.params.authId, payload: data },
+        }
       );
 
       response.status(statusCodes.OK).json(result);
