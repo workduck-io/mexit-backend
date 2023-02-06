@@ -94,7 +94,6 @@ const application = new App([
   new PublicController(),
   new SharedController(),
   new SnippetController(),
-  new TagController(),
   new UserController(),
   new NamespaceController(),
   new ReminderController(),
