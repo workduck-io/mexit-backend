@@ -26,9 +26,9 @@ class LinkController {
       const data = new RequestClass(request, 'ShortenLink').data;
       const result = await response.locals.invoker(
         `${this._linkServiceLambdaBase}-shorten`,
-
         undefined,
         {
+          httpMethod: 'POST',
           payload: data,
         }
       );
@@ -47,8 +47,8 @@ class LinkController {
     try {
       const result = await response.locals.invoker(
         `${this._linkServiceLambdaBase}-workspaceDetails`,
-
-        undefined
+        undefined,
+        { httpMethod: 'GET' }
       );
 
       response.status(statusCodes.OK).json(result);
@@ -65,9 +65,9 @@ class LinkController {
     try {
       const result = await response.locals.invoker(
         `${this._linkServiceLambdaBase}-del`,
-
         undefined,
         {
+          httpMethod: 'DELETE',
           pathParameters: { url: request.params.url },
         }
       );
@@ -89,6 +89,7 @@ class LinkController {
 
         undefined,
         {
+          httpMethod: 'GET',
           pathParameters: { url: request.params.url },
         }
       );

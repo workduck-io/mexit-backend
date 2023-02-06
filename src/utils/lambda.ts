@@ -13,6 +13,7 @@ export interface LambdaInvokePayloadOptions<T> {
     ids: string[];
     key: string;
   };
+  httpMethod?: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 }
 export const generateLambdaInvokePayload = <T = any>(
   locals: LocalsX,
@@ -31,7 +32,7 @@ export const generateLambdaInvokePayload = <T = any>(
   const rKeyVal = RouteKeys[routeKey];
 
   return {
-    httpMethod: rKeyVal.split(' ')[0],
+    httpMethod: options?.httpMethod ?? rKeyVal.split(' ')[0],
     ...(rKeyVal && { routeKey: rKeyVal }),
     headers: headers,
     ...(options?.payload && { payload: options.payload }),

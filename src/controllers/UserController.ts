@@ -83,7 +83,6 @@ class UserController {
     try {
       const result = await response.locals.invoker(
         this._getUserLambdaFunctionName,
-
         'getUser'
       );
 
