@@ -1,4 +1,4 @@
-import { LocalsX } from '../interfaces/Locals';
+import { type LocalsX } from '../interfaces/Locals';
 import { LambdaOptions } from '../libs/LambdaClass';
 
 import { RouteKeys } from '../libs/routeKeys';

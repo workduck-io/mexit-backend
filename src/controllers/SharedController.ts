@@ -1,22 +1,22 @@
 import express, { NextFunction, Request, Response } from 'express';
+import { STAGE } from '../env';
 import container from '../inversify.config';
 import { Redis } from '../libs/RedisClass';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
-import { SharedManager } from '../managers/SharedManager';
 import { initializeSharedRoutes } from '../routes/SharedRoutes';
 
 class SharedController {
   public _urlPath = '/shared';
   public _router = express.Router();
-  public _sharedManager: SharedManager =
-    container.get<SharedManager>(SharedManager);
-  public _transformer: Transformer = container.get<Transformer>(Transformer);
+
+  private _transformer: Transformer = container.get<Transformer>(Transformer);
   private _redisCache: Redis = container.get<Redis>(Redis);
 
   private _UserAccessLabel = 'USERACCESS';
   private _UserAccessTypeLabel = 'USERACCESSTYPE';
+  private _nodeLambdaFunctionName = `mex-backend-${STAGE}-Node`;
 
   constructor() {
     initializeSharedRoutes(this);
@@ -28,27 +28,27 @@ class SharedController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const requestDetail = new RequestClass(request, 'ShareNodeDetail');
-      const result = await this._sharedManager.shareNode(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        requestDetail.data
-      );
-      requestDetail.data.userIDs.forEach(userID => {
+      const body = new RequestClass(request, 'ShareNodeDetail').data;
+      await response.locals.invoker(this._nodeLambdaFunctionName, 'shareNode', {
+        payload: {
+          ...body,
+          nodeID: body.nodeID,
+          userIDs: body.userIDs,
+        },
+      });
+
+      body.userIDs.forEach(userID => {
         this._redisCache.set(
           this._transformer.encodeCacheKey(
             this._UserAccessLabel,
             userID,
-            requestDetail.data.nodeID
+            body.nodeID
           ),
           userID
         );
       });
       this._redisCache.del(
-        this._transformer.encodeCacheKey(
-          this._UserAccessTypeLabel,
-          requestDetail.data.nodeID
-        )
+        this._transformer.encodeCacheKey(this._UserAccessTypeLabel, body.nodeID)
       );
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
@@ -62,29 +62,30 @@ class SharedController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const requestDetail = new RequestClass(
+      const body = new RequestClass(
         request,
         'UpdateAccessTypeForSharedNodeDetail'
+      ).data;
+
+      const result = await response.locals.invoker(
+        this._nodeLambdaFunctionName,
+        'updateAccessTypeForshareNode',
+        { payload: { ...body, type: 'UpdateAccessTypesRequest' } }
       );
 
-      const result = await this._sharedManager.updateAccessTypeForSharedNode(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        requestDetail.data
-      );
-      Object.keys(requestDetail.data.userIDToAccessTypeMap).forEach(userID => {
+      Object.keys(body.userIDToAccessTypeMap).forEach(userID => {
         this._redisCache.set(
           this._transformer.encodeCacheKey(
             this._UserAccessLabel,
             userID,
-            requestDetail.data.nodeID
+            body.nodeID
           ),
           userID
         );
       });
       this._redisCache.del(
         this._transformer.encodeCacheKey(
-          this._UserAccessTypeLabel + requestDetail.data.nodeID
+          this._UserAccessTypeLabel + body.nodeID
         )
       );
       response.status(statusCodes.OK).json(result);
@@ -101,11 +102,18 @@ class SharedController {
     try {
       const body = request.body;
 
-      const result = await this._sharedManager.revokeNodeAccessForUsers(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        body
+      await response.locals.invoker(
+        this._nodeLambdaFunctionName,
+        'revokeNodeAccessForUsers',
+        {
+          payload: {
+            ...body,
+            nodeID: body.nodeID,
+            userIDs: body.userIDs,
+          },
+        }
       );
+
       body.userIDs.forEach((userID: string) => {
         this._redisCache.del(
           this._transformer.encodeCacheKey(
@@ -130,13 +138,14 @@ class SharedController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const nodeId = request.params.nodeId;
+      const nodeID = request.params.nodeId;
 
-      const result = await this._sharedManager.getNodeSharedWithUser(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        nodeId
+      const result = await response.locals.invoker(
+        this._nodeLambdaFunctionName,
+        'getNodeSharedWithUser',
+        { pathParameters: { nodeID: nodeID } }
       );
+
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -149,13 +158,14 @@ class SharedController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const requestDetail = new RequestClass(request, 'UpdateShareNodeDetail');
+      const body = new RequestClass(request, 'UpdateShareNodeDetail').data;
 
-      const result = await this._sharedManager.updateSharedNode(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        requestDetail.data
+      const result = await response.locals.invoker(
+        this._nodeLambdaFunctionName,
+        'updateSharedNode',
+        { payload: { ...body, type: 'UpdateSharedNodeRequest' } }
       );
+
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -183,10 +193,10 @@ class SharedController {
           ),
         },
         () =>
-          this._sharedManager.getUserWithNodesShared(
-            response.locals.workspaceID,
-            response.locals.idToken,
-            nodeId
+          response.locals.invoker(
+            this._nodeLambdaFunctionName,
+            'getUsersWithNodesShared',
+            { pathParameters: { id: nodeId } }
           )
       );
 
@@ -202,10 +212,11 @@ class SharedController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._sharedManager.getAllNodesSharedForUser(
-        response.locals.workspaceID,
-        response.locals.idToken
+      const result = await response.locals.invoker(
+        this._nodeLambdaFunctionName,
+        'getAllSharedNodeForUser'
       );
+
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -219,10 +230,16 @@ class SharedController {
   ): Promise<void> => {
     try {
       const data = new RequestClass(request, 'GetMultipleIds').data;
-      const result = await this._sharedManager.bulkGetSharedNodes(
-        data.ids,
-        response.locals.workspaceID,
-        response.locals.idToken
+
+      const result = await response.locals.invoker(
+        this._nodeLambdaFunctionName,
+        'getNodeSharedWithUser',
+        {
+          allSettled: {
+            ids: data.ids,
+            key: 'nodeID',
+          },
+        }
       );
 
       response.status(statusCodes.OK).json(result);

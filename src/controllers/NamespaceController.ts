@@ -1,34 +1,40 @@
 import express, { NextFunction, Request, Response } from 'express';
+import { STAGE } from '../env';
+import { LocalsX } from '../interfaces/Locals';
 import container from '../inversify.config';
+import { invokeAndCheck } from '../libs/LambdaClass';
 import { Redis } from '../libs/RedisClass';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
-import { NamespaceManager } from '../managers/NamespaceManager';
 import { initializeNamespaceRoutes } from '../routes/NamespaceRoutes';
+import { generateLambdaInvokePayload } from '../utils/lambda';
 
 class NamespaceController {
   public _urlPath = '/namespace';
   public _router = express.Router();
-  public _namespaceManager: NamespaceManager =
-    container.get<NamespaceManager>(NamespaceManager);
-  public _transformer: Transformer = container.get<Transformer>(Transformer);
-  public _cache: Redis = container.get<Redis>(Redis);
+
+  private _transformer: Transformer = container.get<Transformer>(Transformer);
+  private _cache: Redis = container.get<Redis>(Redis);
   private _NSHierarchyLabel = 'NSHIERARCHY';
+  private _namespaceLambdaFunctionName = `mex-backend-${STAGE}-Namespace`;
 
   constructor() {
     initializeNamespaceRoutes(this);
   }
 
   updateILinkCache = async (
-    workspaceId: string,
-    idToken: string,
+    locals: LocalsX,
     namespaceID: string
   ): Promise<any> => {
-    const namespace = await this._namespaceManager.getNamespace(
-      workspaceId,
-      idToken,
-      namespaceID
+    const payload = generateLambdaInvokePayload(locals, 'getNamespace', {
+      pathParameters: { id: namespaceID },
+    });
+
+    const namespace = await invokeAndCheck(
+      this._namespaceLambdaFunctionName,
+      'RequestResponse',
+      payload
     );
     await this._cache.set(namespaceID, namespace);
   };
@@ -40,10 +46,11 @@ class NamespaceController {
   ): Promise<void> => {
     try {
       const body = new RequestClass(request, 'CreateNamespace').data;
-      await this._namespaceManager.createNamespace(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        body
+
+      response.locals.invoker(
+        this._namespaceLambdaFunctionName,
+        'createNamespace',
+        { payload: { ...body, type: 'NamespaceRequest' } }
       );
 
       response.status(statusCodes.NO_CONTENT).send();
@@ -58,15 +65,16 @@ class NamespaceController {
     next: NextFunction
   ): Promise<void> => {
     try {
+      const namespaceID = request.params.namespaceID;
       const namespace = await this._cache.getOrSet(
         {
-          key: request.params.namespaceID,
+          key: namespaceID,
         },
         () =>
-          this._namespaceManager.getNamespace(
-            response.locals.workspaceID,
-            response.locals.idToken,
-            request.params.namespaceID
+          response.locals.invoker(
+            this._namespaceLambdaFunctionName,
+            'getNamespace',
+            { pathParameters: { id: namespaceID } }
           )
       );
 
@@ -84,12 +92,12 @@ class NamespaceController {
   ): Promise<void> => {
     try {
       const body = new RequestClass(request, 'UpdateNamespace').data;
-
-      await this._namespaceManager.updateNamespace(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        body
+      await response.locals.invoker(
+        this._namespaceLambdaFunctionName,
+        'updateNamespace',
+        { payload: { ...body, type: 'NamespaceRequest' } }
       );
+
       await this._cache.del(body.id);
 
       response.status(statusCodes.NO_CONTENT).send();
@@ -104,12 +112,13 @@ class NamespaceController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      await this._namespaceManager.makeNamespacePublic(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.namespaceID
+      const namespaceID = request.params.namespaceID;
+      await response.locals.invoker(
+        this._namespaceLambdaFunctionName,
+        'makeNamespacePublic',
+        { pathParameters: { id: namespaceID } }
       );
-      await this._cache.del(request.params.namespaceID);
+      await this._cache.del(namespaceID);
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
@@ -123,12 +132,13 @@ class NamespaceController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      await this._namespaceManager.makeNamespacePrivate(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.namespaceID
+      const namespaceID = request.params.namespaceID;
+      await response.locals.invoker(
+        this._namespaceLambdaFunctionName,
+        'makeNamespacePrivate',
+        { pathParameters: { id: namespaceID } }
       );
-      await this._cache.del(request.params.namespaceID);
+      await this._cache.del(namespaceID);
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
@@ -142,9 +152,9 @@ class NamespaceController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result: any[] = await this._namespaceManager.getAllNamespaces(
-        response.locals.workspaceID,
-        response.locals.idToken
+      const result: any[] = await response.locals.invoker(
+        this._namespaceLambdaFunctionName,
+        'getAllNamespaces'
       );
 
       const transformedResult = result.toObject('namespaceID');
@@ -155,15 +165,18 @@ class NamespaceController {
         .map(hits => JSON.parse(hits));
       const nonCachedIds = ids.minus(cachedHits.map(item => item.id));
 
-      const promises = nonCachedIds.map(id =>
-        this._namespaceManager.getNamespace(
-          response.locals.workspaceID,
-          response.locals.idToken,
-          id
+      const allNamespacesResults = (
+        await response.locals.invoker(
+          this._namespaceLambdaFunctionName,
+          'getNamespace',
+          {
+            allSettled: {
+              ids: nonCachedIds,
+              key: 'id',
+            },
+          }
         )
-      );
-
-      const allNamespacesResults = await (await Promise.allSettled(promises))
+      )
         .filter(p => p.status === 'fulfilled')
         .map((p: PromiseFulfilledResult<any>) => p.value);
 
@@ -204,11 +217,12 @@ class NamespaceController {
           force: forceRefresh,
         },
         async () => {
-          const result = await this._namespaceManager.getAllNamespaceHierarchy(
-            response.locals.workspaceID,
-            response.locals.idToken,
-            getMetadata
+          const result = await response.locals.invoker(
+            this._namespaceLambdaFunctionName,
+            'getAllNamespaceHierarchy',
+            { queryStringParameters: { getMetadata: getMetadata } }
           );
+
           const namespaceInfo = getMetadata ? result.hierarchy : result;
           const nodesMetadata = getMetadata ? result.nodesMetadata : undefined;
           return JSON.stringify(
@@ -255,10 +269,10 @@ class NamespaceController {
       });
 
       const promises = backendRequestBodies.map(i =>
-        this._namespaceManager.shareNamespace(
-          response.locals.workspaceID,
-          response.locals.idToken,
-          i
+        response.locals.invoker(
+          this._namespaceLambdaFunctionName,
+          'shareNamespace',
+          { payload: i }
         )
       );
 
@@ -277,10 +291,11 @@ class NamespaceController {
   ): Promise<void> => {
     try {
       const body = new RequestClass(request, 'RevokeAccessFromNamespace').data;
-      await this._namespaceManager.revokeAccessFromNamespace(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        body
+
+      await response.locals.invoker(
+        this._namespaceLambdaFunctionName,
+        'revokeUserAccessFromNamespace',
+        { payload: { ...body, type: 'SharedNamespaceRequest' } }
       );
 
       response.status(statusCodes.NO_CONTENT).send();
@@ -295,11 +310,12 @@ class NamespaceController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._namespaceManager.getUsersOfSharedNamespace(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.namespaceID
+      const result = await response.locals.invoker(
+        this._namespaceLambdaFunctionName,
+        'getUsersOfSharedNamespace',
+        { pathParameters: { id: request.params.namespaceID } }
       );
+
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -312,12 +328,16 @@ class NamespaceController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result: string = await this._namespaceManager.getNodeIDFromPath(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.namespaceID,
-        request.params.path,
-        request.query['nodeID'] as string
+      const { path, namespaceID } = request.params;
+      const nodeID = request.query['nodeID'] as string;
+
+      const result: string = await response.locals.invoker(
+        this._namespaceLambdaFunctionName,
+        'getNodeIDFromPath',
+        {
+          pathParameters: { namespaceID: namespaceID, path: path },
+          ...(nodeID && { queryStringParameters: { nodeID: nodeID } }),
+        }
       );
 
       if (result.length === 0) {
@@ -345,16 +365,24 @@ class NamespaceController {
       ).data;
       const namespaceID = request.params.namespaceID;
 
-      await this._namespaceManager.deleteNamespace(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        namespaceID,
-        successorNamespaceID
+      await response.locals.invoker(
+        this._namespaceLambdaFunctionName,
+        'deleteNamespace',
+        {
+          pathParameters: { id: namespaceID },
+          ...(successorNamespaceID && {
+            payload: {
+              type: 'SuccessorNamespaceRequest',
+              successorNamespaceID: successorNamespaceID,
+              action: 'delete',
+            },
+          }),
+        }
       );
 
       this._cache.del(namespaceID);
       if (successorNamespaceID) {
-        this._cache.del(successorNamespaceID);
+        this.updateILinkCache(response.locals, successorNamespaceID);
       }
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
