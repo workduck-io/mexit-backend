@@ -5,7 +5,7 @@ import { statusCodes } from '../libs/statusCodes';
 import { initializeUserRoutes } from '../routes/UserRoutes';
 import { Transformer } from './../libs/TransformerClass';
 import { STAGE } from '../env';
-import { InvocationType } from '../libs/LambdaClass';
+import { InvocationType } from '../libs/LambdaInvoker';
 
 class UserController {
   public _urlPath = '/user';

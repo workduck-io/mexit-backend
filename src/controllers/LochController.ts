@@ -2,7 +2,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { initializeLochRoutes } from '../routes/LochRoutes';
-import { InvocationType } from '../libs/LambdaClass';
+import { InvocationType } from '../libs/LambdaInvoker';
 import { STAGE } from '../env';
 
 class LochController {

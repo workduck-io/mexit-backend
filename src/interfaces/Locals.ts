@@ -1,4 +1,4 @@
-import { InvocationType } from '../libs/LambdaClass';
+import { InvocationType } from '../libs/LambdaInvoker';
 import { RouteKeys } from '../libs/routeKeys';
 import { LambdaInvokePayloadOptions } from '../utils/lambda';
 
