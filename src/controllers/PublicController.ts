@@ -27,7 +27,6 @@ class PublicController {
       const nodeId = request.params.nodeId;
       const result = await response.locals.invoker(
         this._nodeLambdaFunctionName,
-        'RequestResponse',
         'getPublicNode',
         { pathParameters: { id: nodeId } }
       );
@@ -46,7 +45,6 @@ class PublicController {
     try {
       const publicNamespace = await response.locals.invoker(
         this._nsLambdaFunctionName,
-        'RequestResponse',
         'getPublicNamespace',
         { pathParameters: { id: request.params.namespaceID } }
       );
