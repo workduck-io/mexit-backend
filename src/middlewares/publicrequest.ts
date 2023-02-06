@@ -15,14 +15,10 @@ const defaultAcessCreds = new DefaultAccessCreds(
   cred => (accessCreds = cred)
 );
 // Middleware to supply a system token for accessing endpoints that are public
-async function PublicRequest(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> {
+async function PublicRequest(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const access_token = await defaultAcessCreds.getCred();
-    req.headers.authorization = access_token.idToken;
+    res.locals.idToken = access_token.idToken;
     next();
   } catch (error) {
     res.status(statusCodes.INTERNAL_SERVER_ERROR).send({
