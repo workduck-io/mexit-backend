@@ -3,7 +3,7 @@ import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { initializeLinkRoutes } from '../routes/LinkRoutes';
 import { STAGE } from '../env';
-import { InvocationType } from '../libs/LambdaClass';
+import { InvocationType } from '../libs/LambdaInvoker';
 
 class LinkController {
   public _urlPath = '/link';

@@ -29,13 +29,3 @@ export function errorlib(params: WDErrorType) {
     stackTrace: stack,
   });
 }
-
-export const UnexpectedError = (error: any) => {
-  errorlib({
-    message: error.message,
-    errorCode: error.statusCode,
-    errorObject: error,
-    statusCode: statusCodes.INTERNAL_SERVER_ERROR,
-    metaData: error.message,
-  });
-};

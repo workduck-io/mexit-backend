@@ -62,10 +62,6 @@ export const RouteKeys = {
   batchCreateBookmark: 'POST /userStar/batch',
   batchRemoveBookmark: 'DELETE /userStar/batch',
 
-  // Tags Endpoints
-  getAllTagsOfWorkspace: 'GET /tag/all',
-  getNodeWithTag: 'GET /tag/{tagName}/node',
-
   // Namespace Ops - CRUD, Fetch Hierarchy
   createNamespace: 'POST /namespace',
   getNamespace: 'GET /namespace/{id}',

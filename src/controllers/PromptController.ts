@@ -1,6 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { STAGE } from '../env';
-import { InvocationType } from '../libs/LambdaClass';
+import { InvocationType } from '../libs/LambdaInvoker';
 import { statusCodes } from '../libs/statusCodes';
 import { initializePromptRoutes } from '../routes/PromptRoutes';
 

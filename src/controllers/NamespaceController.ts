@@ -2,7 +2,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import { STAGE } from '../env';
 import { LocalsX } from '../interfaces/Locals';
 import container from '../inversify.config';
-import { invokeAndCheck } from '../libs/LambdaClass';
+import { invokeAndCheck } from '../libs/LambdaInvoker';
 import { Redis } from '../libs/RedisClass';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';

@@ -5,7 +5,7 @@ import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { initializeHighlightRoutes } from '../routes/HighlightsRoute';
 
-import { InvocationType } from '../libs/LambdaClass';
+import { InvocationType } from '../libs/LambdaInvoker';
 import { STAGE } from '../env';
 
 class HighlightController {

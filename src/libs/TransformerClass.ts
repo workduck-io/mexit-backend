@@ -55,10 +55,6 @@ export type AllNamespaceHierarchyResponse = {
     }
   >;
 };
-export type ParsedAllNamespacesHierarchy = Record<
-  string,
-  ParsedNamespaceHierarchy
->;
 
 type AllNamespaceHierarchyParserFn = (
   allNamespacesResp: AllNamespaceHierarchyResponse,
