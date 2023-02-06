@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { STAGE } from '../env';
+import { LocalsX } from '../interfaces/Locals';
 import { CopyOrMoveBlock } from '../interfaces/Node';
 
 import { NodeResponse } from '../interfaces/Response';
@@ -28,17 +29,12 @@ class NodeController {
   }
 
   updateILinkCache = async (
-    workspaceId: string,
-    idToken: string,
+    locals: LocalsX,
     namespaceID: string
   ): Promise<any> => {
-    const payload = generateLambdaInvokePayload(
-      { workspaceID: workspaceId, idToken: idToken },
-      'getNamespace',
-      {
-        pathParameters: { id: namespaceID },
-      }
-    );
+    const payload = generateLambdaInvokePayload(locals, 'getNamespace', {
+      pathParameters: { id: namespaceID },
+    });
 
     const namespace = await invokeAndCheck(
       this._nsLambdaFunctionName,
@@ -64,14 +60,11 @@ class NodeController {
         { payload: { ...body, type: 'NodeRequest' } }
       );
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { data, ...rest } = nodeResult; //Dont relay data to frontend
       response.status(statusCodes.OK).json(rest);
 
-      await this.updateILinkCache(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        body.namespaceID
-      );
+      await this.updateILinkCache(response.locals, body.namespaceID);
     } catch (error) {
       next(error);
     }
@@ -315,11 +308,7 @@ class NodeController {
 
       response.status(statusCodes.OK).json(archiveNodeResult);
 
-      await this.updateILinkCache(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        namespaceID
-      );
+      await this.updateILinkCache(response.locals, namespaceID);
     } catch (error) {
       next(error);
     }
@@ -399,13 +388,11 @@ class NodeController {
         .json({ changedPaths: parsedChangedPathsRefactor });
 
       await this.updateILinkCache(
-        response.locals.workspaceID,
-        response.locals.idToken,
+        response.locals,
         body.existingNodePath.namespaceID
       );
       await this.updateILinkCache(
-        response.locals.workspaceID,
-        response.locals.idToken,
+        response.locals,
         body.newNodePath.namespaceID
       );
     } catch (error) {
@@ -431,6 +418,7 @@ class NodeController {
 
       const { node, changedPaths } = bulkCreateResp;
       //TODO: Make part of TransformClass
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { data, dataOrder, ...rest } = node; //Dont relay data to frontend
       const parsedChangedPathsRefactor =
         this._transformer.refactoredPathsHierarchyParser(changedPaths);
@@ -439,11 +427,7 @@ class NodeController {
         .status(statusCodes.OK)
         .json({ node: rest, changedPaths: parsedChangedPathsRefactor });
 
-      await this.updateILinkCache(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        body.nodePath.namespaceID
-      );
+      await this.updateILinkCache(response.locals, body.nodePath.namespaceID);
     } catch (error) {
       next(error);
     }
