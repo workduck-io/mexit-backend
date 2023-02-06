@@ -1,6 +1,6 @@
 import got, { OptionsOfTextResponseBody } from 'got';
 import { injectable } from 'inversify';
-import { GotResponse, GotClientType } from 'src/interfaces/GotClient';
+import { GotResponse, GotClientType } from '../interfaces/GotClient';
 import StatsMap from 'stats-map';
 import mem from 'mem';
 @injectable()
