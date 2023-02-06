@@ -1,6 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
-import { STAGE } from '../env';
 
+import { STAGE } from '../env';
 import container from '../inversify.config';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';

@@ -1,5 +1,5 @@
-import { AuthRequest } from '../middlewares/authrequest';
 import NamespaceController from '../controllers/NamespaceController';
+import { AuthRequest } from '../middlewares/authrequest';
 
 export const initializeNamespaceRoutes = (
   nsObject: NamespaceController

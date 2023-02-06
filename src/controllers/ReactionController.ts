@@ -1,4 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
+
 import { STAGE } from '../env';
 import container from '../inversify.config';
 import { RequestClass } from '../libs/RequestClass';

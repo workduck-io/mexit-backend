@@ -1,5 +1,5 @@
-import { AuthRequest } from '../middlewares/authrequest';
 import ReminderController from '../controllers/ReminderController';
+import { AuthRequest } from '../middlewares/authrequest';
 
 export const initializeReminderRoutes = (
   reminderObject: ReminderController

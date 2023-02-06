@@ -1,5 +1,5 @@
-import { AuthRequest } from '../middlewares/authrequest';
 import OAuth2Controller from '../controllers/OAuth2Controller';
+import { AuthRequest } from '../middlewares/authrequest';
 
 export const initializeOAuth2Routes = (
   oAuth2Object: OAuth2Controller

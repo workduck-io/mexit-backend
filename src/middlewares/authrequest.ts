@@ -1,6 +1,8 @@
+import { NextFunction, Request, Response } from 'express';
+
 import { WDError } from '@workduck-io/wderror';
 import { validate } from '@workduck-io/workspace-validator';
-import { NextFunction, Request, Response } from 'express';
+
 import { statusCodes } from '../libs/statusCodes';
 import { TokenHandler } from '../libs/tokenvalidator';
 // Authenticates the user for accessing

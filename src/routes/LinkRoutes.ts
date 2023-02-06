@@ -1,5 +1,5 @@
-import { AuthRequest } from '../middlewares/authrequest';
 import LinkController from '../controllers/LinkController';
+import { AuthRequest } from '../middlewares/authrequest';
 
 export const initializeLinkRoutes = (linkObject: LinkController): void => {
   linkObject._router.post(

@@ -1,4 +1,5 @@
 import { Container } from 'inversify';
+
 import { GotClient } from './libs/GotClientClass';
 import { Redis } from './libs/RedisClass';
 import { Transformer } from './libs/TransformerClass';
