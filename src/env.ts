@@ -12,10 +12,8 @@ const COGNITO_CLIENT_ID_MAP = {
   test: '25qd6eq6vv3906osgv8v3f8c6v',
 };
 
-export const COGNITO_POOL_ID =
-  process.env.COGNITO_POOL_ID ?? COGNITO_POOL_ID_MAP[STAGE];
+export const COGNITO_POOL_ID = process.env.COGNITO_POOL_ID ?? COGNITO_POOL_ID_MAP[STAGE];
 
-export const COGNITO_CLIENT_ID =
-  process.env.MEXIT_BACKEND_CLIENT_ID ?? COGNITO_CLIENT_ID_MAP[STAGE];
+export const COGNITO_CLIENT_ID = process.env.MEXIT_BACKEND_CLIENT_ID ?? COGNITO_CLIENT_ID_MAP[STAGE];
 
 console.log('STARTING WITH STAGE: ', STAGE);

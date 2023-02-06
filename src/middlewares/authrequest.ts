@@ -7,11 +7,7 @@ import { statusCodes } from '../libs/statusCodes';
 import { TokenHandler } from '../libs/tokenvalidator';
 // Authenticates the user for accessing
 // the endpoint routes.
-async function AuthRequest(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> {
+async function AuthRequest(req: Request, res: Response, next: NextFunction): Promise<void> {
   // remove the 'Bearer ' token from the auth token
   const token = req.headers.authorization?.replace('Bearer ', '');
   try {
@@ -31,12 +27,7 @@ async function AuthRequest(
 
       const headerNeeded = () => {
         const noHeaderPaths = ['/oauth2', '/user/'];
-        const headerWhitelist = [
-          '/user/info',
-          '/user/all',
-          '/user/preference',
-          '/user/invite',
-        ];
+        const headerWhitelist = ['/user/info', '/user/all', '/user/preference', '/user/invite'];
         const url = req.url;
         for (const path of headerWhitelist) {
           if (url.startsWith(path)) return true;
@@ -56,8 +47,7 @@ async function AuthRequest(
           },
         });
 
-        if (isValid)
-          res.locals.workspaceID = req.headers['mex-workspace-id'].toString();
+        if (isValid) res.locals.workspaceID = req.headers['mex-workspace-id'].toString();
         else
           throw new WDError({
             statusCode: statusCodes.BAD_REQUEST,

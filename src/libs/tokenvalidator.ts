@@ -75,9 +75,7 @@ const getPublicKeys = async (): Promise<MapOfKidToPublicKey> => {
 
 const verifyPromised = promisify(jsonwebtoken.verify.bind(jsonwebtoken));
 
-const TokenHandler = async (
-  request: ClaimVerifyRequest
-): Promise<ClaimVerifyResult> => {
+const TokenHandler = async (request: ClaimVerifyRequest): Promise<ClaimVerifyResult> => {
   let result: ClaimVerifyResult;
   try {
     const token = request.token;

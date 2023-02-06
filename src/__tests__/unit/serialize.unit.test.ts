@@ -1,5 +1,5 @@
 import { NodeResponse } from '../../interfaces/Response';
-import { deserializeContent,serializeContent } from '../../libs/serialize';
+import { deserializeContent, serializeContent } from '../../libs/serialize';
 
 describe('Serializer library module', () => {
   describe('Serialize node data', () => {
@@ -89,14 +89,10 @@ describe('Serializer library module', () => {
       expect(deserialiseData.children.length).toBeGreaterThan(0);
       expect(deserialiseData.type).toEqual('p');
       expect(deserialiseData.id).toEqual('BLOCK_test-block');
-      expect(deserialiseData.metadata.createdBy).toEqual(
-        'testuser@testorg.com'
-      );
+      expect(deserialiseData.metadata.createdBy).toEqual('testuser@testorg.com');
       expect(deserialiseData.children[0].type).toEqual('p');
       expect(deserialiseData.children[0].id).toEqual('TEMP_test-data');
-      expect(deserialiseData.children[0].metadata.createdBy).toEqual(
-        'testuser@testorg.com'
-      );
+      expect(deserialiseData.children[0].metadata.createdBy).toEqual('testuser@testorg.com');
       expect(deserialiseData.children[0].italic).toBeTruthy();
       expect(deserialiseData.children[0].text).toEqual('hello test');
     });

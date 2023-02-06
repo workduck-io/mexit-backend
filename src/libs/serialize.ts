@@ -27,16 +27,7 @@ const extractMetadata = (data: any): NodeMetadata => {
 
 // Direct properties are collated in the properties for api
 // and then unfurled when converting back to editor content
-const directPropertyKeys = [
-  'bold',
-  'italic',
-  'underline',
-  'highlight',
-  'code',
-  'url',
-  'value',
-  'body',
-];
+const directPropertyKeys = ['bold', 'italic', 'underline', 'highlight', 'code', 'url', 'value', 'body'];
 
 // From API to content
 export const deserializeContent = (sanatizedContent: any[]) => {

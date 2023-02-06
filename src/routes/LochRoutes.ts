@@ -1,9 +1,7 @@
 import LochController from '../controllers/LochController';
 import { AuthRequest } from '../middlewares/authrequest';
 
-export const initializeLochRoutes = (
-  lochControllerObject: LochController
-): void => {
+export const initializeLochRoutes = (lochControllerObject: LochController): void => {
   lochControllerObject._router.get(
     `${lochControllerObject._urlPath}/all`,
     [AuthRequest],

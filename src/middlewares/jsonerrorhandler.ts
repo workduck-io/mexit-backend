@@ -3,12 +3,7 @@ import { ErrorRequestHandler } from 'express';
 import logger from '../libs/logger';
 import { IWDErrorResponse } from '../libs/WDError';
 
-export const jsonErrorHandler: ErrorRequestHandler = async (
-  err,
-  req,
-  res,
-  next
-) => {
+export const jsonErrorHandler: ErrorRequestHandler = async (err, req, res, next) => {
   const { response } = err;
   const error: IWDErrorResponse = response;
   if (!res) next();

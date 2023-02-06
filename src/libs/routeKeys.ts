@@ -106,8 +106,7 @@ export const RouteKeys = {
   getAllCommentsOfThread: 'GET /all/{nodeId}/block/{blockId}/thread/{threadId}',
   deleteAllCommentsOfNode: 'DELETE /all/{nodeId}',
   deleteAllCommentsOfBlock: 'DELETE /all/{nodeId}/block/{blockId}',
-  deleteAllCommentsOfThread:
-    'DELETE /all/{nodeId}/block/{blockId}/thread/{threadId}',
+  deleteAllCommentsOfThread: 'DELETE /all/{nodeId}/block/{blockId}/thread/{threadId}',
 
   // Reactions - CRUD Operations
   getAllReactionsOfNode: 'GET /node/{nodeId}',

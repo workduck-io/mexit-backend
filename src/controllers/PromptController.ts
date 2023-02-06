@@ -14,16 +14,9 @@ class PromptController {
     initializePromptRoutes(this);
   }
 
-  getAllPrompts = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAllPrompts = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
-        this._promptLambdaName,
-        'getAllPrompts'
-      );
+      const result = await response.locals.invoker(this._promptLambdaName, 'getAllPrompts');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -31,16 +24,9 @@ class PromptController {
     }
   };
 
-  getUserAuthInfo = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getUserAuthInfo = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
-        this._promptLambdaName,
-        'getUserAuthInfo'
-      );
+      const result = await response.locals.invoker(this._promptLambdaName, 'getUserAuthInfo');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -48,18 +34,10 @@ class PromptController {
     }
   };
 
-  updateUserAuthInfo = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  updateUserAuthInfo = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const data = request.body;
-      const result = await response.locals.invoker(
-        this._promptLambdaName,
-        'updateUserAuthInfo',
-        { payload: data }
-      );
+      const result = await response.locals.invoker(this._promptLambdaName, 'updateUserAuthInfo', { payload: data });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -67,16 +45,9 @@ class PromptController {
     }
   };
 
-  getAllPromptProviders = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAllPromptProviders = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
-        this._promptLambdaName,
-        'getAllPromptProviders'
-      );
+      const result = await response.locals.invoker(this._promptLambdaName, 'getAllPromptProviders');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -84,18 +55,13 @@ class PromptController {
     }
   };
 
-  generatePromptResult = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  generatePromptResult = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const data = request.body;
-      const result = await response.locals.invoker(
-        this._promptLambdaName,
-        'generatePromptResult',
-        { payload: data, pathParameters: { id: request.params.promptID } }
-      );
+      const result = await response.locals.invoker(this._promptLambdaName, 'generatePromptResult', {
+        payload: data,
+        pathParameters: { id: request.params.promptID },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {

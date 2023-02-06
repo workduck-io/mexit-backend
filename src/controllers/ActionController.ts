@@ -29,22 +29,14 @@ class ActionController {
     initializeActionRoutes(this);
   }
 
-  getAction = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAction = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const managerResponse = response.locals.invoker(
-        this._lambdaName.action.get,
-        'getAction',
-        {
-          pathParameters: {
-            actionGroupId: request.params.groupId,
-            actionId: request.params.actionId,
-          },
-        }
-      );
+      const managerResponse = response.locals.invoker(this._lambdaName.action.get, 'getAction', {
+        pathParameters: {
+          actionGroupId: request.params.groupId,
+          actionId: request.params.actionId,
+        },
+      });
 
       const result = await this._redisCache.getOrSet(
         {
@@ -59,24 +51,16 @@ class ActionController {
     }
   };
 
-  getAllActions = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAllActions = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const result = await this._redisCache.getOrSet(
         {
           key: request.params.groupId,
         },
         async () =>
-          await response.locals.invoker(
-            this._lambdaName.action.getAll,
-            'getActionsOfActionGroup',
-            {
-              pathParameters: { actionGroupId: request.params.groupId },
-            }
-          )
+          await response.locals.invoker(this._lambdaName.action.getAll, 'getActionsOfActionGroup', {
+            pathParameters: { actionGroupId: request.params.groupId },
+          })
       );
 
       response.status(statusCodes.OK).json(result);
@@ -85,16 +69,9 @@ class ActionController {
     }
   };
 
-  getAllAuth = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAllAuth = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
-        this._lambdaName.auth.getAll,
-        'getAllAuths'
-      );
+      const result = await response.locals.invoker(this._lambdaName.auth.getAll, 'getAllAuths');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -102,17 +79,11 @@ class ActionController {
     }
   };
 
-  getAuth = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAuth = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
-        this._lambdaName.auth.get,
-        'getAuth',
-        { pathParameters: { authTypeId: request.params.authId } }
-      );
+      const result = await response.locals.invoker(this._lambdaName.auth.get, 'getAuth', {
+        pathParameters: { authTypeId: request.params.authId },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -120,17 +91,11 @@ class ActionController {
     }
   };
 
-  refreshAuth = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  refreshAuth = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
-        this._lambdaName.auth.refresh,
-        'refreshAuth',
-        { pathParameters: { source: request.params.source } }
-      );
+      const result = await response.locals.invoker(this._lambdaName.auth.refresh, 'refreshAuth', {
+        pathParameters: { source: request.params.source },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -138,21 +103,13 @@ class ActionController {
     }
   };
 
-  updateAuth = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  updateAuth = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const data = new RequestClass(request).data;
 
-      const result = await response.locals.invoker(
-        this._lambdaName.auth.update,
-        'updateAuth',
-        {
-          pathParameters: { authTypeId: request.params.authId, payload: data },
-        }
-      );
+      const result = await response.locals.invoker(this._lambdaName.auth.update, 'updateAuth', {
+        pathParameters: { authTypeId: request.params.authId, payload: data },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {

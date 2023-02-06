@@ -2,27 +2,11 @@ import ViewController from '../controllers/ViewController';
 import { AuthRequest } from '../middlewares/authrequest';
 
 export const initializeViewRoutes = (viewObject: ViewController): void => {
-  viewObject._router.get(
-    `${viewObject._urlPath}/all/workspace`,
-    [AuthRequest],
-    viewObject.getAllViews
-  );
+  viewObject._router.get(`${viewObject._urlPath}/all/workspace`, [AuthRequest], viewObject.getAllViews);
 
-  viewObject._router.get(
-    `${viewObject._urlPath}/:viewID`,
-    [AuthRequest],
-    viewObject.getView
-  );
+  viewObject._router.get(`${viewObject._urlPath}/:viewID`, [AuthRequest], viewObject.getView);
 
-  viewObject._router.post(
-    `${viewObject._urlPath}`,
-    [AuthRequest],
-    viewObject.postView
-  );
+  viewObject._router.post(`${viewObject._urlPath}`, [AuthRequest], viewObject.postView);
 
-  viewObject._router.delete(
-    `${viewObject._urlPath}/:viewID`,
-    [AuthRequest],
-    viewObject.deleteView
-  );
+  viewObject._router.delete(`${viewObject._urlPath}/:viewID`, [AuthRequest], viewObject.deleteView);
 };

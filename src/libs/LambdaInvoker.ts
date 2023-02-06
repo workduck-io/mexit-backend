@@ -39,9 +39,7 @@ async function invoke(
                       pathParameters: options.pathParameters,
                     }),
                     ...(options.payload && {
-                      body: sendRawBody
-                        ? options.payload
-                        : JSONX.stringify(options.payload),
+                      body: sendRawBody ? options.payload : JSONX.stringify(options.payload),
                     }),
                     routeKey: options.routeKey,
                     ...(options.queryStringParameters && {
@@ -70,27 +68,14 @@ export async function invokeAndCheck(
   sendRawBody = false,
   invocationSource: InvocationSource = 'APIGateway'
 ) {
-  const response = await invoke(
-    functionName,
-    invocationType,
-    options,
-    sendRawBody,
-    invocationSource
-  );
-
+  const response = await invoke(functionName, invocationType, options, sendRawBody, invocationSource);
+  console.log('Resposne: ', response);
   const body = JSONX.parse(response.body);
 
-  if (
-    (response.statusCode !== 200 && response.statusCode !== 204) ||
-    !response.statusCode
-  ) {
+  if ((response.statusCode !== 200 && response.statusCode !== 204) || !response.statusCode) {
     throw new WDError({
       statusCode: response.statusCode ?? statusCodes.INTERNAL_SERVER_ERROR,
-      message: body
-        ? body?.message
-          ? body.message
-          : body
-        : response.errorMessage,
+      message: body ? (body?.message ? body.message : body) : response.errorMessage,
       code: response.statusCode ?? statusCodes.INTERNAL_SERVER_ERROR,
     });
   }

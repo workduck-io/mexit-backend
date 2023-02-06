@@ -1,9 +1,7 @@
 import SharedController from '../controllers/SharedController';
 import { AuthRequest } from '../middlewares/authrequest';
 
-export const initializeSharedRoutes = (
-  sharedControllerObject: SharedController
-): void => {
+export const initializeSharedRoutes = (sharedControllerObject: SharedController): void => {
   sharedControllerObject._router.get(
     `${sharedControllerObject._urlPath}/all`,
     [AuthRequest],

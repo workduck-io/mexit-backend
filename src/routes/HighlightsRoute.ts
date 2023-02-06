@@ -1,14 +1,8 @@
 import HighlightController from '../controllers/HighlightController';
 import { AuthRequest } from '../middlewares/authrequest';
 
-export const initializeHighlightRoutes = (
-  highlightObject: HighlightController
-): void => {
-  highlightObject._router.post(
-    `${highlightObject._urlPath}`,
-    [AuthRequest],
-    highlightObject.createHighlight
-  );
+export const initializeHighlightRoutes = (highlightObject: HighlightController): void => {
+  highlightObject._router.post(`${highlightObject._urlPath}`, [AuthRequest], highlightObject.createHighlight);
 
   highlightObject._router.get(
     `${highlightObject._urlPath}`,

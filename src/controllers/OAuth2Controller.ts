@@ -18,8 +18,7 @@ class OAuth2Controller {
   private static readonly redirectUri = IS_DEV
     ? 'http://localhost:5002/api/v1/oauth2/google'
     : 'https://mex-webapp-dev.workduck.io/api/v1/oauth2/google';
-  private static readonly googleOAuthTokenUrl =
-    'https://www.googleapis.com/oauth2/v4/token';
+  private static readonly googleOAuthTokenUrl = 'https://www.googleapis.com/oauth2/v4/token';
 
   constructor() {
     initializeOAuth2Routes(this);
@@ -27,10 +26,8 @@ class OAuth2Controller {
   }
 
   initializeGoogleOAuthClient(): void {
-    if (!process.env.MEXIT_BACKEND_GOOGLE_CLIENT_ID)
-      throw new Error('Client Id Not Provided');
-    if (!process.env.MEXIT_BACKEND_GOOGLE_CLIENT_SECRET)
-      throw new Error('Client Secret Not Provided');
+    if (!process.env.MEXIT_BACKEND_GOOGLE_CLIENT_ID) throw new Error('Client Id Not Provided');
+    if (!process.env.MEXIT_BACKEND_GOOGLE_CLIENT_SECRET) throw new Error('Client Secret Not Provided');
 
     this._oauth2Client = new OAuth2Client({
       clientId: process.env.MEXIT_BACKEND_GOOGLE_CLIENT_ID,
@@ -39,10 +36,7 @@ class OAuth2Controller {
     });
   }
 
-  getNewAccessToken = async (
-    request: Request,
-    response: Response
-  ): Promise<void> => {
+  getNewAccessToken = async (request: Request, response: Response): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'GoogleAuthRefreshToken');
       const payload = {
@@ -51,21 +45,14 @@ class OAuth2Controller {
         refresh_token: requestDetail.data.refreshToken,
         grant_type: 'refresh_token',
       };
-      const result = await this._gotClient.post(
-        OAuth2Controller.googleOAuthTokenUrl,
-        payload,
-        ''
-      );
+      const result = await this._gotClient.post(OAuth2Controller.googleOAuthTokenUrl, payload, '');
       response.status(statusCodes.OK).send(result).json();
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
 
-  extractTokenFromCode = async (
-    request: Request,
-    response: Response
-  ): Promise<void> => {
+  extractTokenFromCode = async (request: Request, response: Response): Promise<void> => {
     const code = request.query.code;
     try {
       const { tokens } = await this._oauth2Client.getToken(code.toString());
@@ -83,10 +70,7 @@ class OAuth2Controller {
     }
   };
 
-  getGoogleCalendarScopeAuth = async (
-    request: Request,
-    response: Response
-  ): Promise<any> => {
+  getGoogleCalendarScopeAuth = async (request: Request, response: Response): Promise<any> => {
     try {
       const scopes = [
         'email',

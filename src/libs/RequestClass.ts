@@ -15,8 +15,6 @@ export class RequestClass<T extends keyof Interfaces> {
     }
     this.params = req.params ? req.params : {};
     this.query = req.query ? req.query : {};
-    this.authToken = req.headers.authorization
-      ? req.headers.authorization.toString()
-      : null;
+    this.authToken = req.headers.authorization ? req.headers.authorization.toString() : null;
   }
 }

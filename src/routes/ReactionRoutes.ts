@@ -1,9 +1,7 @@
 import ReactionController from '../controllers/ReactionController';
 import { AuthRequest } from '../middlewares/authrequest';
 
-export const initializeReactionRoutes = (
-  reactionObject: ReactionController
-): void => {
+export const initializeReactionRoutes = (reactionObject: ReactionController): void => {
   reactionObject._router.get(
     `${reactionObject._urlPath}/node/:nodeID/block/:blockID`,
     [AuthRequest],
@@ -22,9 +20,5 @@ export const initializeReactionRoutes = (
     reactionObject.getReactionDetailsOfBlock
   );
 
-  reactionObject._router.post(
-    `${reactionObject._urlPath}`,
-    [AuthRequest],
-    reactionObject.toggleReaction
-  );
+  reactionObject._router.post(`${reactionObject._urlPath}`, [AuthRequest], reactionObject.toggleReaction);
 };

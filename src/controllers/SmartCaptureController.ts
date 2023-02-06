@@ -18,22 +18,14 @@ class SmartCaptureController {
     initializeSmartCaptureRoutes(this);
   }
 
-  getAllPublicConfigs = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAllPublicConfigs = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const result = await this._cache.getOrSet(
         {
           key: this._PublicCaptureLabel,
           expires: 24 * 60 * 60 * 60, // 24 hours
         },
-        () =>
-          response.locals.invoker(
-            this._smartCaptureLambdaName,
-            'getPublicCaptureConfig'
-          )
+        () => response.locals.invoker(this._smartCaptureLambdaName, 'getPublicCaptureConfig')
       );
       response.status(statusCodes.OK).json(result);
     } catch (error) {
