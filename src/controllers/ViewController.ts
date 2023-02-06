@@ -25,7 +25,6 @@ class ViewController {
     try {
       const result = await response.locals.invoker(
         this._taskViewLambdaName,
-
         'getView',
         {
           pathParameters: { entityId: request.params.viewID },
@@ -47,7 +46,6 @@ class ViewController {
     try {
       const result = await response.locals.invoker(
         this._taskViewLambdaName,
-
         'getAllViews',
         { additionalHeaders: this._additionalHeaders }
       );
@@ -64,15 +62,10 @@ class ViewController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      await response.locals.invoker(
-        this._taskViewLambdaName,
-
-        'deleteView',
-        {
-          pathParameters: { entityId: request.params.viewID },
-          additionalHeaders: this._additionalHeaders,
-        }
-      );
+      await response.locals.invoker(this._taskViewLambdaName, 'deleteView', {
+        pathParameters: { entityId: request.params.viewID },
+        additionalHeaders: this._additionalHeaders,
+      });
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
@@ -90,7 +83,6 @@ class ViewController {
 
       const result = await response.locals.invoker(
         this._taskViewLambdaName,
-
         'saveView',
         { additionalHeaders: this._additionalHeaders, payload: data }
       );

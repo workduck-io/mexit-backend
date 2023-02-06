@@ -40,7 +40,6 @@ class UserController {
     try {
       const result = await response.locals.invoker(
         this._userLambdaFunctionName,
-
         'updateUserDetails',
         { payload: data }
       );
@@ -62,7 +61,6 @@ class UserController {
 
       const result = await response.locals.invoker(
         this._userLambdaFunctionName,
-
         'updateUserPreference',
         {
           payload: requestDetail,
@@ -101,7 +99,6 @@ class UserController {
       const inviteId = request.params.inviteId;
       const result = await response.locals.invoker(
         this._inviteUserLambdaFunctionName,
-
         'getInvite',
         { pathParameters: { inviteId: inviteId } }
       );
@@ -121,7 +118,6 @@ class UserController {
       const inviteId = request.params.inviteId;
       await response.locals.invoker(
         this._inviteUserLambdaFunctionName,
-
         'deleteInvite',
         {
           pathParameters: { inviteId: inviteId },
@@ -142,7 +138,6 @@ class UserController {
     try {
       const result = await response.locals.invoker(
         this._inviteUserLambdaFunctionName,
-
         'getAllInviteOfWorkspace'
       );
 
@@ -161,7 +156,6 @@ class UserController {
       const payload = new RequestClass(request, 'InviteProperties').data;
       const result = await response.locals.invoker(
         this._inviteUserLambdaFunctionName,
-
         'createInvite',
         { payload: payload }
       );
@@ -180,7 +174,6 @@ class UserController {
     try {
       const result = await response.locals.invoker(
         this._getUserLambdaFunctionName,
-
         'getById',
         {
           pathParameters: { userId: request.params.id },
@@ -200,7 +193,6 @@ class UserController {
     try {
       const result = await response.locals.invoker(
         this._getUserLambdaFunctionName,
-
         'getByEmail',
         { pathParameters: { email: request.params.mail } }
       );
@@ -218,7 +210,6 @@ class UserController {
     try {
       const result = await response.locals.invoker(
         this._userLambdaFunctionName,
-
         'getUsersOfWorkspace'
       );
 
@@ -237,7 +228,6 @@ class UserController {
       payload.linkedinURL = payload.linkedinURL.replace(/\/+$/, '');
       const result = await response.locals.invoker(
         this._getUserLambdaFunctionName,
-
         'getUserByLinkedin',
         { payload: payload }
       );
@@ -258,7 +248,6 @@ class UserController {
     try {
       const registerStatus = await response.locals.invoker(
         this._registerStatusLambdaFunctionName,
-
         'registerStatus'
       );
 

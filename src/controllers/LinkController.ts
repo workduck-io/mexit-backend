@@ -1,6 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { RequestClass } from '../libs/RequestClass';
-import container from '../inversify.config';
 import { statusCodes } from '../libs/statusCodes';
 import { initializeLinkRoutes } from '../routes/LinkRoutes';
 import { STAGE } from '../env';
@@ -86,7 +85,6 @@ class LinkController {
     try {
       const result = await response.locals.invoker(
         `${this._linkServiceLambdaBase}-stats`,
-
         undefined,
         {
           httpMethod: 'GET',

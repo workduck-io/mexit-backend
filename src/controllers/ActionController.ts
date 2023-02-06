@@ -39,7 +39,6 @@ class ActionController {
     try {
       const managerResponse = response.locals.invoker(
         this._lambdaName.action.get,
-
         'getAction',
         {
           pathParameters: {
@@ -75,7 +74,6 @@ class ActionController {
         async () =>
           await response.locals.invoker(
             this._lambdaName.action.getAll,
-
             'getActionsOfActionGroup',
             {
               pathParameters: { actionGroupId: request.params.groupId },
@@ -97,7 +95,6 @@ class ActionController {
     try {
       const result = await response.locals.invoker(
         this._lambdaName.auth.getAll,
-
         'getAllAuths'
       );
 
@@ -115,7 +112,6 @@ class ActionController {
     try {
       const result = await response.locals.invoker(
         this._lambdaName.auth.get,
-
         'getAuth',
         { pathParameters: { authTypeId: request.params.authId } }
       );
@@ -134,7 +130,6 @@ class ActionController {
     try {
       const result = await response.locals.invoker(
         this._lambdaName.auth.refresh,
-
         'refreshAuth',
         { pathParameters: { source: request.params.source } }
       );
@@ -155,7 +150,6 @@ class ActionController {
 
       const result = await response.locals.invoker(
         this._lambdaName.auth.update,
-
         'updateAuth',
         {
           pathParameters: { authTypeId: request.params.authId, payload: data },

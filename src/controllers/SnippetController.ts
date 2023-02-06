@@ -36,7 +36,6 @@ class SnippetController {
       this._redisCache.del(request.body.id);
       const snippetResult = await response.locals.invoker(
         this._snippetLambdaFunctionName,
-
         'createSnippet',
         {
           payload: request.body,
@@ -77,7 +76,6 @@ class SnippetController {
         () =>
           response.locals.invoker(
             this._snippetLambdaFunctionName,
-
             'getSnippet',
             { pathParameters: { id: snippetId } }
           )
@@ -120,7 +118,6 @@ class SnippetController {
       const { successful, failed } = !nonCachedIds.isEmpty()
         ? await response.locals.invoker(
             this._snippetLambdaFunctionName,
-
             'getSnippet',
             {
               allSettled: {
@@ -164,7 +161,6 @@ class SnippetController {
     try {
       const result = await response.locals.invoker(
         this._snippetLambdaFunctionName,
-
         'getAllVersionsOfSnippet',
         { pathParameters: { id: request.params.snippetId } }
       );
@@ -205,7 +201,6 @@ class SnippetController {
 
       await response.locals.invoker(
         this._snippetLambdaFunctionName,
-
         'makeSnippetPublic',
         { pathParameters: { id: snippetId, version: version } }
       );
@@ -233,7 +228,6 @@ class SnippetController {
 
       await response.locals.invoker(
         this._snippetLambdaFunctionName,
-
         'makeSnippetPrivate',
         { pathParameters: { id: snippetId, version: version } }
       );
@@ -273,7 +267,6 @@ class SnippetController {
         () =>
           response.locals.invoker(
             this._snippetLambdaFunctionName,
-
             'getPublicSnippet',
             { pathParameters: { id: snippetId, version: version } }
           )
@@ -298,7 +291,6 @@ class SnippetController {
 
       const result = await response.locals.invoker(
         this._snippetLambdaFunctionName,
-
         'clonePublicSnippet',
         { pathParameters: { id: snippetId, version: version } }
       );
@@ -324,7 +316,6 @@ class SnippetController {
 
       await response.locals.invoker(
         this._snippetLambdaFunctionName,
-
         'deleteVersionOfSnippet',
         {
           pathParameters: { id: snippetID },
@@ -348,7 +339,6 @@ class SnippetController {
 
       await response.locals.invoker(
         this._snippetLambdaFunctionName,
-
         'deleteAllVersionsOfSnippet',
         { pathParameters: { id: snippetID } }
       );
@@ -369,7 +359,6 @@ class SnippetController {
 
       await response.locals.invoker(
         this._snippetLambdaFunctionName,
-
         'updateSnippetMetadata',
         {
           pathParameters: { id: request.params.id },
