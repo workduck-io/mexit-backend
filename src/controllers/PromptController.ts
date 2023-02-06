@@ -23,7 +23,6 @@ class PromptController {
     try {
       const result = await response.locals.invoker(
         this._promptLambdaName,
-
         'getAllPrompts'
       );
 
@@ -41,7 +40,6 @@ class PromptController {
     try {
       const result = await response.locals.invoker(
         this._promptLambdaName,
-
         'getUserAuthInfo'
       );
 
@@ -60,7 +58,6 @@ class PromptController {
       const data = request.body;
       const result = await response.locals.invoker(
         this._promptLambdaName,
-
         'updateUserAuthInfo',
         { payload: data }
       );
@@ -79,7 +76,6 @@ class PromptController {
     try {
       const result = await response.locals.invoker(
         this._promptLambdaName,
-
         'getAllPromptProviders'
       );
 
@@ -98,7 +94,6 @@ class PromptController {
       const data = request.body;
       const result = await response.locals.invoker(
         this._promptLambdaName,
-
         'generatePromptResult',
         { payload: data, pathParameters: { id: request.params.promptID } }
       );

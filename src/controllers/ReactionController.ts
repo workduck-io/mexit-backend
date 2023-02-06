@@ -29,7 +29,6 @@ class ReactionController {
     try {
       const result = await response.locals.invoker(
         this._reactionLambdaName,
-
         'getAllReactionsOfNode',
         {
           pathParameters: { nodeId: request.params.nodeID },
@@ -51,7 +50,6 @@ class ReactionController {
     try {
       const result = await response.locals.invoker(
         this._reactionLambdaName,
-
         'getAllReactionsOfBlock',
         {
           pathParameters: {
@@ -76,7 +74,6 @@ class ReactionController {
     try {
       const result = await response.locals.invoker(
         this._reactionLambdaName,
-
         'getReactionDetailsOfBlock',
         {
           pathParameters: {
@@ -102,7 +99,6 @@ class ReactionController {
       const data = new RequestClass(request, 'Reaction').data;
       await response.locals.invoker(
         this._reactionLambdaName,
-
         'toggleReaction',
         { payload: data }
       );

@@ -24,7 +24,6 @@ class LochController {
     try {
       const result = await response.locals.invoker(
         `${this._mexLochLambdaBase}-allConfig`,
-
         'getAllServices'
       );
 
@@ -42,7 +41,6 @@ class LochController {
     try {
       const result = await response.locals.invoker(
         `${this._mexLochLambdaBase}-connected`,
-
         'getConnectedServices'
       );
 
@@ -61,7 +59,6 @@ class LochController {
       const body = new RequestClass(request, 'ConnectToLochService').data;
       const result = await response.locals.invoker(
         `${this._mexLochLambdaBase}-register`,
-
         'connectToService',
         {
           payload: body,
@@ -84,7 +81,6 @@ class LochController {
         .data;
       const result = await response.locals.invoker(
         `${this._mexLochLambdaBase}-update`,
-
         'updateParentNodeOfService',
         { payload: body }
       );
