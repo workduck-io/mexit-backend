@@ -1,8 +1,9 @@
 import express, { NextFunction, Request, Response } from 'express';
+
+import { STAGE } from '../env';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { initializeLinkRoutes } from '../routes/LinkRoutes';
-import { STAGE } from '../env';
 
 class LinkController {
   public _urlPath = '/link';

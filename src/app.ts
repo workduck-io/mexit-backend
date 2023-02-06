@@ -1,17 +1,12 @@
-import compression from 'compression';
-import cors from 'cors';
 import 'dotenv/config';
-import express from 'express';
 import 'reflect-metadata';
 
-import { IS_DEV } from './env';
-import { errorCodes } from './libs/errorCodes';
-import logger from './libs/logger';
-import expressListRoutes, { COLORS, colorText } from './libs/routeList';
-import { jsonErrorHandler } from './middlewares/jsonerrorhandler';
-import { LogRequest } from './middlewares/logrequest';
+import compression from 'compression';
+import cors from 'cors';
+import express from 'express';
 
 import { wdRequestIdExpressParser } from '@workduck-io/wd-request-id-parser';
+
 import ActionController from './controllers/ActionController';
 import BookmarkController from './controllers/BookmarkController';
 import CommentController from './controllers/CommentController';
@@ -22,6 +17,7 @@ import LochController from './controllers/LochController';
 import NamespaceController from './controllers/NamespaceController';
 import NodeController from './controllers/NodeController';
 import OAuth2Controller from './controllers/OAuth2Controller';
+import PromptController from './controllers/PromptController';
 import PublicController from './controllers/PublicController';
 import ReactionController from './controllers/ReactionController';
 import ReminderController from './controllers/ReminderController';
@@ -30,12 +26,17 @@ import SmartCaptureController from './controllers/SmartCaptureController';
 import SnippetController from './controllers/SnippetController';
 import UserController from './controllers/UserController';
 import ViewController from './controllers/ViewController';
-import container from './inversify.config';
+import { errorCodes } from './libs/errorCodes';
+import logger from './libs/logger';
 import { Redis } from './libs/RedisClass';
+import expressListRoutes, { COLORS, colorText } from './libs/routeList';
+import { InvokeLambda } from './middlewares/invoker';
+import { jsonErrorHandler } from './middlewares/jsonerrorhandler';
+import { LogRequest } from './middlewares/logrequest';
 import responseErrorHandler from './middlewares/responseErrorHandler';
 import { parseReviver } from './utils/ArrayX';
-import PromptController from './controllers/PromptController';
-import { InvokeLambda } from './middlewares/invoker';
+import { IS_DEV } from './env';
+import container from './inversify.config';
 
 class App {
   public _app: express.Application;

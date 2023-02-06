@@ -1,6 +1,5 @@
 import { type LocalsX } from '../interfaces/Locals';
 import { LambdaOptions } from '../libs/LambdaInvoker';
-
 import { RouteKeys } from '../libs/routeKeys';
 
 export interface LambdaInvokePayloadOptions<T> {

@@ -1,11 +1,11 @@
 import express, { NextFunction, Request, Response } from 'express';
+
+import { STAGE } from '../env';
 import container from '../inversify.config';
 import { Redis } from '../libs/RedisClass';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { initializeHighlightRoutes } from '../routes/HighlightsRoute';
-
-import { STAGE } from '../env';
 
 class HighlightController {
   public _urlPath = '/highlight';

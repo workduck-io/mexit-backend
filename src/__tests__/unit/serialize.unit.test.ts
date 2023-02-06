@@ -1,5 +1,5 @@
 import { NodeResponse } from '../../interfaces/Response';
-import { serializeContent, deserializeContent } from '../../libs/serialize';
+import { deserializeContent,serializeContent } from '../../libs/serialize';
 
 describe('Serializer library module', () => {
   describe('Serialize node data', () => {

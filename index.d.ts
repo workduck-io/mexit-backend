@@ -1,4 +1,5 @@
 import 'express';
+
 import { LocalsX } from './src/interfaces/Locals';
 
 declare module 'stats-map';

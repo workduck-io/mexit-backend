@@ -1,5 +1,5 @@
-import { AuthRequest } from '../middlewares/authrequest';
 import SnippetController from '../controllers/SnippetController';
+import { AuthRequest } from '../middlewares/authrequest';
 
 export const initializeSnippetRoutes = (
   snippetObject: SnippetController

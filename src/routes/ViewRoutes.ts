@@ -1,5 +1,5 @@
-import { AuthRequest } from '../middlewares/authrequest';
 import ViewController from '../controllers/ViewController';
+import { AuthRequest } from '../middlewares/authrequest';
 
 export const initializeViewRoutes = (viewObject: ViewController): void => {
   viewObject._router.get(

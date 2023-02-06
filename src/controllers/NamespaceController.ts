@@ -1,4 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
+
 import { STAGE } from '../env';
 import { LocalsX } from '../interfaces/Locals';
 import container from '../inversify.config';

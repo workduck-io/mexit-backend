@@ -1,6 +1,8 @@
+import { NextFunction, Request, Response } from 'express';
+
 import { DefaultAccessCreds } from '@workduck-io/mex-default-user-token';
 import { PublicAccessCreds } from '@workduck-io/mex-default-user-token/src/lib/types/accessCred';
-import { NextFunction, Request, Response } from 'express';
+
 import { COGNITO_CLIENT_ID } from '../env';
 import { errorCodes } from '../libs/errorCodes';
 import { statusCodes } from '../libs/statusCodes';

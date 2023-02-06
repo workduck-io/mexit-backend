@@ -1,6 +1,9 @@
-import { WDError } from '@workduck-io/wderror';
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
+
+import { WDError } from '@workduck-io/wderror';
+
 import logger from '../libs/logger';
+
 import { statusCodes } from './../libs/statusCodes';
 
 const responseErrorHandler: ErrorRequestHandler = (

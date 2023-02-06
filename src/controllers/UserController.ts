@@ -1,10 +1,12 @@
 import express, { NextFunction, Request, Response } from 'express';
+
+import { STAGE } from '../env';
 import container from '../inversify.config';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { initializeUserRoutes } from '../routes/UserRoutes';
+
 import { Transformer } from './../libs/TransformerClass';
-import { STAGE } from '../env';
 
 class UserController {
   public _urlPath = '/user';
