@@ -28,7 +28,6 @@ import ReminderController from './controllers/ReminderController';
 import SharedController from './controllers/SharedController';
 import SmartCaptureController from './controllers/SmartCaptureController';
 import SnippetController from './controllers/SnippetController';
-import TagController from './controllers/TagController';
 import UserController from './controllers/UserController';
 import ViewController from './controllers/ViewController';
 import container from './inversify.config';

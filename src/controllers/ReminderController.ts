@@ -1,18 +1,14 @@
 import express, { NextFunction, Request, Response } from 'express';
-import container from '../inversify.config';
 import { statusCodes } from '../libs/statusCodes';
-import { Transformer } from '../libs/TransformerClass';
 import { RequestClass } from '../libs/RequestClass';
-import { ReminderManager } from '../managers/ReminderManager';
 import { initializeReminderRoutes } from '../routes/ReminderRoutes';
+import { STAGE } from '../env';
 
 class ReminderController {
   public _urlPath = '/reminder';
   public _router = express.Router();
 
-  public _reminderManager: ReminderManager =
-    container.get<ReminderManager>(ReminderManager);
-  public _transformer: Transformer = container.get<Transformer>(Transformer);
+  private _reminderLambdaName = `reminder-${STAGE}-main`;
 
   constructor() {
     initializeReminderRoutes(this);
@@ -24,10 +20,10 @@ class ReminderController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._reminderManager.getReminderByID(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.entityID
+      const result = await response.locals.invoker(
+        this._reminderLambdaName,
+        'getReminderByID',
+        { pathParameters: { entityId: request.params.entityID } }
       );
 
       response.status(statusCodes.OK).json(result);
@@ -42,11 +38,11 @@ class ReminderController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const data = new RequestClass(request, 'Reminder').data;
-      const result = await this._reminderManager.createReminder(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        data
+      const body = new RequestClass(request, 'Reminder').data;
+      const result = await response.locals.invoker(
+        this._reminderLambdaName,
+        'createReminder',
+        { payload: body }
       );
 
       response.status(statusCodes.OK).json(result);
@@ -61,10 +57,10 @@ class ReminderController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._reminderManager.deleteReminderByID(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.entityID
+      const result = await response.locals.invoker(
+        this._reminderLambdaName,
+        'deleteReminderByID',
+        { pathParameters: { entityId: request.params.entityID } }
       );
 
       response.status(statusCodes.OK).json(result);
@@ -79,10 +75,10 @@ class ReminderController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._reminderManager.getAllRemindersOfNode(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.nodeID
+      const result = await response.locals.invoker(
+        this._reminderLambdaName,
+        'getAllRemindersOfNode',
+        { pathParameters: { nodeId: request.params.nodeID } }
       );
 
       response.status(statusCodes.OK).json(result);
@@ -97,10 +93,10 @@ class ReminderController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._reminderManager.deleteAllRemindersOfNode(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.nodeID
+      const result = await response.locals.invoker(
+        this._reminderLambdaName,
+        'deleteAllRemindersOfNode',
+        { pathParameters: { nodeId: request.params.nodeID } }
       );
 
       response.status(statusCodes.OK).json(result);
@@ -115,9 +111,9 @@ class ReminderController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._reminderManager.getAllRemindersOfWorkspace(
-        response.locals.workspaceID,
-        response.locals.idToken
+      const result = await response.locals.invoker(
+        this._reminderLambdaName,
+        'getAllRemindersOfWorkspace'
       );
 
       response.status(statusCodes.OK).json(result);
