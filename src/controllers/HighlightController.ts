@@ -3,17 +3,19 @@ import container from '../inversify.config';
 import { Redis } from '../libs/RedisClass';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
-import { HighlightManager } from '../managers/HighlightManager';
 import { initializeHighlightRoutes } from '../routes/HighlightsRoute';
+
+import { InvocationType } from '../libs/LambdaClass';
+import { STAGE } from '../env';
 
 class HighlightController {
   public _urlPath = '/highlight';
   public _router = express.Router();
 
-  public _highlightManager: HighlightManager =
-    container.get<HighlightManager>(HighlightManager);
-
   private _redisCache: Redis = container.get<Redis>(Redis);
+
+  private _lambdaInvocationType: InvocationType = 'RequestResponse';
+  private _highlightServiceLambdaName = `highlights-${STAGE}-main`;
 
   constructor() {
     initializeHighlightRoutes(this);
@@ -25,12 +27,13 @@ class HighlightController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const requestDetail = new RequestClass(request);
-      this._redisCache.del(requestDetail.data.entityId);
-      const result = await this._highlightManager.createHighlight(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        requestDetail.data
+      const data = new RequestClass(request).data;
+      this._redisCache.del(data.entityId);
+      const result = await response.locals.invoker(
+        this._highlightServiceLambdaName,
+        this._lambdaInvocationType,
+        'createHighlight',
+        { payload: data }
       );
 
       response.status(statusCodes.OK).json(result);
@@ -52,19 +55,20 @@ class HighlightController {
 
       const nonCachedIds = data.ids.minus(cachedHits.map(item => item.id));
 
-      const managerResponse = !nonCachedIds.isEmpty()
-        ? await this._highlightManager.getMultipleHighlights(
-            response.locals.workspaceID,
-            response.locals.idToken,
-            nonCachedIds
+      const lambdaResponse = !nonCachedIds.isEmpty()
+        ? await response.locals.invoker(
+            this._highlightServiceLambdaName,
+            this._lambdaInvocationType,
+            'getHighlightByIDs',
+            { payload: { ids: nonCachedIds } }
           )
         : [];
 
       this._redisCache.mset(
-        managerResponse.toObject('entityId', JSON.stringify)
+        lambdaResponse.toObject('entityId', JSON.stringify)
       );
 
-      response.status(statusCodes.OK).json([...managerResponse, ...cachedHits]);
+      response.status(statusCodes.OK).json([...lambdaResponse, ...cachedHits]);
     } catch (error) {
       next(error);
     }
@@ -76,9 +80,10 @@ class HighlightController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._highlightManager.getAllHighlightsOfWorkspace(
-        response.locals.workspaceID,
-        response.locals.idToken
+      const result = await response.locals.invoker(
+        this._highlightServiceLambdaName,
+        this._lambdaInvocationType,
+        'getAllHighlightsOfWorkspace'
       );
 
       this._redisCache.mset(result.Items.toObject('entityId', JSON.stringify));
@@ -95,12 +100,15 @@ class HighlightController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      await this._highlightManager.deleteHighlight(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.entityId
+      const entityId = request.params.entityId;
+      await response.locals.invoker(
+        this._highlightServiceLambdaName,
+        this._lambdaInvocationType,
+        'deleteHighlightByID',
+        { pathParameters: { entityId: entityId } }
       );
-      this._redisCache.del(request.params.entityId);
+
+      this._redisCache.del(entityId);
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {

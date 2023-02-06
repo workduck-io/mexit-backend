@@ -1,18 +1,21 @@
 import express, { NextFunction, Request, Response } from 'express';
+import { STAGE } from '../env';
 import { NodeResponse } from '../interfaces/Response';
 import container from '../inversify.config';
+import { InvocationType } from '../libs/LambdaClass';
 import { Redis } from '../libs/RedisClass';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
-import { SnippetManager } from '../managers/SnippetManager';
 import { initializeSnippetRoutes } from '../routes/SnippetRoutes';
 class SnippetController {
   public _urlPath = '/snippet';
   public _router = express.Router();
-  public _snippetManager: SnippetManager =
-    container.get<SnippetManager>(SnippetManager);
-  public _transformer: Transformer = container.get<Transformer>(Transformer);
+
+  private _lambdaInvocationType: InvocationType = 'RequestResponse';
+  private _snippetLambdaFunctionName = `mex-backend-${STAGE}-Snippet`;
+
+  private _transformer: Transformer = container.get<Transformer>(Transformer);
   private _redisCache: Redis = container.get<Redis>(Redis);
   private _UserAccessLabel = 'USERACCESS_SNIPPET';
   private _PublicSnippetMockWorkspace = 'PUBLIC';
@@ -30,12 +33,16 @@ class SnippetController {
       const createNextVersion = request.query.createNextVersion === 'true';
       //TODO: update cache instead of deleting it
       this._redisCache.del(request.body.id);
-      const snippetResult = await this._snippetManager.createSnippet(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.body,
-        createNextVersion
+      const snippetResult = await response.locals.invoker(
+        this._snippetLambdaFunctionName,
+        this._lambdaInvocationType,
+        'createSnippet',
+        {
+          payload: request.body,
+          queryStringParameters: { createNextVersion: createNextVersion },
+        }
       );
+
       const deserialisedContent = this._transformer.genericNodeConverter(
         snippetResult,
         false
@@ -67,10 +74,11 @@ class SnippetController {
           force: !this._redisCache.has(userSpecificNodeKey),
         },
         () =>
-          this._snippetManager.getSnippet(
-            snippetId,
-            response.locals.workspaceID,
-            response.locals.idToken
+          response.locals.invoker(
+            this._snippetLambdaFunctionName,
+            this._lambdaInvocationType,
+            'getSnippet',
+            { pathParameters: { id: snippetId } }
           )
       );
       this._redisCache.set(userSpecificNodeKey, snippetId);
@@ -109,10 +117,16 @@ class SnippetController {
       const nonCachedIds = ids.minus(cachedHits.map(item => item.id));
 
       const { successful, failed } = !nonCachedIds.isEmpty()
-        ? await this._snippetManager.bulkGetSnippet(
-            nonCachedIds,
-            response.locals.workspaceID,
-            response.locals.idToken
+        ? await response.locals.invoker(
+            this._snippetLambdaFunctionName,
+            this._lambdaInvocationType,
+            'getSnippet',
+            {
+              allSettled: {
+                ids: nonCachedIds,
+                key: 'id',
+              },
+            }
           )
         : { successful: [], failed: [] };
 
@@ -147,10 +161,11 @@ class SnippetController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const result = await this._snippetManager.getAllVersionsOfSnippet(
-        request.params.snippetId,
-        response.locals.workspaceID,
-        response.locals.idToken
+      const result = await response.locals.invoker(
+        this._snippetLambdaFunctionName,
+        this._lambdaInvocationType,
+        'getAllVersionsOfSnippet',
+        { pathParameters: { id: request.params.snippetId } }
       );
 
       response.status(statusCodes.OK).json(result);
@@ -166,10 +181,11 @@ class SnippetController {
   ): Promise<void> => {
     try {
       const getData = request.query.getData === 'true';
-      const result = await this._snippetManager.getAllSnippetsOfWorkspace(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        getData
+      const result = await response.locals.invoker(
+        this._snippetLambdaFunctionName,
+        this._lambdaInvocationType,
+        'getAllSnippetsOfWorkspace',
+        { queryStringParameters: { getData: getData } }
       );
 
       response.status(statusCodes.OK).json(result);
@@ -186,11 +202,12 @@ class SnippetController {
     try {
       const snippetId = request.params.id;
       const version = request.params.version;
-      await this._snippetManager.makeSnippetPublic(
-        snippetId,
-        version,
-        response.locals.workspaceID,
-        response.locals.idToken
+
+      await response.locals.invoker(
+        this._snippetLambdaFunctionName,
+        this._lambdaInvocationType,
+        'makeSnippetPublic',
+        { pathParameters: { id: snippetId, version: version } }
       );
       this._redisCache.set(
         this._transformer.encodeCacheKey(
@@ -214,12 +231,13 @@ class SnippetController {
       const snippetId = request.params.id;
       const version = request.params.version;
 
-      await this._snippetManager.makeSnippetPrivate(
-        snippetId,
-        version,
-        response.locals.workspaceID,
-        response.locals.idToken
+      await response.locals.invoker(
+        this._snippetLambdaFunctionName,
+        this._lambdaInvocationType,
+        'makeSnippetPrivate',
+        { pathParameters: { id: snippetId, version: version } }
       );
+
       this._redisCache.del(
         this._transformer.encodeCacheKey(
           this._PublicSnippetMockWorkspace,
@@ -253,11 +271,11 @@ class SnippetController {
           ),
         },
         () =>
-          this._snippetManager.getPublicSnippet(
-            snippetId,
-            version,
-            response.locals.workspaceID,
-            response.locals.idToken
+          response.locals.invoker(
+            this._snippetLambdaFunctionName,
+            this._lambdaInvocationType,
+            'getPublicSnippet',
+            { pathParameters: { id: snippetId, version: version } }
           )
       );
 
@@ -278,11 +296,11 @@ class SnippetController {
       const snippetId = request.params.id;
       const version = request.params.version;
 
-      const result = await this._snippetManager.clonePublicSnippet(
-        snippetId,
-        version,
-        response.locals.workspaceID,
-        response.locals.idToken
+      const result = await response.locals.invoker(
+        this._snippetLambdaFunctionName,
+        this._lambdaInvocationType,
+        'clonePublicSnippet',
+        { pathParameters: { id: snippetId, version: version } }
       );
 
       response.json(result);
@@ -304,11 +322,14 @@ class SnippetController {
         ? parseInt(request.query['version'] as string)
         : undefined;
 
-      await this._snippetManager.deleteVersionOfSnippet(
-        snippetID,
-        response.locals.workspaceID,
-        response.locals.idToken,
-        version
+      await response.locals.invoker(
+        this._snippetLambdaFunctionName,
+        this._lambdaInvocationType,
+        'deleteVersionOfSnippet',
+        {
+          pathParameters: { id: snippetID },
+          ...(version && { queryStringParameters: { version: version } }),
+        }
       );
 
       response.status(statusCodes.NO_CONTENT).send();
@@ -325,10 +346,11 @@ class SnippetController {
     try {
       const snippetID = request.params.id;
 
-      await this._snippetManager.deleteAllVersionsOfSnippet(
-        snippetID,
-        response.locals.workspaceID,
-        response.locals.idToken
+      await response.locals.invoker(
+        this._snippetLambdaFunctionName,
+        this._lambdaInvocationType,
+        'deleteAllVersionsOfSnippet',
+        { pathParameters: { id: snippetID } }
       );
 
       response.status(statusCodes.NO_CONTENT).send();
@@ -345,12 +367,16 @@ class SnippetController {
     try {
       const body = new RequestClass(request, 'UpdateMetadata').data;
 
-      await this._snippetManager.updateSnippetMetadata(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.id,
-        body
+      await response.locals.invoker(
+        this._snippetLambdaFunctionName,
+        this._lambdaInvocationType,
+        'updateSnippetMetadata',
+        {
+          pathParameters: { id: request.params.id },
+          payload: { ...body, type: 'MetadataRequest' },
+        }
       );
+
       this._redisCache.del(request.params.id);
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
