@@ -32,7 +32,7 @@ class CommentController {
     try {
       const result = await response.locals.invoker(
         this._commentLambdaName,
-        this._lambdaInvocationType,
+
         'getCommentByID',
         {
           pathParameters: {
@@ -60,7 +60,7 @@ class CommentController {
       );
       const result = await response.locals.invoker(
         this._commentLambdaName,
-        this._lambdaInvocationType,
+
         'createComment',
         { payload: data }
       );
@@ -79,7 +79,7 @@ class CommentController {
     try {
       await response.locals.invoker(
         this._commentLambdaName,
-        this._lambdaInvocationType,
+
         'deleteCommentByID',
         {
           pathParameters: {
@@ -103,7 +103,7 @@ class CommentController {
     try {
       const result = await response.locals.invoker(
         this._commentLambdaName,
-        this._lambdaInvocationType,
+
         'getAllCommentsOfNode',
         {
           pathParameters: { nodeId: request.params.nodeID },
@@ -138,7 +138,7 @@ class CommentController {
         () =>
           response.locals.invoker(
             this._commentLambdaName,
-            this._lambdaInvocationType,
+
             'getAllCommentsOfBlock',
             {
               pathParameters: {
@@ -185,7 +185,7 @@ class CommentController {
       const lambdaResponse = !nonCachedIds.isEmpty()
         ? await response.locals.invoker(
             this._commentLambdaName,
-            this._lambdaInvocationType,
+
             'getAllCommentsOfBlock',
             {
               pathParameters: { nodeId: request.params.nodeID },
@@ -229,7 +229,7 @@ class CommentController {
     try {
       const result = await response.locals.invoker(
         this._commentLambdaName,
-        this._lambdaInvocationType,
+
         'getAllCommentsOfThread',
         {
           pathParameters: {
@@ -254,7 +254,7 @@ class CommentController {
     try {
       const result = await response.locals.invoker(
         this._commentLambdaName,
-        this._lambdaInvocationType,
+
         'deleteAllCommentsOfNode',
         {
           pathParameters: {
@@ -283,7 +283,7 @@ class CommentController {
       );
       const result = await response.locals.invoker(
         this._commentLambdaName,
-        this._lambdaInvocationType,
+
         'deleteAllCommentsOfBlock',
         {
           pathParameters: {
@@ -307,7 +307,7 @@ class CommentController {
     try {
       const result = await response.locals.invoker(
         this._commentLambdaName,
-        this._lambdaInvocationType,
+
         'deleteAllCommentsOfThread',
         {
           pathParameters: {

@@ -21,7 +21,7 @@ export class BookmarkManager {
   ): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._userStarLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.createBookmark,
         headers: { authorization: idToken, 'mex-workspace-id': workspaceId },
@@ -40,7 +40,7 @@ export class BookmarkManager {
   ): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._userStarLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.removeBookmark,
         headers: { authorization: idToken, 'mex-workspace-id': workspaceId },
@@ -58,7 +58,7 @@ export class BookmarkManager {
   ): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._userStarLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.getAllBookmarks,
         headers: { authorization: idToken, 'mex-workspace-id': workspaceId },
@@ -76,7 +76,7 @@ export class BookmarkManager {
   ): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._userStarLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.batchCreateBookmark,
         payload: requestBody,
@@ -95,7 +95,7 @@ export class BookmarkManager {
   ): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._userStarLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.batchRemoveBookmark,
         payload: requestBody,

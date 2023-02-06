@@ -36,7 +36,7 @@ export class SharedManager {
 
     const response = await this._lambda.invokeAndCheck(
       this._nodeLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.shareNode,
         payload: payloadDetail,
@@ -54,7 +54,7 @@ export class SharedManager {
   ): Promise<any> {
     const response = await this._lambda.invokeAndCheck(
       this._nodeLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.updateAccessTypeForshareNode,
         payload: {
@@ -75,7 +75,7 @@ export class SharedManager {
   ): Promise<any> {
     const response = await this._lambda.invokeAndCheck(
       this._nodeLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.revokeNodeAccessForUsers,
         payload: {
@@ -97,7 +97,7 @@ export class SharedManager {
   ): Promise<any> {
     const response = await this._lambda.invokeAndCheck(
       this._nodeLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.getNodeSharedWithUser,
         pathParameters: { nodeID: nodeId },
@@ -115,7 +115,7 @@ export class SharedManager {
   ): Promise<any> {
     const response = await this._lambda.invokeAndCheck(
       this._nodeLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.updateSharedNode,
         payload: { ...nodeDetail, type: 'UpdateSharedNodeRequest' },
@@ -133,7 +133,7 @@ export class SharedManager {
   ): Promise<any> {
     const response = await this._lambda.invokeAndCheck(
       this._nodeLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.getUsersWithNodesShared,
         pathParameters: { id: nodeId },
@@ -150,7 +150,7 @@ export class SharedManager {
   ): Promise<any> {
     const response = await this._lambda.invokeAndCheck(
       this._nodeLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.getAllSharedNodeForUser,
         headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
@@ -168,7 +168,7 @@ export class SharedManager {
     const lambdaPromises = nodeIDs.map(id =>
       this._lambda.invokeAndCheck(
         this._nodeLambdaFunctionName,
-        this._lambdaInvocationType,
+
         {
           routeKey: RouteKeys.getNodeSharedWithUser,
           pathParameters: { nodeID: id },

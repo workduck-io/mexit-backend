@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { errorlib } from '../libs/errorlib';
-import { InvocationType, invokeAndCheck } from '../libs/LambdaClass';
+import { invokeAndCheck } from '../libs/LambdaClass';
 import { RouteKeys } from '../libs/routeKeys';
 import { statusCodes } from '../libs/statusCodes';
 import {
@@ -15,7 +15,6 @@ async function InvokeLambda(
 ): Promise<void> {
   res.locals.invoker = async <T = any>(
     functionName: string,
-    invocationType: InvocationType,
     routeKey: keyof typeof RouteKeys,
     options: LambdaInvokePayloadOptions<T>
   ) => {
@@ -33,7 +32,7 @@ async function InvokeLambda(
               },
             }
           );
-          return invokeAndCheck(functionName, invocationType, invokePayload);
+          return invokeAndCheck(functionName, 'RequestResponse', invokePayload);
         });
 
         return await Promise.allSettled(promises);
@@ -45,7 +44,7 @@ async function InvokeLambda(
         );
         return await invokeAndCheck(
           functionName,
-          invocationType,
+          'RequestResponse',
           invokePayload
         );
       }

@@ -40,7 +40,7 @@ class UserController {
     try {
       const result = await response.locals.invoker(
         this._userLambdaFunctionName,
-        this._lambdaInvocationType,
+
         'updateUserDetails',
         { payload: data }
       );
@@ -62,7 +62,7 @@ class UserController {
 
       const result = await response.locals.invoker(
         this._userLambdaFunctionName,
-        this._lambdaInvocationType,
+
         'updateUserPreference',
         {
           payload: requestDetail,
@@ -83,7 +83,7 @@ class UserController {
     try {
       const result = await response.locals.invoker(
         this._getUserLambdaFunctionName,
-        this._lambdaInvocationType,
+
         'getUser'
       );
 
@@ -102,7 +102,7 @@ class UserController {
       const inviteId = request.params.inviteId;
       const result = await response.locals.invoker(
         this._inviteUserLambdaFunctionName,
-        this._lambdaInvocationType,
+
         'getInvite',
         { pathParameters: { inviteId: inviteId } }
       );
@@ -122,7 +122,7 @@ class UserController {
       const inviteId = request.params.inviteId;
       await response.locals.invoker(
         this._inviteUserLambdaFunctionName,
-        this._lambdaInvocationType,
+
         'deleteInvite',
         {
           pathParameters: { inviteId: inviteId },
@@ -143,7 +143,7 @@ class UserController {
     try {
       const result = await response.locals.invoker(
         this._inviteUserLambdaFunctionName,
-        this._lambdaInvocationType,
+
         'getAllInviteOfWorkspace'
       );
 
@@ -162,7 +162,7 @@ class UserController {
       const payload = new RequestClass(request, 'InviteProperties').data;
       const result = await response.locals.invoker(
         this._inviteUserLambdaFunctionName,
-        this._lambdaInvocationType,
+
         'createInvite',
         { payload: payload }
       );
@@ -181,7 +181,7 @@ class UserController {
     try {
       const result = await response.locals.invoker(
         this._getUserLambdaFunctionName,
-        this._lambdaInvocationType,
+
         'getById',
         {
           pathParameters: { userId: request.params.id },
@@ -201,7 +201,7 @@ class UserController {
     try {
       const result = await response.locals.invoker(
         this._getUserLambdaFunctionName,
-        this._lambdaInvocationType,
+
         'getByEmail',
         { pathParameters: { email: request.params.mail } }
       );
@@ -219,7 +219,7 @@ class UserController {
     try {
       const result = await response.locals.invoker(
         this._userLambdaFunctionName,
-        this._lambdaInvocationType,
+
         'getUsersOfWorkspace'
       );
 
@@ -238,7 +238,7 @@ class UserController {
       payload.linkedinURL = payload.linkedinURL.replace(/\/+$/, '');
       const result = await response.locals.invoker(
         this._getUserLambdaFunctionName,
-        this._lambdaInvocationType,
+
         'getUserByLinkedin',
         { payload: payload }
       );
@@ -259,7 +259,7 @@ class UserController {
     try {
       const registerStatus = await response.locals.invoker(
         this._registerStatusLambdaFunctionName,
-        this._lambdaInvocationType,
+
         'registerStatus'
       );
 

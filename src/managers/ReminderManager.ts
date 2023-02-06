@@ -21,7 +21,7 @@ export class ReminderManager {
   ): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._reminderLambdaName,
-      this._lambdaInvocationType,
+
       {
         httpMethod: 'GET',
         routeKey: RouteKeys.getReminderByID,
@@ -41,7 +41,7 @@ export class ReminderManager {
   ): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._reminderLambdaName,
-      this._lambdaInvocationType,
+
       {
         httpMethod: 'POST',
         routeKey: RouteKeys.createReminder,
@@ -62,7 +62,7 @@ export class ReminderManager {
   ): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._reminderLambdaName,
-      this._lambdaInvocationType,
+
       {
         httpMethod: 'DELETE',
         routeKey: RouteKeys.deleteReminderByID,
@@ -82,7 +82,7 @@ export class ReminderManager {
   ): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._reminderLambdaName,
-      this._lambdaInvocationType,
+
       {
         httpMethod: 'GET',
         routeKey: RouteKeys.getAllRemindersOfNode,
@@ -102,7 +102,7 @@ export class ReminderManager {
   ): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._reminderLambdaName,
-      this._lambdaInvocationType,
+
       {
         httpMethod: 'DELETE',
         routeKey: RouteKeys.deleteAllRemindersOfNode,
@@ -121,7 +121,7 @@ export class ReminderManager {
   ): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._reminderLambdaName,
-      this._lambdaInvocationType,
+
       {
         httpMethod: 'GET',
         routeKey: RouteKeys.getAllRemindersOfWorkspace,
