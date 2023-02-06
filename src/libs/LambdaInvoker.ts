@@ -69,7 +69,6 @@ export async function invokeAndCheck(
   invocationSource: InvocationSource = 'APIGateway'
 ) {
   const response = await invoke(functionName, invocationType, options, sendRawBody, invocationSource);
-  console.log('Resposne: ', response);
   const body = JSONX.parse(response.body);
 
   if ((response.statusCode !== 200 && response.statusCode !== 204) || !response.statusCode) {
