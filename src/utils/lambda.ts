@@ -20,7 +20,7 @@ export const generateLambdaInvokePayload = <T = any>(
   options?: LambdaInvokePayloadOptions<T>
 ): LambdaOptions => {
   let headers = {
-    'mex-workspace-id': locals?.workspaceID,
+    'mex-workspace-id': locals?.workspaceID ?? '',
     authorization: locals?.idToken,
   };
 

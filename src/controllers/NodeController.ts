@@ -28,37 +28,24 @@ class NodeController {
     initializeNodeRoutes(this);
   }
 
-  updateILinkCache = async (
-    locals: LocalsX,
-    namespaceID: string
-  ): Promise<any> => {
+  updateILinkCache = async (locals: LocalsX, namespaceID: string): Promise<any> => {
     const payload = generateLambdaInvokePayload(locals, 'getNamespace', {
       pathParameters: { id: namespaceID },
     });
 
-    const namespace = await invokeAndCheck(
-      this._nsLambdaFunctionName,
-      'RequestResponse',
-      payload
-    );
+    const namespace = await invokeAndCheck(this._nsLambdaFunctionName, 'RequestResponse', payload);
     await this._redisCache.set(namespaceID, namespace);
   };
 
-  createNode = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  createNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const body = new RequestClass(request, 'ContentNodeRequest').data;
       //TODO: update cache instead of deleting it
       this._redisCache.del(body.id);
 
-      const nodeResult = await response.locals.invoker(
-        this._nodeLambdaFunctionName,
-        'createNode',
-        { payload: { ...body, type: 'NodeRequest' } }
-      );
+      const nodeResult = await response.locals.invoker(this._nodeLambdaFunctionName, 'createNode', {
+        payload: { ...body, type: 'NodeRequest' },
+      });
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { data, ...rest } = nodeResult; //Dont relay data to frontend
@@ -70,11 +57,7 @@ class NodeController {
     }
   };
 
-  getNode = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const nodeId = request.params.nodeId;
       const namespaceID = (request.query['namespaceID'] as string) ?? undefined;
@@ -105,57 +88,40 @@ class NodeController {
     }
   };
 
-  getMultipleNode = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getMultipleNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const requestDetail = new RequestClass(request, 'GetMultipleIds');
       const namespaceID = request.query['namespaceID'] as string;
       const ids = requestDetail.data.ids;
       const cachedUserAccess = await this._redisCache.mget(
-        ids.map(id =>
-          this._transformer.encodeCacheKey(
-            this._UserAccessLabel,
-            response.locals.userId,
-            id
-          )
-        )
+        ids.map(id => this._transformer.encodeCacheKey(this._UserAccessLabel, response.locals.userId, id))
       );
 
       const verifiedNodes = ids.intersection(cachedUserAccess); //Checking if user has acess)
 
-      const cachedHits = (await this._redisCache.mget(verifiedNodes))
-        .filterEmpty()
-        .map(hits => JSON.parse(hits));
+      const cachedHits = (await this._redisCache.mget(verifiedNodes)).filterEmpty().map(hits => JSON.parse(hits));
 
       const nonCachedIds = ids.minus(cachedHits.map(item => item.id));
 
-      const lambdaResponse = !nonCachedIds.isEmpty()
-        ? await response.locals.invoker(
-            this._nodeLambdaFunctionName,
-            'getMultipleNode',
-            {
-              payload: { ids: nonCachedIds },
-              ...(namespaceID && {
-                queryStringParameters: { namespaceID: namespaceID },
-              }),
-            }
-          )
-        : { successful: [], failed: [] };
-      await this._redisCache.mset(
-        lambdaResponse.successful.toObject('id', JSON.stringify)
-      );
+      let lambdaResponse = { successful: [], failed: [] };
+      if (!nonCachedIds.isEmpty()) {
+        const rawLambdaResp = await response.locals.invoker(this._nodeLambdaFunctionName, 'getMultipleNode', {
+          payload: { ids: nonCachedIds },
+          ...(namespaceID && {
+            queryStringParameters: { namespaceID: namespaceID },
+          }),
+        });
+
+        const fetchedIDs = new Set(rawLambdaResp.map(node => node.id));
+        const failedIDs = nonCachedIds.filter(id => !fetchedIDs.has(id));
+        lambdaResponse = { successful: rawLambdaResp, failed: failedIDs };
+      }
+
+      await this._redisCache.mset(lambdaResponse.successful.toObject('id', JSON.stringify));
 
       this._redisCache.mset(
         lambdaResponse.successful.toObject(
-          val =>
-            this._transformer.encodeCacheKey(
-              this._UserAccessLabel,
-              response.locals.userId,
-              val.id
-            ),
+          val => this._transformer.encodeCacheKey(this._UserAccessLabel, response.locals.userId, val.id),
           val => val.id
         )
       );
@@ -168,21 +134,13 @@ class NodeController {
     }
   };
 
-  appendNode = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  appendNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const blockDetail = new RequestClass(request, 'AppendBlockRequest').data;
-      const result = await response.locals.invoker(
-        this._nodeLambdaFunctionName,
-        'appendNode',
-        {
-          pathParameters: { id: request.params.nodeId },
-          payload: { ...blockDetail, type: 'ElementRequest' },
-        }
-      );
+      const result = await response.locals.invoker(this._nodeLambdaFunctionName, 'appendNode', {
+        pathParameters: { id: request.params.nodeId },
+        payload: { ...blockDetail, type: 'ElementRequest' },
+      });
 
       this._redisCache.del(request.params.nodeId);
       response.status(statusCodes.OK).json(result);
@@ -191,21 +149,15 @@ class NodeController {
     }
   };
 
-  deleteBlocks = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  deleteBlocks = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const nodeBlockMap = new RequestClass(request, 'DeleteBlocksRequest')
-        .data;
+      const nodeBlockMap = new RequestClass(request, 'DeleteBlocksRequest').data;
 
       const result = Object.entries(nodeBlockMap).map(([nodeId, blockIds]) => {
-        return response.locals.invoker(
-          this._nodeLambdaFunctionName,
-          'deleteBlocks',
-          { payload: { ids: blockIds }, pathParameters: { id: nodeId } }
-        );
+        return response.locals.invoker(this._nodeLambdaFunctionName, 'deleteBlocks', {
+          payload: { ids: blockIds },
+          pathParameters: { id: nodeId },
+        });
       });
 
       this._redisCache.mdel(Object.keys(nodeBlockMap));
@@ -216,11 +168,7 @@ class NodeController {
     }
   };
 
-  copyOrMoveBlock = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  copyOrMoveBlock = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const data = new RequestClass(request, 'CopyOrMoveBlockRequest').data;
 
@@ -235,11 +183,7 @@ class NodeController {
         destinationNodeID: data.destinationNodeId,
       };
 
-      await response.locals.invoker(
-        this._nodeLambdaFunctionName,
-        'copyOrMoveBlock',
-        { payload: payload }
-      );
+      await response.locals.invoker(this._nodeLambdaFunctionName, 'copyOrMoveBlock', { payload: payload });
 
       response.status(statusCodes.NO_CONTENT).json();
     } catch (error) {
@@ -247,18 +191,10 @@ class NodeController {
     }
   };
 
-  makeNodePublic = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  makeNodePublic = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const nodeId = request.params.id;
-      await response.locals.invoker(
-        this._nodeLambdaFunctionName,
-        'makeNodePublic',
-        { pathParameters: { id: nodeId } }
-      );
+      await response.locals.invoker(this._nodeLambdaFunctionName, 'makeNodePublic', { pathParameters: { id: nodeId } });
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
@@ -266,18 +202,12 @@ class NodeController {
     }
   };
 
-  makeNodePrivate = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  makeNodePrivate = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const nodeId = request.params.id;
-      await response.locals.invoker(
-        this._nodeLambdaFunctionName,
-        'makeNodePrivate',
-        { pathParameters: { id: nodeId } }
-      );
+      await response.locals.invoker(this._nodeLambdaFunctionName, 'makeNodePrivate', {
+        pathParameters: { id: nodeId },
+      });
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
@@ -285,26 +215,19 @@ class NodeController {
     }
   };
 
-  archiveNode = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  archiveNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const body = new RequestClass(request, 'ArchiveNodeDetail').data;
       const namespaceID = request.query['namespaceID'] as string;
 
       if (!namespaceID) {
-        response
-          .status(statusCodes.BAD_REQUEST)
-          .json({ message: 'NamespaceID missing in query parameters' });
+        response.status(statusCodes.BAD_REQUEST).json({ message: 'NamespaceID missing in query parameters' });
       }
 
-      const archiveNodeResult = await response.locals.invoker(
-        this._nodeLambdaFunctionName,
-        'archiveNode',
-        { payload: body, queryStringParameters: { namespaceID: namespaceID } }
-      );
+      const archiveNodeResult = await response.locals.invoker(this._nodeLambdaFunctionName, 'archiveNode', {
+        payload: body,
+        queryStringParameters: { namespaceID: namespaceID },
+      });
 
       response.status(statusCodes.OK).json(archiveNodeResult);
 
@@ -314,21 +237,13 @@ class NodeController {
     }
   };
 
-  deleteArchivedNode = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  deleteArchivedNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const body = new RequestClass(request, 'ArchiveNodeDetail').data;
 
-      await response.locals.invoker(
-        this._nodeLambdaFunctionName,
-        'deleteArchivedNode',
-        {
-          payload: body,
-        }
-      );
+      await response.locals.invoker(this._nodeLambdaFunctionName, 'deleteArchivedNode', {
+        payload: body,
+      });
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
@@ -336,28 +251,18 @@ class NodeController {
     }
   };
 
-  unArchiveNode = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  unArchiveNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const body = new RequestClass(request, 'ArchiveNodeDetail').data;
       const namespaceID = request.query['namespaceID'];
 
       if (!namespaceID) {
-        response
-          .status(statusCodes.BAD_REQUEST)
-          .json({ message: 'NamespaceID missing in query parameters' });
+        response.status(statusCodes.BAD_REQUEST).json({ message: 'NamespaceID missing in query parameters' });
       }
-      const archiveNodeResult = await response.locals.invoker(
-        this._nodeLambdaFunctionName,
-        'unArchiveNode',
-        {
-          payload: body,
-          queryStringParameters: { namespaceID: namespaceID },
-        }
-      );
+      const archiveNodeResult = await response.locals.invoker(this._nodeLambdaFunctionName, 'unArchiveNode', {
+        payload: body,
+        queryStringParameters: { namespaceID: namespaceID },
+      });
 
       response.status(statusCodes.OK).json(archiveNodeResult);
     } catch (error) {
@@ -365,67 +270,41 @@ class NodeController {
     }
   };
 
-  refactorHierarchy = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  refactorHierarchy = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const body = new RequestClass(request, 'RefactorRequest').data;
 
-      const refactorResp = await response.locals.invoker(
-        this._nodeLambdaFunctionName,
-        'refactorHierarchy',
-        { payload: { ...body, type: 'RefactorRequest' } }
-      );
+      const refactorResp = await response.locals.invoker(this._nodeLambdaFunctionName, 'refactorHierarchy', {
+        payload: { ...body, type: 'RefactorRequest' },
+      });
 
       const { changedPaths } = refactorResp;
-      const parsedChangedPathsRefactor =
-        this._transformer.refactoredPathsHierarchyParser(changedPaths);
+      const parsedChangedPathsRefactor = this._transformer.refactoredPathsHierarchyParser(changedPaths);
 
-      response
-        .status(statusCodes.OK)
-        .json({ changedPaths: parsedChangedPathsRefactor });
+      response.status(statusCodes.OK).json({ changedPaths: parsedChangedPathsRefactor });
 
-      await this.updateILinkCache(
-        response.locals,
-        body.existingNodePath.namespaceID
-      );
-      await this.updateILinkCache(
-        response.locals,
-        body.newNodePath.namespaceID
-      );
+      await this.updateILinkCache(response.locals, body.existingNodePath.namespaceID);
+      await this.updateILinkCache(response.locals, body.newNodePath.namespaceID);
     } catch (error) {
       next(error);
     }
   };
 
-  bulkCreateNode = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  bulkCreateNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const body = new RequestClass(request, 'BulkCreateNode').data;
 
-      const bulkCreateResp = await response.locals.invoker(
-        this._nodeLambdaFunctionName,
-        'bulkCreateNode',
-        {
-          payload: { ...body, type: 'NodeBulkRequest' },
-        }
-      );
+      const bulkCreateResp = await response.locals.invoker(this._nodeLambdaFunctionName, 'bulkCreateNode', {
+        payload: { ...body, type: 'NodeBulkRequest' },
+      });
 
       const { node, changedPaths } = bulkCreateResp;
       //TODO: Make part of TransformClass
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { data, dataOrder, ...rest } = node; //Dont relay data to frontend
-      const parsedChangedPathsRefactor =
-        this._transformer.refactoredPathsHierarchyParser(changedPaths);
+      const parsedChangedPathsRefactor = this._transformer.refactoredPathsHierarchyParser(changedPaths);
 
-      response
-        .status(statusCodes.OK)
-        .json({ node: rest, changedPaths: parsedChangedPathsRefactor });
+      response.status(statusCodes.OK).json({ node: rest, changedPaths: parsedChangedPathsRefactor });
 
       await this.updateILinkCache(response.locals, body.nodePath.namespaceID);
     } catch (error) {
@@ -433,16 +312,9 @@ class NodeController {
     }
   };
 
-  getArchivedNodes = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getArchivedNodes = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const getArchiveResp = await response.locals.invoker(
-        this._nodeLambdaFunctionName,
-        'getArchivedNodes'
-      );
+      const getArchiveResp = await response.locals.invoker(this._nodeLambdaFunctionName, 'getArchivedNodes');
 
       response.status(statusCodes.OK).json(getArchiveResp);
     } catch (error) {
@@ -450,23 +322,15 @@ class NodeController {
     }
   };
 
-  updateNodeMetadata = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  updateNodeMetadata = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const nodeID = request.params.id;
       const body = new RequestClass(request, 'UpdateMetadata').data;
 
-      await response.locals.invoker(
-        this._nodeLambdaFunctionName,
-        'updateNodeMetadata',
-        {
-          pathParameters: { id: nodeID },
-          payload: { ...body, type: 'MetadataRequest' },
-        }
-      );
+      await response.locals.invoker(this._nodeLambdaFunctionName, 'updateNodeMetadata', {
+        pathParameters: { id: nodeID },
+        payload: { ...body, type: 'MetadataRequest' },
+      });
       this._redisCache.del(nodeID);
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
