@@ -83,14 +83,23 @@ class SnippetController {
 
       const nonCachedIds = ids.minus(cachedHits.map(item => item.id));
 
-      const { successful, failed } = !nonCachedIds.isEmpty()
-        ? await response.locals.invoker(this._snippetLambdaFunctionName, 'getSnippet', {
-            allSettled: {
-              ids: nonCachedIds,
-              key: 'id',
-            },
-          })
-        : { successful: [], failed: [] };
+      let lambdaResponse = { successful: [], failed: [] };
+
+      if (!nonCachedIds.isEmpty()) {
+        const rawLambdaResponse = await response.locals.invoker(this._snippetLambdaFunctionName, 'getSnippet', {
+          allSettled: {
+            ids: nonCachedIds,
+            key: 'id',
+          },
+        });
+
+        rawLambdaResponse.forEach((prom, index) => {
+          if (prom.status === 'fulfilled') lambdaResponse.successful.push(prom.value);
+          else lambdaResponse.failed.push(nonCachedIds[index]);
+        });
+      }
+
+      const { successful, failed } = lambdaResponse;
 
       await this._redisCache.mset(successful.toObject('id', JSON.stringify));
 
