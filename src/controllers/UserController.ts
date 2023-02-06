@@ -5,7 +5,6 @@ import { statusCodes } from '../libs/statusCodes';
 import { initializeUserRoutes } from '../routes/UserRoutes';
 import { Transformer } from './../libs/TransformerClass';
 import { STAGE } from '../env';
-import { InvocationType } from '../libs/LambdaInvoker';
 
 class UserController {
   public _urlPath = '/user';
@@ -13,7 +12,6 @@ class UserController {
 
   public _transformer: Transformer = container.get<Transformer>(Transformer);
 
-  private _lambdaInvocationType: InvocationType = 'RequestResponse';
   private _userLambdaFunctionName = `workduck-user-service-${STAGE}-user`;
   private _getUserLambdaFunctionName = `workduck-user-service-${STAGE}-getUser`;
   private _userMexBackendLambdaFunctionName = `mex-backend-${STAGE}-User`;

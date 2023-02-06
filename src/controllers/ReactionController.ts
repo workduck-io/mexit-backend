@@ -1,7 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { STAGE } from '../env';
 import container from '../inversify.config';
-import { InvocationType } from '../libs/LambdaInvoker';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
@@ -12,7 +11,6 @@ class ReactionController {
   public _router = express.Router();
   public _transformer: Transformer = container.get<Transformer>(Transformer);
 
-  private _lambdaInvocationType: InvocationType = 'RequestResponse';
   private _reactionLambdaName = `reaction-${STAGE}-main`;
 
   private _additionalHeaders = { 'mex-api-ver': 'v2' };

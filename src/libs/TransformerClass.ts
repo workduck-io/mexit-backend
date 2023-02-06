@@ -24,7 +24,7 @@ interface ILinkResponse {
   nodesMetadata: { [nodeID: string]: any };
 }
 
-export interface NamespaceInfo {
+interface NamespaceInfo {
   id: string;
   name: string;
   createdAt: number;
@@ -39,13 +39,13 @@ interface ILinkWithMetadata extends ILink {
   metadata?: { icon?: IconMetadata };
 }
 
-export interface ParsedNamespaceHierarchy {
+interface ParsedNamespaceHierarchy {
   name: string;
   nodeHierarchy: ILinkWithMetadata[];
   namespaceMetadata?: { icon: IconMetadata };
 }
 
-export type AllNamespaceHierarchyResponse = {
+type AllNamespaceHierarchyResponse = {
   namespaceInfo: Record<
     string,
     {

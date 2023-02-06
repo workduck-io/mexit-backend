@@ -1,5 +1,3 @@
-import GuidGenerator from '../libs/GuidGenerator';
-
 import { NodeMetadata } from '../interfaces/Node';
 
 const removeNulls = (obj: any): any => {
@@ -39,62 +37,6 @@ const directPropertyKeys = [
   'value',
   'body',
 ];
-const PropKeysArray = [...directPropertyKeys] as const;
-type PropKeys = typeof PropKeysArray[number];
-type DirectProperties = Record<PropKeys, boolean | string>;
-
-// Keys that will be replicated as is
-const directKeys = [];
-
-// Keys that will be mapped to different key
-const mappedKeys = {
-  text: 'content',
-};
-
-// From content to api
-export const serializeContent = (content: any[]) => {
-  return content.map(el => {
-    const nl: any = {};
-    const directProperties: DirectProperties = {};
-
-    if (el.id) {
-      nl.id = el.id;
-    } else {
-      nl.id = GuidGenerator.generateTempGUID();
-    }
-
-    if (el.type) {
-      if (el.type !== 'paragraph') {
-        nl.elementType = el.type;
-      }
-    }
-
-    Object.keys(el).forEach(k => {
-      if (directPropertyKeys.includes(k)) {
-        directProperties[k] = el[k];
-      } else if (directKeys.includes(k)) {
-        nl[k] = el[k];
-      } else if (mappedKeys[k] !== undefined) {
-        nl[mappedKeys[k]] = el[k];
-      }
-    });
-
-    const nlproperties = {
-      ...directProperties,
-      ...el.properties,
-    };
-
-    if (Object.keys(nlproperties).length > 0) {
-      nl.properties = nlproperties;
-    }
-
-    if (el.children) {
-      nl.children = serializeContent(el.children);
-    }
-
-    return nl;
-  });
-};
 
 // From API to content
 export const deserializeContent = (sanatizedContent: any[]) => {

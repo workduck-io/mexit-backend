@@ -1,6 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { STAGE } from '../env';
-import { InvocationType } from '../libs/LambdaInvoker';
 import { statusCodes } from '../libs/statusCodes';
 import { initializePromptRoutes } from '../routes/PromptRoutes';
 
@@ -8,7 +7,6 @@ class PromptController {
   public _urlPath = '/prompt';
   public _router = express.Router();
 
-  private _lambdaInvocationType: InvocationType = 'RequestResponse';
   private _promptLambdaName = `gpt3Prompt-${STAGE}-main`;
 
   constructor() {

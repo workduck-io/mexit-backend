@@ -5,8 +5,8 @@ import { JSONX } from '../utils/JSONX';
 import LambdaConfig from './InvokeLambda';
 import { statusCodes } from './statusCodes';
 
-export type InvocationType = 'RequestResponse' | 'Event';
-export type InvocationSource = 'Direct' | 'APIGateway';
+type InvocationType = 'RequestResponse' | 'Event';
+type InvocationSource = 'Direct' | 'APIGateway';
 
 export interface LambdaOptions {
   payload?: any;
@@ -17,7 +17,7 @@ export interface LambdaOptions {
   httpMethod?: string;
 }
 
-export async function invoke(
+async function invoke(
   functionName: string,
   invocationType: InvocationType,
   options: LambdaOptions,

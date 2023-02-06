@@ -5,7 +5,6 @@ import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { initializeHighlightRoutes } from '../routes/HighlightsRoute';
 
-import { InvocationType } from '../libs/LambdaInvoker';
 import { STAGE } from '../env';
 
 class HighlightController {
@@ -14,7 +13,6 @@ class HighlightController {
 
   private _redisCache: Redis = container.get<Redis>(Redis);
 
-  private _lambdaInvocationType: InvocationType = 'RequestResponse';
   private _highlightServiceLambdaName = `highlights-${STAGE}-main`;
 
   constructor() {

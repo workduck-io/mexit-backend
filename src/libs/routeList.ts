@@ -30,7 +30,7 @@ const spacer = (x: number) =>
 export const colorText = (color: number, string: string) =>
   `\u001b[${color}m${string}\u001b[${COLORS.clear}m`;
 
-export const colorMethod = (method: string) => {
+const colorMethod = (method: string) => {
   switch (method) {
     case 'POST':
       return colorText(COLORS.yellow, method);

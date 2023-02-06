@@ -4,11 +4,11 @@ import jwkToPem from 'jwk-to-pem';
 import got from 'got';
 import { COGNITO_POOL_ID } from '../env';
 
-export interface ClaimVerifyRequest {
+interface ClaimVerifyRequest {
   readonly token?: string;
 }
 
-export interface ClaimVerifyResult {
+interface ClaimVerifyResult {
   readonly userEmail: string;
   readonly userId: string;
   readonly eventId: string;

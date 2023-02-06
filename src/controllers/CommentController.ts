@@ -1,7 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { STAGE } from '../env';
 import container from '../inversify.config';
-import { InvocationType } from '../libs/LambdaInvoker';
 import { Redis } from '../libs/RedisClass';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
@@ -17,7 +16,6 @@ class CommentController {
   private _UserAccessLabel = 'USERACCESS';
   private _CommentBlockLabel = 'COMMENTBLOCK';
 
-  private _lambdaInvocationType: InvocationType = 'RequestResponse';
   private _commentLambdaName = `comment-${STAGE}-main`;
 
   constructor() {

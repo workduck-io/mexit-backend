@@ -1,6 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { STAGE } from '../env';
-import { InvocationType } from '../libs/LambdaInvoker';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { initializeViewRoutes } from '../routes/ViewRoutes';
@@ -9,7 +8,6 @@ class ViewController {
   public _urlPath = '/view';
   public _router = express.Router();
 
-  private _lambdaInvocationType: InvocationType = 'RequestResponse';
   private _taskViewLambdaName = `task-${STAGE}-view`;
   private _additionalHeaders: { 'mex-api-ver': 'v2' };
 

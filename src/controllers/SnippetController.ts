@@ -2,7 +2,6 @@ import express, { NextFunction, Request, Response } from 'express';
 import { STAGE } from '../env';
 import { NodeResponse } from '../interfaces/Response';
 import container from '../inversify.config';
-import { InvocationType } from '../libs/LambdaInvoker';
 import { Redis } from '../libs/RedisClass';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
@@ -13,7 +12,6 @@ class SnippetController {
   public _urlPath = '/snippet';
   public _router = express.Router();
 
-  private _lambdaInvocationType: InvocationType = 'RequestResponse';
   private _snippetLambdaFunctionName = `mex-backend-${STAGE}-Snippet`;
 
   private _transformer: Transformer = container.get<Transformer>(Transformer);
