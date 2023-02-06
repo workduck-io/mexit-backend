@@ -20,7 +20,7 @@ export class NamespaceManager {
   ): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._namespaceLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.createNamespace,
         payload: { ...namespaceDetail, type: 'NamespaceRequest' },
@@ -38,7 +38,7 @@ export class NamespaceManager {
   ): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._namespaceLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.getNamespace,
         pathParameters: { id: namespaceId },
@@ -56,7 +56,7 @@ export class NamespaceManager {
   ): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._namespaceLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.updateNamespace,
         payload: { ...namespaceDetail, type: 'NamespaceRequest' },
@@ -74,7 +74,7 @@ export class NamespaceManager {
   ): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._namespaceLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.makeNamespacePublic,
         pathParameters: { id: namespaceId },
@@ -92,7 +92,7 @@ export class NamespaceManager {
   ): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._namespaceLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.makeNamespacePrivate,
         pathParameters: { id: namespaceId },
@@ -106,7 +106,7 @@ export class NamespaceManager {
   async getPublicNamespace(idToken: string, namespaceId: string): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._namespaceLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.getPublicNamespace,
         pathParameters: { id: namespaceId },
@@ -120,7 +120,7 @@ export class NamespaceManager {
   async getAllNamespaces(workspaceID: string, idToken: string): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._namespaceLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.getAllNamespaces,
         headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
@@ -138,7 +138,7 @@ export class NamespaceManager {
   ): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._namespaceLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.getAllNamespaceHierarchy,
         headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
@@ -156,7 +156,7 @@ export class NamespaceManager {
   ): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._namespaceLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.shareNamespace,
         payload: { ...body, type: 'SharedNamespaceRequest' },
@@ -174,7 +174,7 @@ export class NamespaceManager {
   ): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._namespaceLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.revokeUserAccessFromNamespace,
         payload: { ...body, type: 'SharedNamespaceRequest' },
@@ -192,7 +192,7 @@ export class NamespaceManager {
   ): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._namespaceLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.getUsersOfSharedNamespace,
         pathParameters: { id: namespaceID },
@@ -213,7 +213,7 @@ export class NamespaceManager {
   ): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._namespaceLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.getNodeIDFromPath,
         headers: { 'mex-workspace-id': workspaceID, authorization: idToken },
@@ -234,7 +234,7 @@ export class NamespaceManager {
   ): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._namespaceLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.deleteNamespace,
         headers: { 'mex-workspace-id': workspaceID, authorization: idToken },

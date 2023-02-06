@@ -10,7 +10,6 @@ export interface LocalsX {
   userIdRaw?: string;
   invoker?: <T = any>(
     functionName: string,
-    invocationType: InvocationType,
     routeKey?: keyof typeof RouteKeys,
     options?: LambdaInvokePayloadOptions<T>
   ) => Promise<any>;

@@ -31,7 +31,7 @@ class HighlightController {
       this._redisCache.del(data.entityId);
       const result = await response.locals.invoker(
         this._highlightServiceLambdaName,
-        this._lambdaInvocationType,
+
         'createHighlight',
         { payload: data }
       );
@@ -58,7 +58,7 @@ class HighlightController {
       const lambdaResponse = !nonCachedIds.isEmpty()
         ? await response.locals.invoker(
             this._highlightServiceLambdaName,
-            this._lambdaInvocationType,
+
             'getHighlightByIDs',
             { payload: { ids: nonCachedIds } }
           )
@@ -82,7 +82,7 @@ class HighlightController {
     try {
       const result = await response.locals.invoker(
         this._highlightServiceLambdaName,
-        this._lambdaInvocationType,
+
         'getAllHighlightsOfWorkspace'
       );
 
@@ -103,7 +103,7 @@ class HighlightController {
       const entityId = request.params.entityId;
       await response.locals.invoker(
         this._highlightServiceLambdaName,
-        this._lambdaInvocationType,
+
         'deleteHighlightByID',
         { pathParameters: { entityId: entityId } }
       );

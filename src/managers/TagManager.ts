@@ -20,7 +20,7 @@ export class TagManager {
   ): Promise<any> {
     const response = await this._lambda.invokeAndCheck(
       this._tagLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.getAllTagsOfWorkspace,
         headers: { 'mex-workspace-id': workspaceId, authorization: idToken },
@@ -37,7 +37,7 @@ export class TagManager {
   ): Promise<any> {
     const response = await this._lambda.invokeAndCheck(
       this._tagLambdaFunctionName,
-      this._lambdaInvocationType,
+
       {
         routeKey: RouteKeys.getNodeWithTag,
         pathParameters: { tagName: tagName },

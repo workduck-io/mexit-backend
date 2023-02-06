@@ -8,6 +8,7 @@ import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
 import { initializeSnippetRoutes } from '../routes/SnippetRoutes';
+
 class SnippetController {
   public _urlPath = '/snippet';
   public _router = express.Router();
@@ -35,7 +36,7 @@ class SnippetController {
       this._redisCache.del(request.body.id);
       const snippetResult = await response.locals.invoker(
         this._snippetLambdaFunctionName,
-        this._lambdaInvocationType,
+
         'createSnippet',
         {
           payload: request.body,
@@ -76,7 +77,7 @@ class SnippetController {
         () =>
           response.locals.invoker(
             this._snippetLambdaFunctionName,
-            this._lambdaInvocationType,
+
             'getSnippet',
             { pathParameters: { id: snippetId } }
           )
@@ -119,7 +120,7 @@ class SnippetController {
       const { successful, failed } = !nonCachedIds.isEmpty()
         ? await response.locals.invoker(
             this._snippetLambdaFunctionName,
-            this._lambdaInvocationType,
+
             'getSnippet',
             {
               allSettled: {
@@ -163,7 +164,7 @@ class SnippetController {
     try {
       const result = await response.locals.invoker(
         this._snippetLambdaFunctionName,
-        this._lambdaInvocationType,
+
         'getAllVersionsOfSnippet',
         { pathParameters: { id: request.params.snippetId } }
       );
@@ -183,7 +184,6 @@ class SnippetController {
       const getData = request.query.getData === 'true';
       const result = await response.locals.invoker(
         this._snippetLambdaFunctionName,
-        this._lambdaInvocationType,
         'getAllSnippetsOfWorkspace',
         { queryStringParameters: { getData: getData } }
       );
@@ -205,7 +205,7 @@ class SnippetController {
 
       await response.locals.invoker(
         this._snippetLambdaFunctionName,
-        this._lambdaInvocationType,
+
         'makeSnippetPublic',
         { pathParameters: { id: snippetId, version: version } }
       );
@@ -233,7 +233,7 @@ class SnippetController {
 
       await response.locals.invoker(
         this._snippetLambdaFunctionName,
-        this._lambdaInvocationType,
+
         'makeSnippetPrivate',
         { pathParameters: { id: snippetId, version: version } }
       );
@@ -273,7 +273,7 @@ class SnippetController {
         () =>
           response.locals.invoker(
             this._snippetLambdaFunctionName,
-            this._lambdaInvocationType,
+
             'getPublicSnippet',
             { pathParameters: { id: snippetId, version: version } }
           )
@@ -298,7 +298,7 @@ class SnippetController {
 
       const result = await response.locals.invoker(
         this._snippetLambdaFunctionName,
-        this._lambdaInvocationType,
+
         'clonePublicSnippet',
         { pathParameters: { id: snippetId, version: version } }
       );
@@ -324,7 +324,7 @@ class SnippetController {
 
       await response.locals.invoker(
         this._snippetLambdaFunctionName,
-        this._lambdaInvocationType,
+
         'deleteVersionOfSnippet',
         {
           pathParameters: { id: snippetID },
@@ -348,7 +348,7 @@ class SnippetController {
 
       await response.locals.invoker(
         this._snippetLambdaFunctionName,
-        this._lambdaInvocationType,
+
         'deleteAllVersionsOfSnippet',
         { pathParameters: { id: snippetID } }
       );
@@ -369,7 +369,7 @@ class SnippetController {
 
       await response.locals.invoker(
         this._snippetLambdaFunctionName,
-        this._lambdaInvocationType,
+
         'updateSnippetMetadata',
         {
           pathParameters: { id: request.params.id },

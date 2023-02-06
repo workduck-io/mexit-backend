@@ -17,7 +17,7 @@ export class SmartCaptureManager {
   async getPublicConfig(workspaceID: string, idToken: string): Promise<any> {
     const result = await this._lambda.invokeAndCheck(
       this._smartCaptureLambdaName,
-      this._lambdaInvocationType,
+
       {
         httpMethod: 'GET',
         routeKey: RouteKeys.getPublicCaptureConfig,
