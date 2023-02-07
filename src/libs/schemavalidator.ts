@@ -6,10 +6,7 @@ import { errorlib } from './errorlib';
 import { statusCodes } from './statusCodes';
 const ajv = new Ajv({ allErrors: true });
 ajv.addSchema(schema);
-export function schemaValidator<T extends keyof Interfaces>(
-  data: Interfaces[T],
-  nameOfInterface: T
-) {
+export function schemaValidator<T extends keyof Interfaces>(data: Interfaces[T], nameOfInterface: T) {
   const validate = ajv.compile(schema.definitions[nameOfInterface]);
   const valid = validate(data);
   if (!valid) {

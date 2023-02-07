@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 
 import { statusCodes } from '../libs/statusCodes';
 
@@ -10,11 +10,7 @@ class HealthCheckController {
     this._router.get(this._urlPath, [], this.ping);
   }
 
-  ping = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  ping = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       response.status(statusCodes.OK).json({ ping: 'pong' });
     } catch (error) {

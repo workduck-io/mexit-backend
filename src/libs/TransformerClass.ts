@@ -24,7 +24,7 @@ interface ILinkResponse {
   nodesMetadata: { [nodeID: string]: any };
 }
 
-export interface NamespaceInfo {
+interface NamespaceInfo {
   id: string;
   name: string;
   createdAt: number;
@@ -39,13 +39,13 @@ interface ILinkWithMetadata extends ILink {
   metadata?: { icon?: IconMetadata };
 }
 
-export interface ParsedNamespaceHierarchy {
+interface ParsedNamespaceHierarchy {
   name: string;
   nodeHierarchy: ILinkWithMetadata[];
   namespaceMetadata?: { icon: IconMetadata };
 }
 
-export type AllNamespaceHierarchyResponse = {
+type AllNamespaceHierarchyResponse = {
   namespaceInfo: Record<
     string,
     {
@@ -55,17 +55,10 @@ export type AllNamespaceHierarchyResponse = {
     }
   >;
 };
-export type ParsedAllNamespacesHierarchy = Record<
-  string,
-  ParsedNamespaceHierarchy
->;
 
 type AllNamespaceHierarchyParserFn = (
   allNamespacesResp: AllNamespaceHierarchyResponse,
-  nodesMetadata?: Record<
-    string,
-    { metadata: any; updatedAt: number; createdAt: number }
-  >,
+  nodesMetadata?: Record<string, { metadata: any; updatedAt: number; createdAt: number }>,
   options?: { withParentNodeId: boolean; allowDuplicates?: boolean }
 ) => Record<string, ParsedNamespaceHierarchy>;
 
@@ -97,9 +90,7 @@ export class Transformer {
         const nodeTitle = nodes[index];
         const nodeID = nodes[index + 1];
 
-        const nodePath = prefix
-          ? `${prefix}${this.ILINK_DELIMITER}${nodeTitle}`
-          : nodeTitle;
+        const nodePath = prefix ? `${prefix}${this.ILINK_DELIMITER}${nodeTitle}` : nodeTitle;
 
         /*
           Drafts.A and Drafts.B exist, we need to check if the Drafts parent node is the same by checking
@@ -109,8 +100,7 @@ export class Transformer {
           we handle that on the frontend for now
         */
         if (idPathMapping[nodeID]) {
-          if (idPathMapping[nodeID] !== nodePath)
-            throw new Error('Invalid Linkdata Input');
+          if (idPathMapping[nodeID] !== nodePath) throw new Error('Invalid Linkdata Input');
         } else {
           idPathMapping[nodeID] = nodePath;
           ilinks.push({
@@ -132,8 +122,7 @@ export class Transformer {
   ): ILink[] => {
     const ilinks: ILink[] = [];
     const idPathMapping: { [key: string]: string } = {};
-    const pathIdMapping: { [key: string]: { nodeid: string; index: number } } =
-      {};
+    const pathIdMapping: { [key: string]: { nodeid: string; index: number } } = {};
 
     for (const subTree of linkData) {
       const nodes = subTree.split('#');
@@ -176,9 +165,7 @@ export class Transformer {
           idPathMapping[nodeID] = nodePath;
           pathIdMapping[nodePath] = { nodeid: nodeID, index: ilinks.length };
           const ilink: ILink = { nodeid: nodeID, path: nodePath };
-          ilinks.push(
-            options?.withParentNodeId ? { ...ilink, parentNodeId } : ilink
-          );
+          ilinks.push(options?.withParentNodeId ? { ...ilink, parentNodeId } : ilink);
         }
 
         prefix = nodePath;
@@ -194,20 +181,14 @@ export class Transformer {
       const iLinks: ILink[] = [];
 
       linkDatas.map((data, _) => {
-        const delimitedStrings = data
-          .split(this.LINK_HIERARCHY_DELIMITER)
-          .filter(element => element);
+        const delimitedStrings = data.split(this.LINK_HIERARCHY_DELIMITER).filter(element => element);
 
-        if (delimitedStrings.length % 2 !== 0)
-          reject(new Error('Invalid linkdata input'));
+        if (delimitedStrings.length % 2 !== 0) reject(new Error('Invalid linkdata input'));
 
         let cumulativePath: string;
         for (let index = 0; index < delimitedStrings.length; ) {
           if (!cumulativePath) cumulativePath = delimitedStrings[index];
-          else
-            cumulativePath = cumulativePath.concat(
-              '.'.concat(delimitedStrings[index])
-            );
+          else cumulativePath = cumulativePath.concat('.'.concat(delimitedStrings[index]));
 
           iLinks.push({
             nodeid: delimitedStrings[index + 1],
@@ -236,16 +217,10 @@ export class Transformer {
   };
 
   genericNodeConverter = (nodeResponse: NodeResponse, returnData = true) => {
-    if (
-      nodeResponse.id.startsWith(this.CAPTURES.NODE) ||
-      nodeResponse.id.startsWith(this.CAPTURES.SNIPPET)
-    )
+    if (nodeResponse.id.startsWith(this.CAPTURES.NODE) || nodeResponse.id.startsWith(this.CAPTURES.SNIPPET))
       return this.convertNodeToContentFormat(nodeResponse, returnData);
   };
-  convertNodeToContentFormat = (
-    nodeResponse: NodeResponse,
-    returnData = true
-  ): ContentNode => {
+  convertNodeToContentFormat = (nodeResponse: NodeResponse, returnData = true): ContentNode => {
     const content = deserializeContent(nodeResponse.data);
     const metadata: NodeMetadata = {
       createdAt: nodeResponse.createdAt,
@@ -275,35 +250,26 @@ export class Transformer {
     options = { withParentNodeId: false, allowDuplicates: false }
   ) => {
     const parsedNSHierarchy: Record<string, ParsedNamespaceHierarchy> = {};
-    Object.entries(allNamespacesResp.namespaceInfo).forEach(
-      ([namespaceID, namespaceValue]) => {
-        const nHierarchy = this.hierarchyParser(
-          namespaceValue.nodeHierarchy,
-          options
-        );
-        parsedNSHierarchy[namespaceID] = {
-          name: namespaceValue.name,
-          nodeHierarchy: nHierarchy,
-          namespaceMetadata: namespaceValue.namespaceMetadata,
-        };
-      }
-    );
+    Object.entries(allNamespacesResp.namespaceInfo).forEach(([namespaceID, namespaceValue]) => {
+      const nHierarchy = this.hierarchyParser(namespaceValue.nodeHierarchy, options);
+      parsedNSHierarchy[namespaceID] = {
+        name: namespaceValue.name,
+        nodeHierarchy: nHierarchy,
+        namespaceMetadata: namespaceValue.namespaceMetadata,
+      };
+    });
 
     if (nodesMetadata) {
-      Object.entries(parsedNSHierarchy).forEach(
-        ([namespaceID, namespaceValue]) => {
-          namespaceValue.nodeHierarchy = namespaceValue.nodeHierarchy.map(
-            ilink => {
-              return {
-                ...ilink,
-                createdAt: nodesMetadata[ilink.nodeid]?.createdAt || Infinity,
-                updatedAt: nodesMetadata[ilink.nodeid]?.updatedAt || Infinity,
-                metadata: nodesMetadata[ilink.nodeid]?.metadata || undefined,
-              };
-            }
-          );
-        }
-      );
+      Object.entries(parsedNSHierarchy).forEach(([namespaceID, namespaceValue]) => {
+        namespaceValue.nodeHierarchy = namespaceValue.nodeHierarchy.map(ilink => {
+          return {
+            ...ilink,
+            createdAt: nodesMetadata[ilink.nodeid]?.createdAt || Infinity,
+            updatedAt: nodesMetadata[ilink.nodeid]?.updatedAt || Infinity,
+            metadata: nodesMetadata[ilink.nodeid]?.metadata || undefined,
+          };
+        });
+      });
     }
 
     return parsedNSHierarchy;
@@ -320,10 +286,7 @@ export class Transformer {
   };
 
   refactoredPathsHierarchyParser = (
-    refactorChangedPaths: Record<
-      string,
-      { removedPaths: string[]; addedPaths: string[] }
-    >[],
+    refactorChangedPaths: Record<string, { removedPaths: string[]; addedPaths: string[] }>[],
     options = { withParentNodeId: false, allowDuplicates: false }
   ) => {
     const parsedRefactorChangedPaths: Record<

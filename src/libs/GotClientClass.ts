@@ -1,6 +1,6 @@
 import got, { OptionsOfTextResponseBody } from 'got';
 import { injectable } from 'inversify';
-import { GotResponse, GotClientType } from 'src/interfaces/GotClient';
+import { GotResponse, GotClientType } from '../interfaces/GotClient';
 import StatsMap from 'stats-map';
 import mem from 'mem';
 @injectable()
@@ -29,12 +29,7 @@ export class GotClient implements GotClientType {
     },
   };
 
-  async post<T>(
-    url: string,
-    payload: T,
-    authToken: string,
-    searchParams?: any
-  ): Promise<GotResponse> {
+  async post<T>(url: string, payload: T, authToken: string, searchParams?: any): Promise<GotResponse> {
     this._gotResponse.data = await this._memGot
       .post(url, {
         json: payload,
@@ -49,11 +44,7 @@ export class GotClient implements GotClientType {
     return this._gotResponse;
   }
 
-  async delete(
-    url: string,
-    authToken: string,
-    searchParams?: any
-  ): Promise<GotResponse> {
+  async delete(url: string, authToken: string, searchParams?: any): Promise<GotResponse> {
     this._gotResponse.data = await this._memGot
       .delete(url, {
         headers: {
@@ -66,12 +57,7 @@ export class GotClient implements GotClientType {
 
     return this._gotResponse;
   }
-  async put<T>(
-    url: string,
-    payload: T,
-    authToken: string,
-    searchParams?: any
-  ): Promise<GotResponse> {
+  async put<T>(url: string, payload: T, authToken: string, searchParams?: any): Promise<GotResponse> {
     this._gotResponse.data = await this._memGot
       .put(url, {
         json: payload,
@@ -86,11 +72,7 @@ export class GotClient implements GotClientType {
     return this._gotResponse;
   }
 
-  async get(
-    url: string,
-    authToken: string,
-    searchParams?: any
-  ): Promise<GotResponse> {
+  async get(url: string, authToken: string, searchParams?: any): Promise<GotResponse> {
     this._gotResponse.data = await this._memGot
       .get(url, {
         headers: {

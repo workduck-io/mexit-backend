@@ -29,6 +29,7 @@ import {
   AppendBlockRequest,
   BulkCreateNode,
   Comment,
+  ConnectToLochService,
   ContentNodeRequest,
   CopyOrMoveBlockRequest,
   CreateNamespace,
@@ -51,7 +52,6 @@ import {
   SnippetUpdateVersionRequest,
   UpdateMetadata,
   UpdateNamespace,
-  ConnectToLochService,
   UpdateParentNodeForLochService,
 } from './interfaces/Request';
 import {
@@ -62,6 +62,7 @@ import {
   NodeDataResponse,
   NodeResponse,
 } from './interfaces/Response';
+import { SnippetUpdate } from './interfaces/Snippet';
 import {
   InviteProperties,
   RegistrationStatus,
@@ -73,8 +74,6 @@ import {
 import { WDErrorType } from './interfaces/WDError';
 import { errorCodes } from './libs/errorCodes';
 import { statusCodes } from './libs/statusCodes';
-
-import { SnippetUpdate } from './interfaces/Snippet';
 import schema from './types.json';
 
 type SchemaType = typeof schema.definitions;

@@ -1,29 +1,23 @@
 import express, { NextFunction, Request, Response } from 'express';
-import container from '../inversify.config';
+
+import { STAGE } from '../env';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
-import { LochManager } from '../managers/LochManager';
 import { initializeLochRoutes } from '../routes/LochRoutes';
 
 class LochController {
   public _urlPath = '/loch';
   public _router = express.Router();
-  public _lochManager: LochManager = container.get<LochManager>(LochManager);
+
+  private _mexLochLambdaBase = `mex-loch-${STAGE}`;
 
   constructor() {
     initializeLochRoutes(this);
   }
 
-  getAllServices = async (
-    _: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAllServices = async (_: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await this._lochManager.getAllServices(
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
+      const result = await response.locals.invoker(`${this._mexLochLambdaBase}-allConfig`, 'getAllServices');
 
       response.status(statusCodes.OK).jsonp(result);
     } catch (error) {
@@ -31,16 +25,9 @@ class LochController {
     }
   };
 
-  getConnectedServives = async (
-    _: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getConnectedServives = async (_: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await this._lochManager.getConnectedServices(
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
+      const result = await response.locals.invoker(`${this._mexLochLambdaBase}-connected`, 'getConnectedServices');
 
       response.status(statusCodes.OK).jsonp(result);
     } catch (error) {
@@ -48,18 +35,12 @@ class LochController {
     }
   };
 
-  connectToService = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  connectToService = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const body = new RequestClass(request, 'ConnectToLochService').data;
-      const result = await this._lochManager.connectToService(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        body
-      );
+      const result = await response.locals.invoker(`${this._mexLochLambdaBase}-register`, 'connectToService', {
+        payload: body,
+      });
 
       response.status(statusCodes.NO_CONTENT).jsonp(result);
     } catch (error) {
@@ -73,14 +54,10 @@ class LochController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const body = new RequestClass(request, 'UpdateParentNodeForLochService')
-        .data;
-      const result = await this._lochManager.updateParentNoteOfConnected(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        body
-      );
-
+      const body = new RequestClass(request, 'UpdateParentNodeForLochService').data;
+      const result = await response.locals.invoker(`${this._mexLochLambdaBase}-update`, 'updateParentNodeOfService', {
+        payload: body,
+      });
       response.status(statusCodes.NO_CONTENT).json(result);
     } catch (error) {
       next(error);

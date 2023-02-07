@@ -1,33 +1,22 @@
 import express, { NextFunction, Request, Response } from 'express';
-import container from '../inversify.config';
+
+import { STAGE } from '../env';
 import { statusCodes } from '../libs/statusCodes';
-import { Transformer } from '../libs/TransformerClass';
-import { PromptManager } from '../managers/PromptManager';
 import { initializePromptRoutes } from '../routes/PromptRoutes';
 
 class PromptController {
   public _urlPath = '/prompt';
   public _router = express.Router();
 
-  public _promptManager: PromptManager =
-    container.get<PromptManager>(PromptManager);
-
-  public _transformer: Transformer = container.get<Transformer>(Transformer);
+  private _promptLambdaName = `gpt3Prompt-${STAGE}-main`;
 
   constructor() {
     initializePromptRoutes(this);
   }
 
-  getAllPrompts = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAllPrompts = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await this._promptManager.getAllPrompts(
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
+      const result = await response.locals.invoker(this._promptLambdaName, 'getAllPrompts');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -35,16 +24,9 @@ class PromptController {
     }
   };
 
-  getUserAuthInfo = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getUserAuthInfo = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await this._promptManager.getUserAuthInfo(
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
+      const result = await response.locals.invoker(this._promptLambdaName, 'getUserAuthInfo');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -52,18 +34,10 @@ class PromptController {
     }
   };
 
-  updateUserAuthInfo = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  updateUserAuthInfo = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const data = request.body;
-      const result = await this._promptManager.updateUserAuthInfo(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        data
-      );
+      const result = await response.locals.invoker(this._promptLambdaName, 'updateUserAuthInfo', { payload: data });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -71,16 +45,9 @@ class PromptController {
     }
   };
 
-  getAllPromptProviders = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAllPromptProviders = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await this._promptManager.getAllPromptProviders(
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
+      const result = await response.locals.invoker(this._promptLambdaName, 'getAllPromptProviders');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -88,19 +55,13 @@ class PromptController {
     }
   };
 
-  generatePromptResult = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  generatePromptResult = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const data = request.body;
-      const result = await this._promptManager.generatePromptResult(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.promptID,
-        data
-      );
+      const result = await response.locals.invoker(this._promptLambdaName, 'generatePromptResult', {
+        payload: data,
+        pathParameters: { id: request.params.promptID },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {

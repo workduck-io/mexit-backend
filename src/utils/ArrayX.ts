@@ -25,16 +25,11 @@ Object.defineProperty(Array.prototype, 'minus', {
 });
 
 Object.defineProperty(Array.prototype, 'toObject', {
-  value: function (
-    key: string | ((a) => string),
-    value = (item: any) => item
-  ): any {
+  value: function (key: string | ((a) => string), value = (item: any) => item): any {
     return this.reduce((acc, val) => {
       return {
         ...acc,
-        [typeof key === 'string' ? get<string>(val, key) : key(val)]: value
-          ? value(val)
-          : val,
+        [typeof key === 'string' ? get<string>(val, key) : key(val)]: value ? value(val) : val,
       };
     }, {});
   },

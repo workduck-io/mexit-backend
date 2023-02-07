@@ -1,33 +1,31 @@
 import express, { NextFunction, Request, Response } from 'express';
+
+import { STAGE } from '../env';
 import container from '../inversify.config';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
-import { ReactionManager } from '../managers/ReactionManager';
 import { initializeReactionRoutes } from '../routes/ReactionRoutes';
 
 class ReactionController {
   public _urlPath = '/reaction';
   public _router = express.Router();
-  public _reactionManager: ReactionManager =
-    container.get<ReactionManager>(ReactionManager);
   public _transformer: Transformer = container.get<Transformer>(Transformer);
+
+  private _reactionLambdaName = `reaction-${STAGE}-main`;
+
+  private _additionalHeaders = { 'mex-api-ver': 'v2' };
 
   constructor() {
     initializeReactionRoutes(this);
   }
 
-  getReactionsOfNode = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getReactionsOfNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await this._reactionManager.getReactionsOfNode(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.nodeID
-      );
+      const result = await response.locals.invoker(this._reactionLambdaName, 'getAllReactionsOfNode', {
+        pathParameters: { nodeId: request.params.nodeID },
+        additionalHeaders: this._additionalHeaders,
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -35,18 +33,15 @@ class ReactionController {
     }
   };
 
-  getReactionsOfBlock = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getReactionsOfBlock = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await this._reactionManager.getReactionsOfBlock(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.nodeID,
-        request.params.blockID
-      );
+      const result = await response.locals.invoker(this._reactionLambdaName, 'getAllReactionsOfBlock', {
+        pathParameters: {
+          nodeId: request.params.nodeID,
+          blockId: request.params.blockID,
+        },
+        additionalHeaders: this._additionalHeaders,
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -54,18 +49,15 @@ class ReactionController {
     }
   };
 
-  getReactionDetailsOfBlock = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getReactionDetailsOfBlock = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await this._reactionManager.getReactionDetailsOfBlock(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.nodeID,
-        request.params.blockID
-      );
+      const result = await response.locals.invoker(this._reactionLambdaName, 'getReactionDetailsOfBlock', {
+        pathParameters: {
+          nodeId: request.params.nodeID,
+          blockId: request.params.blockID,
+        },
+        additionalHeaders: this._additionalHeaders,
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -73,18 +65,11 @@ class ReactionController {
     }
   };
 
-  toggleReaction = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  toggleReaction = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const requestDetail = new RequestClass(request, 'Reaction');
-      await this._reactionManager.toggleReaction(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        requestDetail.data
-      );
+      const data = new RequestClass(request, 'Reaction').data;
+      await response.locals.invoker(this._reactionLambdaName, 'toggleReaction', { payload: data });
+
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
       next(error);

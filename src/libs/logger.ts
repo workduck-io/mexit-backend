@@ -31,12 +31,7 @@ const productionLogger = () =>
         logStreamName: function () {
           // Spread log streams across dates as the server stays up
           let date = new Date().toISOString().split('T')[0];
-          return (
-            'mexit-backend-prod-' +
-            date +
-            '-' +
-            crypto.createHash('md5').update(startTime).digest('hex')
-          );
+          return 'mexit-backend-prod-' + date + '-' + crypto.createHash('md5').update(startTime).digest('hex');
         },
         awsRegion: AWS_REGION,
       }),

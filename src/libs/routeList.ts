@@ -24,13 +24,11 @@ export const COLORS = {
   brightGreen: 92,
 };
 
-const spacer = (x: number) =>
-  x > 0 ? [...new Array(x)].map(() => ' ').join('') : '';
+const spacer = (x: number) => (x > 0 ? [...new Array(x)].map(() => ' ').join('') : '');
 
-export const colorText = (color: number, string: string) =>
-  `\u001b[${color}m${string}\u001b[${COLORS.clear}m`;
+export const colorText = (color: number, string: string) => `\u001b[${color}m${string}\u001b[${COLORS.clear}m`;
 
-export const colorMethod = (method: string) => {
+const colorMethod = (method: string) => {
   switch (method) {
     case 'POST':
       return colorText(COLORS.yellow, method);
@@ -48,28 +46,19 @@ export const colorMethod = (method: string) => {
 };
 
 const getPathFromRegex = regex => {
-  return regex
-    .toString()
-    .replace('/^', '')
-    .replace('?(?=\\/|$)/i', '')
-    .replace(/\\\//g, '/');
+  return regex.toString().replace('/^', '').replace('?(?=\\/|$)/i', '').replace(/\\\//g, '/');
 };
 
 function expressListRoutes(app: express.Application, opts?: Partial<Options>) {
   const stacks = app._router.stack.reduce((acc, stack) => {
     if (stack.handle.stack) {
       const routerPath = getPathFromRegex(stack.regexp);
-      return [
-        ...acc,
-        ...stack.handle.stack.map(stack => ({ routerPath, ...stack })),
-      ];
+      return [...acc, ...stack.handle.stack.map(stack => ({ routerPath, ...stack }))];
     }
     return [...acc, stack];
   }, []);
 
-  const options: Options = opts
-    ? { ...defaultOptions, ...opts }
-    : defaultOptions;
+  const options: Options = opts ? { ...defaultOptions, ...opts } : defaultOptions;
 
   if (stacks) {
     for (const stack of stacks) {
@@ -82,11 +71,7 @@ function expressListRoutes(app: express.Application, opts?: Partial<Options>) {
             const stackSpace = spacer(options.spaces - method.length);
             const stackPath = colorText(
               COLORS.brightGreen,
-              path.resolve(
-                [options.prefix, stack.routerPath, stack.route.path, route.path]
-                  .filter(s => !!s)
-                  .join('')
-              )
+              path.resolve([options.prefix, stack.routerPath, stack.route.path, route.path].filter(s => !!s).join(''))
             );
             options.logger(stackMethod, stackSpace, stackPath);
             routeLogged[method] = true;

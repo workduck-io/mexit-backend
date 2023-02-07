@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+
 import container from '../../inversify.config';
 import { Transformer } from '../../libs/TransformerClass';
 
@@ -30,9 +31,9 @@ describe('Transformer Module', () => {
   describe('Decode link hierarchy to ILink format - Fail Case', () => {
     it('should return the decoded nodeid and the corresponding node path', async () => {
       const linkHierarchy = ['A#Aid#B#Bid#C#Cid', 'F#Fid', 'R#Rid#Q#Qid', 'C#'];
-      expect(
-        async () => await transformer.decodeLinkHierarchy(linkHierarchy)
-      ).rejects.toThrow('Invalid linkdata input');
+      expect(async () => await transformer.decodeLinkHierarchy(linkHierarchy)).rejects.toThrow(
+        'Invalid linkdata input'
+      );
     });
   });
 });
