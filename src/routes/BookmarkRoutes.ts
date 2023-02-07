@@ -1,9 +1,7 @@
 import BookmarkController from '../controllers/BookmarkController';
 import { AuthRequest } from '../middlewares/authrequest';
 
-export const initializeBookmarkRoutes = (
-  bookmarkControllerObject: BookmarkController
-): void => {
+export const initializeBookmarkRoutes = (bookmarkControllerObject: BookmarkController): void => {
   bookmarkControllerObject._router.get(
     `${bookmarkControllerObject._urlPath}`,
     [AuthRequest],

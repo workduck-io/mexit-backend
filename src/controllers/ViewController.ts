@@ -1,32 +1,27 @@
 import express, { NextFunction, Request, Response } from 'express';
-import container from '../inversify.config';
+
+import { STAGE } from '../env';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
-import { Transformer } from '../libs/TransformerClass';
-import { ViewManager } from '../managers/ViewManager';
 import { initializeViewRoutes } from '../routes/ViewRoutes';
 
 class ViewController {
   public _urlPath = '/view';
   public _router = express.Router();
-  public _viewManager: ViewManager = container.get<ViewManager>(ViewManager);
-  public _transformer: Transformer = container.get<Transformer>(Transformer);
+
+  private _taskViewLambdaName = `task-${STAGE}-view`;
+  private _additionalHeaders: { 'mex-api-ver': 'v2' };
 
   constructor() {
     initializeViewRoutes(this);
   }
 
-  getView = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getView = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await this._viewManager.getView(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.viewID
-      );
+      const result = await response.locals.invoker(this._taskViewLambdaName, 'getView', {
+        pathParameters: { entityId: request.params.viewID },
+        additionalHeaders: this._additionalHeaders,
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -34,16 +29,11 @@ class ViewController {
     }
   };
 
-  getAllViews = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAllViews = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await this._viewManager.getAllViews(
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
+      const result = await response.locals.invoker(this._taskViewLambdaName, 'getAllViews', {
+        additionalHeaders: this._additionalHeaders,
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -51,17 +41,12 @@ class ViewController {
     }
   };
 
-  deleteView = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  deleteView = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      await this._viewManager.deleteView(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.viewID
-      );
+      await response.locals.invoker(this._taskViewLambdaName, 'deleteView', {
+        pathParameters: { entityId: request.params.viewID },
+        additionalHeaders: this._additionalHeaders,
+      });
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
@@ -69,18 +54,15 @@ class ViewController {
     }
   };
 
-  postView = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  postView = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const requestDetail = new RequestClass(request, 'PostView');
-      const result = await this._viewManager.saveView(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        requestDetail.data
-      );
+      const data = new RequestClass(request, 'PostView').data;
+
+      const result = await response.locals.invoker(this._taskViewLambdaName, 'saveView', {
+        additionalHeaders: this._additionalHeaders,
+        payload: data,
+      });
+
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);

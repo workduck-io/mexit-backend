@@ -1,32 +1,27 @@
 import express, { NextFunction, Request, Response } from 'express';
+
+import { STAGE } from '../env';
 import { RequestClass } from '../libs/RequestClass';
-import container from '../inversify.config';
 import { statusCodes } from '../libs/statusCodes';
-import { LinkManager } from '../managers/LinkManager';
 import { initializeLinkRoutes } from '../routes/LinkRoutes';
 
 class LinkController {
   public _urlPath = '/link';
   public _router = express.Router();
 
-  public _linkManager: LinkManager = container.get<LinkManager>(LinkManager);
+  private _linkServiceLambdaBase = `mex-url-shortner-${STAGE}`;
 
   constructor() {
     initializeLinkRoutes(this);
   }
 
-  shortenLink = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  shortenLink = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const data = new RequestClass(request, 'ShortenLink').data;
-      const result = await this._linkManager.createNewShort(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        data
-      );
+      const result = await response.locals.invoker(`${this._linkServiceLambdaBase}-shorten`, undefined, {
+        httpMethod: 'POST',
+        payload: data,
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -34,16 +29,11 @@ class LinkController {
     }
   };
 
-  getAllShortsOfWorkspace = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAllShortsOfWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await this._linkManager.getAllShortsOfWorkspace(
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
+      const result = await response.locals.invoker(`${this._linkServiceLambdaBase}-workspaceDetails`, undefined, {
+        httpMethod: 'GET',
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -51,17 +41,12 @@ class LinkController {
     }
   };
 
-  deleteShort = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  deleteShort = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await this._linkManager.deleteShort(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.url
-      );
+      const result = await response.locals.invoker(`${this._linkServiceLambdaBase}-del`, undefined, {
+        httpMethod: 'DELETE',
+        pathParameters: { url: request.params.url },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -69,17 +54,12 @@ class LinkController {
     }
   };
 
-  getStatsByURL = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getStatsByURL = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await this._linkManager.getStatsByURL(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.url
-      );
+      const result = await response.locals.invoker(`${this._linkServiceLambdaBase}-stats`, undefined, {
+        httpMethod: 'GET',
+        pathParameters: { url: request.params.url },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {

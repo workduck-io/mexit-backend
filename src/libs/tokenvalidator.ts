@@ -4,11 +4,11 @@ import jwkToPem from 'jwk-to-pem';
 import got from 'got';
 import { COGNITO_POOL_ID } from '../env';
 
-export interface ClaimVerifyRequest {
+interface ClaimVerifyRequest {
   readonly token?: string;
 }
 
-export interface ClaimVerifyResult {
+interface ClaimVerifyResult {
   readonly userEmail: string;
   readonly userId: string;
   readonly eventId: string;
@@ -75,9 +75,7 @@ const getPublicKeys = async (): Promise<MapOfKidToPublicKey> => {
 
 const verifyPromised = promisify(jsonwebtoken.verify.bind(jsonwebtoken));
 
-const TokenHandler = async (
-  request: ClaimVerifyRequest
-): Promise<ClaimVerifyResult> => {
+const TokenHandler = async (request: ClaimVerifyRequest): Promise<ClaimVerifyResult> => {
   let result: ClaimVerifyResult;
   try {
     const token = request.token;

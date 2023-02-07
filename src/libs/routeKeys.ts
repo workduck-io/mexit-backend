@@ -62,10 +62,6 @@ export const RouteKeys = {
   batchCreateBookmark: 'POST /userStar/batch',
   batchRemoveBookmark: 'DELETE /userStar/batch',
 
-  // Tags Endpoints
-  getAllTagsOfWorkspace: 'GET /tag/all',
-  getNodeWithTag: 'GET /tag/{tagName}/node',
-
   // Namespace Ops - CRUD, Fetch Hierarchy
   createNamespace: 'POST /namespace',
   getNamespace: 'GET /namespace/{id}',
@@ -110,8 +106,7 @@ export const RouteKeys = {
   getAllCommentsOfThread: 'GET /all/{nodeId}/block/{blockId}/thread/{threadId}',
   deleteAllCommentsOfNode: 'DELETE /all/{nodeId}',
   deleteAllCommentsOfBlock: 'DELETE /all/{nodeId}/block/{blockId}',
-  deleteAllCommentsOfThread:
-    'DELETE /all/{nodeId}/block/{blockId}/thread/{threadId}',
+  deleteAllCommentsOfThread: 'DELETE /all/{nodeId}/block/{blockId}/thread/{threadId}',
 
   // Reactions - CRUD Operations
   getAllReactionsOfNode: 'GET /node/{nodeId}',

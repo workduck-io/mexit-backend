@@ -1,9 +1,10 @@
 import express, { NextFunction, Request, Response } from 'express';
+
+import { STAGE } from '../env';
 import container from '../inversify.config';
 import { Redis } from '../libs/RedisClass';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
-import { ActionManager } from '../managers/ActionManager';
 import { initializeActionRoutes } from '../routes/ActionRoutes';
 
 class ActionController {
@@ -11,25 +12,31 @@ class ActionController {
   public _router = express.Router();
   private _redisCache: Redis = container.get<Redis>(Redis);
 
-  public _actionManager: ActionManager =
-    container.get<ActionManager>(ActionManager);
+  private _lambdaName = {
+    action: {
+      getAll: `actionHelperService-${STAGE}-getAllActionGroups`,
+      get: `actionHelperService-${STAGE}-getAction`,
+    },
+    auth: {
+      get: `authService-${STAGE}-getAuth`,
+      getAll: `authService-${STAGE}-getAllAuths`,
+      update: `authService-${STAGE}-updateCurrentWorkspace`,
+      refresh: `authService-${STAGE}-refreshWorkspaceAuth`,
+    },
+  };
 
   constructor() {
     initializeActionRoutes(this);
   }
 
-  getAction = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAction = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const managerResponse = this._actionManager.getAction(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.groupId,
-        request.params.actionId
-      );
+      const managerResponse = response.locals.invoker(this._lambdaName.action.get, 'getAction', {
+        pathParameters: {
+          actionGroupId: request.params.groupId,
+          actionId: request.params.actionId,
+        },
+      });
 
       const result = await this._redisCache.getOrSet(
         {
@@ -44,22 +51,16 @@ class ActionController {
     }
   };
 
-  getAllActions = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAllActions = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const result = await this._redisCache.getOrSet(
         {
           key: request.params.groupId,
         },
         async () =>
-          await this._actionManager.getAllActions(
-            response.locals.workspaceID,
-            response.locals.idToken,
-            request.params.groupId
-          )
+          await response.locals.invoker(this._lambdaName.action.getAll, 'getActionsOfActionGroup', {
+            pathParameters: { actionGroupId: request.params.groupId },
+          })
       );
 
       response.status(statusCodes.OK).json(result);
@@ -68,16 +69,9 @@ class ActionController {
     }
   };
 
-  getAllAuth = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAllAuth = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await this._actionManager.getAllAuths(
-        response.locals.workspaceID,
-        response.locals.idToken
-      );
+      const result = await response.locals.invoker(this._lambdaName.auth.getAll, 'getAllAuths');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -85,17 +79,11 @@ class ActionController {
     }
   };
 
-  getAuth = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  getAuth = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await this._actionManager.getAuth(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.authId
-      );
+      const result = await response.locals.invoker(this._lambdaName.auth.get, 'getAuth', {
+        pathParameters: { authTypeId: request.params.authId },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -103,17 +91,11 @@ class ActionController {
     }
   };
 
-  refreshAuth = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  refreshAuth = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await this._actionManager.refreshAuth(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.source
-      );
+      const result = await response.locals.invoker(this._lambdaName.auth.refresh, 'refreshAuth', {
+        pathParameters: { source: request.params.source },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -121,20 +103,13 @@ class ActionController {
     }
   };
 
-  updateAuth = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  updateAuth = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const data = new RequestClass(request).data;
 
-      const result = await this._actionManager.updateAuth(
-        response.locals.workspaceID,
-        response.locals.idToken,
-        request.params.authId,
-        data
-      );
+      const result = await response.locals.invoker(this._lambdaName.auth.update, 'updateAuth', {
+        pathParameters: { authTypeId: request.params.authId, payload: data },
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {

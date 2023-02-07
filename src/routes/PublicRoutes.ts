@@ -1,9 +1,7 @@
 import PublicController from '../controllers/PublicController';
 import { PublicRequest } from '../middlewares/publicrequest';
 
-export const initializePublicRoutes = (
-  publicControllerObject: PublicController
-): void => {
+export const initializePublicRoutes = (publicControllerObject: PublicController): void => {
   publicControllerObject._router.get(
     `${publicControllerObject._urlPath}/namespace/:namespaceID`,
     [PublicRequest],
