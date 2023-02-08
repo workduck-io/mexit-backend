@@ -11,8 +11,8 @@ class PublicController {
   public _router = express.Router();
   public _transformer: Transformer = container.get<Transformer>(Transformer);
 
-  private _nsLambdaFunctionName = `mex-backend-${STAGE}-Namespace`;
-  private _nodeLambdaFunctionName = `mex-backend-${STAGE}-Node`;
+  private _nsLambdaFunctionName = `mex-backend-${STAGE}-Namespace:latest`;
+  private _nodeLambdaFunctionName = `mex-backend-${STAGE}-Node:latest`;
 
   constructor() {
     initializePublicRoutes(this);

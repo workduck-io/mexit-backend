@@ -13,7 +13,7 @@ class SnippetController {
   public _urlPath = '/snippet';
   public _router = express.Router();
 
-  private _snippetLambdaFunctionName = `mex-backend-${STAGE}-Snippet`;
+  private _snippetLambdaFunctionName = `mex-backend-${STAGE}-Snippet:latest`;
 
   private _transformer: Transformer = container.get<Transformer>(Transformer);
   private _redisCache: Redis = container.get<Redis>(Redis);
@@ -83,7 +83,7 @@ class SnippetController {
 
       const nonCachedIds = ids.minus(cachedHits.map(item => item.id));
 
-      let lambdaResponse = { successful: [], failed: [] };
+      const lambdaResponse = { successful: [], failed: [] };
 
       if (!nonCachedIds.isEmpty()) {
         const rawLambdaResponse = await response.locals.invoker(this._snippetLambdaFunctionName, 'getSnippet', {
