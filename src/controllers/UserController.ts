@@ -16,7 +16,7 @@ class UserController {
 
   private _userLambdaFunctionName = `workduck-user-service-${STAGE}-user`;
   private _getUserLambdaFunctionName = `workduck-user-service-${STAGE}-getUser`;
-  private _userMexBackendLambdaFunctionName = `mex-backend-${STAGE}-User`;
+  private _userMexBackendLambdaFunctionName = `mex-backend-${STAGE}-User:latest`;
   private _registerStatusLambdaFunctionName = `workduck-user-service-${STAGE}-registerStatus`;
   private _inviteUserLambdaFunctionName = `workduck-user-service-${STAGE}-invite`;
 

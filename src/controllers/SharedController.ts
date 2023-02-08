@@ -17,7 +17,7 @@ class SharedController {
 
   private _UserAccessLabel = 'USERACCESS';
   private _UserAccessTypeLabel = 'USERACCESSTYPE';
-  private _nodeLambdaFunctionName = `mex-backend-${STAGE}-Node`;
+  private _nodeLambdaFunctionName = `mex-backend-${STAGE}-Node:latest`;
 
   constructor() {
     initializeSharedRoutes(this);
