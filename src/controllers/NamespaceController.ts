@@ -18,7 +18,7 @@ class NamespaceController {
   private _transformer: Transformer = container.get<Transformer>(Transformer);
   private _cache: Redis = container.get<Redis>(Redis);
   private _NSHierarchyLabel = 'NSHIERARCHY';
-  private _namespaceLambdaFunctionName = `mex-backend-${STAGE}-Namespace`;
+  private _namespaceLambdaFunctionName = `mex-backend-${STAGE}-Namespace:latest`;
 
   constructor() {
     initializeNamespaceRoutes(this);
