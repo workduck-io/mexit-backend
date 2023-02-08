@@ -8,7 +8,7 @@ class BookmarkController {
   public _urlPath = '/userStar';
   public _router = express.Router();
 
-  private _userStarLambdaFunctionName = `mex-backend-${STAGE}-UserStar`;
+  private _userStarLambdaFunctionName = `mex-backend-${STAGE}-UserStar:latest`;
 
   constructor() {
     initializeBookmarkRoutes(this);
