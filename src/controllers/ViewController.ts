@@ -58,10 +58,15 @@ class ViewController {
     try {
       const data = new RequestClass(request, 'PostView').data;
 
-      const result = await response.locals.invoker(this._taskViewLambdaName, 'saveView', {
-        additionalHeaders: this._additionalHeaders,
-        payload: data,
-      });
+      const result = await response.locals.invoker(
+        this._taskViewLambdaName,
+        'saveView',
+        {
+          additionalHeaders: this._additionalHeaders,
+          payload: data,
+        },
+        true
+      );
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {

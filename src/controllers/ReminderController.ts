@@ -30,7 +30,7 @@ class ReminderController {
   createReminder = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const body = new RequestClass(request, 'Reminder').data;
-      const result = await response.locals.invoker(this._reminderLambdaName, 'createReminder', { payload: body });
+      const result = await response.locals.invoker(this._reminderLambdaName, 'createReminder', { payload: body }, true);
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {

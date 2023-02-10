@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 
+import { type InvocationSource } from '../interfaces/Locals';
 import { errorlib } from '../libs/errorlib';
 import { invokeAndCheck } from '../libs/LambdaInvoker';
 import { RouteKeys } from '../libs/routeKeys';
@@ -10,7 +11,9 @@ async function InvokeLambda(req: Request, res: Response, next: NextFunction): Pr
   res.locals.invoker = async <T = any>(
     functionName: string,
     routeKey: keyof typeof RouteKeys,
-    options?: LambdaInvokePayloadOptions<T>
+    options?: LambdaInvokePayloadOptions<T>,
+    sendRawBody = false,
+    invocationSource: InvocationSource = 'APIGateway'
   ) => {
     try {
       if (options?.allSettled) {
@@ -22,13 +25,13 @@ async function InvokeLambda(req: Request, res: Response, next: NextFunction): Pr
               [options?.allSettled?.key]: id,
             },
           });
-          return invokeAndCheck(functionName, 'RequestResponse', invokePayload);
+          return invokeAndCheck(functionName, 'RequestResponse', invokePayload, sendRawBody, invocationSource);
         });
 
         return await Promise.allSettled(promises);
       } else {
         const invokePayload = generateLambdaInvokePayload(res.locals, routeKey, options);
-        return await invokeAndCheck(functionName, 'RequestResponse', invokePayload);
+        return await invokeAndCheck(functionName, 'RequestResponse', invokePayload, sendRawBody, invocationSource);
       }
     } catch (error: any) {
       errorlib({
