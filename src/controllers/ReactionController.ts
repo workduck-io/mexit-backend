@@ -68,7 +68,7 @@ class ReactionController {
   toggleReaction = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const data = new RequestClass(request, 'Reaction').data;
-      await response.locals.invoker(this._reactionLambdaName, 'toggleReaction', { payload: data });
+      await response.locals.invoker(this._reactionLambdaName, 'toggleReaction', { payload: data }, true);
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
