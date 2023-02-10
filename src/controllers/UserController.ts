@@ -34,9 +34,14 @@ class UserController {
     }
 
     try {
-      const result = await response.locals.invoker(this._userLambdaFunctionName, 'updateUserDetails', {
-        payload: data,
-      });
+      const result = await response.locals.invoker(
+        this._userLambdaFunctionName,
+        'updateUserDetails',
+        {
+          payload: data,
+        },
+        true
+      );
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -49,9 +54,14 @@ class UserController {
       const requestDetail = new RequestClass(request, 'UserPreference').data;
       requestDetail.id = userId;
 
-      const result = await response.locals.invoker(this._userLambdaFunctionName, 'updateUserPreference', {
-        payload: requestDetail,
-      });
+      const result = await response.locals.invoker(
+        this._userLambdaFunctionName,
+        'updateUserPreference',
+        {
+          payload: requestDetail,
+        },
+        true
+      );
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -153,9 +163,14 @@ class UserController {
     try {
       const payload = request.body;
       payload.linkedinURL = payload.linkedinURL.replace(/\/+$/, '');
-      const result = await response.locals.invoker(this._getUserLambdaFunctionName, 'getUserByLinkedin', {
-        payload: payload,
-      });
+      const result = await response.locals.invoker(
+        this._getUserLambdaFunctionName,
+        'getUserByLinkedin',
+        {
+          payload: payload,
+        },
+        true
+      );
 
       response.status(statusCodes.OK).json({
         mex_user: result.length > 0 ? true : false,

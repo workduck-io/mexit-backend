@@ -42,7 +42,7 @@ class CommentController {
     try {
       const data = new RequestClass(request, 'Comment').data;
       this._cache.del(this._transformer.encodeCacheKey(this._CommentBlockLabel, data.blockId));
-      const result = await response.locals.invoker(this._commentLambdaName, 'createComment', { payload: data });
+      const result = await response.locals.invoker(this._commentLambdaName, 'createComment', { payload: data }, true);
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
