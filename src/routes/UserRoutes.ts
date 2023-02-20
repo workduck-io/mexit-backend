@@ -25,5 +25,5 @@ export const initializeUserRoutes = (userObject: UserController): void => {
 
   userObject._router.post(`${userObject._urlPath}/linkedin`, [AuthRequest], userObject.getUserByLinkedin);
 
-  userObject._router.get(`${userObject._urlPath}/:id`, [PublicRequest], userObject.getById);
+  userObject._router.get(`${userObject._urlPath}/:id`, [AuthRequest], userObject.getById);
 };
