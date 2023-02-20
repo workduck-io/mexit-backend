@@ -42,18 +42,17 @@ class PublicController {
   getPublicNamespace = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const namespaceID = request.params.namespaceID;
-      const parsedPublicNS = await this._cache.getOrSet(
+      const publicNS = await this._cache.getOrSet(
         {
           key: namespaceID,
         },
         () =>
-          response.locals
-            .invoker(this._nsLambdaFunctionName, 'getPublicNamespace', {
-              pathParameters: { id: request.params.namespaceID },
-            })
-            .then(res => this._transformer.namespaceHierarchyParser(res))
+          response.locals.invoker(this._nsLambdaFunctionName, 'getPublicNamespace', {
+            pathParameters: { id: request.params.namespaceID },
+          })
       );
-      response.status(statusCodes.OK).json(parsedPublicNS);
+      const parsedNS = this._transformer.namespaceHierarchyParser(publicNS);
+      response.status(statusCodes.OK).json(parsedNS);
     } catch (error) {
       next(error);
     }
