@@ -1,6 +1,5 @@
 import UserController from '../controllers/UserController';
 import { AuthRequest } from '../middlewares/authrequest';
-import { PublicRequest } from '../middlewares/publicrequest';
 
 export const initializeUserRoutes = (userObject: UserController): void => {
   userObject._router.get(`${userObject._urlPath}/status`, [AuthRequest], userObject.registerStatus);
