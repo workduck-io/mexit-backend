@@ -48,7 +48,7 @@ class SharedController {
     try {
       const body = new RequestClass(request, 'UpdateAccessTypeForSharedNodeDetail').data;
 
-      const result = await response.locals.invoker(this._nodeLambdaFunctionName, 'updateAccessTypeForshareNode', {
+      await response.locals.invoker(this._nodeLambdaFunctionName, 'updateAccessTypeForshareNode', {
         payload: { ...body, type: 'UpdateAccessTypesRequest' },
       });
 
@@ -56,7 +56,7 @@ class SharedController {
         this._redisCache.set(this._transformer.encodeCacheKey(this._UserAccessLabel, userID, body.nodeID), userID);
       });
       this._redisCache.del(this._transformer.encodeCacheKey(this._UserAccessTypeLabel + body.nodeID));
-      response.status(statusCodes.OK).json(result);
+      response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
       next(error);
     }
@@ -102,11 +102,12 @@ class SharedController {
     try {
       const body = new RequestClass(request, 'UpdateShareNodeDetail').data;
 
-      const result = await response.locals.invoker(this._nodeLambdaFunctionName, 'updateSharedNode', {
+      await response.locals.invoker(this._nodeLambdaFunctionName, 'updateSharedNode', {
         payload: { ...body, type: 'UpdateSharedNodeRequest' },
       });
 
-      response.status(statusCodes.OK).json(result);
+      this._redisCache.del(body.id);
+      response.status(statusCodes.NO_CONTENT).json();
     } catch (error) {
       next(error);
     }
