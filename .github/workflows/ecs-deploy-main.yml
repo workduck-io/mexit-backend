@@ -66,8 +66,6 @@ jobs:
           sed -i "s/<mexit_backend_google_client_id>/$MEXIT_BACKEND_GOOGLE_CLIENT_ID/g" deploy/test-taskdef.json
           sed -i "s/<mexit_backend_google_client_secret>/$MEXIT_BACKEND_GOOGLE_CLIENT_SECRET/g" deploy/test-taskdef.json
           sed -i "s/<MEX_DEFAULT_USER_REFRESH_TOKEN>/$MEX_DEFAULT_USER_REFRESH_TOKEN/g" deploy/test-taskdef.json
-          sed -i "s/<MEX_DEFAULT_USER_ID>/$MEX_DEFAULT_USER_ID/g" deploy/test-taskdef.json
-          sed -i "s/<MEX_DEFAULT_WORKSPACE_ID>/$MEX_DEFAULT_WORKSPACE_ID/g" deploy/test-taskdef.json
           sed -i "s/<mexit_backend_redis_host>/$MEXIT_BACKEND_REDIS_HOST/g" deploy/test-taskdef.json
           sed -i "s/<mexit_backend_redis_port>/$MEXIT_BACKEND_REDIS_PORT/g" deploy/test-taskdef.json
 
@@ -76,8 +74,6 @@ jobs:
           MEXIT_BACKEND_GOOGLE_CLIENT_SECRET: ${{ secrets.MEXIT_BACKEND_GOOGLE_CLIENT_SECRET }}
           MEX_DEFAULT_USER_REFRESH_TOKEN: ${{ secrets.TEST_MEX_DEFAULT_USER_REFRESH_TOKEN }}
           MEX_DEFAULT_USER_ID: ${{ secrets.TEST_MEX_DEFAULT_USER_ID }}
-          MEX_DEFAULT_WORKSPACE_ID: ${{ secrets.TEST_MEX_DEFAULT_WORKSPACE_ID }}
-          MEXIT_BACKEND_REDIS_HOST: ${{ secrets.TEST_MEXIT_BACKEND_REDIS_HOST }}
           MEXIT_BACKEND_REDIS_PORT: ${{ secrets.TEST_MEXIT_BACKEND_TEST_REDIS_PORT }}
 
       - name: Render Amazon ECS task definition for Mexit Backend Container
