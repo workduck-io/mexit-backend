@@ -43,6 +43,10 @@
           "value": "<mexit_backend_redis_port>"
         },
         {
+          "name": "REST_API_KEY",
+          "value": "<rest_api_key>"
+        },
+        {
           "name": "NODE_ENV",
           "value": "production"
         },

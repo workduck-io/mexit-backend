@@ -50,6 +50,7 @@ export const generateAPIGatewayInvokePayload = <T = any>(
   let headers = {
     'mex-workspace-id': locals?.workspaceID ?? '',
     authorization: locals?.idToken,
+    'x-api-key': process.env.REST_API_KEY,
   };
 
   if (options?.additionalHeaders) {

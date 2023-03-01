@@ -52,7 +52,7 @@ async function InvokeLambda(req: Request, res: Response, next: NextFunction): Pr
         const url =
           invocationDestination === 'HTTP'
             ? 'https://cn5gt90qx5.execute-api.us-east-1.amazonaws.com/v1/node'
-            : 'https://77956pfj9b.execute-api.us-east-1.amazonaws.com/test/v1/node/rest ';
+            : 'https://77956pfj9b.execute-api.us-east-1.amazonaws.com/test/v1/node/rest';
 
         console.log('Invoking: ', { url, invocationDestination });
         const invokePayload = generateAPIGatewayInvokePayload(res.locals, routeKey, options);
