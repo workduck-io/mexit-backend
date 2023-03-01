@@ -79,7 +79,7 @@ jobs:
           MEX_DEFAULT_USER_REFRESH_TOKEN: ${{ secrets.TEST_MEX_DEFAULT_USER_REFRESH_TOKEN }}
           MEX_DEFAULT_USER_ID: ${{ secrets.TEST_MEX_DEFAULT_USER_ID }}
           MEXIT_BACKEND_REDIS_PORT: ${{ secrets.TEST_MEXIT_BACKEND_TEST_REDIS_PORT }}
-          REST_API_KEY: ${{ secrets.REST_API_GATEWAY_KEY }}
+          REST_API_KEY: ${{ secrets.REST_API_KEY }}
 
       - name: Render Amazon ECS task definition for Mexit Backend Container
         id: render-task-definition-app

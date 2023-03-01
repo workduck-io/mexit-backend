@@ -42,7 +42,7 @@
           "name": "MEXIT_BACKEND_REDIS_PORT",
           "value": "<mexit_backend_redis_port>"
         },
-        {
+        { 
           "name": "REST_API_KEY",
           "value": "<rest_api_key>"
         },
