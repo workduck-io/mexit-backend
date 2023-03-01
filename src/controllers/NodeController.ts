@@ -11,7 +11,7 @@ import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
 import { initializeNodeRoutes } from '../routes/NodeRoutes';
-import { generateLambdaInvokePayload } from '../utils/lambda';
+import { generateLambdaInvokePayload } from '../utils/generatePayload';
 
 class NodeController {
   public _urlPath = '/node';
@@ -39,13 +39,22 @@ class NodeController {
 
   createNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
+      const invocationDestination = (request.query['dest'] as any) ?? 'Lambda';
       const body = new RequestClass(request, 'ContentNodeRequest').data;
+
       //TODO: update cache instead of deleting it
       this._redisCache.del(body.id);
 
-      const nodeResult = await response.locals.invoker(this._nodeLambdaFunctionName, 'createNode', {
-        payload: { ...body, type: 'NodeRequest' },
-      });
+      const nodeResult = await response.locals.invoker(
+        this._nodeLambdaFunctionName,
+        'createNode',
+        {
+          payload: { ...body, type: 'NodeRequest' },
+        },
+        false,
+        'APIGateway',
+        invocationDestination
+      );
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { data, ...rest } = nodeResult; //Dont relay data to frontend

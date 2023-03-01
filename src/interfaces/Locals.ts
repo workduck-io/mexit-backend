@@ -1,5 +1,6 @@
 import { RouteKeys } from '../libs/routeKeys';
-import { LambdaInvokePayloadOptions } from '../utils/lambda';
+import { InvocationDestination } from '../middlewares/invoker';
+import { LambdaInvokePayloadOptions } from '../utils/generatePayload';
 
 export type InvocationSource = 'Direct' | 'APIGateway';
 export interface LocalsX {
@@ -13,6 +14,7 @@ export interface LocalsX {
     routeKey?: keyof typeof RouteKeys,
     options?: LambdaInvokePayloadOptions<T>,
     sendRawBody?: boolean,
-    invocationSource?: InvocationSource
+    invocationSource?: InvocationSource,
+    invocationDestination?: InvocationDestination
   ) => Promise<any>;
 }

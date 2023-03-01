@@ -41,3 +41,24 @@ export const generateLambdaInvokePayload = <T = any>(
     ...(options?.pathParameters && { pathParameters: options.pathParameters }),
   };
 };
+
+export const generateAPIGatewayInvokePayload = <T = any>(
+  locals: LocalsX,
+  routeKey: keyof typeof RouteKeys,
+  options?: LambdaInvokePayloadOptions<T>
+): any => {
+  let headers = {
+    'mex-workspace-id': locals?.workspaceID ?? '',
+    authorization: locals?.idToken,
+  };
+
+  if (options?.additionalHeaders) {
+    headers = { ...headers, ...options.additionalHeaders };
+  }
+
+  return {
+    method: 'POST',
+    ...(options?.payload && { json: options.payload }),
+    headers: headers,
+  };
+};

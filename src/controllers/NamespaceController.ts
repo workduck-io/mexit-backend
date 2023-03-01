@@ -9,7 +9,7 @@ import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
 import { initializeNamespaceRoutes } from '../routes/NamespaceRoutes';
-import { generateLambdaInvokePayload } from '../utils/lambda';
+import { generateLambdaInvokePayload } from '../utils/generatePayload';
 
 class NamespaceController {
   public _urlPath = '/namespace';
