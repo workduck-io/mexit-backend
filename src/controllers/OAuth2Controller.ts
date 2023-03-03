@@ -45,8 +45,10 @@ class OAuth2Controller {
         refresh_token: requestDetail.data.refreshToken,
         grant_type: 'refresh_token',
       };
-      const result = await this._gotClient.post(OAuth2Controller.googleOAuthTokenUrl, payload, '');
-      response.status(statusCodes.OK).send(result).json();
+      const result = await this._gotClient.request(OAuth2Controller.googleOAuthTokenUrl, {
+        json: payload,
+      });
+      response.status(statusCodes.OK).json({ data: result.body, status: result.statusCode });
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
