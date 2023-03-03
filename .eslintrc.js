@@ -19,12 +19,7 @@ module.exports = {
     warnOnUnsupportedTypeScriptVersion: false,
   },
   parser: '@typescript-eslint/parser',
-  plugins: [
-    '@typescript-eslint',
-    'unused-imports',
-    'simple-import-sort',
-    'import',
-  ],
+  plugins: ['@typescript-eslint', 'unused-imports', 'simple-import-sort', 'import'],
   env: { es6: true },
   extends: [
     'eslint:recommended',
@@ -34,10 +29,7 @@ module.exports = {
     'plugin:node/recommended',
   ],
   rules: {
-    'node/no-unsupported-features/es-syntax': [
-      'error',
-      { ignores: ['modules'] },
-    ],
+    'node/no-unsupported-features/es-syntax': ['error', { ignores: ['modules'] }],
     'node/exports-style': ['error', 'module.exports'],
     'node/prefer-global/buffer': ['error', 'always'],
     'node/prefer-global/console': ['error', 'always'],
@@ -63,10 +55,10 @@ module.exports = {
             groups: [
               // Side effect imports.
               ['^\\u0000'],
-              // Third party @ packages first
-              ['^@?\\w'],
               // Internal packages.
               ['^(@workduck-io)(/.*|$)'],
+              // Third party @ packages first
+              ['^@?\\w'],
               // Parent imports. Put `..` last.
               ['^\\.\\.(?!/?$)', '^\\.\\./?$'],
               // Other relative imports. Put same-folder imports and `.` last.

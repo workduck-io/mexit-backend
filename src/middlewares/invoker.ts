@@ -1,63 +1,46 @@
 import { NextFunction, Request, Response } from 'express';
 
-import { type InvocationSource } from '../interfaces/Locals';
+import { InvocationSource } from '../interfaces/Locals';
+import container from '../inversify.config';
 import { errorlib } from '../libs/errorlib';
+import { GotClient } from '../libs/GotClientClass';
 import { invokeAndCheck } from '../libs/LambdaInvoker';
 import { RouteKeys } from '../libs/routeKeys';
 import { statusCodes } from '../libs/statusCodes';
-import {
-  generateAPIGatewayInvokePayload,
-  generateLambdaInvokePayload,
-  LambdaInvokePayloadOptions,
-} from '../utils/generatePayload';
+import { generateInvokePayload, InvokePayloadOptions } from '../utils/generatePayload';
 
-import got from 'got';
-import mem from 'mem';
-import StatsMap from 'stats-map';
-
-export type InvocationDestination = 'Lambda' | 'REST' | 'HTTP';
-
-const cache = new StatsMap();
-const gotClient = mem(got, { cache: cache });
+const APIClient = container.get<GotClient>(GotClient);
 
 async function InvokeLambda(req: Request, res: Response, next: NextFunction): Promise<void> {
   res.locals.invoker = async <T = any>(
     functionName: string,
     routeKey: keyof typeof RouteKeys,
-    options?: LambdaInvokePayloadOptions<T>,
+    options?: InvokePayloadOptions<T>,
     sendRawBody = false,
-    invocationSource: InvocationSource = 'APIGateway',
-    invocationDestination: InvocationDestination = 'Lambda'
+    invocationSource: InvocationSource = 'APIGateway'
   ) => {
     try {
-      if (invocationDestination === 'Lambda') {
-        if (options?.allSettled) {
-          const promises = options.allSettled.ids.map(id => {
-            const invokePayload = generateLambdaInvokePayload(res.locals, routeKey, {
+      if (options?.allSettled) {
+        const promises = options.allSettled.ids.map(id => {
+          const invokePayload = generateInvokePayload(
+            res.locals,
+            'Lambda',
+            {
               ...options,
               pathParameters: {
                 ...(options?.pathParameters ?? {}),
                 [options?.allSettled?.key]: id,
               },
-            });
-            return invokeAndCheck(functionName, 'RequestResponse', invokePayload, sendRawBody, invocationSource);
-          });
+            },
+            routeKey
+          );
+          return invokeAndCheck(functionName, 'RequestResponse', invokePayload, sendRawBody, invocationSource);
+        });
 
-          return await Promise.allSettled(promises);
-        } else {
-          const invokePayload = generateLambdaInvokePayload(res.locals, routeKey, options);
-          return await invokeAndCheck(functionName, 'RequestResponse', invokePayload, sendRawBody, invocationSource);
-        }
+        return await Promise.allSettled(promises);
       } else {
-        const url =
-          invocationDestination === 'HTTP'
-            ? 'https://cn5gt90qx5.execute-api.us-east-1.amazonaws.com/v1/node'
-            : 'https://77956pfj9b.execute-api.us-east-1.amazonaws.com/test/v1/node/rest';
-
-        console.log('Invoking: ', { url, invocationDestination });
-        const invokePayload = generateAPIGatewayInvokePayload(res.locals, routeKey, options);
-        const resp = await got(url, { ...invokePayload, throwHttpErrors: false }).json();
-        return resp;
+        const invokePayload = generateInvokePayload(res.locals, 'Lambda', options, routeKey);
+        return await invokeAndCheck(functionName, 'RequestResponse', invokePayload, sendRawBody, invocationSource);
       }
     } catch (error: any) {
       console.log('Error: ', error);
@@ -69,6 +52,23 @@ async function InvokeLambda(req: Request, res: Response, next: NextFunction): Pr
         metaData: error.message,
       });
     }
+  };
+
+  res.locals.gatewayInvoker = async <T = any>(url: string, options?: InvokePayloadOptions<T>): Promise<any> => {
+    try {
+      const invokePayload = generateInvokePayload(res.locals, 'APIGateway', options);
+      const response = await APIClient.request(url, invokePayload);
+      return response;
+    } catch (error) {
+      errorlib({
+        message: error.message,
+        errorCode: error.statusCode,
+        errorObject: error,
+        statusCode: statusCodes.INTERNAL_SERVER_ERROR,
+        metaData: error.message,
+      });
+    }
+    return;
   };
 
   next();

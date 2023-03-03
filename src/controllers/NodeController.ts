@@ -11,7 +11,7 @@ import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
 import { initializeNodeRoutes } from '../routes/NodeRoutes';
-import { generateLambdaInvokePayload } from '../utils/generatePayload';
+import { generateInvokePayload } from '../utils/generatePayload';
 
 class NodeController {
   public _urlPath = '/node';
@@ -29,9 +29,14 @@ class NodeController {
   }
 
   updateILinkCache = async (locals: LocalsX, namespaceID: string): Promise<any> => {
-    const payload = generateLambdaInvokePayload(locals, 'getNamespace', {
-      pathParameters: { id: namespaceID },
-    });
+    const payload = generateInvokePayload(
+      locals,
+      'Lambda',
+      {
+        pathParameters: { id: namespaceID },
+      },
+      'getNamespace'
+    );
 
     const namespace = await invokeAndCheck(this._nsLambdaFunctionName, 'RequestResponse', payload);
     await this._redisCache.set(namespaceID, namespace);
@@ -39,7 +44,6 @@ class NodeController {
 
   createNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const invocationDestination = (request.query['dest'] as any) ?? 'Lambda';
       const body = new RequestClass(request, 'ContentNodeRequest').data;
 
       //TODO: update cache instead of deleting it
@@ -52,8 +56,7 @@ class NodeController {
           payload: { ...body, type: 'NodeRequest' },
         },
         false,
-        'APIGateway',
-        invocationDestination
+        'APIGateway'
       );
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
