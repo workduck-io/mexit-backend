@@ -15,5 +15,5 @@ export interface LocalsX {
     sendRawBody?: boolean,
     invocationSource?: InvocationSource
   ) => Promise<any>;
-  gatewayInvoker?: <T = any>(destination: string, options?: InvokePayloadOptions<T>) => Promise<any>;
+  gatewayInvoker?: <T = any>(url: string, options?: InvokePayloadOptions<T>) => Promise<any>;
 }

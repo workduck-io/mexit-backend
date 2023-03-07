@@ -18,7 +18,7 @@ jobs:
       DOCKER_BUILDKIT: 1
       MEXIT_BACKEND_REDIS_HOST: ${{ secrets.TEST_MEXIT_BACKEND_REDIS_HOST }}
       MEXIT_BACKEND_REDIS_PORT: ${{ secrets.TEST_MEXIT_BACKEND_REDIS_PORT }}
-      REST_API_KEY: ${{ secrets.REST_API_GATEWAY_KEY }}
+      REST_API_KEY: ${{ secrets.REST_API_KEY }}
 
     steps:
       - uses: actions/checkout@v3

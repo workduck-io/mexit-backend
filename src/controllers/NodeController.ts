@@ -49,14 +49,12 @@ class NodeController {
       //TODO: update cache instead of deleting it
       this._redisCache.del(body.id);
 
-      const nodeResult = await response.locals.invoker(
-        this._nodeLambdaFunctionName,
-        'createNode',
+      const nodeResult = await response.locals.gatewayInvoker(
+        'https://77956pfj9b.execute-api.us-east-1.amazonaws.com/test/v1/node/rest',
         {
           payload: { ...body, type: 'NodeRequest' },
-        },
-        false,
-        'APIGateway'
+          httpMethod: 'POST',    
+        }
       );
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars

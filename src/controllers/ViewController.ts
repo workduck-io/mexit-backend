@@ -1,7 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
 
 import { STAGE } from '../env';
-import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { initializeViewRoutes } from '../routes/ViewRoutes';
 
@@ -56,14 +55,14 @@ class ViewController {
 
   postView = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const data = new RequestClass(request, 'PostView').data;
+      // const data = new RequestClass(request, 'PostView').data;
 
       const result = await response.locals.invoker(
         this._taskViewLambdaName,
         'saveView',
         {
           additionalHeaders: this._additionalHeaders,
-          payload: data,
+          payload: request.body,
         },
         true
       );

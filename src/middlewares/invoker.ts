@@ -57,9 +57,12 @@ async function InvokeLambda(req: Request, res: Response, next: NextFunction): Pr
   res.locals.gatewayInvoker = async <T = any>(url: string, options?: InvokePayloadOptions<T>): Promise<any> => {
     try {
       const invokePayload = generateInvokePayload(res.locals, 'APIGateway', options);
+      console.log('Gateway invoke payload: ', invokePayload);
       const response = await APIClient.request(url, invokePayload);
+      console.log('Response: ', response);
       return response;
     } catch (error) {
+      console.log('error in gateway invoker: ', error);
       errorlib({
         message: error.message,
         errorCode: error.statusCode,
