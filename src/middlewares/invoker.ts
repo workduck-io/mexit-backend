@@ -1,11 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
 
+import Config from '../config';
 import { InvocationSource } from '../interfaces/Locals';
+import { Destination } from '../interfaces/Request';
 import container from '../inversify.config';
 import { errorlib } from '../libs/errorlib';
 import { GotClient } from '../libs/GotClientClass';
 import { invokeAndCheck } from '../libs/LambdaInvoker';
-import { RouteKeys } from '../libs/routeKeys';
+import { APIGatewayRouteKeys, RouteKeys } from '../libs/routeKeys';
 import { statusCodes } from '../libs/statusCodes';
 import { generateInvokePayload, InvokePayloadOptions } from '../utils/generatePayload';
 
@@ -54,10 +56,22 @@ async function InvokeLambda(req: Request, res: Response, next: NextFunction): Pr
     }
   };
 
-  res.locals.gatewayInvoker = async <T = any>(url: string, options?: InvokePayloadOptions<T>): Promise<any> => {
+  res.locals.gatewayInvoker = async <T = any>(
+    routeKey,
+    options?: InvokePayloadOptions<T>,
+    ...args: string[]
+  ): Promise<any> => {
     try {
-      const invokePayload = generateInvokePayload(res.locals, 'APIGateway', options);
-      console.log('Gateway invoke payload: ', invokePayload);
+      const { method, route, APIGateway } = APIGatewayRouteKeys[routeKey] as Destination;
+
+      const additionalHeaders = { 'x-api-key': Config[APIGateway].token };
+      const url = `${Config[APIGateway].url}/${typeof route === 'function' ? route(...args) : route}`;
+      const invokePayload = generateInvokePayload(res.locals, 'APIGateway', {
+        ...options,
+        additionalHeaders,
+        httpMethod: method,
+      });
+
       const response = await APIClient.request(url, invokePayload);
       console.log('Response: ', response);
       return response;

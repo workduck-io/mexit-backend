@@ -1,4 +1,4 @@
-import { RouteKeys } from '../libs/routeKeys';
+import { APIGatewayRouteKeys, RouteKeys } from '../libs/routeKeys';
 import { InvokePayloadOptions } from '../utils/generatePayload';
 
 export type InvocationSource = 'Direct' | 'APIGateway';
@@ -15,5 +15,9 @@ export interface LocalsX {
     sendRawBody?: boolean,
     invocationSource?: InvocationSource
   ) => Promise<any>;
-  gatewayInvoker?: <T = any>(url: string, options?: InvokePayloadOptions<T>) => Promise<any>;
+  gatewayInvoker?: <T = any>(
+    routeKey: keyof typeof APIGatewayRouteKeys,
+    options?: InvokePayloadOptions<T>,
+    ...args: string[]
+  ) => Promise<any>;
 }

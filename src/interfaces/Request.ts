@@ -1,3 +1,5 @@
+import Config from '../config';
+
 import { ContentNode } from './Node';
 
 export interface ContentNodeRequest extends ContentNode {
@@ -182,4 +184,10 @@ export interface UpdateParentNodeForLochService {
   serviceType: string;
   parentNodeId: string;
   namespaceId: string;
+}
+
+export interface Destination {
+  route: string | ((...args: string[]) => string);
+  method: 'GET' | 'POST' | 'DELETE' | 'PUT' | 'PATCH';
+  APIGateway: keyof typeof Config;
 }

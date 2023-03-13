@@ -1,23 +1,6 @@
+import { Destination } from '../interfaces/Request';
+
 export const RouteKeys = {
-  // Node Operations - CRU, Refactor, bulkCreate
-  createNode: 'POST /node',
-  getMultipleNode: 'GET /v1/node/ids',
-  getNode: 'GET /node/{id}',
-  appendNode: 'PATCH /node/{id}/append',
-  deleteBlocks: 'PATCH /node/{id}/delete/block',
-  refactorHierarchy: 'POST /node/refactor',
-  bulkCreateNode: 'POST /node/bulk',
-  copyOrMoveBlock: 'PATCH /node/block/movement',
-  makeNodePublic: 'PATCH /node/makePublic/{id}',
-  makeNodePrivate: 'PATCH /node/makePrivate/{id}',
-  updateNodeMetadata: 'PATCH /node/metadata/{id}',
-
-  // Node Archive Operations
-  getArchivedNodes: 'GET /node/archive',
-  archiveNode: 'PUT /node/archive/middleware',
-  unArchiveNode: 'PUT /v1/node/unarchive',
-  deleteArchivedNode: 'POST /node/archive/delete',
-
   // User Ops
   getById: 'GET /{userId}',
   getByEmail: 'GET /email/{email}',
@@ -147,3 +130,38 @@ export const RouteKeys = {
   updateUserAuthInfo: 'POST /userAuth',
   getAllPromptProviders: 'GET /providers',
 };
+
+export const APIGatewayRouteKeys = {
+  // Node Endpoints
+  CreateNode: { route: '/v1/node/rest', method: 'POST', APIGateway: 'Node' },
+  GetNode: { route: (nodeID: string) => `/v1/node/${nodeID}`, method: 'GET', APIGateway: 'Node' },
+  GetMultipleNodes: { route: '/v1/node/ids', method: 'GET', APIGateway: 'Node' },
+  AppendNode: { route: (nodeID: string) => `/node/${nodeID}/append`, method: 'PATCH', APIGateway: 'Node' },
+  DeleteBlocks: { route: (nodeID: string) => `/v1/node/${nodeID}`, method: 'GET', APIGateway: 'Node' },
+  RefactorHierarchy: { route: `/node/refactor`, method: 'POST', APIGateway: 'Node' },
+  BulkCreateNode: { route: `/node/bulk`, method: 'POST', APIGateway: 'Node' },
+  CopyOrMoveBlock: {
+    route: `/node/block/movement`,
+    method: 'PATCH',
+    APIGateway: 'Node',
+  },
+  MakeNodePublic: { route: (nodeID: string) => `/node/makePublic/${nodeID}`, method: 'PATCH', APIGateway: 'Node' },
+  MakeNodePrivate: { route: (nodeID: string) => `/node/makePrivate/${nodeID}`, method: 'PATCH', APIGateway: 'Node' },
+  UpdateNodeMetadata: { route: (nodeID: string) => `/node/metadata/${nodeID}`, method: 'PATCH', APIGateway: 'Node' },
+  GetArchivedNodes: { route: `/node/archive`, method: 'GET', APIGateway: 'Node' },
+  ArchiveNode: { route: `/node/archive/middleware`, method: 'PUT', APIGateway: 'Node' },
+  UnarchiveNode: { route: `/v1/node/unarchive`, method: 'PUT', APIGateway: 'Node' },
+  DeleteArchivedNode: { route: `/node/archive/delete`, method: 'POST', APIGateway: 'Node' },
+
+  // Reminder Endpoints
+  GetReminderByID: { route: (entityID: string) => `/${entityID}`, method: 'GET', APIGateway: 'Reminder' },
+  CreateReminder: { route: '/', method: 'POST', APIGateway: 'Reminder' },
+  DeleteReminderByID: { route: (entityID: string) => `/${entityID}`, method: 'DELETE', APIGateway: 'Reminder' },
+  GetAllRemindersOfNode: { route: (nodeID: string) => `/all/node/${nodeID}`, method: 'GET', APIGateway: 'Reminder' },
+  DeleteAllRemindersOfNode: {
+    route: (nodeID: string) => `/all/node/${nodeID}`,
+    method: 'DELETE',
+    APIGateway: 'Reminder',
+  },
+  GetAllRemindersOfWorkspace: { route: `/all/workspace`, method: 'GET', APIGateway: 'Reminder' },
+} satisfies Record<string, Destination>;

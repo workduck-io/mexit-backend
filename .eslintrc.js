@@ -39,6 +39,12 @@ module.exports = {
     'node/prefer-promises/dns': 'error',
     'node/prefer-promises/fs': 'error',
     '@typescript-eslint/no-explicit-any': 'off',
+    'node/no-unpublished-import': [
+      'warn',
+      {
+        allowModules: ['**/config'],
+      },
+    ],
   },
   overrides: [
     {
