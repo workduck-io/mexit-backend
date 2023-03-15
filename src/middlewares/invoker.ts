@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 
-import Config from '../config';
+import Config from '../config.json';
 import { InvocationSource } from '../interfaces/Locals';
 import { Destination } from '../interfaces/Request';
 import container from '../inversify.config';
@@ -73,7 +73,6 @@ async function InvokeLambda(req: Request, res: Response, next: NextFunction): Pr
       });
 
       const response = await APIClient.request(url, invokePayload);
-      console.log('Response: ', response);
       return response;
     } catch (error) {
       console.log('error in gateway invoker: ', error);

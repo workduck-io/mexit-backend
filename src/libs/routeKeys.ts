@@ -132,6 +132,9 @@ export const RouteKeys = {
 };
 
 export const APIGatewayRouteKeys = {
+  // Ping Endpoint
+  Ping: { route: '/ping', method: 'GET', APIGateway: 'Node' },
+
   // Node Endpoints
   CreateNode: { route: '/v1/node/rest', method: 'POST', APIGateway: 'Node' },
   GetNode: { route: (nodeID: string) => `/v1/node/${nodeID}`, method: 'GET', APIGateway: 'Node' },
