@@ -21,7 +21,6 @@ class NodeController {
 
   private _UserAccessLabel = 'USERACCESS';
 
-  private _nodeLambdaFunctionName = `mex-backend-${STAGE}-Node:latest`;
   private _nsLambdaFunctionName = `mex-backend-${STAGE}-Namespace:latest`;
 
   constructor() {
