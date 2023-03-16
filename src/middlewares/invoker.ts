@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 
 // @ts-ignore
+// eslint-disable-next-line
 import Config from '../config.json';
 import { InvocationSource } from '../interfaces/Locals';
 import { Destination } from '../interfaces/Request';

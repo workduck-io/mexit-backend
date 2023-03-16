@@ -42,7 +42,7 @@ module.exports = {
     'node/no-unpublished-import': [
       'warn',
       {
-        allowModules: ['**/config'],
+        allowModules: ['config'],
       },
     ],
   },

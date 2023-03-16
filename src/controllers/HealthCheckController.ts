@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response, response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 
 import { statusCodes } from '../libs/statusCodes';
 

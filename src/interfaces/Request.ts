@@ -1,4 +1,5 @@
 // @ts-ignore
+// eslint-disable-next-line
 import Config from '../config.json';
 
 import { ContentNode } from './Node';
