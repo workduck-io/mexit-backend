@@ -15,4 +15,5 @@ RUN --mount=type=secret,id=npmrc,dst=.npmrc yarn install --production=true --fro
 COPY --from=builder ./usr/src/app/dist dist/
 
 EXPOSE 5002
+RUN ["node", "dist/pre-init.js"]
 CMD ["dumb-init", "node", "dist/app.js"]

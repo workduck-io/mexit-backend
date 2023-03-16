@@ -1,3 +1,4 @@
+// @ts-ignore
 import Config from '../config.json';
 
 import { ContentNode } from './Node';

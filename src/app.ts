@@ -37,13 +37,6 @@ import responseErrorHandler from './middlewares/responseErrorHandler';
 import { parseReviver } from './utils/ArrayX';
 import { IS_DEV } from './env';
 import container from './inversify.config';
-import fs from 'fs';
-import path from 'path';
-
-const configPath = path.resolve(__dirname, 'config.json');
-if (!fs.existsSync(configPath)) {
-  throw new Error('config.json not found, quitting');
-}
 
 class App {
   public _app: express.Application;

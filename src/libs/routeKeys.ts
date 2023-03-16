@@ -136,9 +136,9 @@ export const APIGatewayRouteKeys = {
   Ping: { route: '/ping', method: 'GET', APIGateway: 'Node' },
 
   // Node Endpoints
-  CreateNode: { route: '/v1/node/rest', method: 'POST', APIGateway: 'Node' },
+  CreateNode: { route: '/v1/node', method: 'POST', APIGateway: 'Node' },
   GetNode: { route: (nodeID: string) => `/v1/node/${nodeID}`, method: 'GET', APIGateway: 'Node' },
-  GetMultipleNodes: { route: '/v1/node/ids', method: 'GET', APIGateway: 'Node' },
+  GetMultipleNodes: { route: '/v1/node/ids', method: 'POST', APIGateway: 'Node' },
   AppendNode: { route: (nodeID: string) => `/node/${nodeID}/append`, method: 'PATCH', APIGateway: 'Node' },
   DeleteBlocks: { route: (nodeID: string) => `/v1/node/${nodeID}`, method: 'GET', APIGateway: 'Node' },
   RefactorHierarchy: { route: `/node/refactor`, method: 'POST', APIGateway: 'Node' },
