@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - api-gateway-invoker-experiments
+      - move-to-rest-api-gateway-invoker
 
 jobs:
   build-and-deploy-ecs:

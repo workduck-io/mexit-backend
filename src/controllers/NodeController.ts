@@ -135,7 +135,6 @@ class NodeController {
         successful: [...lambdaResponse.successful, ...cachedHits],
       });
     } catch (error) {
-      console.log("Error in get multiple: ", error)
       next(error);
     }
   };
