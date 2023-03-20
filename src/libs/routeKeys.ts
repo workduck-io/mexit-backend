@@ -1,7 +1,7 @@
 export const RouteKeys = {
   // Node Operations - CRU, Refactor, bulkCreate
   createNode: 'POST /node',
-  getMultipleNode: 'GET /v1/node/ids',
+  getMultipleNode: 'POST /v1/node/ids',
   getNode: 'GET /node/{id}',
   appendNode: 'PATCH /node/{id}/append',
   deleteBlocks: 'PATCH /node/{id}/delete/block',

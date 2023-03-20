@@ -2,7 +2,7 @@ name: Deploy to test-mexit-backend-ecs-cluster on push to branch main
 
 on:
   push:
-    branches: [main]
+    branches: [main, test-deploy-main]
 
 jobs:
   build-and-deploy-ecs:
