@@ -11,15 +11,19 @@ const getConfigFromAWS = async () => {
       region: 'us-east-1',
     });
 
+    console.log("Client: ", client)
+
     const response = await client.send(
       new GetSecretValueCommand({
         SecretId: secret_name,
         VersionStage: 'AWSCURRENT', // VersionStage defaults to AWSCURRENT if unspecified
       })
     );
+    console.log("Response: ", response)
     const secret = response.SecretString;
     fs.writeFileSync(configPath, secret);
   } catch (error) {
+    console.log("Error in fetch config: ", error)
     throw new Error('Could not fetch config.json: ', error);
   }
 };
