@@ -152,14 +152,31 @@ class SharedController {
     try {
       const data = new RequestClass(request, 'GetMultipleIds').data;
 
-      const result = await response.locals.invoker(this._nodeLambdaFunctionName, 'getNodeSharedWithUser', {
+      const result: any[] = await response.locals.invoker(this._nodeLambdaFunctionName, 'getNodeSharedWithUser', {
         allSettled: {
           ids: data.ids,
           key: 'nodeID',
         },
       });
 
-      response.status(statusCodes.OK).json(result);
+      const formattedRes = result.reduce(
+        (acc, val) => {
+          return val.status === 'fulfilled'
+            ? {
+                ...acc,
+                fulfilled: [...acc.fulfilled, val.value],
+              }
+            : {
+                ...acc,
+                rejected: [...acc.rejected, val.value],
+              };
+        },
+        {
+          fulfilled: [],
+          rejected: [],
+        }
+      );
+      response.status(statusCodes.OK).json(formattedRes);
     } catch (error) {
       next(error);
     }
