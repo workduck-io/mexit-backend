@@ -164,16 +164,16 @@ class SharedController {
           return val.status === 'fulfilled'
             ? {
                 ...acc,
-                fulfilled: [...acc.fulfilled, val.value],
+                successful: [...acc.successful, val.value],
               }
             : {
                 ...acc,
-                rejected: [...acc.rejected, val.value],
+                failed: [...acc.failed, val.value],
               };
         },
         {
-          fulfilled: [],
-          rejected: [],
+          successful: [],
+          failed: [],
         }
       );
       response.status(statusCodes.OK).json(formattedRes);
