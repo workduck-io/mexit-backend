@@ -2,7 +2,9 @@ name: Deploy to test-mexit-backend-ecs-cluster on push to branch main
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - move-to-rest-api-gateway-invoker
 
 jobs:
   build-and-deploy-ecs:
@@ -16,6 +18,7 @@ jobs:
       DOCKER_BUILDKIT: 1
       MEXIT_BACKEND_REDIS_HOST: ${{ secrets.TEST_MEXIT_BACKEND_REDIS_HOST }}
       MEXIT_BACKEND_REDIS_PORT: ${{ secrets.TEST_MEXIT_BACKEND_REDIS_PORT }}
+      REST_API_KEY: ${{ secrets.REST_API_KEY }}
 
     steps:
       - uses: actions/checkout@v3
@@ -68,6 +71,7 @@ jobs:
           sed -i "s/<MEX_DEFAULT_USER_REFRESH_TOKEN>/$MEX_DEFAULT_USER_REFRESH_TOKEN/g" deploy/test-taskdef.json
           sed -i "s/<mexit_backend_redis_host>/$MEXIT_BACKEND_REDIS_HOST/g" deploy/test-taskdef.json
           sed -i "s/<mexit_backend_redis_port>/$MEXIT_BACKEND_REDIS_PORT/g" deploy/test-taskdef.json
+          sed -i "s/<rest_api_key>/$REST_API_KEYT/g" deploy/test-taskdef.json
 
         env:
           MEXIT_BACKEND_GOOGLE_CLIENT_ID: ${{ secrets.MEXIT_BACKEND_GOOGLE_CLIENT_ID }}
@@ -75,6 +79,7 @@ jobs:
           MEX_DEFAULT_USER_REFRESH_TOKEN: ${{ secrets.TEST_MEX_DEFAULT_USER_REFRESH_TOKEN }}
           MEX_DEFAULT_USER_ID: ${{ secrets.TEST_MEX_DEFAULT_USER_ID }}
           MEXIT_BACKEND_REDIS_PORT: ${{ secrets.TEST_MEXIT_BACKEND_TEST_REDIS_PORT }}
+          REST_API_KEY: ${{ secrets.REST_API_KEY }}
 
       - name: Render Amazon ECS task definition for Mexit Backend Container
         id: render-task-definition-app

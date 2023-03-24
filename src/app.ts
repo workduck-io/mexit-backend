@@ -1,11 +1,11 @@
 import 'dotenv/config';
 import 'reflect-metadata';
 
+import { wdRequestIdExpressParser } from '@workduck-io/wd-request-id-parser';
+
 import compression from 'compression';
 import cors from 'cors';
 import express from 'express';
-
-import { wdRequestIdExpressParser } from '@workduck-io/wd-request-id-parser';
 
 import ActionController from './controllers/ActionController';
 import BookmarkController from './controllers/BookmarkController';

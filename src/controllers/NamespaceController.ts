@@ -9,7 +9,7 @@ import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
 import { initializeNamespaceRoutes } from '../routes/NamespaceRoutes';
-import { generateLambdaInvokePayload } from '../utils/lambda';
+import { generateInvokePayload } from '../utils/generatePayload';
 
 class NamespaceController {
   public _urlPath = '/namespace';
@@ -25,9 +25,14 @@ class NamespaceController {
   }
 
   updateILinkCache = async (locals: LocalsX, namespaceID: string): Promise<any> => {
-    const payload = generateLambdaInvokePayload(locals, 'getNamespace', {
-      pathParameters: { id: namespaceID },
-    });
+    const payload = generateInvokePayload(
+      locals,
+      'Lambda',
+      {
+        pathParameters: { id: namespaceID },
+      },
+      'getNamespace'
+    );
 
     const namespace = await invokeAndCheck(this._namespaceLambdaFunctionName, 'RequestResponse', payload);
     await this._cache.set(namespaceID, namespace);

@@ -26,6 +26,7 @@ services:
       - AWS_SECRET_ACCESS_KEY
       - MEXIT_BACKEND_REDIS_HOST=redis
       - MEXIT_BACKEND_REDIS_PORT=6379
+      - REST_API_KEY
 
     volumes:
       - ./:/usr/src/app

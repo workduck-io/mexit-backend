@@ -8,7 +8,7 @@ import { statusCodes } from './statusCodes';
 type InvocationType = 'RequestResponse' | 'Event';
 type InvocationSource = 'Direct' | 'APIGateway';
 
-export interface LambdaOptions {
+export interface LambdaInvokeOptions {
   payload?: any;
   pathParameters?: any;
   routeKey?: string;
@@ -20,7 +20,7 @@ export interface LambdaOptions {
 async function invoke(
   functionName: string,
   invocationType: InvocationType,
-  options: LambdaOptions,
+  options: LambdaInvokeOptions,
   sendRawBody = false,
   invocationSource: InvocationSource = 'APIGateway'
 ) {
@@ -64,7 +64,7 @@ async function invoke(
 export async function invokeAndCheck(
   functionName: string,
   invocationType: InvocationType,
-  options: LambdaOptions,
+  options: LambdaInvokeOptions,
   sendRawBody = false,
   invocationSource: InvocationSource = 'APIGateway'
 ) {

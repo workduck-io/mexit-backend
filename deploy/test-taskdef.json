@@ -3,6 +3,7 @@
   "cpu": "768",
   "memory": "768",
   "requiresCompatibilities": ["EC2"],
+  "executionRoleArn": "ecsTaskExecutionRole",
   "containerDefinitions": [
     {
       "name": "app",
@@ -42,6 +43,10 @@
           "name": "MEXIT_BACKEND_REDIS_PORT",
           "value": "<mexit_backend_redis_port>"
         },
+        { 
+          "name": "REST_API_KEY",
+          "value": "<rest_api_key>"
+        },
         {
           "name": "NODE_ENV",
           "value": "production"
@@ -49,6 +54,12 @@
         {
           "name": "STAGE",
           "value": "test"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "GATEWAY_CONFIG",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:418506370286:secret:test-mexit-backend-api-gateway-tokens-eNHJb6"
         }
       ]
     },

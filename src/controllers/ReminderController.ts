@@ -1,6 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
 
-import { STAGE } from '../env';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { initializeReminderRoutes } from '../routes/ReminderRoutes';
@@ -9,17 +8,13 @@ class ReminderController {
   public _urlPath = '/reminder';
   public _router = express.Router();
 
-  private _reminderLambdaName = `reminder-${STAGE}-main`;
-
   constructor() {
     initializeReminderRoutes(this);
   }
 
   getReminder = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(this._reminderLambdaName, 'getReminderByID', {
-        pathParameters: { entityId: request.params.entityID },
-      });
+      const result = await response.locals.gatewayInvoker('GetReminderByID', undefined, request.params.entityID);
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -30,7 +25,7 @@ class ReminderController {
   createReminder = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const body = new RequestClass(request, 'Reminder').data;
-      const result = await response.locals.invoker(this._reminderLambdaName, 'createReminder', { payload: body }, true);
+      const result = await response.locals.gatewayInvoker('CreateReminder', { payload: body });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -40,9 +35,7 @@ class ReminderController {
 
   deleteReminder = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(this._reminderLambdaName, 'deleteReminderByID', {
-        pathParameters: { entityId: request.params.entityID },
-      });
+      const result = await response.locals.gatewayInvoker('DeleteReminderByID', undefined, request.params.entityID);
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -52,9 +45,7 @@ class ReminderController {
 
   getAllRemindersOfNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(this._reminderLambdaName, 'getAllRemindersOfNode', {
-        pathParameters: { nodeId: request.params.nodeID },
-      });
+      const result = await response.locals.gatewayInvoker('GetAllRemindersOfNode', undefined, request.params.nodeID );
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -64,9 +55,7 @@ class ReminderController {
 
   deleteAllRemindersOfNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(this._reminderLambdaName, 'deleteAllRemindersOfNode', {
-        pathParameters: { nodeId: request.params.nodeID },
-      });
+      const result = await response.locals.gatewayInvoker('DeleteAllRemindersOfNode',undefined, request.params.nodeID );
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -76,7 +65,7 @@ class ReminderController {
 
   getAllRemindersOfWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(this._reminderLambdaName, 'getAllRemindersOfWorkspace');
+      const result = await response.locals.gatewayInvoker('GetAllRemindersOfWorkspace'); 
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
