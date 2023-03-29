@@ -13,7 +13,7 @@ export const RouteKeys = {
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
   GetNode: {
-    route: (nodeID: string) => `GET /v1/node/${nodeID}`,
+    route: 'GET /v1/node/{nodeID}',
     APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
@@ -23,47 +23,47 @@ export const RouteKeys = {
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
   AppendNode: {
-    route: (nodeID: string) => `PATCH /node/${nodeID}/append`,
+    route: 'PATCH /node/{nodeID}/append',
     APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
   DeleteBlocks: {
-    route: (nodeID: string) => `GET /v1/node/${nodeID}`,
+    route: 'GET /v1/node/{nodeID}',
     APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
   RefactorHierarchy: {
-    route: `POST /node/refactor`,
+    route: 'POST /node/refactor',
     APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
   BulkCreateNode: {
-    route: `POST /node/bulk`,
+    route: 'POST /node/bulk',
     APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
   CopyOrMoveBlock: {
-    route: `PATCH /node/block/movement`,
+    route: 'PATCH /node/block/movement',
     APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
   MakeNodePublic: {
-    route: (nodeID: string) => `PATCH /node/makePublic/${nodeID}`,
+    route: 'PATCH /node/makePublic/{nodeID}',
     APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
   MakeNodePrivate: {
-    route: (nodeID: string) => `PATCH /node/makePrivate/${nodeID}`,
+    route: 'PATCH /node/makePrivate/{nodeID}',
     APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
   UpdateNodeMetadata: {
-    route: (nodeID: string) => `PATCH /node/metadata/${nodeID}`,
+    route: 'PATCH /node/metadata/{nodeID}',
     APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
   GetArchivedNodes: {
-    route: `GET /node/archive`,
+    route: 'GET /node/archive',
     APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
@@ -78,21 +78,21 @@ export const RouteKeys = {
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
   DeleteArchivedNode: {
-    route: `POST /node/archive/delete`,
+    route: 'POST /node/archive/delete',
     APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
 
   // Reminder Endpoints
-  GetReminderByID: { route: (entityID: string) => `GET /${entityID}`, APIGateway: 'Reminder' },
+  GetReminderByID: { route: 'GET /{entityID}', APIGateway: 'Reminder' },
   CreateReminder: { route: 'POST /', APIGateway: 'Reminder' },
-  DeleteReminderByID: { route: (entityID: string) => `DELETE /${entityID}`, APIGateway: 'Reminder' },
-  GetAllRemindersOfNode: { route: (nodeID: string) => `GET /all/node/${nodeID}`, APIGateway: 'Reminder' },
+  DeleteReminderByID: { route: 'DELETE /{entityID}', APIGateway: 'Reminder' },
+  GetAllRemindersOfNode: { route: 'GET /all/node/{nodeID}', APIGateway: 'Reminder' },
   DeleteAllRemindersOfNode: {
-    route: (nodeID: string) => `DELETE /all/node/${nodeID}`,
+    route: 'DELETE /all/node/{nodeID}',
     APIGateway: 'Reminder',
   },
-  GetAllRemindersOfWorkspace: { route: `GET /all/workspace`, APIGateway: 'Reminder' },
+  GetAllRemindersOfWorkspace: { route: 'GET /all/workspace', APIGateway: 'Reminder' },
 
   // User Ops
   getById: { route: 'GET /{userId}', functionName: `workduck-user-service-${STAGE}-getUser` },

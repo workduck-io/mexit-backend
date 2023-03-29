@@ -64,3 +64,9 @@ export const generateInvokePayload = <T = any>(
 
   return payload;
 };
+
+export const getPathFromPathParameters = (route: string, pathParameters: Record<string, string>): string => {
+  return route.replace(/{(.*?)}/g, (match, key) => {
+    return pathParameters[key] || match;
+  });
+};

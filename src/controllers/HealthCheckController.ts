@@ -21,7 +21,7 @@ class HealthCheckController {
 
   pingGateway = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const res = await response.locals.gatewayInvoker('Ping');
+      const res = await response.locals.invoker('Ping', undefined, 'APIGateway');
       response.status(statusCodes.OK).json(res);
     } catch (error) {
       next(error);

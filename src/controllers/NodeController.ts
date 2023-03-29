@@ -23,7 +23,7 @@ class NodeController {
   }
 
   updateILinkCache = async (locals: LocalsX, namespaceID: string): Promise<any> => {
-    const namespace = await locals.invoker('getNamespace', undefined, 'APIGateway', namespaceID);
+    const namespace = await locals.invoker('getNamespace', { pathParameters: { id: namespaceID } }, 'APIGateway');
     console.log('Namespace: ', namespace);
     await this._redisCache.set(namespaceID, namespace);
   };
@@ -71,10 +71,10 @@ class NodeController {
           response.locals.invoker(
             'GetNode',
             {
+              pathParameters: { nodeID: nodeId },
               ...(namespaceID && { queryStringParameters: { namespaceID: namespaceID } }),
             },
-            'APIGateway',
-            nodeId
+            'APIGateway'
           )
       );
 
@@ -142,9 +142,9 @@ class NodeController {
         'AppendNode',
         {
           payload: { ...blockDetail, type: 'ElementRequest' },
+          pathParameters: { nodeID },
         },
-        'APIGateway',
-        nodeID
+        'APIGateway'
       );
 
       this._redisCache.del(nodeID);
@@ -162,10 +162,10 @@ class NodeController {
         return response.locals.invoker(
           'DeleteBlocks',
           {
+            pathParameters: { nodeID: nodeId },
             payload: { ids: blockIds },
           },
-          'APIGateway',
-          nodeId
+          'APIGateway'
         );
       });
 
@@ -203,7 +203,7 @@ class NodeController {
   makeNodePublic = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const nodeId = request.params.id;
-      await response.locals.invoker('MakeNodePublic', undefined, 'APIGateway', nodeId);
+      await response.locals.invoker('MakeNodePublic', { pathParameters: { nodeID: nodeId } }, 'APIGateway');
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
@@ -214,7 +214,7 @@ class NodeController {
   makeNodePrivate = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const nodeId = request.params.id;
-      await response.locals.invoker('MakeNodePrivate', undefined, 'APIGateway', nodeId);
+      await response.locals.invoker('MakeNodePrivate', { pathParameters: { nodeID: nodeId } }, 'APIGateway');
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
@@ -356,9 +356,8 @@ class NodeController {
 
       await response.locals.invoker(
         'UpdateNodeMetadata',
-        { payload: { ...body, type: 'MetadataRequest' } },
-        'APIGateway',
-        nodeID
+        { payload: { ...body, type: 'MetadataRequest' }, pathParameters: { nodeID: nodeID } },
+        'APIGateway'
       );
       this._redisCache.del(nodeID);
       response.status(statusCodes.NO_CONTENT).send();

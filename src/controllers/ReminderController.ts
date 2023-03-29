@@ -10,11 +10,15 @@ class ReminderController {
 
   constructor() {
     initializeReminderRoutes(this);
-  }
+  } 
 
   getReminder = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker('GetReminderByID', undefined, 'APIGateway', request.params.entityID);
+      const result = await response.locals.invoker(
+        'GetReminderByID',
+        { pathParameters: { entityID: request.params.entityID } },
+        'APIGateway'
+      );
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -25,7 +29,11 @@ class ReminderController {
   createReminder = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const body = new RequestClass(request, 'Reminder').data;
-      const result = await response.locals.invoker('CreateReminder', { payload: body }, 'APIGateway');
+      const result = await response.locals.invoker(
+        'CreateReminder',
+        { payload: body, pathParameters: { entityID: request.params.entityID } },
+        'APIGateway'
+      );
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -37,9 +45,8 @@ class ReminderController {
     try {
       const result = await response.locals.invoker(
         'DeleteReminderByID',
-        undefined,
-        'APIGateway',
-        request.params.entityID
+        { pathParameters: { entityID: request.params.entityID } },
+        'APIGateway'
       );
 
       response.status(statusCodes.OK).json(result);
@@ -52,9 +59,8 @@ class ReminderController {
     try {
       const result = await response.locals.invoker(
         'GetAllRemindersOfNode',
-        undefined,
-        'APIGateway',
-        request.params.nodeID
+        { pathParameters: { nodeID: request.params.nodeID } },
+        'APIGateway'
       );
 
       response.status(statusCodes.OK).json(result);
@@ -67,9 +73,8 @@ class ReminderController {
     try {
       const result = await response.locals.invoker(
         'DeleteAllRemindersOfNode',
-        undefined,
-        'APIGateway',
-        request.params.nodeID
+        { pathParameters: { nodeID: request.params.nodeID } },
+        'APIGateway'
       );
 
       response.status(statusCodes.OK).json(result);
