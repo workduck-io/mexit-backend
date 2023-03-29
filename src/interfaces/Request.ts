@@ -1,7 +1,3 @@
-// @ts-ignore
-// eslint-disable-next-line
-import Config from '../config.json';
-
 import { ContentNode } from './Node';
 
 export interface ContentNodeRequest extends ContentNode {
@@ -187,9 +183,3 @@ export interface UpdateParentNodeForLochService {
   parentNodeId: string;
   namespaceId: string;
 }
-
-export type Destination = {
-  route?: string;
-  APIGateway?: keyof typeof Config;
-  functionName?: string;
-};

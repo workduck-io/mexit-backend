@@ -1,5 +1,14 @@
+// eslint-disable-next-line
+// @ts-ignore
+import Config from '../config.json';
+
 import { STAGE } from '../env';
-import { Destination } from '../interfaces/Request';
+
+export type Destination = {
+  route?: string;
+  APIGateway?: keyof typeof Config;
+  functionName?: string;
+};
 
 export const RouteKeys = {
   // Ping Endpoint

@@ -34,7 +34,6 @@ import {
   CreateNamespace,
   DeleteBlocksRequest,
   DeleteNamespace,
-  Destination,
   Filter,
   FilterJoin,
   FilterType,
@@ -150,5 +149,4 @@ export default class Interfaces implements Definitions {
   DeleteNamespace: DeleteNamespace;
   ConnectToLochService: ConnectToLochService;
   UpdateParentNodeForLochService: UpdateParentNodeForLochService;
-  Destination: Destination;
 }

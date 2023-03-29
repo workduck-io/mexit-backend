@@ -4,12 +4,11 @@ import { NextFunction, Request, Response } from 'express';
 // eslint-disable-next-line
 import Config from '../config.json';
 import { IS_DEV } from '../env';
-import { Destination } from '../interfaces/Request';
 import container from '../inversify.config';
 import { errorlib } from '../libs/errorlib';
 import { GotClient } from '../libs/GotClientClass';
 import { invokeAndCheck } from '../libs/LambdaInvoker';
-import { RouteKeys } from '../libs/routeKeys';
+import { Destination, RouteKeys } from '../libs/routeKeys';
 import { statusCodes } from '../libs/statusCodes';
 import { generateInvokePayload, getPathFromPathParameters, InvokePayloadOptions } from '../utils/generatePayload';
 

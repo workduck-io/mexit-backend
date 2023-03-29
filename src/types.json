@@ -805,24 +805,6 @@
             },
             "type": "object"
         },
-        "Destination": {
-            "properties": {
-                "APIGateway": {
-                    "type": [
-                        "string",
-                        "number",
-                        "symbol"
-                    ]
-                },
-                "functionName": {
-                    "type": "string"
-                },
-                "route": {
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
         "Filter": {
             "properties": {
                 "id": {
