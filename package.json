@@ -55,7 +55,7 @@
   "dependencies": {
     "@aws-sdk/client-cloudwatch-logs": "^3.92.0",
     "@aws-sdk/client-lambda": "^3.190.0",
-    "@aws-sdk/client-secrets-manager": "^3.290.0",
+    "@aws-sdk/client-secrets-manager": "^3.299.0",
     "@aws-sdk/util-utf8-node": "^3.188.0",
     "@workduck-io/mex-default-user-token": "^0.0.1",
     "@workduck-io/wd-request-id-parser": "^0.0.3",
