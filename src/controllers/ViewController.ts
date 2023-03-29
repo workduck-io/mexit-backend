@@ -1,6 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
 
-import { STAGE } from '../env';
 import { statusCodes } from '../libs/statusCodes';
 import { initializeViewRoutes } from '../routes/ViewRoutes';
 
@@ -8,7 +7,6 @@ class ViewController {
   public _urlPath = '/view';
   public _router = express.Router();
 
-  private _taskViewLambdaName = `task-${STAGE}-view`;
   private _additionalHeaders: { 'mex-api-ver': 'v2' };
 
   constructor() {
@@ -17,7 +15,7 @@ class ViewController {
 
   getView = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(this._taskViewLambdaName, 'getView', {
+      const result = await response.locals.invoker('getView', {
         pathParameters: { entityId: request.params.viewID },
         additionalHeaders: this._additionalHeaders,
       });
@@ -30,7 +28,7 @@ class ViewController {
 
   getAllViews = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(this._taskViewLambdaName, 'getAllViews', {
+      const result = await response.locals.invoker('getAllViews', {
         additionalHeaders: this._additionalHeaders,
       });
 
@@ -42,7 +40,7 @@ class ViewController {
 
   deleteView = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      await response.locals.invoker(this._taskViewLambdaName, 'deleteView', {
+      await response.locals.invoker('deleteView', {
         pathParameters: { entityId: request.params.viewID },
         additionalHeaders: this._additionalHeaders,
       });
@@ -55,17 +53,11 @@ class ViewController {
 
   postView = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      // const data = new RequestClass(request, 'PostView').data;
-
-      const result = await response.locals.invoker(
-        this._taskViewLambdaName,
-        'saveView',
-        {
-          additionalHeaders: this._additionalHeaders,
-          payload: request.body,
-        },
-        true
-      );
+      const result = await response.locals.invoker('saveView', {
+        additionalHeaders: this._additionalHeaders,
+        payload: request.body,
+        sendRawBody: true,
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {

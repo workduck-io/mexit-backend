@@ -1,7 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
 
 import { STAGE } from '../env';
-import { LocalsX } from '../interfaces/Locals';
 import container from '../inversify.config';
 import { invokeAndCheck } from '../libs/LambdaInvoker';
 import { Redis } from '../libs/RedisClass';
@@ -10,6 +9,7 @@ import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
 import { initializeNamespaceRoutes } from '../routes/NamespaceRoutes';
 import { generateInvokePayload } from '../utils/generatePayload';
+import { LocalsX } from '../utils/Locals';
 
 class NamespaceController {
   public _urlPath = '/namespace';
@@ -42,7 +42,7 @@ class NamespaceController {
     try {
       const body = new RequestClass(request, 'CreateNamespace').data;
 
-      response.locals.invoker(this._namespaceLambdaFunctionName, 'createNamespace', {
+      response.locals.invoker('createNamespace', {
         payload: { ...body, type: 'NamespaceRequest' },
       });
 
@@ -60,7 +60,7 @@ class NamespaceController {
           key: namespaceID,
         },
         () =>
-          response.locals.invoker(this._namespaceLambdaFunctionName, 'getNamespace', {
+          response.locals.invoker('getNamespace', {
             pathParameters: { id: namespaceID },
           })
       );
@@ -75,7 +75,7 @@ class NamespaceController {
   updateNamespace = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const body = new RequestClass(request, 'UpdateNamespace').data;
-      await response.locals.invoker(this._namespaceLambdaFunctionName, 'updateNamespace', {
+      await response.locals.invoker('updateNamespace', {
         payload: { ...body, type: 'NamespaceRequest' },
       });
 
@@ -90,7 +90,7 @@ class NamespaceController {
   makeNamespacePublic = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const namespaceID = request.params.namespaceID;
-      await response.locals.invoker(this._namespaceLambdaFunctionName, 'makeNamespacePublic', {
+      await response.locals.invoker('makeNamespacePublic', {
         pathParameters: { id: namespaceID },
       });
       await this._cache.del(namespaceID);
@@ -104,7 +104,7 @@ class NamespaceController {
   makeNamespacePrivate = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const namespaceID = request.params.namespaceID;
-      await response.locals.invoker(this._namespaceLambdaFunctionName, 'makeNamespacePrivate', {
+      await response.locals.invoker('makeNamespacePrivate', {
         pathParameters: { id: namespaceID },
       });
       await this._cache.del(namespaceID);
@@ -117,7 +117,7 @@ class NamespaceController {
 
   getAllNamespaces = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result: any[] = await response.locals.invoker(this._namespaceLambdaFunctionName, 'getAllNamespaces');
+      const result: any[] = await response.locals.invoker('getAllNamespaces');
 
       const transformedResult = result.toObject('namespaceID');
 
@@ -126,7 +126,7 @@ class NamespaceController {
       const nonCachedIds = ids.minus(cachedHits.map(item => item.id));
 
       const allNamespacesResults = (
-        await response.locals.invoker(this._namespaceLambdaFunctionName, 'getNamespace', {
+        await response.locals.invoker('getNamespace', {
           allSettled: {
             ids: nonCachedIds,
             key: 'id',
@@ -162,7 +162,7 @@ class NamespaceController {
           force: forceRefresh,
         },
         async () => {
-          const result = await response.locals.invoker(this._namespaceLambdaFunctionName, 'getAllNamespaceHierarchy', {
+          const result = await response.locals.invoker('getAllNamespaceHierarchy', {
             queryStringParameters: { getMetadata: getMetadata },
           });
 
@@ -199,9 +199,7 @@ class NamespaceController {
         });
       });
 
-      const promises = backendRequestBodies.map(i =>
-        response.locals.invoker(this._namespaceLambdaFunctionName, 'shareNamespace', { payload: i })
-      );
+      const promises = backendRequestBodies.map(i => response.locals.invoker('shareNamespace', { payload: i }));
 
       await Promise.all(promises);
 
@@ -215,7 +213,7 @@ class NamespaceController {
     try {
       const body = new RequestClass(request, 'RevokeAccessFromNamespace').data;
 
-      await response.locals.invoker(this._namespaceLambdaFunctionName, 'revokeUserAccessFromNamespace', {
+      await response.locals.invoker('revokeUserAccessFromNamespace', {
         payload: { ...body, type: 'SharedNamespaceRequest' },
       });
 
@@ -227,7 +225,7 @@ class NamespaceController {
 
   getUsersInvitedToNamespace = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(this._namespaceLambdaFunctionName, 'getUsersOfSharedNamespace', {
+      const result = await response.locals.invoker('getUsersOfSharedNamespace', {
         pathParameters: { id: request.params.namespaceID },
       });
 
@@ -242,7 +240,7 @@ class NamespaceController {
       const { path, namespaceID } = request.params;
       const nodeID = request.query['nodeID'] as string;
 
-      const result: string = await response.locals.invoker(this._namespaceLambdaFunctionName, 'getNodeIDFromPath', {
+      const result: string = await response.locals.invoker('getNodeIDFromPath', {
         pathParameters: { namespaceID: namespaceID, path: path },
         ...(nodeID && { queryStringParameters: { nodeID: nodeID } }),
       });
@@ -265,7 +263,7 @@ class NamespaceController {
       const { successorNamespaceID } = new RequestClass(request, 'DeleteNamespace').data;
       const namespaceID = request.params.namespaceID;
 
-      await response.locals.invoker(this._namespaceLambdaFunctionName, 'deleteNamespace', {
+      await response.locals.invoker('deleteNamespace', {
         pathParameters: { id: namespaceID },
         ...(successorNamespaceID && {
           payload: {

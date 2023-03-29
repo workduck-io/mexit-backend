@@ -1,6 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
 
-import { STAGE } from '../env';
 import container from '../inversify.config';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
@@ -13,12 +12,6 @@ class UserController {
   public _router = express.Router();
 
   public _transformer: Transformer = container.get<Transformer>(Transformer);
-
-  private _userLambdaFunctionName = `workduck-user-service-${STAGE}-user`;
-  private _getUserLambdaFunctionName = `workduck-user-service-${STAGE}-getUser`;
-  private _userMexBackendLambdaFunctionName = `mex-backend-${STAGE}-User:latest`;
-  private _registerStatusLambdaFunctionName = `workduck-user-service-${STAGE}-registerStatus`;
-  private _inviteUserLambdaFunctionName = `workduck-user-service-${STAGE}-invite`;
 
   constructor() {
     initializeUserRoutes(this);
@@ -34,14 +27,10 @@ class UserController {
     }
 
     try {
-      const result = await response.locals.invoker(
-        this._userLambdaFunctionName,
-        'updateUserDetails',
-        {
-          payload: data,
-        },
-        true
-      );
+      const result = await response.locals.invoker('updateUserDetails', {
+        payload: data,
+        sendRawBody: true,
+      });
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -54,14 +43,10 @@ class UserController {
       const requestDetail = new RequestClass(request, 'UserPreference').data;
       requestDetail.id = userId;
 
-      const result = await response.locals.invoker(
-        this._userLambdaFunctionName,
-        'updateUserPreference',
-        {
-          payload: requestDetail,
-        },
-        true
-      );
+      const result = await response.locals.invoker('updateUserPreference', {
+        payload: requestDetail,
+        sendRawBody: true,
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -71,7 +56,7 @@ class UserController {
 
   get = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
-      const result = await response.locals.invoker(this._getUserLambdaFunctionName, 'getUser');
+      const result = await response.locals.invoker('getUser');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -82,7 +67,7 @@ class UserController {
   getInvite = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
       const inviteId = request.params.inviteId;
-      const result = await response.locals.invoker(this._inviteUserLambdaFunctionName, 'getInvite', {
+      const result = await response.locals.invoker('getInvite', {
         pathParameters: { inviteId: inviteId },
       });
 
@@ -95,7 +80,7 @@ class UserController {
   deleteInvite = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
       const inviteId = request.params.inviteId;
-      await response.locals.invoker(this._inviteUserLambdaFunctionName, 'deleteInvite', {
+      await response.locals.invoker('deleteInvite', {
         pathParameters: { inviteId: inviteId },
       });
 
@@ -107,7 +92,7 @@ class UserController {
 
   getInvitesOfWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
-      const result = await response.locals.invoker(this._inviteUserLambdaFunctionName, 'getAllInviteOfWorkspace');
+      const result = await response.locals.invoker('getAllInviteOfWorkspace');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -118,7 +103,7 @@ class UserController {
   createInvite = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
       const payload = new RequestClass(request, 'InviteProperties').data;
-      const result = await response.locals.invoker(this._inviteUserLambdaFunctionName, 'createInvite', {
+      const result = await response.locals.invoker('createInvite', {
         payload: payload,
       });
 
@@ -130,7 +115,7 @@ class UserController {
 
   getById = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
-      const result = await response.locals.invoker(this._getUserLambdaFunctionName, 'getById', {
+      const result = await response.locals.invoker('getById', {
         pathParameters: { userId: request.params.id },
       });
 
@@ -141,7 +126,7 @@ class UserController {
   };
   getByMail = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
-      const result = await response.locals.invoker(this._getUserLambdaFunctionName, 'getByEmail', {
+      const result = await response.locals.invoker('getByEmail', {
         pathParameters: { email: request.params.mail },
       });
 
@@ -152,7 +137,7 @@ class UserController {
   };
   getUsersOfWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
-      const result = await response.locals.invoker(this._userLambdaFunctionName, 'getUsersOfWorkspace');
+      const result = await response.locals.invoker('getUsersOfWorkspace');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -163,14 +148,10 @@ class UserController {
     try {
       const payload = request.body;
       payload.linkedinURL = payload.linkedinURL.replace(/\/+$/, '');
-      const result = await response.locals.invoker(
-        this._getUserLambdaFunctionName,
-        'getUserByLinkedin',
-        {
-          payload: payload,
-        },
-        true
-      );
+      const result = await response.locals.invoker('getUserByLinkedin', {
+        payload: payload,
+        sendRawBody: true,
+      });
 
       response.status(statusCodes.OK).json({
         mex_user: result.length > 0 ? true : false,
@@ -182,7 +163,7 @@ class UserController {
 
   registerStatus = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const registerStatus = await response.locals.invoker(this._registerStatusLambdaFunctionName, 'registerStatus');
+      const registerStatus = await response.locals.invoker('registerStatus');
 
       response.status(statusCodes.OK).send(registerStatus);
     } catch (error) {

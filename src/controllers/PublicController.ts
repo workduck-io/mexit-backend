@@ -1,6 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
 
-import { STAGE } from '../env';
 import container from '../inversify.config';
 import { Redis } from '../libs/RedisClass';
 import { statusCodes } from '../libs/statusCodes';
@@ -13,8 +12,6 @@ class PublicController {
 
   private _transformer: Transformer = container.get<Transformer>(Transformer);
   private _cache: Redis = container.get<Redis>(Redis);
-  private _nsLambdaFunctionName = `mex-backend-${STAGE}-Namespace:latest`;
-  private _nodeLambdaFunctionName = `mex-backend-${STAGE}-Node:latest`;
 
   constructor() {
     initializePublicRoutes(this);
@@ -28,7 +25,7 @@ class PublicController {
           key: nodeId,
         },
         () =>
-          response.locals.invoker(this._nodeLambdaFunctionName, 'getPublicNode', {
+          response.locals.invoker('getPublicNode', {
             pathParameters: { id: nodeId },
           })
       );
@@ -47,7 +44,7 @@ class PublicController {
           key: namespaceID,
         },
         () =>
-          response.locals.invoker(this._nsLambdaFunctionName, 'getPublicNamespace', {
+          response.locals.invoker('getPublicNamespace', {
             pathParameters: { id: request.params.namespaceID },
           })
       );

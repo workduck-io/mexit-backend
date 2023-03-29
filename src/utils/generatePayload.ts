@@ -1,6 +1,6 @@
-import { LocalsX } from '../interfaces/Locals';
 import { LambdaInvokeOptions } from '../libs/LambdaInvoker';
-import { RouteKeys } from '../libs/routeKeys';
+
+import { LocalsX } from './Locals';
 
 export type HTTPMethod = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 
@@ -15,6 +15,7 @@ export interface InvokePayloadOptions<T> {
     key: string;
   };
   httpMethod?: HTTPMethod;
+  sendRawBody?: boolean;
 }
 
 interface GatewayInvokeOptions {
@@ -30,7 +31,7 @@ export const generateInvokePayload = <T = any>(
   locals: LocalsX,
   invokerDestination: 'APIGateway' | 'Lambda' = 'Lambda',
   options?: InvokePayloadOptions<T>,
-  routeKey?: keyof typeof RouteKeys
+  route?: string
 ): Partial<InvokeOptions> => {
   const isAPIGateway = invokerDestination === 'APIGateway';
   let headers = {
@@ -43,19 +44,19 @@ export const generateInvokePayload = <T = any>(
     headers = { ...headers, ...options.additionalHeaders };
   }
 
+  const httpMethod = options?.httpMethod ?? route.split(' ')[0];
   let payload: Partial<InvokeOptions> = {
     headers: headers,
     ...(options?.payload && (isAPIGateway ? { json: options.payload } : { payload: options.payload })),
   };
 
   if (isAPIGateway) {
-    payload['method'] = options?.httpMethod;
+    payload['method'] = httpMethod;
   } else {
-    const rKeyVal = RouteKeys[routeKey];
     payload = {
       ...payload,
-      ...(rKeyVal && { routeKey: rKeyVal }),
-      httpMethod: options?.httpMethod ?? rKeyVal.split(' ')[0],
+      ...(route && { routeKey: route }),
+      httpMethod: httpMethod,
       ...(options?.queryStringParameters && {
         queryStringParameters: options.queryStringParameters,
       }),
@@ -64,4 +65,10 @@ export const generateInvokePayload = <T = any>(
   }
 
   return payload;
+};
+
+export const getPathFromPathParameters = (route: string, pathParameters: Record<string, string>): string => {
+  return route.replace(/{(.*?)}/g, (match, key) => {
+    return pathParameters[key] || match;
+  });
 };

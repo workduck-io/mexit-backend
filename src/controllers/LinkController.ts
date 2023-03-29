@@ -1,6 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
 
-import { STAGE } from '../env';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { initializeLinkRoutes } from '../routes/LinkRoutes';
@@ -9,8 +8,6 @@ class LinkController {
   public _urlPath = '/link';
   public _router = express.Router();
 
-  private _linkServiceLambdaBase = `mex-url-shortner-${STAGE}`;
-
   constructor() {
     initializeLinkRoutes(this);
   }
@@ -18,15 +15,11 @@ class LinkController {
   shortenLink = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const data = new RequestClass(request, 'ShortenLink').data;
-      const result = await response.locals.invoker(
-        `${this._linkServiceLambdaBase}-shorten`,
-        undefined,
-        {
-          httpMethod: 'POST',
-          payload: data,
-        },
-        true
-      );
+      const result = await response.locals.invoker('shortenLink', {
+        httpMethod: 'POST',
+        payload: data,
+        sendRawBody: true,
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -36,14 +29,10 @@ class LinkController {
 
   getAllShortsOfWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
-        `${this._linkServiceLambdaBase}-workspaceDetails`,
-        undefined,
-        {
-          httpMethod: 'GET',
-        },
-        true
-      );
+      const result = await response.locals.invoker('getAllShortsOfWorkspace', {
+        httpMethod: 'GET',
+        sendRawBody: true,
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -53,15 +42,11 @@ class LinkController {
 
   deleteShort = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
-        `${this._linkServiceLambdaBase}-del`,
-        undefined,
-        {
-          httpMethod: 'DELETE',
-          pathParameters: { url: request.params.url },
-        },
-        true
-      );
+      const result = await response.locals.invoker('deleteShort', {
+        httpMethod: 'DELETE',
+        pathParameters: { url: request.params.url },
+        sendRawBody: true,
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -71,15 +56,11 @@ class LinkController {
 
   getStatsByURL = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
-        `${this._linkServiceLambdaBase}-stats`,
-        undefined,
-        {
-          httpMethod: 'GET',
-          pathParameters: { url: request.params.url },
-        },
-        true
-      );
+      const result = await response.locals.invoker('getStatsByURL', {
+        httpMethod: 'GET',
+        pathParameters: { url: request.params.url },
+        sendRawBody: true,
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {

@@ -1,162 +1,281 @@
-import { Destination } from '../interfaces/Request';
+// eslint-disable-next-line
+// @ts-ignore
+import Config from '../config.json';
 
-export const RouteKeys = {
-  // User Ops
-  getById: 'GET /{userId}',
-  getByEmail: 'GET /email/{email}',
-  getUser: 'GET /',
-  getUsersOfWorkspace: 'GET /all',
-  updateUserDetails: 'PUT /info',
-  updateUserPreference: 'PUT /preference',
-  createUserPreference: 'POST ',
-  getUserByLinkedin: 'POST /linkedin',
-  registerStatus: 'GET /status',
-  //User Invite
-  getInvite: 'GET /invite/{inviteId}',
-  getAllInviteOfWorkspace: 'GET /invite',
-  createInvite: 'POST /invite',
-  deleteInvite: 'DELETE /invite/{inviteId}',
+import { STAGE } from '../env';
 
-  // Shared Note Ops
-  shareNode: 'POST /shared/node',
-  updateAccessTypeForshareNode: 'PUT /shared/node',
-  revokeNodeAccessForUsers: 'DELETE /shared/node',
-  getNodeSharedWithUser: 'GET /shared/node/{nodeID}',
-  updateSharedNode: 'POST /shared/node/update',
-  getUsersWithNodesShared: 'GET /shared/node/{id}/users',
-  getAllSharedNodeForUser: 'GET /shared/node/all',
-
-  // Snippet Ops
-  getSnippet: 'GET /snippet/{id}',
-  getAllVersionsOfSnippet: 'GET /snippet/{id}/all',
-  getAllSnippetsOfWorkspace: 'GET /snippet/all',
-  createSnippet: 'POST /snippet',
-  makeSnippetPublic: 'PATCH /snippet/makePublic/{id}/{version}',
-  makeSnippetPrivate: 'PATCH /snippet/makePrivate/{id}/{version}',
-  clonePublicSnippet: 'POST /snippet/clone/{id}/{version}',
-  deleteVersionOfSnippet: 'DELETE /snippet/{id}',
-  deleteAllVersionsOfSnippet: 'DELETE /snippet/{id}/all',
-  updateSnippetMetadata: 'PATCH /v1/snippet/metadata/{id}',
-
-  // User Star (Bookmark) Endpoints
-  createBookmark: 'POST /userStar/{id}',
-  removeBookmark: 'DELETE /userStar/{id}',
-  getAllBookmarks: 'GET /userStar/all',
-  batchCreateBookmark: 'POST /userStar/batch',
-  batchRemoveBookmark: 'DELETE /userStar/batch',
-
-  // Namespace Ops - CRUD, Fetch Hierarchy
-  createNamespace: 'POST /namespace',
-  getNamespace: 'GET /namespace/{id}',
-  updateNamespace: 'PATCH /namespace',
-  makeNamespacePublic: 'PATCH /namespace/makePublic/{id}',
-  makeNamespacePrivate: 'PATCH /namespace/makePrivate/{id}',
-  getAllNamespaceHierarchy: 'GET /namespace/all/hierarchy',
-  getAllNamespaces: 'GET /v2/namespace/all',
-  getNodeIDFromPath: 'GET /namespace/{namespaceID}/path/{path}',
-  deleteNamespace: 'POST /namespace/{id}',
-
-  // Views - CRUD Operations
-  getAllViews: 'GET /view/all/workspace',
-  getView: 'GET /view/{entityId}',
-  deleteView: 'DELETE /view/{entityId}',
-  saveView: 'POST /view',
-
-  // Public Namespace, Node and Snippet Ops
-  getPublicNode: 'GET /node/public/{id}',
-  getPublicNamespace: 'GET /namespace/public/{id}',
-  getPublicSnippet: 'GET /snippet/public/{id}/{version}',
-
-  // Shared Namespaces Roues
-  shareNamespace: 'POST /shared/namespace',
-  revokeUserAccessFromNamespace: 'DELETE /shared/namespace',
-  getUsersOfSharedNamespace: 'GET /shared/namespace/{id}/users',
-
-  // Comments
-  getCommentByID: 'GET /{nodeId}/{entityId}',
-  createComment: 'POST /',
-  deleteCommentByID: 'DELETE /{nodeId}/{entityId}',
-  getAllCommentsOfNode: 'GET /all/{nodeId}',
-  getAllCommentsOfBlock: 'GET /all/{nodeId}/block/{blockId}',
-  getAllCommentsOfThread: 'GET /all/{nodeId}/block/{blockId}/thread/{threadId}',
-  deleteAllCommentsOfNode: 'DELETE /all/{nodeId}',
-  deleteAllCommentsOfBlock: 'DELETE /all/{nodeId}/block/{blockId}',
-  deleteAllCommentsOfThread: 'DELETE /all/{nodeId}/block/{blockId}/thread/{threadId}',
-
-  // Reactions - CRUD Operations
-  getAllReactionsOfNode: 'GET /node/{nodeId}',
-  getAllReactionsOfBlock: 'GET /node/{nodeId}/block/{blockId}',
-  getReactionDetailsOfBlock: 'GET /node/{nodeId}/block/{blockId}/details',
-  toggleReaction: 'POST /',
-
-  //SmartCapture
-  getPublicCaptureConfig: 'GET /config/all/public',
-
-  //Highlights
-  getHighlightByID: 'GET /{entityId}',
-  createHighlight: 'POST /',
-  deleteHighlightByID: 'DELETE /{entityId}',
-  getHighlightByIDs: 'GET /multiple',
-  getAllHighlightsOfWorkspace: 'GET /all',
-
-  // Mex Loch
-  getAllServices: 'GET /connect/all',
-  getConnectedServices: 'GET /connect',
-  connectToService: 'POST /connect',
-  updateParentNodeOfService: 'PUT /connect',
-
-  //Actions
-  getActionsOfActionGroup: 'GET /{actionGroupId}/helpers',
-  getAction: 'GET /{actionGroupId}/helpers/{actionId}',
-
-  //Action Auth
-  getAuth: 'GET /{authTypeId}',
-  getAllAuths: 'GET /all',
-  updateAuth: 'PUT /current/{authTypeId}',
-  refreshAuth: 'PUT /refresh/{source}',
-
-  // Prompt
-  getAllPrompts: 'GET /allUser',
-  generatePromptResult: 'POST /result/{id}',
-  getUserAuthInfo: 'GET /userAuth',
-  updateUserAuthInfo: 'POST /userAuth',
-  getAllPromptProviders: 'GET /providers',
+export type Destination = {
+  route?: string;
+  APIGateway?: keyof typeof Config;
+  functionName?: string;
 };
 
-export const APIGatewayRouteKeys = {
+export const RouteKeys = {
   // Ping Endpoint
-  Ping: { route: '/ping', method: 'GET', APIGateway: 'Node' },
+  Ping: { route: 'GET /ping', APIGateway: 'Node' },
 
   // Node Endpoints
-  CreateNode: { route: '/v1/node', method: 'POST', APIGateway: 'Node' },
-  GetNode: { route: (nodeID: string) => `/v1/node/${nodeID}`, method: 'GET', APIGateway: 'Node' },
-  GetMultipleNodes: { route: '/v1/node/ids', method: 'POST', APIGateway: 'Node' },
-  AppendNode: { route: (nodeID: string) => `/node/${nodeID}/append`, method: 'PATCH', APIGateway: 'Node' },
-  DeleteBlocks: { route: (nodeID: string) => `/v1/node/${nodeID}`, method: 'GET', APIGateway: 'Node' },
-  RefactorHierarchy: { route: `/node/refactor`, method: 'POST', APIGateway: 'Node' },
-  BulkCreateNode: { route: `/node/bulk`, method: 'POST', APIGateway: 'Node' },
-  CopyOrMoveBlock: {
-    route: `/node/block/movement`,
-    method: 'PATCH',
+  // Function name fallback needed for direct lambda invocation
+  CreateNode: {
+    route: 'POST /v1/node',
     APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
   },
-  MakeNodePublic: { route: (nodeID: string) => `/node/makePublic/${nodeID}`, method: 'PATCH', APIGateway: 'Node' },
-  MakeNodePrivate: { route: (nodeID: string) => `/node/makePrivate/${nodeID}`, method: 'PATCH', APIGateway: 'Node' },
-  UpdateNodeMetadata: { route: (nodeID: string) => `/node/metadata/${nodeID}`, method: 'PATCH', APIGateway: 'Node' },
-  GetArchivedNodes: { route: `/node/archive`, method: 'GET', APIGateway: 'Node' },
-  ArchiveNode: { route: `/node/archive/middleware`, method: 'PUT', APIGateway: 'Node' },
-  UnarchiveNode: { route: `/v1/node/unarchive`, method: 'PUT', APIGateway: 'Node' },
-  DeleteArchivedNode: { route: `/node/archive/delete`, method: 'POST', APIGateway: 'Node' },
+  GetNode: {
+    route: 'GET /v1/node/{nodeID}',
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
+  GetMultipleNodes: {
+    route: 'POST /v1/node/ids',
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
+  AppendNode: {
+    route: 'PATCH /node/{nodeID}/append',
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
+  DeleteBlocks: {
+    route: 'GET /v1/node/{nodeID}',
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
+  RefactorHierarchy: {
+    route: 'POST /node/refactor',
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
+  BulkCreateNode: {
+    route: 'POST /node/bulk',
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
+  CopyOrMoveBlock: {
+    route: 'PATCH /node/block/movement',
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
+  MakeNodePublic: {
+    route: 'PATCH /node/makePublic/{nodeID}',
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
+  MakeNodePrivate: {
+    route: 'PATCH /node/makePrivate/{nodeID}',
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
+  UpdateNodeMetadata: {
+    route: 'PATCH /node/metadata/{nodeID}',
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
+  GetArchivedNodes: {
+    route: 'GET /node/archive',
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
+  ArchiveNode: {
+    route: `PUT /node/archive/middleware`,
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
+  UnarchiveNode: {
+    route: `PUT /v1/node/unarchive`,
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
+  DeleteArchivedNode: {
+    route: 'POST /node/archive/delete',
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
 
   // Reminder Endpoints
-  GetReminderByID: { route: (entityID: string) => `/${entityID}`, method: 'GET', APIGateway: 'Reminder' },
-  CreateReminder: { route: '/', method: 'POST', APIGateway: 'Reminder' },
-  DeleteReminderByID: { route: (entityID: string) => `/${entityID}`, method: 'DELETE', APIGateway: 'Reminder' },
-  GetAllRemindersOfNode: { route: (nodeID: string) => `/all/node/${nodeID}`, method: 'GET', APIGateway: 'Reminder' },
+  GetReminderByID: { route: 'GET /{entityID}', APIGateway: 'Reminder' },
+  CreateReminder: { route: 'POST /', APIGateway: 'Reminder' },
+  DeleteReminderByID: { route: 'DELETE /{entityID}', APIGateway: 'Reminder' },
+  GetAllRemindersOfNode: { route: 'GET /all/node/{nodeID}', APIGateway: 'Reminder' },
   DeleteAllRemindersOfNode: {
-    route: (nodeID: string) => `/all/node/${nodeID}`,
-    method: 'DELETE',
+    route: 'DELETE /all/node/{nodeID}',
     APIGateway: 'Reminder',
   },
-  GetAllRemindersOfWorkspace: { route: `/all/workspace`, method: 'GET', APIGateway: 'Reminder' },
+  GetAllRemindersOfWorkspace: { route: 'GET /all/workspace', APIGateway: 'Reminder' },
+
+  // User Ops
+  getById: { route: 'GET /{userId}', functionName: `workduck-user-service-${STAGE}-getUser` },
+  getByEmail: { route: 'GET /email/{email}', functionName: `workduck-user-service-${STAGE}-getUser` },
+  getUser: { route: 'GET /', functionName: `workduck-user-service-${STAGE}-getUser` },
+  getUsersOfWorkspace: { route: 'GET /all', functionName: `workduck-user-service-${STAGE}-user` },
+  updateUserDetails: { route: 'PUT /info', functionName: `workduck-user-service-${STAGE}-user` },
+  updateUserPreference: { route: 'PUT /preference', functionName: `workduck-user-service-${STAGE}-user` },
+  getUserByLinkedin: { route: 'POST /linkedin', functionName: `workduck-user-service-${STAGE}-getUser` },
+  registerStatus: { route: 'GET /status', functionName: `workduck-user-service-${STAGE}-registerStatus` },
+
+  //User Invite
+  getInvite: { route: 'GET /invite/{inviteId}', functionName: `workduck-user-service-${STAGE}-invite` },
+  getAllInviteOfWorkspace: { route: 'GET /invite', functionName: `workduck-user-service-${STAGE}-invite` },
+  createInvite: { route: 'POST /invite', functionName: `workduck-user-service-${STAGE}-invite` },
+  deleteInvite: { route: 'DELETE /invite/{inviteId}', functionName: `workduck-user-service-${STAGE}-invite` },
+
+  // Share Note Ops
+  shareNode: { route: 'POST /shared/node', functionName: `mex-backend-${STAGE}-Node:latest` },
+  updateAccessTypeForshareNode: { route: 'PUT /shared/node', functionName: `mex-backend-${STAGE}-Node:latest` },
+  revokeNodeAccessForUsers: { route: 'DELETE /shared/node', functionName: `mex-backend-${STAGE}-Node:latest` },
+  getNodeSharedWithUser: { route: 'GET /shared/node/{nodeID}', functionName: `mex-backend-${STAGE}-Node:latest` },
+  updateSharedNode: { route: 'POST /shared/node/update', functionName: `mex-backend-${STAGE}-Node:latest` },
+  getUsersWithNodesShared: { route: 'GET /shared/node/{id}/users', functionName: `mex-backend-${STAGE}-Node:latest` },
+  getAllSharedNodeForUser: { route: 'GET /shared/node/all', functionName: `mex-backend-${STAGE}-Node:latest` },
+
+  // Snippet Ops
+  getSnippet: { route: 'GET /snippet/{id}', functionName: `mex-backend-${STAGE}-Snippet:latest` },
+  getAllVersionsOfSnippet: { route: 'GET /snippet/{id}/all', functionName: `mex-backend-${STAGE}-Snippet:latest` },
+  getAllSnippetsOfWorkspace: { route: 'GET /snippet/all', functionName: `mex-backend-${STAGE}-Snippet:latest` },
+  createSnippet: { route: 'POST /snippet', functionName: `mex-backend-${STAGE}-Snippet:latest` },
+  makeSnippetPublic: {
+    route: 'PATCH /snippet/makePublic/{id}/{version}',
+    functionName: `mex-backend-${STAGE}-Snippet:latest`,
+  },
+  makeSnippetPrivate: {
+    route: 'PATCH /snippet/makePrivate/{id}/{version}',
+    functionName: `mex-backend-${STAGE}-Snippet:latest`,
+  },
+  clonePublicSnippet: {
+    route: 'POST /snippet/clone/{id}/{version}',
+    functionName: `mex-backend-${STAGE}-Snippet:latest`,
+  },
+  deleteVersionOfSnippet: { route: 'DELETE /snippet/{id}', functionName: `mex-backend-${STAGE}-Snippet:latest` },
+  deleteAllVersionsOfSnippet: {
+    route: 'DELETE /snippet/{id}/all',
+    functionName: `mex-backend-${STAGE}-Snippet:latest`,
+  },
+  updateSnippetMetadata: {
+    route: 'PATCH /v1/snippet/metadata/{id}',
+    functionName: `mex-backend-${STAGE}-Snippet:latest`,
+  },
+
+  // Bookmark Ops
+  createBookmark: { route: 'POST /userStar/{id}', functionName: `mex-backend-${STAGE}-UserStar:latest` },
+  removeBookmark: { route: 'DELETE /userStar/{id}', functionName: `mex-backend-${STAGE}-UserStar:latest` },
+  getAllBookmarks: { route: 'GET /userStar/all', functionName: `mex-backend-${STAGE}-UserStar:latest` },
+  batchCreateBookmark: { route: 'POST /userStar/batch', functionName: `mex-backend-${STAGE}-UserStar:latest` },
+  batchRemoveBookmark: { route: 'DELETE /userStar/batch', functionName: `mex-backend-${STAGE}-UserStar:latest` },
+
+  // Namespace Ops
+  createNamespace: { route: 'POST /namespace', functionName: `mex-backend-${STAGE}-Namespace:latest` },
+  getNamespace: { route: 'GET /namespace/{id}', functionName: `mex-backend-${STAGE}-Namespace:latest` },
+  updateNamespace: { route: 'PATCH /namespace', functionName: `mex-backend-${STAGE}-Namespace:latest` },
+  makeNamespacePublic: {
+    route: 'PATCH /namespace/makePublic/{id}',
+    functionName: `mex-backend-${STAGE}-Namespace:latest`,
+  },
+  makeNamespacePrivate: {
+    route: 'PATCH /namespace/makePrivate/{id}',
+    functionName: `mex-backend-${STAGE}-Namespace:latest`,
+  },
+  getAllNamespaceHierarchy: {
+    route: 'GET /namespace/all/hierarchy',
+    functionName: `mex-backend-${STAGE}-Namespace:latest`,
+  },
+  getAllNamespaces: { route: 'GET /v2/namespace/all', functionName: `mex-backend-${STAGE}-Namespace:latest` },
+  getNodeIDFromPath: {
+    route: 'GET /namespace/{namespaceID}/path/{path}',
+    functionName: `mex-backend-${STAGE}-Namespace:latest`,
+  },
+  deleteNamespace: { route: 'POST /namespace/{id}', functionName: `mex-backend-${STAGE}-Namespace:latest` },
+
+  // View Ops
+  getAllViews: { route: 'GET /view/all/workspace', functionName: `task-${STAGE}-view` },
+  getView: { route: 'GET /view/{entityId}', functionName: `task-${STAGE}-view` },
+  deleteView: { route: 'DELETE /view/{entityId}', functionName: `task-${STAGE}-view` },
+  saveView: { route: 'POST /view', functionName: `task-${STAGE}-view` },
+
+  // Public Namespace, Node and Snippet Ops
+  getPublicNode: { route: 'GET /node/public/{id}', functionName: `mex-backend-${STAGE}-Node:latest` },
+  getPublicNamespace: { route: 'GET /namespace/public/{id}', functionName: `mex-backend-${STAGE}-Namespace:latest` },
+  getPublicSnippet: {
+    route: 'GET /snippet/public/{id}/{version}',
+    functionName: `mex-backend-${STAGE}-Snippet:latest`,
+  },
+
+  // Share Namespace Ops
+  shareNamespace: { route: 'POST /shared/namespace', functionName: `mex-backend-${STAGE}-Namespace:latest` },
+  revokeUserAccessFromNamespace: {
+    route: 'DELETE /shared/namespace',
+    functionName: `mex-backend-${STAGE}-Namespace:latest`,
+  },
+  getUsersOfSharedNamespace: {
+    route: 'GET /shared/namespace/{id}/users',
+    functionName: `mex-backend-${STAGE}-Namespace:latest`,
+  },
+
+  // Comments Ops
+  getCommentByID: { route: 'GET /{nodeId}/{entityId}', functionName: `comment-${STAGE}-main` },
+  createComment: { route: 'POST /', functionName: `comment-${STAGE}-main` },
+  deleteCommentByID: { route: 'DELETE /{nodeId}/{entityId}', functionName: `comment-${STAGE}-main` },
+  getAllCommentsOfNode: { route: 'GET /all/{nodeId}', functionName: `comment-${STAGE}-main` },
+  getAllCommentsOfBlock: { route: 'GET /all/{nodeId}/block/{blockId}', functionName: `comment-${STAGE}-main` },
+  getAllCommentsOfThread: {
+    route: 'GET /all/{nodeId}/block/{blockId}/thread/{threadId}',
+    functionName: `comment-${STAGE}-main`,
+  },
+  deleteAllCommentsOfNode: { route: 'DELETE /all/{nodeId}', functionName: `comment-${STAGE}-main` },
+  deleteAllCommentsOfBlock: { route: 'DELETE /all/{nodeId}/block/{blockId}', functionName: `comment-${STAGE}-main` },
+  deleteAllCommentsOfThread: {
+    route: 'DELETE /all/{nodeId}/block/{blockId}/thread/{threadId}',
+    functionName: `comment-${STAGE}-main`,
+  },
+
+  // Reaction Ops
+  getAllReactionsOfNode: { route: 'GET /node/{nodeId}', functionName: `reaction-${STAGE}-main` },
+  getAllReactionsOfBlock: { route: 'GET /node/{nodeId}/block/{blockId}', functionName: `reaction-${STAGE}-main` },
+  getReactionDetailsOfBlock: {
+    route: 'GET /node/{nodeId}/block/{blockId}/details',
+    functionName: `reaction-${STAGE}-main`,
+  },
+  toggleReaction: { route: 'POST /', functionName: `reaction-${STAGE}-main` },
+
+  // Smart Capture Ops
+  getPublicCaptureConfig: { route: 'GET /config/all/public', functionName: `smartcapture-${STAGE}-config` },
+
+  // Highlight Ops
+  getHighlightByID: { route: 'GET /{entityId}', functionName: `highlights-${STAGE}-main` },
+  createHighlight: { route: 'POST /', functionName: `highlights-${STAGE}-main` },
+  deleteHighlightByID: { route: 'DELETE /{entityId}', functionName: `highlights-${STAGE}-main` },
+  getHighlightByIDs: { route: 'GET /multiple', functionName: `highlights-${STAGE}-main` },
+  getAllHighlightsOfWorkspace: { route: 'GET /all', functionName: `highlights-${STAGE}-main` },
+
+  // Mex Loch Ops
+  getAllServices: { route: 'GET /connect/all', functionName: `mex-loch-${STAGE}-allConfig` },
+  getConnectedServices: { route: 'GET /connect', functionName: `mex-loch-${STAGE}-connected` },
+  connectToService: { route: 'POST /connect', functionName: `mex-loch-${STAGE}-register` },
+  updateParentNodeOfService: { route: 'PUT /connect', functionName: `mex-loch-${STAGE}-update` },
+
+  // Actions Ops
+  getActionsOfActionGroup: {
+    route: 'GET /{actionGroupId}/helpers',
+    functionName: `actionHelperService-${STAGE}-getAllActionGroups`,
+  },
+  getAction: {
+    route: 'GET /{actionGroupId}/helpers/{actionId}',
+    functionName: `actionHelperService-${STAGE}-getAction`,
+  },
+  getAuth: { route: 'GET /{authTypeId}', functionName: `authService-${STAGE}-getAuth` },
+  getAllAuths: { route: 'GET /all', functionName: `authService-${STAGE}-getAllAuths` },
+  updateAuth: { route: 'PUT /current/{authTypeId}', functionName: `authService-${STAGE}-updateCurrentWorkspace` },
+  refreshAuth: { route: 'PUT /refresh/{source}', functionName: `authService-${STAGE}-refreshWorkspaceAuth` },
+
+  // Prompt Ops
+  getAllPrompts: { route: 'GET /allUser', functionName: `gpt3Prompt-${STAGE}-main` },
+  generatePromptResult: { route: 'POST /result/{id}', functionName: `gpt3Prompt-${STAGE}-main` },
+  getUserAuthInfo: { route: 'GET /userAuth', functionName: `gpt3Prompt-${STAGE}-main` },
+  updateUserAuthInfo: { route: 'POST /userAuth', functionName: `gpt3Prompt-${STAGE}-main` },
+  getAllPromptProviders: { route: 'GET /providers', functionName: `gpt3Prompt-${STAGE}-main` },
+
+  // Link Ops
+  shortenLink: { functionName: `mex-url-shortner-${STAGE}-shorten` },
+  getAllShortsOfWorkspace: { functionName: `mex-url-shortner-${STAGE}-workspaceDetails` },
+  deleteShort: { functionName: `mex-url-shortner-${STAGE}-del` },
+  getStatsByURL: { functionName: `mex-url-shortner-${STAGE}-stats` },
 } satisfies Record<string, Destination>;

@@ -25,7 +25,7 @@ class SmartCaptureController {
           key: this._PublicCaptureLabel,
           expires: 24 * 60 * 60 * 60, // 24 hours
         },
-        () => response.locals.invoker(this._smartCaptureLambdaName, 'getPublicCaptureConfig')
+        () => response.locals.invoker('getPublicCaptureConfig')
       );
       response.status(statusCodes.OK).json(result);
     } catch (error) {

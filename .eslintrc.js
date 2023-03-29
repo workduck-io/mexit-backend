@@ -82,6 +82,12 @@ module.exports = {
         '@typescript-eslint/ban-ts-comment': 'off',
       },
     },
+    {
+      files: ['*.js'],
+      rules: {
+        '@typescript-eslint/no-var-requires': 'off',
+      },
+    },
   ],
   settings: {
     node: {

@@ -1,6 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
 
-import { STAGE } from '../env';
 import container from '../inversify.config';
 import { Redis } from '../libs/RedisClass';
 import { RequestClass } from '../libs/RequestClass';
@@ -17,7 +16,6 @@ class SharedController {
 
   private _UserAccessLabel = 'USERACCESS';
   private _UserAccessTypeLabel = 'USERACCESSTYPE';
-  private _nodeLambdaFunctionName = `mex-backend-${STAGE}-Node:latest`;
 
   constructor() {
     initializeSharedRoutes(this);
@@ -26,7 +24,7 @@ class SharedController {
   shareNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const body = new RequestClass(request, 'ShareNodeDetail').data;
-      await response.locals.invoker(this._nodeLambdaFunctionName, 'shareNode', {
+      await response.locals.invoker('shareNode', {
         payload: {
           ...body,
           nodeID: body.nodeID,
@@ -48,7 +46,7 @@ class SharedController {
     try {
       const body = new RequestClass(request, 'UpdateAccessTypeForSharedNodeDetail').data;
 
-      await response.locals.invoker(this._nodeLambdaFunctionName, 'updateAccessTypeForshareNode', {
+      await response.locals.invoker('updateAccessTypeForshareNode', {
         payload: { ...body, type: 'UpdateAccessTypesRequest' },
       });
 
@@ -66,7 +64,7 @@ class SharedController {
     try {
       const body = request.body;
 
-      await response.locals.invoker(this._nodeLambdaFunctionName, 'revokeNodeAccessForUsers', {
+      await response.locals.invoker('revokeNodeAccessForUsers', {
         payload: {
           ...body,
           nodeID: body.nodeID,
@@ -88,7 +86,7 @@ class SharedController {
     try {
       const nodeID = request.params.nodeId;
 
-      const result = await response.locals.invoker(this._nodeLambdaFunctionName, 'getNodeSharedWithUser', {
+      const result = await response.locals.invoker('getNodeSharedWithUser', {
         pathParameters: { nodeID: nodeID },
       });
 
@@ -102,7 +100,7 @@ class SharedController {
     try {
       const body = new RequestClass(request, 'UpdateShareNodeDetail').data;
 
-      await response.locals.invoker(this._nodeLambdaFunctionName, 'updateSharedNode', {
+      await response.locals.invoker('updateSharedNode', {
         payload: { ...body, type: 'UpdateSharedNodeRequest' },
       });
 
@@ -127,7 +125,7 @@ class SharedController {
           key: this._transformer.encodeCacheKey(this._UserAccessTypeLabel, nodeId),
         },
         () =>
-          response.locals.invoker(this._nodeLambdaFunctionName, 'getUsersWithNodesShared', {
+          response.locals.invoker('getUsersWithNodesShared', {
             pathParameters: { id: nodeId },
           })
       );
@@ -140,7 +138,7 @@ class SharedController {
 
   getAllNodesSharedForUser = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(this._nodeLambdaFunctionName, 'getAllSharedNodeForUser');
+      const result = await response.locals.invoker('getAllSharedNodeForUser');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -152,7 +150,7 @@ class SharedController {
     try {
       const data = new RequestClass(request, 'GetMultipleIds').data;
 
-      const result: any[] = await response.locals.invoker(this._nodeLambdaFunctionName, 'getNodeSharedWithUser', {
+      const result: any[] = await response.locals.invoker('getNodeSharedWithUser', {
         allSettled: {
           ids: data.ids,
           key: 'nodeID',

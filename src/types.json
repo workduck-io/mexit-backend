@@ -986,39 +986,6 @@
             },
             "type": "object"
         },
-        "InvocationSource": {
-            "enum": [
-                "APIGateway",
-                "Direct"
-            ],
-            "type": "string"
-        },
-        "LocalsX": {
-            "properties": {
-                "gatewayInvoker": {
-                    "type": "object"
-                },
-                "idToken": {
-                    "type": "string"
-                },
-                "invoker": {
-                    "type": "object"
-                },
-                "userEmail": {
-                    "type": "string"
-                },
-                "userId": {
-                    "type": "string"
-                },
-                "userIdRaw": {
-                    "type": "string"
-                },
-                "workspaceID": {
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
         "MetaTag": {
             "properties": {
                 "name": {

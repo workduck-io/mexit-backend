@@ -1,6 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
 
-import { STAGE } from '../env';
 import container from '../inversify.config';
 import { Redis } from '../libs/RedisClass';
 import { RequestClass } from '../libs/RequestClass';
@@ -13,8 +12,6 @@ class HighlightController {
 
   private _redisCache: Redis = container.get<Redis>(Redis);
 
-  private _highlightServiceLambdaName = `highlights-${STAGE}-main`;
-
   constructor() {
     initializeHighlightRoutes(this);
   }
@@ -23,14 +20,10 @@ class HighlightController {
     try {
       const data = new RequestClass(request).data;
       this._redisCache.del(data.entityId);
-      const result = await response.locals.invoker(
-        this._highlightServiceLambdaName,
-        'createHighlight',
-        {
-          payload: data,
-        },
-        true
-      );
+      const result = await response.locals.invoker('createHighlight', {
+        payload: data,
+        sendRawBody: true,
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -46,14 +39,10 @@ class HighlightController {
       const nonCachedIds = data.ids.minus(cachedHits.map(item => item.id));
 
       const lambdaResponse = !nonCachedIds.isEmpty()
-        ? await response.locals.invoker(
-            this._highlightServiceLambdaName,
-            'getHighlightByIDs',
-            {
-              payload: { ids: nonCachedIds },
-            },
-            true
-          )
+        ? await response.locals.invoker('getHighlightByIDs', {
+            payload: { ids: nonCachedIds },
+            sendRawBody: true,
+          })
         : [];
 
       this._redisCache.mset(lambdaResponse.toObject('entityId', JSON.stringify));
@@ -66,12 +55,7 @@ class HighlightController {
 
   getAllHighlightsOfWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
-        this._highlightServiceLambdaName,
-        'getAllHighlightsOfWorkspace',
-        undefined,
-        true
-      );
+      const result = await response.locals.invoker('getAllHighlightsOfWorkspace', { sendRawBody: true });
 
       this._redisCache.mset(result.Items.toObject('entityId', JSON.stringify));
 
@@ -84,14 +68,10 @@ class HighlightController {
   deleteHighlight = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const entityId = request.params.entityId;
-      await response.locals.invoker(
-        this._highlightServiceLambdaName,
-        'deleteHighlightByID',
-        {
-          pathParameters: { entityId: entityId },
-        },
-        true
-      );
+      await response.locals.invoker('deleteHighlightByID', {
+        pathParameters: { entityId: entityId },
+        sendRawBody: true,
+      });
 
       this._redisCache.del(entityId);
 
