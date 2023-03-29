@@ -1,6 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
 
-import { STAGE } from '../env';
 import { statusCodes } from '../libs/statusCodes';
 import { initializeBookmarkRoutes } from '../routes/BookmarkRoutes';
 
@@ -8,15 +7,13 @@ class BookmarkController {
   public _urlPath = '/userStar';
   public _router = express.Router();
 
-  private _userStarLambdaFunctionName = `mex-backend-${STAGE}-UserStar:latest`;
-
   constructor() {
     initializeBookmarkRoutes(this);
   }
 
   getBookmarksForUser = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker(this._userStarLambdaFunctionName, 'getAllBookmarks');
+      const result = await response.locals.lambdaInvoker('getAllBookmarks');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -26,7 +23,7 @@ class BookmarkController {
 
   createBookmark = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      await response.locals.lambdaInvoker(this._userStarLambdaFunctionName, 'createBookmark', {
+      await response.locals.lambdaInvoker('createBookmark', {
         pathParameters: { id: request.params.nodeID },
       });
 
@@ -38,7 +35,7 @@ class BookmarkController {
 
   removeBookmark = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      await response.locals.lambdaInvoker(this._userStarLambdaFunctionName, 'removeBookmark', {
+      await response.locals.lambdaInvoker('removeBookmark', {
         pathParameters: { id: request.params.nodeID },
       });
 
@@ -50,7 +47,7 @@ class BookmarkController {
 
   batchCreateBookmarks = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      await response.locals.lambdaInvoker(this._userStarLambdaFunctionName, 'batchCreateBookmark', {
+      await response.locals.lambdaInvoker('batchCreateBookmark', {
         payload: request.body,
       });
 
@@ -62,7 +59,7 @@ class BookmarkController {
 
   batchRemoveBookmarks = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      await response.locals.lambdaInvoker(this._userStarLambdaFunctionName, 'batchRemoveBookmark', {
+      await response.locals.lambdaInvoker('batchRemoveBookmark', {
         payload: request.body,
       });
 

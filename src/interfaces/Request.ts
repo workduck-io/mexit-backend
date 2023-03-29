@@ -195,8 +195,8 @@ export interface APIGatewayDestination {
 }
 
 export interface LambdaDestination {
-  route: string;
-  functionNameSuffix: string;
+  route?: string;
+  functionName: string;
 }
 
 export type Destination = APIGatewayDestination | LambdaDestination;

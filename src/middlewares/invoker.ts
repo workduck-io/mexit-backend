@@ -4,12 +4,12 @@ import { NextFunction, Request, Response } from 'express';
 // eslint-disable-next-line
 import Config from '../config.json';
 import { InvocationSource } from '../interfaces/Locals';
-import { APIGatewayDestination } from '../interfaces/Request';
+import { APIGatewayDestination, LambdaDestination } from '../interfaces/Request';
 import container from '../inversify.config';
 import { errorlib } from '../libs/errorlib';
 import { GotClient } from '../libs/GotClientClass';
 import { invokeAndCheck } from '../libs/LambdaInvoker';
-import { APIGatewayRouteKeys, RouteKeys } from '../libs/routeKeys';
+import { RouteKeys } from '../libs/routeKeys';
 import { statusCodes } from '../libs/statusCodes';
 import { generateInvokePayload, InvokePayloadOptions } from '../utils/generatePayload';
 
@@ -19,11 +19,11 @@ const forceAPIGatewayInvoker = !!process.env.FORCE_API_GATEWAY;
 
 async function InvokeLambda(req: Request, res: Response, next: NextFunction): Promise<void> {
   res.locals.lambdaInvoker = async <T = any>(
-    functionName: string,
     routeKey: keyof typeof RouteKeys,
     options?: InvokePayloadOptions<T> & { sendRawBody: boolean; invocationSource: InvocationSource }
   ) => {
     try {
+      const { route, functionName } = RouteKeys[routeKey] as LambdaDestination;
       if (options?.allSettled) {
         const promises = options.allSettled.ids.map(id => {
           const invokePayload = generateInvokePayload(
@@ -36,26 +36,26 @@ async function InvokeLambda(req: Request, res: Response, next: NextFunction): Pr
                 [options?.allSettled?.key]: id,
               },
             },
-            routeKey
+            route
           );
           return invokeAndCheck(
             functionName,
             'RequestResponse',
             invokePayload,
-            options.sendRawBody,
-            options.invocationSource
+            options?.sendRawBody ?? false,
+            options?.invocationSource ?? 'APIGateway'
           );
         });
 
         return await Promise.allSettled(promises);
       } else {
-        const invokePayload = generateInvokePayload(res.locals, 'Lambda', options, routeKey);
+        const invokePayload = generateInvokePayload(res.locals, 'Lambda', options, route);
         return await invokeAndCheck(
           functionName,
           'RequestResponse',
           invokePayload,
-          options.sendRawBody,
-          options.invocationSource
+          options?.sendRawBody ?? false,
+          options?.invocationSource ?? 'APIGateway'
         );
       }
     } catch (error: any) {
@@ -71,12 +71,12 @@ async function InvokeLambda(req: Request, res: Response, next: NextFunction): Pr
   };
 
   res.locals.gatewayInvoker = async <T = any>(
-    routeKey: keyof typeof APIGatewayRouteKeys,
+    routeKey: keyof typeof RouteKeys,
     options?: InvokePayloadOptions<T>,
     ...args: string[]
   ): Promise<any> => {
     try {
-      const { method, route, APIGateway } = APIGatewayRouteKeys[routeKey] as APIGatewayDestination;
+      const { method, route, APIGateway } = RouteKeys[routeKey] as APIGatewayDestination;
 
       const additionalHeaders = { 'x-api-key': Config[APIGateway].token };
       const url = `${Config[APIGateway].url}/${typeof route === 'function' ? route(...args) : route}`;

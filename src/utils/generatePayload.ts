@@ -1,6 +1,5 @@
 import { LocalsX } from '../interfaces/Locals';
 import { LambdaInvokeOptions } from '../libs/LambdaInvoker';
-import { RouteKeys } from '../libs/routeKeys';
 
 export type HTTPMethod = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 
@@ -30,7 +29,7 @@ export const generateInvokePayload = <T = any>(
   locals: LocalsX,
   invokerDestination: 'APIGateway' | 'Lambda' = 'Lambda',
   options?: InvokePayloadOptions<T>,
-  routeKey?: keyof typeof RouteKeys
+  route?: string
 ): Partial<InvokeOptions> => {
   const isAPIGateway = invokerDestination === 'APIGateway';
   let headers = {
@@ -51,11 +50,10 @@ export const generateInvokePayload = <T = any>(
   if (isAPIGateway) {
     payload['method'] = options?.httpMethod;
   } else {
-    const rKeyVal = RouteKeys[routeKey];
     payload = {
       ...payload,
-      ...(rKeyVal && { routeKey: rKeyVal }),
-      httpMethod: options?.httpMethod ?? rKeyVal.split(' ')[0],
+      ...(route && { routeKey: route }),
+      httpMethod: options?.httpMethod ?? route.split(' ')[0],
       ...(options?.queryStringParameters && {
         queryStringParameters: options.queryStringParameters,
       }),

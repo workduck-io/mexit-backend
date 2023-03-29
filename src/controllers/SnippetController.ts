@@ -1,6 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
 
-import { STAGE } from '../env';
 import { NodeResponse } from '../interfaces/Response';
 import container from '../inversify.config';
 import { Redis } from '../libs/RedisClass';
@@ -12,8 +11,6 @@ import { initializeSnippetRoutes } from '../routes/SnippetRoutes';
 class SnippetController {
   public _urlPath = '/snippet';
   public _router = express.Router();
-
-  private _snippetLambdaFunctionName = `mex-backend-${STAGE}-Snippet:latest`;
 
   private _transformer: Transformer = container.get<Transformer>(Transformer);
   private _redisCache: Redis = container.get<Redis>(Redis);
@@ -29,7 +26,7 @@ class SnippetController {
       const createNextVersion = request.query.createNextVersion === 'true';
       //TODO: update cache instead of deleting it
       this._redisCache.del(request.body.id);
-      const snippetResult = await response.locals.lambdaInvoker(this._snippetLambdaFunctionName, 'createSnippet', {
+      const snippetResult = await response.locals.lambdaInvoker('createSnippet', {
         payload: request.body,
         queryStringParameters: { createNextVersion: createNextVersion },
       });
@@ -58,7 +55,7 @@ class SnippetController {
           force: !this._redisCache.has(userSpecificNodeKey),
         },
         () =>
-          response.locals.lambdaInvoker(this._snippetLambdaFunctionName, 'getSnippet', {
+          response.locals.lambdaInvoker('getSnippet', {
             pathParameters: { id: snippetId },
           })
       );
@@ -88,7 +85,7 @@ class SnippetController {
       const lambdaResponse = { successful: [], failed: [] };
 
       if (!nonCachedIds.isEmpty()) {
-        const rawLambdaResponse = await response.locals.lambdaInvoker(this._snippetLambdaFunctionName, 'getSnippet', {
+        const rawLambdaResponse = await response.locals.lambdaInvoker('getSnippet', {
           allSettled: {
             ids: nonCachedIds,
             key: 'id',
@@ -121,7 +118,7 @@ class SnippetController {
 
   getAllVersionsOfSnippets = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker(this._snippetLambdaFunctionName, 'getAllVersionsOfSnippet', {
+      const result = await response.locals.lambdaInvoker('getAllVersionsOfSnippet', {
         pathParameters: { id: request.params.snippetId },
       });
 
@@ -134,7 +131,7 @@ class SnippetController {
   getAllSnippetsOfWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const getData = request.query.getData === 'true';
-      const result = await response.locals.lambdaInvoker(this._snippetLambdaFunctionName, 'getAllSnippetsOfWorkspace', {
+      const result = await response.locals.lambdaInvoker('getAllSnippetsOfWorkspace', {
         queryStringParameters: { getData: getData },
       });
 
@@ -149,7 +146,7 @@ class SnippetController {
       const snippetId = request.params.id;
       const version = request.params.version;
 
-      await response.locals.lambdaInvoker(this._snippetLambdaFunctionName, 'makeSnippetPublic', {
+      await response.locals.lambdaInvoker('makeSnippetPublic', {
         pathParameters: { id: snippetId, version: version },
       });
       this._redisCache.set(
@@ -167,7 +164,7 @@ class SnippetController {
       const snippetId = request.params.id;
       const version = request.params.version;
 
-      await response.locals.lambdaInvoker(this._snippetLambdaFunctionName, 'makeSnippetPrivate', {
+      await response.locals.lambdaInvoker('makeSnippetPrivate', {
         pathParameters: { id: snippetId, version: version },
       });
 
@@ -190,7 +187,7 @@ class SnippetController {
           force: !this._redisCache.has(this._transformer.encodeCacheKey(this._PublicSnippetMockWorkspace, snippetId)),
         },
         () =>
-          response.locals.lambdaInvoker(this._snippetLambdaFunctionName, 'getPublicSnippet', {
+          response.locals.lambdaInvoker('getPublicSnippet', {
             pathParameters: { id: snippetId, version: version },
           })
       );
@@ -208,7 +205,7 @@ class SnippetController {
       const snippetId = request.params.id;
       const version = request.params.version;
 
-      const result = await response.locals.lambdaInvoker(this._snippetLambdaFunctionName, 'clonePublicSnippet', {
+      const result = await response.locals.lambdaInvoker('clonePublicSnippet', {
         pathParameters: { id: snippetId, version: version },
       });
 
@@ -225,7 +222,7 @@ class SnippetController {
       // If a version is not passed in query parameters, it deletes the latest version
       const version = request.query['version'] ? parseInt(request.query['version'] as string) : undefined;
 
-      await response.locals.lambdaInvoker(this._snippetLambdaFunctionName, 'deleteVersionOfSnippet', {
+      await response.locals.lambdaInvoker('deleteVersionOfSnippet', {
         pathParameters: { id: snippetID },
         ...(version && { queryStringParameters: { version: version } }),
       });
@@ -240,7 +237,7 @@ class SnippetController {
     try {
       const snippetID = request.params.id;
 
-      await response.locals.lambdaInvoker(this._snippetLambdaFunctionName, 'deleteAllVersionsOfSnippet', {
+      await response.locals.lambdaInvoker('deleteAllVersionsOfSnippet', {
         pathParameters: { id: snippetID },
       });
 
@@ -254,7 +251,7 @@ class SnippetController {
     try {
       const body = new RequestClass(request, 'UpdateMetadata').data;
 
-      await response.locals.lambdaInvoker(this._snippetLambdaFunctionName, 'updateSnippetMetadata', {
+      await response.locals.lambdaInvoker('updateSnippetMetadata', {
         pathParameters: { id: request.params.id },
         payload: { ...body, type: 'MetadataRequest' },
       });

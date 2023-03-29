@@ -1,6 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
 
-import { STAGE } from '../env';
 import { statusCodes } from '../libs/statusCodes';
 import { initializePromptRoutes } from '../routes/PromptRoutes';
 
@@ -8,15 +7,13 @@ class PromptController {
   public _urlPath = '/prompt';
   public _router = express.Router();
 
-  private _promptLambdaName = `gpt3Prompt-${STAGE}-main`;
-
   constructor() {
     initializePromptRoutes(this);
   }
 
   getAllPrompts = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker(this._promptLambdaName, 'getAllPrompts');
+      const result = await response.locals.lambdaInvoker('getAllPrompts');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -26,7 +23,7 @@ class PromptController {
 
   getUserAuthInfo = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker(this._promptLambdaName, 'getUserAuthInfo');
+      const result = await response.locals.lambdaInvoker('getUserAuthInfo');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -37,7 +34,7 @@ class PromptController {
   updateUserAuthInfo = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const data = request.body;
-      const result = await response.locals.lambdaInvoker(this._promptLambdaName, 'updateUserAuthInfo', {
+      const result = await response.locals.lambdaInvoker('updateUserAuthInfo', {
         payload: data,
       });
 
@@ -49,7 +46,7 @@ class PromptController {
 
   getAllPromptProviders = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker(this._promptLambdaName, 'getAllPromptProviders');
+      const result = await response.locals.lambdaInvoker('getAllPromptProviders');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -60,7 +57,7 @@ class PromptController {
   generatePromptResult = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const data = request.body;
-      const result = await response.locals.lambdaInvoker(this._promptLambdaName, 'generatePromptResult', {
+      const result = await response.locals.lambdaInvoker('generatePromptResult', {
         payload: data,
         pathParameters: { id: request.params.promptID },
       });

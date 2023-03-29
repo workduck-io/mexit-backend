@@ -1,6 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
 
-import { STAGE } from '../env';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { initializeLinkRoutes } from '../routes/LinkRoutes';
@@ -9,8 +8,6 @@ class LinkController {
   public _urlPath = '/link';
   public _router = express.Router();
 
-  private _linkServiceLambdaBase = `mex-url-shortner-${STAGE}`;
-
   constructor() {
     initializeLinkRoutes(this);
   }
@@ -18,7 +15,7 @@ class LinkController {
   shortenLink = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const data = new RequestClass(request, 'ShortenLink').data;
-      const result = await response.locals.lambdaInvoker(`${this._linkServiceLambdaBase}-shorten`, undefined, {
+      const result = await response.locals.lambdaInvoker('shortenLink', {
         httpMethod: 'POST',
         payload: data,
         sendRawBody: true,
@@ -32,7 +29,7 @@ class LinkController {
 
   getAllShortsOfWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker(`${this._linkServiceLambdaBase}-workspaceDetails`, undefined, {
+      const result = await response.locals.lambdaInvoker('getAllShortsOfWorkspace', {
         httpMethod: 'GET',
         sendRawBody: true,
       });
@@ -45,7 +42,7 @@ class LinkController {
 
   deleteShort = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker(`${this._linkServiceLambdaBase}-del`, undefined, {
+      const result = await response.locals.lambdaInvoker('deleteShort', {
         httpMethod: 'DELETE',
         pathParameters: { url: request.params.url },
         sendRawBody: true,
@@ -59,7 +56,7 @@ class LinkController {
 
   getStatsByURL = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker(`${this._linkServiceLambdaBase}-stats`, undefined, {
+      const result = await response.locals.lambdaInvoker('getStatsByURL', {
         httpMethod: 'GET',
         pathParameters: { url: request.params.url },
         sendRawBody: true,
