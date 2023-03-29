@@ -8,16 +8,15 @@ export interface LocalsX {
   userId?: string;
   userEmail?: string;
   userIdRaw?: string;
-  invoker?: <T = any>(
+  lambdaInvoker?: <T = any>(
     functionName: string,
     routeKey?: keyof typeof RouteKeys,
-    options?: InvokePayloadOptions<T>,
-    sendRawBody?: boolean,
-    invocationSource?: InvocationSource
+    options?: InvokePayloadOptions<T> & { sendRawBody?: boolean; invocationSource?: InvocationSource }
   ) => Promise<any>;
   gatewayInvoker?: <T = any>(
     routeKey: keyof typeof APIGatewayRouteKeys,
     options?: InvokePayloadOptions<T>,
     ...args: string[]
   ) => Promise<any>;
+  invoker?: any;
 }

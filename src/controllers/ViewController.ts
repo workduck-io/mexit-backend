@@ -17,7 +17,7 @@ class ViewController {
 
   getView = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(this._taskViewLambdaName, 'getView', {
+      const result = await response.locals.lambdaInvoker(this._taskViewLambdaName, 'getView', {
         pathParameters: { entityId: request.params.viewID },
         additionalHeaders: this._additionalHeaders,
       });
@@ -30,7 +30,7 @@ class ViewController {
 
   getAllViews = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(this._taskViewLambdaName, 'getAllViews', {
+      const result = await response.locals.lambdaInvoker(this._taskViewLambdaName, 'getAllViews', {
         additionalHeaders: this._additionalHeaders,
       });
 
@@ -42,7 +42,7 @@ class ViewController {
 
   deleteView = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      await response.locals.invoker(this._taskViewLambdaName, 'deleteView', {
+      await response.locals.lambdaInvoker(this._taskViewLambdaName, 'deleteView', {
         pathParameters: { entityId: request.params.viewID },
         additionalHeaders: this._additionalHeaders,
       });
@@ -55,17 +55,11 @@ class ViewController {
 
   postView = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      // const data = new RequestClass(request, 'PostView').data;
-
-      const result = await response.locals.invoker(
-        this._taskViewLambdaName,
-        'saveView',
-        {
-          additionalHeaders: this._additionalHeaders,
-          payload: request.body,
-        },
-        true
-      );
+      const result = await response.locals.lambdaInvoker(this._taskViewLambdaName, 'saveView', {
+        additionalHeaders: this._additionalHeaders,
+        payload: request.body,
+        sendRawBody: true,
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {

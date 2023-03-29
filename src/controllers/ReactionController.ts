@@ -22,7 +22,7 @@ class ReactionController {
 
   getReactionsOfNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(this._reactionLambdaName, 'getAllReactionsOfNode', {
+      const result = await response.locals.lambdaInvoker(this._reactionLambdaName, 'getAllReactionsOfNode', {
         pathParameters: { nodeId: request.params.nodeID },
         additionalHeaders: this._additionalHeaders,
       });
@@ -35,7 +35,7 @@ class ReactionController {
 
   getReactionsOfBlock = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(this._reactionLambdaName, 'getAllReactionsOfBlock', {
+      const result = await response.locals.lambdaInvoker(this._reactionLambdaName, 'getAllReactionsOfBlock', {
         pathParameters: {
           nodeId: request.params.nodeID,
           blockId: request.params.blockID,
@@ -51,7 +51,7 @@ class ReactionController {
 
   getReactionDetailsOfBlock = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(this._reactionLambdaName, 'getReactionDetailsOfBlock', {
+      const result = await response.locals.lambdaInvoker(this._reactionLambdaName, 'getReactionDetailsOfBlock', {
         pathParameters: {
           nodeId: request.params.nodeID,
           blockId: request.params.blockID,
@@ -68,7 +68,10 @@ class ReactionController {
   toggleReaction = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const data = new RequestClass(request, 'Reaction').data;
-      await response.locals.invoker(this._reactionLambdaName, 'toggleReaction', { payload: data }, true);
+      await response.locals.lambdaInvoker(this._reactionLambdaName, 'toggleReaction', {
+        payload: data,
+        sendRawBody: true,
+      });
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {

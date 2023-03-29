@@ -4,7 +4,7 @@ import { NextFunction, Request, Response } from 'express';
 // eslint-disable-next-line
 import Config from '../config.json';
 import { InvocationSource } from '../interfaces/Locals';
-import { Destination } from '../interfaces/Request';
+import { APIGatewayDestination } from '../interfaces/Request';
 import container from '../inversify.config';
 import { errorlib } from '../libs/errorlib';
 import { GotClient } from '../libs/GotClientClass';
@@ -14,14 +14,14 @@ import { statusCodes } from '../libs/statusCodes';
 import { generateInvokePayload, InvokePayloadOptions } from '../utils/generatePayload';
 
 const APIClient = container.get<GotClient>(GotClient);
+const isProduction = process.env.NODE_ENV === 'production';
+const forceAPIGatewayInvoker = !!process.env.FORCE_API_GATEWAY;
 
 async function InvokeLambda(req: Request, res: Response, next: NextFunction): Promise<void> {
-  res.locals.invoker = async <T = any>(
+  res.locals.lambdaInvoker = async <T = any>(
     functionName: string,
     routeKey: keyof typeof RouteKeys,
-    options?: InvokePayloadOptions<T>,
-    sendRawBody = false,
-    invocationSource: InvocationSource = 'APIGateway'
+    options?: InvokePayloadOptions<T> & { sendRawBody: boolean; invocationSource: InvocationSource }
   ) => {
     try {
       if (options?.allSettled) {
@@ -38,13 +38,25 @@ async function InvokeLambda(req: Request, res: Response, next: NextFunction): Pr
             },
             routeKey
           );
-          return invokeAndCheck(functionName, 'RequestResponse', invokePayload, sendRawBody, invocationSource);
+          return invokeAndCheck(
+            functionName,
+            'RequestResponse',
+            invokePayload,
+            options.sendRawBody,
+            options.invocationSource
+          );
         });
 
         return await Promise.allSettled(promises);
       } else {
         const invokePayload = generateInvokePayload(res.locals, 'Lambda', options, routeKey);
-        return await invokeAndCheck(functionName, 'RequestResponse', invokePayload, sendRawBody, invocationSource);
+        return await invokeAndCheck(
+          functionName,
+          'RequestResponse',
+          invokePayload,
+          options.sendRawBody,
+          options.invocationSource
+        );
       }
     } catch (error: any) {
       console.log('Error: ', error);
@@ -59,12 +71,12 @@ async function InvokeLambda(req: Request, res: Response, next: NextFunction): Pr
   };
 
   res.locals.gatewayInvoker = async <T = any>(
-    routeKey,
+    routeKey: keyof typeof APIGatewayRouteKeys,
     options?: InvokePayloadOptions<T>,
     ...args: string[]
   ): Promise<any> => {
     try {
-      const { method, route, APIGateway } = APIGatewayRouteKeys[routeKey] as Destination;
+      const { method, route, APIGateway } = APIGatewayRouteKeys[routeKey] as APIGatewayDestination;
 
       const additionalHeaders = { 'x-api-key': Config[APIGateway].token };
       const url = `${Config[APIGateway].url}/${typeof route === 'function' ? route(...args) : route}`;
@@ -89,6 +101,13 @@ async function InvokeLambda(req: Request, res: Response, next: NextFunction): Pr
     return;
   };
 
+  res.locals.invoker = async (routeKey: keyof typeof RouteKeys) => {
+    if (forceAPIGatewayInvoker || isProduction) {
+      return await res.locals.gatewayInvoker(routeKey);
+    } else {
+      return await res.locals.lambdaInvoker;
+    }
+  };
   next();
 }
 

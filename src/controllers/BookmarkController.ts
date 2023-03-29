@@ -16,7 +16,7 @@ class BookmarkController {
 
   getBookmarksForUser = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(this._userStarLambdaFunctionName, 'getAllBookmarks');
+      const result = await response.locals.lambdaInvoker(this._userStarLambdaFunctionName, 'getAllBookmarks');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -26,7 +26,7 @@ class BookmarkController {
 
   createBookmark = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      await response.locals.invoker(this._userStarLambdaFunctionName, 'createBookmark', {
+      await response.locals.lambdaInvoker(this._userStarLambdaFunctionName, 'createBookmark', {
         pathParameters: { id: request.params.nodeID },
       });
 
@@ -38,7 +38,7 @@ class BookmarkController {
 
   removeBookmark = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      await response.locals.invoker(this._userStarLambdaFunctionName, 'removeBookmark', {
+      await response.locals.lambdaInvoker(this._userStarLambdaFunctionName, 'removeBookmark', {
         pathParameters: { id: request.params.nodeID },
       });
 
@@ -50,7 +50,7 @@ class BookmarkController {
 
   batchCreateBookmarks = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      await response.locals.invoker(this._userStarLambdaFunctionName, 'batchCreateBookmark', {
+      await response.locals.lambdaInvoker(this._userStarLambdaFunctionName, 'batchCreateBookmark', {
         payload: request.body,
       });
 
@@ -62,7 +62,9 @@ class BookmarkController {
 
   batchRemoveBookmarks = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      await response.locals.invoker(this._userStarLambdaFunctionName, 'batchRemoveBookmark', { payload: request.body });
+      await response.locals.lambdaInvoker(this._userStarLambdaFunctionName, 'batchRemoveBookmark', {
+        payload: request.body,
+      });
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {

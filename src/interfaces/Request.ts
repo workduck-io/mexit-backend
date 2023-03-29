@@ -188,8 +188,15 @@ export interface UpdateParentNodeForLochService {
   namespaceId: string;
 }
 
-export interface Destination {
+export interface APIGatewayDestination {
   route: string | ((...args: string[]) => string);
   method: 'GET' | 'POST' | 'DELETE' | 'PUT' | 'PATCH';
   APIGateway: keyof typeof Config;
 }
+
+export interface LambdaDestination {
+  route: string;
+  functionNameSuffix: string;
+}
+
+export type Destination = APIGatewayDestination | LambdaDestination;

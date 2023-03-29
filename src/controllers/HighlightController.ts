@@ -23,14 +23,10 @@ class HighlightController {
     try {
       const data = new RequestClass(request).data;
       this._redisCache.del(data.entityId);
-      const result = await response.locals.invoker(
-        this._highlightServiceLambdaName,
-        'createHighlight',
-        {
-          payload: data,
-        },
-        true
-      );
+      const result = await response.locals.lambdaInvoker(this._highlightServiceLambdaName, 'createHighlight', {
+        payload: data,
+        sendRawBody: true,
+      });
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -46,14 +42,10 @@ class HighlightController {
       const nonCachedIds = data.ids.minus(cachedHits.map(item => item.id));
 
       const lambdaResponse = !nonCachedIds.isEmpty()
-        ? await response.locals.invoker(
-            this._highlightServiceLambdaName,
-            'getHighlightByIDs',
-            {
-              payload: { ids: nonCachedIds },
-            },
-            true
-          )
+        ? await response.locals.lambdaInvoker(this._highlightServiceLambdaName, 'getHighlightByIDs', {
+            payload: { ids: nonCachedIds },
+            sendRawBody: true,
+          })
         : [];
 
       this._redisCache.mset(lambdaResponse.toObject('entityId', JSON.stringify));
@@ -66,11 +58,10 @@ class HighlightController {
 
   getAllHighlightsOfWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker(
+      const result = await response.locals.lambdaInvoker(
         this._highlightServiceLambdaName,
         'getAllHighlightsOfWorkspace',
-        undefined,
-        true
+        { sendRawBody: true }
       );
 
       this._redisCache.mset(result.Items.toObject('entityId', JSON.stringify));
@@ -84,14 +75,10 @@ class HighlightController {
   deleteHighlight = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const entityId = request.params.entityId;
-      await response.locals.invoker(
-        this._highlightServiceLambdaName,
-        'deleteHighlightByID',
-        {
-          pathParameters: { entityId: entityId },
-        },
-        true
-      );
+      await response.locals.lambdaInvoker(this._highlightServiceLambdaName, 'deleteHighlightByID', {
+        pathParameters: { entityId: entityId },
+        sendRawBody: true,
+      });
 
       this._redisCache.del(entityId);
 

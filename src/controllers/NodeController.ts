@@ -47,7 +47,6 @@ class NodeController {
 
       //TODO: update cache instead of deleting it
       this._redisCache.del(body.id);
-
       const nodeResult = await response.locals.gatewayInvoker('CreateNode', {
         payload: { ...body, type: 'NodeRequest' },
       });
