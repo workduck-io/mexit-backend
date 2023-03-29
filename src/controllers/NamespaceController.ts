@@ -1,7 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
 
 import { STAGE } from '../env';
-import { LocalsX } from '../interfaces/Locals';
 import container from '../inversify.config';
 import { invokeAndCheck } from '../libs/LambdaInvoker';
 import { Redis } from '../libs/RedisClass';
@@ -10,6 +9,7 @@ import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
 import { initializeNamespaceRoutes } from '../routes/NamespaceRoutes';
 import { generateInvokePayload } from '../utils/generatePayload';
+import { LocalsX } from '../utils/Locals';
 
 class NamespaceController {
   public _urlPath = '/namespace';

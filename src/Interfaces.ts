@@ -1,7 +1,6 @@
 import { AuthorizeRefreshTokenType, AuthorizeType } from './interfaces/Auth';
 import { GenericObjectType, GenericType } from './interfaces/Generics';
 import { GoogleAuthRefreshToken } from './interfaces/GoogleService';
-import { InvocationSource, LocalsX } from './interfaces/Locals';
 import {
   ActivityNodeDetail,
   ArchiveNodeDetail,
@@ -35,6 +34,7 @@ import {
   CreateNamespace,
   DeleteBlocksRequest,
   DeleteNamespace,
+  Destination,
   Filter,
   FilterJoin,
   FilterType,
@@ -150,6 +150,5 @@ export default class Interfaces implements Definitions {
   DeleteNamespace: DeleteNamespace;
   ConnectToLochService: ConnectToLochService;
   UpdateParentNodeForLochService: UpdateParentNodeForLochService;
-  InvocationSource: InvocationSource;
-  LocalsX: LocalsX;
+  Destination: Destination;
 }

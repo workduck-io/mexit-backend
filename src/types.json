@@ -805,6 +805,24 @@
             },
             "type": "object"
         },
+        "Destination": {
+            "properties": {
+                "APIGateway": {
+                    "type": [
+                        "string",
+                        "number",
+                        "symbol"
+                    ]
+                },
+                "functionName": {
+                    "type": "string"
+                },
+                "route": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "Filter": {
             "properties": {
                 "id": {
@@ -981,39 +999,6 @@
                     "type": "string"
                 },
                 "permission": {
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
-        "InvocationSource": {
-            "enum": [
-                "APIGateway",
-                "Direct"
-            ],
-            "type": "string"
-        },
-        "LocalsX": {
-            "properties": {
-                "gatewayInvoker": {
-                    "type": "object"
-                },
-                "idToken": {
-                    "type": "string"
-                },
-                "invoker": {
-                    "type": "object"
-                },
-                "userEmail": {
-                    "type": "string"
-                },
-                "userId": {
-                    "type": "string"
-                },
-                "userIdRaw": {
-                    "type": "string"
-                },
-                "workspaceID": {
                     "type": "string"
                 }
             },

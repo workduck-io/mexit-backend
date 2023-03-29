@@ -1,7 +1,7 @@
 import { RouteKeys } from '../libs/routeKeys';
-import { InvokePayloadOptions } from '../utils/generatePayload';
 
-export type InvocationSource = 'Direct' | 'APIGateway';
+import { InvokePayloadOptions } from './generatePayload';
+
 export interface LocalsX {
   workspaceID?: string;
   idToken?: string;

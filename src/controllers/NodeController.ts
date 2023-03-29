@@ -1,6 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
 
-import { LocalsX } from '../interfaces/Locals';
 import { CopyOrMoveBlock } from '../interfaces/Node';
 import { NodeResponse } from '../interfaces/Response';
 import container from '../inversify.config';
@@ -9,6 +8,7 @@ import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
 import { initializeNodeRoutes } from '../routes/NodeRoutes';
+import { LocalsX } from '../utils/Locals';
 
 class NodeController {
   public _urlPath = '/node';

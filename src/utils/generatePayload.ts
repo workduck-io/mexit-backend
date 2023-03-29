@@ -1,5 +1,6 @@
-import { LocalsX } from '../interfaces/Locals';
 import { LambdaInvokeOptions } from '../libs/LambdaInvoker';
+
+import { LocalsX } from './Locals';
 
 export type HTTPMethod = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 
