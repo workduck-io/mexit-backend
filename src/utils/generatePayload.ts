@@ -43,18 +43,19 @@ export const generateInvokePayload = <T = any>(
     headers = { ...headers, ...options.additionalHeaders };
   }
 
+  const httpMethod = options?.httpMethod ?? route.split(' ')[0];
   let payload: Partial<InvokeOptions> = {
     headers: headers,
     ...(options?.payload && (isAPIGateway ? { json: options.payload } : { payload: options.payload })),
   };
 
   if (isAPIGateway) {
-    payload['method'] = options?.httpMethod;
+    payload['method'] = httpMethod;
   } else {
     payload = {
       ...payload,
       ...(route && { routeKey: route }),
-      httpMethod: options?.httpMethod ?? route.split(' ')[0],
+      httpMethod: httpMethod,
       ...(options?.queryStringParameters && {
         queryStringParameters: options.queryStringParameters,
       }),

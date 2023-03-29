@@ -24,7 +24,6 @@ class NodeController {
 
   updateILinkCache = async (locals: LocalsX, namespaceID: string): Promise<any> => {
     const namespace = await locals.invoker('getNamespace', { pathParameters: { id: namespaceID } }, 'APIGateway');
-    console.log('Namespace: ', namespace);
     await this._redisCache.set(namespaceID, namespace);
   };
 

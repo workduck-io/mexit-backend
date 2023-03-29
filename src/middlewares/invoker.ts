@@ -40,7 +40,6 @@ async function InvokeLambda(req: Request, res: Response, next: NextFunction): Pr
         return await Promise.allSettled(promises);
       } else {
         const invokePayload = generateInvokePayload(res.locals, 'Lambda', options, route);
-        console.log('Invoke Payload: ', { invokePayload, functionName });
         return await invokeAndCheck(functionName, 'RequestResponse', invokePayload, options?.sendRawBody ?? false);
       }
     } catch (error: any) {
@@ -63,13 +62,18 @@ async function InvokeLambda(req: Request, res: Response, next: NextFunction): Pr
       const { route, APIGateway } = RouteKeys[routeKey] as Destination;
 
       const additionalHeaders = { 'x-api-key': Config[APIGateway].token };
-      const path = options?.pathParameters ? getPathFromPathParameters(route, options.pathParameters) : route;
-      const url = `${Config[APIGateway].url}/${path}`;
-      const invokePayload = generateInvokePayload(res.locals, 'APIGateway', {
-        ...options,
-        additionalHeaders,
-      });
+      const invokePayload = generateInvokePayload(
+        res.locals,
+        'APIGateway',
+        {
+          ...options,
+          additionalHeaders,
+        },
+        route
+      );
 
+      const path = options?.pathParameters ? getPathFromPathParameters(route, options.pathParameters) : route;
+      const url = `${Config[APIGateway].url}/${path.split(' ')[1]}`;
       const response = await APIClient.request(url, invokePayload);
       return response;
     } catch (error) {
