@@ -24,7 +24,7 @@ class SharedController {
   shareNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const body = new RequestClass(request, 'ShareNodeDetail').data;
-      await response.locals.lambdaInvoker('shareNode', {
+      await response.locals.invoker('shareNode', {
         payload: {
           ...body,
           nodeID: body.nodeID,
@@ -46,7 +46,7 @@ class SharedController {
     try {
       const body = new RequestClass(request, 'UpdateAccessTypeForSharedNodeDetail').data;
 
-      await response.locals.lambdaInvoker('updateAccessTypeForshareNode', {
+      await response.locals.invoker('updateAccessTypeForshareNode', {
         payload: { ...body, type: 'UpdateAccessTypesRequest' },
       });
 
@@ -64,7 +64,7 @@ class SharedController {
     try {
       const body = request.body;
 
-      await response.locals.lambdaInvoker('revokeNodeAccessForUsers', {
+      await response.locals.invoker('revokeNodeAccessForUsers', {
         payload: {
           ...body,
           nodeID: body.nodeID,
@@ -86,7 +86,7 @@ class SharedController {
     try {
       const nodeID = request.params.nodeId;
 
-      const result = await response.locals.lambdaInvoker('getNodeSharedWithUser', {
+      const result = await response.locals.invoker('getNodeSharedWithUser', {
         pathParameters: { nodeID: nodeID },
       });
 
@@ -100,7 +100,7 @@ class SharedController {
     try {
       const body = new RequestClass(request, 'UpdateShareNodeDetail').data;
 
-      await response.locals.lambdaInvoker('updateSharedNode', {
+      await response.locals.invoker('updateSharedNode', {
         payload: { ...body, type: 'UpdateSharedNodeRequest' },
       });
 
@@ -125,7 +125,7 @@ class SharedController {
           key: this._transformer.encodeCacheKey(this._UserAccessTypeLabel, nodeId),
         },
         () =>
-          response.locals.lambdaInvoker('getUsersWithNodesShared', {
+          response.locals.invoker('getUsersWithNodesShared', {
             pathParameters: { id: nodeId },
           })
       );
@@ -138,7 +138,7 @@ class SharedController {
 
   getAllNodesSharedForUser = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker('getAllSharedNodeForUser');
+      const result = await response.locals.invoker('getAllSharedNodeForUser');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -150,7 +150,7 @@ class SharedController {
     try {
       const data = new RequestClass(request, 'GetMultipleIds').data;
 
-      const result: any[] = await response.locals.lambdaInvoker('getNodeSharedWithUser', {
+      const result: any[] = await response.locals.invoker('getNodeSharedWithUser', {
         allSettled: {
           ids: data.ids,
           key: 'nodeID',

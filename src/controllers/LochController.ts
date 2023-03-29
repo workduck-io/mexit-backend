@@ -14,7 +14,7 @@ class LochController {
 
   getAllServices = async (_: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker('getAllServices');
+      const result = await response.locals.invoker('getAllServices');
 
       response.status(statusCodes.OK).jsonp(result);
     } catch (error) {
@@ -24,7 +24,7 @@ class LochController {
 
   getConnectedServives = async (_: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker('getConnectedServices');
+      const result = await response.locals.invoker('getConnectedServices');
 
       response.status(statusCodes.OK).jsonp(result);
     } catch (error) {
@@ -35,7 +35,7 @@ class LochController {
   connectToService = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const body = new RequestClass(request, 'ConnectToLochService').data;
-      const result = await response.locals.lambdaInvoker('connectToService', {
+      const result = await response.locals.invoker('connectToService', {
         payload: body,
       });
 
@@ -52,7 +52,7 @@ class LochController {
   ): Promise<void> => {
     try {
       const body = new RequestClass(request, 'UpdateParentNodeForLochService').data;
-      const result = await response.locals.lambdaInvoker('updateParentNodeOfService', {
+      const result = await response.locals.invoker('updateParentNodeOfService', {
         payload: body,
       });
       response.status(statusCodes.NO_CONTENT).json(result);

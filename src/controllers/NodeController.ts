@@ -1,17 +1,14 @@
 import express, { NextFunction, Request, Response } from 'express';
 
-import { STAGE } from '../env';
 import { LocalsX } from '../interfaces/Locals';
 import { CopyOrMoveBlock } from '../interfaces/Node';
 import { NodeResponse } from '../interfaces/Response';
 import container from '../inversify.config';
-import { invokeAndCheck } from '../libs/LambdaInvoker';
 import { Redis } from '../libs/RedisClass';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
 import { initializeNodeRoutes } from '../routes/NodeRoutes';
-import { generateInvokePayload } from '../utils/generatePayload';
 
 class NodeController {
   public _urlPath = '/node';
@@ -21,23 +18,13 @@ class NodeController {
 
   private _UserAccessLabel = 'USERACCESS';
 
-  private _nsLambdaFunctionName = `mex-backend-${STAGE}-Namespace:latest`;
-
   constructor() {
     initializeNodeRoutes(this);
   }
 
   updateILinkCache = async (locals: LocalsX, namespaceID: string): Promise<any> => {
-    const payload = generateInvokePayload(
-      locals,
-      'Lambda',
-      {
-        pathParameters: { id: namespaceID },
-      },
-      'getNamespace'
-    );
-
-    const namespace = await invokeAndCheck(this._nsLambdaFunctionName, 'RequestResponse', payload);
+    const namespace = await locals.invoker('getNamespace', undefined, 'APIGateway', namespaceID);
+    console.log('Namespace: ', namespace);
     await this._redisCache.set(namespaceID, namespace);
   };
 
@@ -47,9 +34,13 @@ class NodeController {
 
       //TODO: update cache instead of deleting it
       this._redisCache.del(body.id);
-      const nodeResult = await response.locals.gatewayInvoker('CreateNode', {
-        payload: { ...body, type: 'NodeRequest' },
-      });
+      const nodeResult = await response.locals.invoker(
+        'CreateNode',
+        {
+          payload: { ...body, type: 'NodeRequest' },
+        },
+        'APIGateway'
+      );
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { data, ...rest } = nodeResult; //Dont relay data to frontend
@@ -77,11 +68,12 @@ class NodeController {
           force: !this._redisCache.has(userSpecificNodeKey),
         },
         () =>
-          response.locals.gatewayInvoker(
+          response.locals.invoker(
             'GetNode',
             {
               ...(namespaceID && { queryStringParameters: { namespaceID: namespaceID } }),
             },
+            'APIGateway',
             nodeId
           )
       );
@@ -110,12 +102,16 @@ class NodeController {
 
       let lambdaResponse = { successful: [], failed: [] };
       if (!nonCachedIds.isEmpty()) {
-        const rawLambdaResp = await response.locals.gatewayInvoker('GetMultipleNodes', {
-          payload: { ids: nonCachedIds },
-          ...(namespaceID && {
-            queryStringParameters: { namespaceID: namespaceID },
-          }),
-        });
+        const rawLambdaResp = await response.locals.invoker(
+          'GetMultipleNodes',
+          {
+            payload: { ids: nonCachedIds },
+            ...(namespaceID && {
+              queryStringParameters: { namespaceID: namespaceID },
+            }),
+          },
+          'APIGateway'
+        );
         const fetchedIDs = new Set(rawLambdaResp.map(node => node.id));
         const failedIDs = nonCachedIds.filter(id => !fetchedIDs.has(id));
         lambdaResponse = { successful: rawLambdaResp, failed: failedIDs };
@@ -142,11 +138,12 @@ class NodeController {
     try {
       const blockDetail = new RequestClass(request, 'AppendBlockRequest').data;
       const nodeID = request.params.nodeId;
-      const result = await response.locals.gatewayInvoker(
+      const result = await response.locals.invoker(
         'AppendNode',
         {
           payload: { ...blockDetail, type: 'ElementRequest' },
         },
+        'APIGateway',
         nodeID
       );
 
@@ -162,11 +159,12 @@ class NodeController {
       const nodeBlockMap = new RequestClass(request, 'DeleteBlocksRequest').data;
 
       const result = Object.entries(nodeBlockMap).map(([nodeId, blockIds]) => {
-        return response.locals.gatewayInvoker(
+        return response.locals.invoker(
           'DeleteBlocks',
           {
             payload: { ids: blockIds },
           },
+          'APIGateway',
           nodeId
         );
       });
@@ -194,7 +192,7 @@ class NodeController {
         destinationNodeID: data.destinationNodeId,
       };
 
-      await response.locals.gatewayInvoker('CopyOrMoveBlock', { payload: payload });
+      await response.locals.invoker('CopyOrMoveBlock', { payload: payload }, 'APIGateway');
 
       response.status(statusCodes.NO_CONTENT).json();
     } catch (error) {
@@ -205,7 +203,7 @@ class NodeController {
   makeNodePublic = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const nodeId = request.params.id;
-      await response.locals.gatewayInvoker('MakeNodePublic', undefined, nodeId);
+      await response.locals.invoker('MakeNodePublic', undefined, 'APIGateway', nodeId);
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
@@ -216,7 +214,7 @@ class NodeController {
   makeNodePrivate = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const nodeId = request.params.id;
-      await response.locals.gatewayInvoker('MakeNodePrivate', undefined, nodeId);
+      await response.locals.invoker('MakeNodePrivate', undefined, 'APIGateway', nodeId);
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
@@ -233,10 +231,14 @@ class NodeController {
         response.status(statusCodes.BAD_REQUEST).json({ message: 'NamespaceID missing in query parameters' });
       }
 
-      const archiveNodeResult = await response.locals.gatewayInvoker('ArchiveNode', {
-        payload: body,
-        queryStringParameters: { namespaceID: namespaceID },
-      });
+      const archiveNodeResult = await response.locals.invoker(
+        'ArchiveNode',
+        {
+          payload: body,
+          queryStringParameters: { namespaceID: namespaceID },
+        },
+        'APIGateway'
+      );
 
       response.status(statusCodes.OK).json(archiveNodeResult);
 
@@ -250,9 +252,13 @@ class NodeController {
     try {
       const body = new RequestClass(request, 'ArchiveNodeDetail').data;
 
-      await response.locals.gatewayInvoker('DeleteArchivedNode', {
-        payload: body,
-      });
+      await response.locals.invoker(
+        'DeleteArchivedNode',
+        {
+          payload: body,
+        },
+        'APIGateway'
+      );
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
@@ -269,10 +275,14 @@ class NodeController {
         response.status(statusCodes.BAD_REQUEST).json({ message: 'NamespaceID missing in query parameters' });
       }
 
-      const archiveNodeResult = await response.locals.gatewayInvoker('UnarchiveNode', {
-        payload: body,
-        queryStringParameters: { namespaceID: namespaceID },
-      });
+      const archiveNodeResult = await response.locals.invoker(
+        'UnarchiveNode',
+        {
+          payload: body,
+          queryStringParameters: { namespaceID: namespaceID },
+        },
+        'APIGateway'
+      );
 
       response.status(statusCodes.OK).json(archiveNodeResult);
     } catch (error) {
@@ -284,9 +294,13 @@ class NodeController {
     try {
       const body = new RequestClass(request, 'RefactorRequest').data;
 
-      const refactorResp = await response.locals.gatewayInvoker('RefactorHierarchy', {
-        payload: { ...body, type: 'RefactorRequest' },
-      });
+      const refactorResp = await response.locals.invoker(
+        'RefactorHierarchy',
+        {
+          payload: { ...body, type: 'RefactorRequest' },
+        },
+        'APIGateway'
+      );
 
       const { changedPaths } = refactorResp;
       const parsedChangedPathsRefactor = this._transformer.refactoredPathsHierarchyParser(changedPaths);
@@ -304,9 +318,13 @@ class NodeController {
     try {
       const body = new RequestClass(request, 'BulkCreateNode').data;
 
-      const bulkCreateResp = await response.locals.gatewayInvoker('BulkCreateNode', {
-        payload: { ...body, type: 'NodeBulkRequest' },
-      });
+      const bulkCreateResp = await response.locals.invoker(
+        'BulkCreateNode',
+        {
+          payload: { ...body, type: 'NodeBulkRequest' },
+        },
+        'APIGateway'
+      );
 
       const { node, changedPaths } = bulkCreateResp;
       //TODO: Make part of TransformClass
@@ -324,7 +342,7 @@ class NodeController {
 
   getArchivedNodes = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const getArchiveResp = await response.locals.gatewayInvoker('GetArchivedNodes');
+      const getArchiveResp = await response.locals.invoker('GetArchivedNodes', undefined, 'APIGateway');
       response.status(statusCodes.OK).json(getArchiveResp);
     } catch (error) {
       next(error);
@@ -336,9 +354,10 @@ class NodeController {
       const nodeID = request.params.id;
       const body = new RequestClass(request, 'UpdateMetadata').data;
 
-      await response.locals.gatewayInvoker(
+      await response.locals.invoker(
         'UpdateNodeMetadata',
         { payload: { ...body, type: 'MetadataRequest' } },
+        'APIGateway',
         nodeID
       );
       this._redisCache.del(nodeID);

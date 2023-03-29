@@ -19,7 +19,7 @@ class ReactionController {
 
   getReactionsOfNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker('getAllReactionsOfNode', {
+      const result = await response.locals.invoker('getAllReactionsOfNode', {
         pathParameters: { nodeId: request.params.nodeID },
         additionalHeaders: this._additionalHeaders,
       });
@@ -32,7 +32,7 @@ class ReactionController {
 
   getReactionsOfBlock = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker('getAllReactionsOfBlock', {
+      const result = await response.locals.invoker('getAllReactionsOfBlock', {
         pathParameters: {
           nodeId: request.params.nodeID,
           blockId: request.params.blockID,
@@ -48,7 +48,7 @@ class ReactionController {
 
   getReactionDetailsOfBlock = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker('getReactionDetailsOfBlock', {
+      const result = await response.locals.invoker('getReactionDetailsOfBlock', {
         pathParameters: {
           nodeId: request.params.nodeID,
           blockId: request.params.blockID,
@@ -65,7 +65,7 @@ class ReactionController {
   toggleReaction = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const data = new RequestClass(request, 'Reaction').data;
-      await response.locals.lambdaInvoker('toggleReaction', {
+      await response.locals.invoker('toggleReaction', {
         payload: data,
         sendRawBody: true,
       });

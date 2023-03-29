@@ -3,40 +3,96 @@ import { Destination } from '../interfaces/Request';
 
 export const RouteKeys = {
   // Ping Endpoint
-  Ping: { route: '/ping', method: 'GET', APIGateway: 'Node' },
+  Ping: { route: 'GET /ping', APIGateway: 'Node' },
 
   // Node Endpoints
-  CreateNode: { route: '/v1/node', method: 'POST', APIGateway: 'Node' },
-  GetNode: { route: (nodeID: string) => `/v1/node/${nodeID}`, method: 'GET', APIGateway: 'Node' },
-  GetMultipleNodes: { route: '/v1/node/ids', method: 'POST', APIGateway: 'Node' },
-  AppendNode: { route: (nodeID: string) => `/node/${nodeID}/append`, method: 'PATCH', APIGateway: 'Node' },
-  DeleteBlocks: { route: (nodeID: string) => `/v1/node/${nodeID}`, method: 'GET', APIGateway: 'Node' },
-  RefactorHierarchy: { route: `/node/refactor`, method: 'POST', APIGateway: 'Node' },
-  BulkCreateNode: { route: `/node/bulk`, method: 'POST', APIGateway: 'Node' },
-  CopyOrMoveBlock: {
-    route: `/node/block/movement`,
-    method: 'PATCH',
+  // Function name fallback needed for direct lambda invocation
+  CreateNode: {
+    route: 'POST /v1/node',
     APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
   },
-  MakeNodePublic: { route: (nodeID: string) => `/node/makePublic/${nodeID}`, method: 'PATCH', APIGateway: 'Node' },
-  MakeNodePrivate: { route: (nodeID: string) => `/node/makePrivate/${nodeID}`, method: 'PATCH', APIGateway: 'Node' },
-  UpdateNodeMetadata: { route: (nodeID: string) => `/node/metadata/${nodeID}`, method: 'PATCH', APIGateway: 'Node' },
-  GetArchivedNodes: { route: `/node/archive`, method: 'GET', APIGateway: 'Node' },
-  ArchiveNode: { route: `/node/archive/middleware`, method: 'PUT', APIGateway: 'Node' },
-  UnarchiveNode: { route: `/v1/node/unarchive`, method: 'PUT', APIGateway: 'Node' },
-  DeleteArchivedNode: { route: `/node/archive/delete`, method: 'POST', APIGateway: 'Node' },
+  GetNode: {
+    route: (nodeID: string) => `GET /v1/node/${nodeID}`,
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
+  GetMultipleNodes: {
+    route: 'POST /v1/node/ids',
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
+  AppendNode: {
+    route: (nodeID: string) => `PATCH /node/${nodeID}/append`,
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
+  DeleteBlocks: {
+    route: (nodeID: string) => `GET /v1/node/${nodeID}`,
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
+  RefactorHierarchy: {
+    route: `POST /node/refactor`,
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
+  BulkCreateNode: {
+    route: `POST /node/bulk`,
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
+  CopyOrMoveBlock: {
+    route: `PATCH /node/block/movement`,
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
+  MakeNodePublic: {
+    route: (nodeID: string) => `PATCH /node/makePublic/${nodeID}`,
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
+  MakeNodePrivate: {
+    route: (nodeID: string) => `PATCH /node/makePrivate/${nodeID}`,
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
+  UpdateNodeMetadata: {
+    route: (nodeID: string) => `PATCH /node/metadata/${nodeID}`,
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
+  GetArchivedNodes: {
+    route: `GET /node/archive`,
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
+  ArchiveNode: {
+    route: `PUT /node/archive/middleware`,
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
+  UnarchiveNode: {
+    route: `PUT /v1/node/unarchive`,
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
+  DeleteArchivedNode: {
+    route: `POST /node/archive/delete`,
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
 
   // Reminder Endpoints
-  GetReminderByID: { route: (entityID: string) => `/${entityID}`, method: 'GET', APIGateway: 'Reminder' },
-  CreateReminder: { route: '/', method: 'POST', APIGateway: 'Reminder' },
-  DeleteReminderByID: { route: (entityID: string) => `/${entityID}`, method: 'DELETE', APIGateway: 'Reminder' },
-  GetAllRemindersOfNode: { route: (nodeID: string) => `/all/node/${nodeID}`, method: 'GET', APIGateway: 'Reminder' },
+  GetReminderByID: { route: (entityID: string) => `GET /${entityID}`, APIGateway: 'Reminder' },
+  CreateReminder: { route: 'POST /', APIGateway: 'Reminder' },
+  DeleteReminderByID: { route: (entityID: string) => `DELETE /${entityID}`, APIGateway: 'Reminder' },
+  GetAllRemindersOfNode: { route: (nodeID: string) => `GET /all/node/${nodeID}`, APIGateway: 'Reminder' },
   DeleteAllRemindersOfNode: {
-    route: (nodeID: string) => `/all/node/${nodeID}`,
-    method: 'DELETE',
+    route: (nodeID: string) => `DELETE /all/node/${nodeID}`,
     APIGateway: 'Reminder',
   },
-  GetAllRemindersOfWorkspace: { route: `/all/workspace`, method: 'GET', APIGateway: 'Reminder' },
+  GetAllRemindersOfWorkspace: { route: `GET /all/workspace`, APIGateway: 'Reminder' },
 
   // User Ops
   getById: { route: 'GET /{userId}', functionName: `workduck-user-service-${STAGE}-getUser` },

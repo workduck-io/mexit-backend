@@ -17,5 +17,10 @@ export interface LocalsX {
     options?: InvokePayloadOptions<T>,
     ...args: string[]
   ) => Promise<any>;
-  invoker?: any;
+  invoker?: <T = any>(
+    routeKey: keyof typeof RouteKeys,
+    options?: InvokePayloadOptions<T>,
+    invokerDestination?: 'APIGateway' | 'Lambda',
+    ...args: string[]
+  ) => Promise<any>;
 }

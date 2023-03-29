@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 // @ts-ignore
 // eslint-disable-next-line
 import Config from '../config.json';
-import { InvocationSource } from '../interfaces/Locals';
+import { IS_DEV } from '../env';
 import { APIGatewayDestination, LambdaDestination } from '../interfaces/Request';
 import container from '../inversify.config';
 import { errorlib } from '../libs/errorlib';
@@ -14,14 +14,10 @@ import { statusCodes } from '../libs/statusCodes';
 import { generateInvokePayload, InvokePayloadOptions } from '../utils/generatePayload';
 
 const APIClient = container.get<GotClient>(GotClient);
-const isProduction = process.env.NODE_ENV === 'production';
 const forceAPIGatewayInvoker = !!process.env.FORCE_API_GATEWAY;
 
 async function InvokeLambda(req: Request, res: Response, next: NextFunction): Promise<void> {
-  res.locals.lambdaInvoker = async <T = any>(
-    routeKey: keyof typeof RouteKeys,
-    options?: InvokePayloadOptions<T> & { sendRawBody: boolean; invocationSource: InvocationSource }
-  ) => {
+  const lambdaInvoker = async <T = any>(routeKey: keyof typeof RouteKeys, options?: InvokePayloadOptions<T>) => {
     try {
       const { route, functionName } = RouteKeys[routeKey] as LambdaDestination;
       if (options?.allSettled) {
@@ -38,25 +34,14 @@ async function InvokeLambda(req: Request, res: Response, next: NextFunction): Pr
             },
             route
           );
-          return invokeAndCheck(
-            functionName,
-            'RequestResponse',
-            invokePayload,
-            options?.sendRawBody ?? false,
-            options?.invocationSource ?? 'APIGateway'
-          );
+          return invokeAndCheck(functionName, 'RequestResponse', invokePayload, options?.sendRawBody ?? false);
         });
 
         return await Promise.allSettled(promises);
       } else {
         const invokePayload = generateInvokePayload(res.locals, 'Lambda', options, route);
-        return await invokeAndCheck(
-          functionName,
-          'RequestResponse',
-          invokePayload,
-          options?.sendRawBody ?? false,
-          options?.invocationSource ?? 'APIGateway'
-        );
+        console.log('Invoke Payload: ', { invokePayload, functionName });
+        return await invokeAndCheck(functionName, 'RequestResponse', invokePayload, options?.sendRawBody ?? false);
       }
     } catch (error: any) {
       console.log('Error: ', error);
@@ -70,20 +55,20 @@ async function InvokeLambda(req: Request, res: Response, next: NextFunction): Pr
     }
   };
 
-  res.locals.gatewayInvoker = async <T = any>(
+  const gatewayInvoker = async <T = any>(
     routeKey: keyof typeof RouteKeys,
     options?: InvokePayloadOptions<T>,
     ...args: string[]
   ): Promise<any> => {
     try {
-      const { method, route, APIGateway } = RouteKeys[routeKey] as APIGatewayDestination;
+      const { route, APIGateway } = RouteKeys[routeKey] as APIGatewayDestination;
 
       const additionalHeaders = { 'x-api-key': Config[APIGateway].token };
-      const url = `${Config[APIGateway].url}/${typeof route === 'function' ? route(...args) : route}`;
+      const path = (typeof route === 'function' ? route(...args) : route).split(' ')[1];
+      const url = `${Config[APIGateway].url}/${path}`;
       const invokePayload = generateInvokePayload(res.locals, 'APIGateway', {
         ...options,
         additionalHeaders,
-        httpMethod: method,
       });
 
       const response = await APIClient.request(url, invokePayload);
@@ -101,11 +86,18 @@ async function InvokeLambda(req: Request, res: Response, next: NextFunction): Pr
     return;
   };
 
-  res.locals.invoker = async (routeKey: keyof typeof RouteKeys) => {
-    if (forceAPIGatewayInvoker || isProduction) {
-      return await res.locals.gatewayInvoker(routeKey);
+  res.locals.invoker = async <T = any>(
+    routeKey: keyof typeof RouteKeys,
+    options?: InvokePayloadOptions<T>,
+    invokerDestination: 'APIGateway' | 'Lambda' = 'APIGateway',
+    ...args: string[]
+  ): Promise<any> => {
+    const useLambdaInvoker = IS_DEV && !forceAPIGatewayInvoker;
+    if (invokerDestination === 'Lambda' || useLambdaInvoker) {
+      return await lambdaInvoker(routeKey, options);
     } else {
-      return await res.locals.lambdaInvoker;
+      console.log('Using API Gateway Invoker', { routeKey });
+      return await gatewayInvoker(routeKey, options, ...args);
     }
   };
   next();

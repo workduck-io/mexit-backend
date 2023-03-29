@@ -13,7 +13,7 @@ class BookmarkController {
 
   getBookmarksForUser = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker('getAllBookmarks');
+      const result = await response.locals.invoker('getAllBookmarks');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -23,7 +23,7 @@ class BookmarkController {
 
   createBookmark = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      await response.locals.lambdaInvoker('createBookmark', {
+      await response.locals.invoker('createBookmark', {
         pathParameters: { id: request.params.nodeID },
       });
 
@@ -35,7 +35,7 @@ class BookmarkController {
 
   removeBookmark = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      await response.locals.lambdaInvoker('removeBookmark', {
+      await response.locals.invoker('removeBookmark', {
         pathParameters: { id: request.params.nodeID },
       });
 
@@ -47,7 +47,7 @@ class BookmarkController {
 
   batchCreateBookmarks = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      await response.locals.lambdaInvoker('batchCreateBookmark', {
+      await response.locals.invoker('batchCreateBookmark', {
         payload: request.body,
       });
 
@@ -59,7 +59,7 @@ class BookmarkController {
 
   batchRemoveBookmarks = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      await response.locals.lambdaInvoker('batchRemoveBookmark', {
+      await response.locals.invoker('batchRemoveBookmark', {
         payload: request.body,
       });
 

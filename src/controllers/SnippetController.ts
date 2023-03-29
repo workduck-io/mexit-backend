@@ -26,7 +26,7 @@ class SnippetController {
       const createNextVersion = request.query.createNextVersion === 'true';
       //TODO: update cache instead of deleting it
       this._redisCache.del(request.body.id);
-      const snippetResult = await response.locals.lambdaInvoker('createSnippet', {
+      const snippetResult = await response.locals.invoker('createSnippet', {
         payload: request.body,
         queryStringParameters: { createNextVersion: createNextVersion },
       });
@@ -55,7 +55,7 @@ class SnippetController {
           force: !this._redisCache.has(userSpecificNodeKey),
         },
         () =>
-          response.locals.lambdaInvoker('getSnippet', {
+          response.locals.invoker('getSnippet', {
             pathParameters: { id: snippetId },
           })
       );
@@ -85,7 +85,7 @@ class SnippetController {
       const lambdaResponse = { successful: [], failed: [] };
 
       if (!nonCachedIds.isEmpty()) {
-        const rawLambdaResponse = await response.locals.lambdaInvoker('getSnippet', {
+        const rawLambdaResponse = await response.locals.invoker('getSnippet', {
           allSettled: {
             ids: nonCachedIds,
             key: 'id',
@@ -118,7 +118,7 @@ class SnippetController {
 
   getAllVersionsOfSnippets = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker('getAllVersionsOfSnippet', {
+      const result = await response.locals.invoker('getAllVersionsOfSnippet', {
         pathParameters: { id: request.params.snippetId },
       });
 
@@ -131,7 +131,7 @@ class SnippetController {
   getAllSnippetsOfWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const getData = request.query.getData === 'true';
-      const result = await response.locals.lambdaInvoker('getAllSnippetsOfWorkspace', {
+      const result = await response.locals.invoker('getAllSnippetsOfWorkspace', {
         queryStringParameters: { getData: getData },
       });
 
@@ -146,7 +146,7 @@ class SnippetController {
       const snippetId = request.params.id;
       const version = request.params.version;
 
-      await response.locals.lambdaInvoker('makeSnippetPublic', {
+      await response.locals.invoker('makeSnippetPublic', {
         pathParameters: { id: snippetId, version: version },
       });
       this._redisCache.set(
@@ -164,7 +164,7 @@ class SnippetController {
       const snippetId = request.params.id;
       const version = request.params.version;
 
-      await response.locals.lambdaInvoker('makeSnippetPrivate', {
+      await response.locals.invoker('makeSnippetPrivate', {
         pathParameters: { id: snippetId, version: version },
       });
 
@@ -187,7 +187,7 @@ class SnippetController {
           force: !this._redisCache.has(this._transformer.encodeCacheKey(this._PublicSnippetMockWorkspace, snippetId)),
         },
         () =>
-          response.locals.lambdaInvoker('getPublicSnippet', {
+          response.locals.invoker('getPublicSnippet', {
             pathParameters: { id: snippetId, version: version },
           })
       );
@@ -205,7 +205,7 @@ class SnippetController {
       const snippetId = request.params.id;
       const version = request.params.version;
 
-      const result = await response.locals.lambdaInvoker('clonePublicSnippet', {
+      const result = await response.locals.invoker('clonePublicSnippet', {
         pathParameters: { id: snippetId, version: version },
       });
 
@@ -222,7 +222,7 @@ class SnippetController {
       // If a version is not passed in query parameters, it deletes the latest version
       const version = request.query['version'] ? parseInt(request.query['version'] as string) : undefined;
 
-      await response.locals.lambdaInvoker('deleteVersionOfSnippet', {
+      await response.locals.invoker('deleteVersionOfSnippet', {
         pathParameters: { id: snippetID },
         ...(version && { queryStringParameters: { version: version } }),
       });
@@ -237,7 +237,7 @@ class SnippetController {
     try {
       const snippetID = request.params.id;
 
-      await response.locals.lambdaInvoker('deleteAllVersionsOfSnippet', {
+      await response.locals.invoker('deleteAllVersionsOfSnippet', {
         pathParameters: { id: snippetID },
       });
 
@@ -251,7 +251,7 @@ class SnippetController {
     try {
       const body = new RequestClass(request, 'UpdateMetadata').data;
 
-      await response.locals.lambdaInvoker('updateSnippetMetadata', {
+      await response.locals.invoker('updateSnippetMetadata', {
         pathParameters: { id: request.params.id },
         payload: { ...body, type: 'MetadataRequest' },
       });

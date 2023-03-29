@@ -27,7 +27,7 @@ class UserController {
     }
 
     try {
-      const result = await response.locals.lambdaInvoker('updateUserDetails', {
+      const result = await response.locals.invoker('updateUserDetails', {
         payload: data,
         sendRawBody: true,
       });
@@ -43,7 +43,7 @@ class UserController {
       const requestDetail = new RequestClass(request, 'UserPreference').data;
       requestDetail.id = userId;
 
-      const result = await response.locals.lambdaInvoker('updateUserPreference', {
+      const result = await response.locals.invoker('updateUserPreference', {
         payload: requestDetail,
         sendRawBody: true,
       });
@@ -56,7 +56,7 @@ class UserController {
 
   get = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
-      const result = await response.locals.lambdaInvoker('getUser');
+      const result = await response.locals.invoker('getUser');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -67,7 +67,7 @@ class UserController {
   getInvite = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
       const inviteId = request.params.inviteId;
-      const result = await response.locals.lambdaInvoker('getInvite', {
+      const result = await response.locals.invoker('getInvite', {
         pathParameters: { inviteId: inviteId },
       });
 
@@ -80,7 +80,7 @@ class UserController {
   deleteInvite = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
       const inviteId = request.params.inviteId;
-      await response.locals.lambdaInvoker('deleteInvite', {
+      await response.locals.invoker('deleteInvite', {
         pathParameters: { inviteId: inviteId },
       });
 
@@ -92,7 +92,7 @@ class UserController {
 
   getInvitesOfWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
-      const result = await response.locals.lambdaInvoker('getAllInviteOfWorkspace');
+      const result = await response.locals.invoker('getAllInviteOfWorkspace');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -103,7 +103,7 @@ class UserController {
   createInvite = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
       const payload = new RequestClass(request, 'InviteProperties').data;
-      const result = await response.locals.lambdaInvoker('createInvite', {
+      const result = await response.locals.invoker('createInvite', {
         payload: payload,
       });
 
@@ -115,7 +115,7 @@ class UserController {
 
   getById = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
-      const result = await response.locals.lambdaInvoker('getById', {
+      const result = await response.locals.invoker('getById', {
         pathParameters: { userId: request.params.id },
       });
 
@@ -126,7 +126,7 @@ class UserController {
   };
   getByMail = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
-      const result = await response.locals.lambdaInvoker('getByEmail', {
+      const result = await response.locals.invoker('getByEmail', {
         pathParameters: { email: request.params.mail },
       });
 
@@ -137,7 +137,7 @@ class UserController {
   };
   getUsersOfWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
-      const result = await response.locals.lambdaInvoker('getUsersOfWorkspace');
+      const result = await response.locals.invoker('getUsersOfWorkspace');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -148,7 +148,7 @@ class UserController {
     try {
       const payload = request.body;
       payload.linkedinURL = payload.linkedinURL.replace(/\/+$/, '');
-      const result = await response.locals.lambdaInvoker('getUserByLinkedin', {
+      const result = await response.locals.invoker('getUserByLinkedin', {
         payload: payload,
         sendRawBody: true,
       });
@@ -163,7 +163,7 @@ class UserController {
 
   registerStatus = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const registerStatus = await response.locals.lambdaInvoker('registerStatus');
+      const registerStatus = await response.locals.invoker('registerStatus');
 
       response.status(statusCodes.OK).send(registerStatus);
     } catch (error) {

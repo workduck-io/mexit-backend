@@ -25,7 +25,7 @@ class PublicController {
           key: nodeId,
         },
         () =>
-          response.locals.lambdaInvoker('getPublicNode', {
+          response.locals.invoker('getPublicNode', {
             pathParameters: { id: nodeId },
           })
       );
@@ -44,7 +44,7 @@ class PublicController {
           key: namespaceID,
         },
         () =>
-          response.locals.lambdaInvoker('getPublicNamespace', {
+          response.locals.invoker('getPublicNamespace', {
             pathParameters: { id: request.params.namespaceID },
           })
       );

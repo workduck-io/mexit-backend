@@ -17,7 +17,7 @@ class ActionController {
 
   getAction = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const managerResponse = response.locals.lambdaInvoker('getAction', {
+      const managerResponse = response.locals.invoker('getAction', {
         pathParameters: {
           actionGroupId: request.params.groupId,
           actionId: request.params.actionId,
@@ -44,7 +44,7 @@ class ActionController {
           key: request.params.groupId,
         },
         async () =>
-          await response.locals.lambdaInvoker('getActionsOfActionGroup', {
+          await response.locals.invoker('getActionsOfActionGroup', {
             pathParameters: { actionGroupId: request.params.groupId },
           })
       );
@@ -57,7 +57,7 @@ class ActionController {
 
   getAllAuth = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker('getAllAuths');
+      const result = await response.locals.invoker('getAllAuths');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -67,7 +67,7 @@ class ActionController {
 
   getAuth = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker('getAuth', {
+      const result = await response.locals.invoker('getAuth', {
         pathParameters: { authTypeId: request.params.authId },
       });
 
@@ -79,7 +79,7 @@ class ActionController {
 
   refreshAuth = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker('refreshAuth', {
+      const result = await response.locals.invoker('refreshAuth', {
         pathParameters: { source: request.params.source },
       });
 
@@ -93,7 +93,7 @@ class ActionController {
     try {
       const data = new RequestClass(request).data;
 
-      const result = await response.locals.lambdaInvoker('updateAuth', {
+      const result = await response.locals.invoker('updateAuth', {
         pathParameters: { authTypeId: request.params.authId, payload: data },
       });
 

@@ -14,7 +14,7 @@ class ReminderController {
 
   getReminder = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.gatewayInvoker('GetReminderByID', undefined, request.params.entityID);
+      const result = await response.locals.invoker('GetReminderByID', undefined, 'APIGateway', request.params.entityID);
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -25,7 +25,7 @@ class ReminderController {
   createReminder = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const body = new RequestClass(request, 'Reminder').data;
-      const result = await response.locals.gatewayInvoker('CreateReminder', { payload: body });
+      const result = await response.locals.invoker('CreateReminder', { payload: body }, 'APIGateway');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -35,7 +35,12 @@ class ReminderController {
 
   deleteReminder = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.gatewayInvoker('DeleteReminderByID', undefined, request.params.entityID);
+      const result = await response.locals.invoker(
+        'DeleteReminderByID',
+        undefined,
+        'APIGateway',
+        request.params.entityID
+      );
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -45,7 +50,12 @@ class ReminderController {
 
   getAllRemindersOfNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.gatewayInvoker('GetAllRemindersOfNode', undefined, request.params.nodeID );
+      const result = await response.locals.invoker(
+        'GetAllRemindersOfNode',
+        undefined,
+        'APIGateway',
+        request.params.nodeID
+      );
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -55,7 +65,12 @@ class ReminderController {
 
   deleteAllRemindersOfNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.gatewayInvoker('DeleteAllRemindersOfNode',undefined, request.params.nodeID );
+      const result = await response.locals.invoker(
+        'DeleteAllRemindersOfNode',
+        undefined,
+        'APIGateway',
+        request.params.nodeID
+      );
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -65,7 +80,7 @@ class ReminderController {
 
   getAllRemindersOfWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.gatewayInvoker('GetAllRemindersOfWorkspace'); 
+      const result = await response.locals.invoker('GetAllRemindersOfWorkspace', undefined, 'APIGateway');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {

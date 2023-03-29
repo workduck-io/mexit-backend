@@ -15,7 +15,7 @@ class ViewController {
 
   getView = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker('getView', {
+      const result = await response.locals.invoker('getView', {
         pathParameters: { entityId: request.params.viewID },
         additionalHeaders: this._additionalHeaders,
       });
@@ -28,7 +28,7 @@ class ViewController {
 
   getAllViews = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker('getAllViews', {
+      const result = await response.locals.invoker('getAllViews', {
         additionalHeaders: this._additionalHeaders,
       });
 
@@ -40,7 +40,7 @@ class ViewController {
 
   deleteView = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      await response.locals.lambdaInvoker('deleteView', {
+      await response.locals.invoker('deleteView', {
         pathParameters: { entityId: request.params.viewID },
         additionalHeaders: this._additionalHeaders,
       });
@@ -53,7 +53,7 @@ class ViewController {
 
   postView = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker('saveView', {
+      const result = await response.locals.invoker('saveView', {
         additionalHeaders: this._additionalHeaders,
         payload: request.body,
         sendRawBody: true,

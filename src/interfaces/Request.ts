@@ -190,7 +190,7 @@ export interface UpdateParentNodeForLochService {
 
 export interface APIGatewayDestination {
   route: string | ((...args: string[]) => string);
-  method: 'GET' | 'POST' | 'DELETE' | 'PUT' | 'PATCH';
+  // method: 'GET' | 'POST' | 'DELETE' | 'PUT' | 'PATCH';
   APIGateway: keyof typeof Config;
 }
 

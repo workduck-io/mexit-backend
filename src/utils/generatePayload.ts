@@ -14,6 +14,7 @@ export interface InvokePayloadOptions<T> {
     key: string;
   };
   httpMethod?: HTTPMethod;
+  sendRawBody?: boolean;
 }
 
 interface GatewayInvokeOptions {

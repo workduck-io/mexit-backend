@@ -15,7 +15,7 @@ class LinkController {
   shortenLink = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const data = new RequestClass(request, 'ShortenLink').data;
-      const result = await response.locals.lambdaInvoker('shortenLink', {
+      const result = await response.locals.invoker('shortenLink', {
         httpMethod: 'POST',
         payload: data,
         sendRawBody: true,
@@ -29,7 +29,7 @@ class LinkController {
 
   getAllShortsOfWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker('getAllShortsOfWorkspace', {
+      const result = await response.locals.invoker('getAllShortsOfWorkspace', {
         httpMethod: 'GET',
         sendRawBody: true,
       });
@@ -42,7 +42,7 @@ class LinkController {
 
   deleteShort = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker('deleteShort', {
+      const result = await response.locals.invoker('deleteShort', {
         httpMethod: 'DELETE',
         pathParameters: { url: request.params.url },
         sendRawBody: true,
@@ -56,7 +56,7 @@ class LinkController {
 
   getStatsByURL = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker('getStatsByURL', {
+      const result = await response.locals.invoker('getStatsByURL', {
         httpMethod: 'GET',
         pathParameters: { url: request.params.url },
         sendRawBody: true,

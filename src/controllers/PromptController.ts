@@ -13,7 +13,7 @@ class PromptController {
 
   getAllPrompts = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker('getAllPrompts');
+      const result = await response.locals.invoker('getAllPrompts');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -23,7 +23,7 @@ class PromptController {
 
   getUserAuthInfo = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker('getUserAuthInfo');
+      const result = await response.locals.invoker('getUserAuthInfo');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -34,7 +34,7 @@ class PromptController {
   updateUserAuthInfo = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const data = request.body;
-      const result = await response.locals.lambdaInvoker('updateUserAuthInfo', {
+      const result = await response.locals.invoker('updateUserAuthInfo', {
         payload: data,
       });
 
@@ -46,7 +46,7 @@ class PromptController {
 
   getAllPromptProviders = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.lambdaInvoker('getAllPromptProviders');
+      const result = await response.locals.invoker('getAllPromptProviders');
 
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -57,7 +57,7 @@ class PromptController {
   generatePromptResult = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const data = request.body;
-      const result = await response.locals.lambdaInvoker('generatePromptResult', {
+      const result = await response.locals.invoker('generatePromptResult', {
         payload: data,
         pathParameters: { id: request.params.promptID },
       });
