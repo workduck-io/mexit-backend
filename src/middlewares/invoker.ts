@@ -91,7 +91,7 @@ async function InvokeLambda(req: Request, res: Response, next: NextFunction): Pr
   res.locals.invoker = async <T = any>(
     routeKey: keyof typeof RouteKeys,
     options?: InvokePayloadOptions<T>,
-    invokerDestination: 'APIGateway' | 'Lambda' = 'APIGateway'
+    invokerDestination: 'APIGateway' | 'Lambda' = 'Lambda'
   ): Promise<any> => {
     const useLambdaInvoker = IS_DEV && !forceAPIGatewayInvoker;
     if (invokerDestination === 'Lambda' || useLambdaInvoker) {
