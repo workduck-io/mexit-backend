@@ -163,27 +163,51 @@ export const RouteKeys = {
   batchRemoveBookmark: { route: 'DELETE /userStar/batch', functionName: `mex-backend-${STAGE}-UserStar:latest` },
 
   // Namespace Ops
-  createNamespace: { route: 'POST /namespace', functionName: `mex-backend-${STAGE}-Namespace:latest` },
-  getNamespace: { route: 'GET /namespace/{id}', functionName: `mex-backend-${STAGE}-Namespace:latest` },
-  updateNamespace: { route: 'PATCH /namespace', functionName: `mex-backend-${STAGE}-Namespace:latest` },
+  createNamespace: {
+    route: 'POST /namespace',
+    functionName: `mex-backend-${STAGE}-Namespace:latest`,
+    APIGateway: 'Node',
+  },
+  getNamespace: {
+    route: 'GET /namespace/{id}',
+    functionName: `mex-backend-${STAGE}-Namespace:latest`,
+    APIGateway: 'Node',
+  },
+  updateNamespace: {
+    route: 'PATCH /namespace',
+    functionName: `mex-backend-${STAGE}-Namespace:latest`,
+    APIGateway: 'Node',
+  },
   makeNamespacePublic: {
     route: 'PATCH /namespace/makePublic/{id}',
+    APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Namespace:latest`,
   },
   makeNamespacePrivate: {
     route: 'PATCH /namespace/makePrivate/{id}',
+    APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Namespace:latest`,
   },
   getAllNamespaceHierarchy: {
     route: 'GET /namespace/all/hierarchy',
+    APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Namespace:latest`,
   },
-  getAllNamespaces: { route: 'GET /v2/namespace/all', functionName: `mex-backend-${STAGE}-Namespace:latest` },
+  getAllNamespaces: {
+    route: 'GET /v2/namespace/all',
+    functionName: `mex-backend-${STAGE}-Namespace:latest`,
+    APIGateway: 'Node',
+  },
   getNodeIDFromPath: {
     route: 'GET /namespace/{namespaceID}/path/{path}',
+    APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Namespace:latest`,
   },
-  deleteNamespace: { route: 'POST /namespace/{id}', functionName: `mex-backend-${STAGE}-Namespace:latest` },
+  deleteNamespace: {
+    route: 'POST /namespace/{id}',
+    functionName: `mex-backend-${STAGE}-Namespace:latest`,
+    APIGateway: 'Node',
+  },
 
   // View Ops
   getAllViews: { route: 'GET /view/all/workspace', functionName: `task-${STAGE}-view` },
