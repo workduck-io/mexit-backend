@@ -97,7 +97,6 @@ async function InvokeLambda(req: Request, res: Response, next: NextFunction): Pr
     if (invokerDestination === 'Lambda' || useLambdaInvoker) {
       return await lambdaInvoker(routeKey, options);
     } else {
-      console.log('Using API Gateway Invoker', { routeKey });
       return await gatewayInvoker(routeKey, options);
     }
   };
