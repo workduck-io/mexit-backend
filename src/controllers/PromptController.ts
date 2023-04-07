@@ -21,6 +21,18 @@ class PromptController {
     }
   };
 
+  chatWithGPT = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
+    try {
+      const result = await response.locals.invoker('chatWithGPT', {
+        payload: request.body,
+      });
+
+      response.status(statusCodes.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   getUserAuthInfo = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const result = await response.locals.invoker('getUserAuthInfo');

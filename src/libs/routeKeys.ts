@@ -292,6 +292,7 @@ export const RouteKeys = {
 
   // Prompt Ops
   getAllPrompts: { route: 'GET /allUser', functionName: `gpt3Prompt-${STAGE}-main` },
+  chatWithGPT: { route: 'POST /chat', functionName: `gpt3Prompt-${STAGE}-main` },
   generatePromptResult: { route: 'POST /result/{id}', functionName: `gpt3Prompt-${STAGE}-main` },
   getUserAuthInfo: { route: 'GET /userAuth', functionName: `gpt3Prompt-${STAGE}-main` },
   updateUserAuthInfo: { route: 'POST /userAuth', functionName: `gpt3Prompt-${STAGE}-main` },
