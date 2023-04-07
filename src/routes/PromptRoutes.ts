@@ -8,10 +8,10 @@ export const initializePromptRoutes = (promptControllerObject: PromptController)
     promptControllerObject.getAllPrompts
   );
 
-  promptControllerObject._router.get(
+  promptControllerObject._router.post(
     `${promptControllerObject._urlPath}/chat`,
     [AuthRequest],
-    promptControllerObject.getAllPrompts
+    promptControllerObject.chatWithGPT
   );
 
   promptControllerObject._router.get(

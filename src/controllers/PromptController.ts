@@ -25,6 +25,7 @@ class PromptController {
     try {
       const result = await response.locals.invoker('chatWithGPT', {
         payload: request.body,
+        sendRawBody: true,
       });
 
       response.status(statusCodes.OK).json(result);
