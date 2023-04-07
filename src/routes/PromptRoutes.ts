@@ -9,6 +9,12 @@ export const initializePromptRoutes = (promptControllerObject: PromptController)
   );
 
   promptControllerObject._router.get(
+    `${promptControllerObject._urlPath}/chat`,
+    [AuthRequest],
+    promptControllerObject.getAllPrompts
+  );
+
+  promptControllerObject._router.get(
     `${promptControllerObject._urlPath}/userAuth`,
     [AuthRequest],
     promptControllerObject.getUserAuthInfo
