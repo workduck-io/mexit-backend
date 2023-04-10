@@ -308,5 +308,5 @@ export const RouteKeys = {
   updateCapture: { functionName: `mex-backend-${STAGE}-SmartCapture:latest`, route: 'POST /v1/capture/{id}' },
   getCapture: { functionName: `mex-backend-${STAGE}-SmartCapture:latest`, route: 'GET /v1/capture/{id}' },
   deleteCapture: { functionName: `mex-backend-${STAGE}-SmartCapture:latest`, route: 'DELETE /v1/capture/{id}' },
-  filterAllCaptures: { functionName: `mex-backend-${STAGE}-SmartCapture:latest`, route: 'DELETE /v1/capture/filter' },
+  filterAllCaptures: { functionName: `mex-backend-${STAGE}-SmartCapture:latest`, route: 'GET /v1/capture/filter' },
 } satisfies Record<string, Destination>;
