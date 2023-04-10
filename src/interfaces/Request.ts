@@ -183,3 +183,17 @@ export interface UpdateParentNodeForLochService {
   parentNodeId: string;
   namespaceId: string;
 }
+
+export interface SmartCaptureRequest {
+  nodeNamespaceMap: {
+    nodeID: string;
+    namespaceID: string;
+  };
+  data: {
+    id: string;
+    content: string;
+    elementType: 'smartCapture';
+    elementMetadata: Record<string, any>;
+    children: Array<any>;
+  };
+}

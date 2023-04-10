@@ -48,6 +48,7 @@ import {
   RevokeAccessFromNamespace,
   ShareNamespace,
   ShortenLink,
+  SmartCaptureRequest,
   SnippetUpdateVersionRequest,
   UpdateMetadata,
   UpdateNamespace,
@@ -149,4 +150,5 @@ export default class Interfaces implements Definitions {
   DeleteNamespace: DeleteNamespace;
   ConnectToLochService: ConnectToLochService;
   UpdateParentNodeForLochService: UpdateParentNodeForLochService;
+  SmartCaptureRequest: SmartCaptureRequest;
 }

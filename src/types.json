@@ -1345,6 +1345,9 @@
             ],
             "type": "object"
         },
+        "Record<string,any>": {
+            "type": "object"
+        },
         "RefactorRequest": {
             "properties": {
                 "existingNodePath": {
@@ -1466,6 +1469,61 @@
             },
             "required": [
                 "url"
+            ],
+            "type": "object"
+        },
+        "SmartCaptureRequest": {
+            "properties": {
+                "data": {
+                    "properties": {
+                        "children": {
+                            "items": {},
+                            "type": "array"
+                        },
+                        "content": {
+                            "type": "string"
+                        },
+                        "elementMetadata": {
+                            "$ref": "types#/definitions/Record<string,any>"
+                        },
+                        "elementType": {
+                            "enum": [
+                                "smartCapture"
+                            ],
+                            "type": "string"
+                        },
+                        "id": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "children",
+                        "content",
+                        "elementMetadata",
+                        "elementType",
+                        "id"
+                    ],
+                    "type": "object"
+                },
+                "nodeNamespaceMap": {
+                    "properties": {
+                        "namespaceID": {
+                            "type": "string"
+                        },
+                        "nodeID": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "namespaceID",
+                        "nodeID"
+                    ],
+                    "type": "object"
+                }
+            },
+            "required": [
+                "data",
+                "nodeNamespaceMap"
             ],
             "type": "object"
         },
