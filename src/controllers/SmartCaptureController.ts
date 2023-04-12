@@ -3,6 +3,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import { STAGE } from '../env';
 import container from '../inversify.config';
 import { Redis } from '../libs/RedisClass';
+import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { initializeSmartCaptureRoutes } from '../routes/SmartCaptureRoutes';
 
@@ -27,6 +28,102 @@ class SmartCaptureController {
         },
         () => response.locals.invoker('getPublicCaptureConfig')
       );
+      response.status(statusCodes.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  createCapture = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
+    try {
+      const body = new RequestClass(request, 'SmartCaptureRequest').data;
+
+      const captureResult = await response.locals.invoker('createSmartCapture', {
+        payload: { ...body, type: 'SmartCaptureRequest' },
+      });
+
+      response.status(statusCodes.OK).json(captureResult);
+
+      const capture = { id: captureResult, ...body };
+      await this._cache.set(captureResult, capture);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  updateCapture = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
+    try {
+      const body = new RequestClass(request, 'SmartCaptureRequest').data;
+      const id = request.params.id;
+
+      await response.locals.invoker('createSmartCapture', {
+        payload: { ...body, type: 'SmartCaptureRequest' },
+        pathParameters: { id: id },
+      });
+
+      response.status(statusCodes.NO_CONTENT).send();
+
+      await this._cache.del(id);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getCapture = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
+    try {
+      const id = request.params.id;
+      const queryParams = {
+        namespaceID: request.query['namespaceID'] as string,
+        nodeID: request.query['nodeID'] as string,
+      };
+
+      const captureResult = await this._cache.getOrSet(
+        {
+          key: id,
+        },
+        () =>
+          response.locals.invoker('getCapture', {
+            pathParameters: { id: id },
+            queryStringParameters: queryParams,
+          })
+      );
+
+      response.status(statusCodes.OK).json(captureResult);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  deleteCapture = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
+    try {
+      const id = request.params.id;
+
+      await response.locals.invoker('deleteCapture', { pathParameters: { id: id } });
+      response.status(statusCodes.NO_CONTENT).send();
+
+      await this._cache.del(id);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  filterAllCaptures = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { configID, isWorkspaceID, isUserID } = request.query;
+
+      const queryParam = Object.fromEntries(
+        Object.entries({ configID, isWorkspaceID, isUserID })
+          .filter(([_, value]) => value !== undefined)
+          .map(([key, value]) => [key, value])
+      );
+
+      if (Object.keys(queryParam).length !== 1) {
+        response
+          .status(statusCodes.BAD_REQUEST)
+          .json({ error: 'Provide only one of configID, isWorkspaceID and isUserID as query parameter' });
+      }
+
+      const result = await response.locals.invoker('filterAllCaptures', { queryStringParameters: queryParam });
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
