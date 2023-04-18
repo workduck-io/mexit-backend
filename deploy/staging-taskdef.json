@@ -3,6 +3,7 @@
   "cpu": "768",
   "memory": "1536",
   "requiresCompatibilities": ["EC2"],
+  "executionRoleArn": "ecsTaskExecutionRole",
   "containerDefinitions": [
     {
       "name": "app",
