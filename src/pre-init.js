@@ -27,6 +27,7 @@ const getConfigFromAWS = async () => {
       fs.writeFileSync(configPath, secret);
     }
   } catch (error) {
+    console.log('Error: ', error);
     throw new Error('Could not fetch config.json: ', error);
   }
 };

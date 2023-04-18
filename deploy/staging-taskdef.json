@@ -50,6 +50,12 @@
           "name": "STAGE",
           "value": "staging"
         }
+      ],
+      "secrets": [
+        {
+          "name": "GATEWAY_CONFIG",
+          "valueFrom": "arn:aws:secretsmanager:us-east-1:418506370286:secret:staging-mexit-backend-api-gateway-tokens-elGtUq"
+        }
       ]
     },
     {
