@@ -1345,9 +1345,6 @@
             ],
             "type": "object"
         },
-        "Record<string,any>": {
-            "type": "object"
-        },
         "RefactorRequest": {
             "properties": {
                 "existingNodePath": {
@@ -1483,9 +1480,7 @@
                         "content": {
                             "type": "string"
                         },
-                        "elementMetadata": {
-                            "$ref": "types#/definitions/Record<string,any>"
-                        },
+                        "elementMetadata": {},
                         "elementType": {
                             "enum": [
                                 "smartCapture"

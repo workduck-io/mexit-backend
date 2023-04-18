@@ -193,7 +193,7 @@ export interface SmartCaptureRequest {
     id: string;
     content: string;
     elementType: 'smartCapture';
-    elementMetadata: Record<string, any>;
+    elementMetadata: any;
     children: Array<any>;
   };
 }
