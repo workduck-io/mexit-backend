@@ -6,6 +6,7 @@ on:
       - main
       - move-to-rest-api-gateway-invoker
       - local-test-deploy
+      - local-deploy-test
 
 jobs:
   build-and-deploy-ecs:

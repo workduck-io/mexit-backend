@@ -73,7 +73,9 @@ async function InvokeLambda(req: Request, res: Response, next: NextFunction): Pr
 
       const path = options?.pathParameters ? getPathFromPathParameters(route, options.pathParameters) : route;
       const url = `${Config[APIGateway].url}/${path.split(' ')[1]}`;
+      console.log('Sending request to API Gateway invoker: ', { path, url, invokePayload });
       const response = await APIClient.request(url, invokePayload);
+      console.log('Response from API Gateway: ', response);
       return response;
     } catch (error) {
       console.log('error in gateway invoker: ', error);
@@ -97,7 +99,11 @@ async function InvokeLambda(req: Request, res: Response, next: NextFunction): Pr
     if (invokerDestination === 'Lambda' || useLambdaInvoker) {
       return await lambdaInvoker(routeKey, options);
     } else {
-      return await gatewayInvoker(routeKey, options);
+      try {
+        return await gatewayInvoker(routeKey, options);
+      } catch (error) {
+        console.log('Error in gateway invoker: ', error);
+      }
     }
   };
   next();
