@@ -9,6 +9,7 @@ import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
 import { initializeNodeRoutes } from '../routes/NodeRoutes';
 import { LocalsX } from '../utils/Locals';
+import { mog } from '../utils/mog';
 
 class NodeController {
   public _urlPath = '/node';
@@ -94,10 +95,11 @@ class NodeController {
       );
 
       const verifiedNodes = ids.intersection(cachedUserAccess); //Checking if user has acess)
-
       const cachedHits = (await this._redisCache.mget(verifiedNodes)).filterEmpty().map(hits => JSON.parse(hits));
+      mog('Cached Hits', { cachedHits: cachedHits.map(item => item.id) });
 
       const nonCachedIds = ids.minus(cachedHits.map(item => item.id));
+      mog('Non Cached', { nonCachedIds });
 
       let lambdaResponse = { successful: [], failed: [] };
       if (!nonCachedIds.isEmpty()) {
@@ -113,6 +115,7 @@ class NodeController {
         );
         const fetchedIDs = new Set(rawLambdaResp.map(node => node.id));
         const failedIDs = nonCachedIds.filter(id => !fetchedIDs.has(id));
+        mog('FETCHED/FAILED', { fetchedIDs, failedIDs });
         lambdaResponse = { successful: rawLambdaResp, failed: failedIDs };
       }
 
