@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - move-to-rest-api-gateway-invoker
+      - local-test-deploy
 
 jobs:
   build-and-deploy-ecs:
