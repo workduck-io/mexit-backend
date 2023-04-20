@@ -87,7 +87,7 @@ class SharedController {
       const nodeID = request.params.nodeId;
 
       const result = await response.locals.invoker('getNodeSharedWithUser', {
-        pathParameters: { nodeID: nodeID },
+        pathParameters: { id: nodeID },
       });
 
       response.status(statusCodes.OK).json(result);

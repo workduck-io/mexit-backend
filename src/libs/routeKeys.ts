@@ -22,7 +22,7 @@ export const RouteKeys = {
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
   GetNode: {
-    route: 'GET /v1/node/{nodeID}',
+    route: 'GET /v1/node/{id}',
     APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
@@ -32,12 +32,12 @@ export const RouteKeys = {
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
   AppendNode: {
-    route: 'PATCH /node/{nodeID}/append',
+    route: 'PATCH /node/{id}/append',
     APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
   DeleteBlocks: {
-    route: 'GET /v1/node/{nodeID}',
+    route: 'PATCH /v1/node/{id}/delete/block',
     APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
@@ -57,17 +57,17 @@ export const RouteKeys = {
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
   MakeNodePublic: {
-    route: 'PATCH /node/makePublic/{nodeID}',
+    route: 'PATCH /node/makePublic/{id}',
     APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
   MakeNodePrivate: {
-    route: 'PATCH /node/makePrivate/{nodeID}',
+    route: 'PATCH /node/makePrivate/{id}',
     APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
   UpdateNodeMetadata: {
-    route: 'PATCH /node/metadata/{nodeID}',
+    route: 'PATCH /node/metadata/{id}',
     APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
@@ -123,7 +123,7 @@ export const RouteKeys = {
   shareNode: { route: 'POST /shared/node', functionName: `mex-backend-${STAGE}-Node:latest` },
   updateAccessTypeForshareNode: { route: 'PUT /shared/node', functionName: `mex-backend-${STAGE}-Node:latest` },
   revokeNodeAccessForUsers: { route: 'DELETE /shared/node', functionName: `mex-backend-${STAGE}-Node:latest` },
-  getNodeSharedWithUser: { route: 'GET /shared/node/{nodeID}', functionName: `mex-backend-${STAGE}-Node:latest` },
+  getNodeSharedWithUser: { route: 'GET /shared/node/{id}', functionName: `mex-backend-${STAGE}-Node:latest` },
   updateSharedNode: { route: 'POST /shared/node/update', functionName: `mex-backend-${STAGE}-Node:latest` },
   getUsersWithNodesShared: { route: 'GET /shared/node/{id}/users', functionName: `mex-backend-${STAGE}-Node:latest` },
   getAllSharedNodeForUser: { route: 'GET /shared/node/all', functionName: `mex-backend-${STAGE}-Node:latest` },

@@ -71,7 +71,7 @@ class NodeController {
           response.locals.invoker(
             'GetNode',
             {
-              pathParameters: { nodeID: nodeId },
+              pathParameters: { id: nodeId },
               ...(namespaceID && { queryStringParameters: { namespaceID: namespaceID } }),
             },
             'APIGateway'
@@ -96,12 +96,10 @@ class NodeController {
 
       const verifiedNodes = ids.intersection(cachedUserAccess); //Checking if user has acess)
       const cachedHits = (await this._redisCache.mget(verifiedNodes)).filterEmpty().map(hits => JSON.parse(hits));
-      mog('Cached Hits', { cachedHits: cachedHits.map(item => item.id) });
 
       const nonCachedIds = ids.minus(cachedHits.map(item => item.id));
-      mog('Non Cached', { nonCachedIds });
 
-      let lambdaResponse = { successful: [], failed: [] };
+      const lambdaResponse = { successful: [], failed: [] };
       if (!nonCachedIds.isEmpty()) {
         const rawLambdaResp = await response.locals.invoker(
           'GetMultipleNodes',
@@ -116,17 +114,25 @@ class NodeController {
         const fetchedIDs = new Set(rawLambdaResp.map(node => node.id));
         const failedIDs = nonCachedIds.filter(id => !fetchedIDs.has(id));
         mog('FETCHED/FAILED', { fetchedIDs, failedIDs });
-        lambdaResponse = { successful: rawLambdaResp, failed: failedIDs };
+
+        lambdaResponse.successful = rawLambdaResp;
+        lambdaResponse.failed = failedIDs;
+
+        await this._redisCache.mset(lambdaResponse.successful.toObject('id', JSON.stringify));
+
+        this._redisCache.mset(
+          lambdaResponse.successful.toObject(
+            val => this._transformer.encodeCacheKey(this._UserAccessLabel, response.locals.userId, val.id),
+            val => val.id
+          )
+        );
       }
 
-      await this._redisCache.mset(lambdaResponse.successful.toObject('id', JSON.stringify));
-
-      this._redisCache.mset(
-        lambdaResponse.successful.toObject(
-          val => this._transformer.encodeCacheKey(this._UserAccessLabel, response.locals.userId, val.id),
-          val => val.id
-        )
-      );
+      mog('Lambda Response', {
+        successful: lambdaResponse.successful.map(item => item.id),
+        failed: lambdaResponse.failed,
+        cachedHits: cachedHits.map(item => item.id),
+      });
       response.status(statusCodes.OK).json({
         failed: lambdaResponse.failed,
         successful: [...lambdaResponse.successful, ...cachedHits],
@@ -144,11 +150,10 @@ class NodeController {
         'AppendNode',
         {
           payload: { ...blockDetail, type: 'ElementRequest' },
-          pathParameters: { nodeID },
+          pathParameters: { id: nodeID },
         },
         'APIGateway'
       );
-
       this._redisCache.del(nodeID);
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -164,7 +169,7 @@ class NodeController {
         return response.locals.invoker(
           'DeleteBlocks',
           {
-            pathParameters: { nodeID: nodeId },
+            pathParameters: { id: nodeId },
             payload: { ids: blockIds },
           },
           'APIGateway'
@@ -205,7 +210,7 @@ class NodeController {
   makeNodePublic = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const nodeId = request.params.id;
-      await response.locals.invoker('MakeNodePublic', { pathParameters: { nodeID: nodeId } }, 'APIGateway');
+      await response.locals.invoker('MakeNodePublic', { pathParameters: { id: nodeId } }, 'APIGateway');
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
@@ -216,7 +221,7 @@ class NodeController {
   makeNodePrivate = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const nodeId = request.params.id;
-      await response.locals.invoker('MakeNodePrivate', { pathParameters: { nodeID: nodeId } }, 'APIGateway');
+      await response.locals.invoker('MakeNodePrivate', { pathParameters: { id: nodeId } }, 'APIGateway');
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
@@ -358,7 +363,7 @@ class NodeController {
 
       await response.locals.invoker(
         'UpdateNodeMetadata',
-        { payload: { ...body, type: 'MetadataRequest' }, pathParameters: { nodeID: nodeID } },
+        { payload: { ...body, type: 'MetadataRequest' }, pathParameters: { id: nodeID } },
         'APIGateway'
       );
       this._redisCache.del(nodeID);
