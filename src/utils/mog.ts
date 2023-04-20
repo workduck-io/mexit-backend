@@ -5,7 +5,7 @@ export const mog = (title: string, propertiesToLog?: Record<string, any>): void 
     console.group(title);
     if (propertiesToLog)
       Object.entries(propertiesToLog).forEach(([key, value]) => {
-        console.info(`${key}: `, JSON.stringify(value, null, 2));
+        console.info(`${key}: `, value);
       });
     console.groupEnd();
   }
