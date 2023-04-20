@@ -155,13 +155,11 @@ export class Transformer {
             }
           }
         } else if (pathIdMapping[nodePath] && !options?.allowDuplicates) {
-          // mog(`Found existing notePath: ${nodePath} with ${nodeID} at index: ${pathIdMapping[nodePath].index}`)
           ilinks[pathIdMapping[nodePath].index] = {
             nodeid: nodeID,
             path: nodePath,
           };
         } else {
-          // mog(`Inserting: ${nodePath} with ${nodeID} at index: ${ilinks.length}`)
           idPathMapping[nodeID] = nodePath;
           pathIdMapping[nodePath] = { nodeid: nodeID, index: ilinks.length };
           const ilink: ILink = { nodeid: nodeID, path: nodePath };

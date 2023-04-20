@@ -101,6 +101,7 @@ class NodeController {
 
       const lambdaResponse = { successful: [], failed: [] };
       if (!nonCachedIds.isEmpty()) {
+        mog('Fetching Nodes', { nonCachedIds, ids });
         const rawLambdaResp = await response.locals.invoker(
           'GetMultipleNodes',
           {
@@ -113,7 +114,7 @@ class NodeController {
         );
         const fetchedIDs = new Set(rawLambdaResp.map(node => node.id));
         const failedIDs = nonCachedIds.filter(id => !fetchedIDs.has(id));
-        mog('FETCHED/FAILED', { fetchedIDs, failedIDs });
+        mog('FETCHED/FAILED Safe', { fetchedIDs, failedIDs });
 
         lambdaResponse.successful = rawLambdaResp;
         lambdaResponse.failed = failedIDs;
