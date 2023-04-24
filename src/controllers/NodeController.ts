@@ -7,6 +7,7 @@ import { Redis } from '../libs/RedisClass';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
+import { globalInvoker } from '../middlewares/invoker';
 import { initializeNodeRoutes } from '../routes/NodeRoutes';
 import { LocalsX } from '../utils/Locals';
 import { mog } from '../utils/mog';
@@ -99,11 +100,16 @@ class NodeController {
 
       const nonCachedIds = ids.minus(cachedHits.map(item => item.id));
 
-      const lambdaResponse = { successful: [], failed: [] };
       if (!nonCachedIds.isEmpty()) {
         mog('Fetching Nodes', { nonCachedIds, ids });
-        const rawLambdaResp = await response.locals.invoker(
+        const locals = {
+          'mex-workspace-id': response.locals?.workspaceID ?? '',
+          authorization: response.locals?.idToken,
+        } as any;
+
+        const rawLambdaResp: any[] = await globalInvoker(
           'GetMultipleNodes',
+          locals,
           {
             payload: { ids: nonCachedIds },
             ...(namespaceID && {
@@ -115,28 +121,27 @@ class NodeController {
         const fetchedIDs = new Set(rawLambdaResp.map(node => node.id));
         const failedIDs = nonCachedIds.filter(id => !fetchedIDs.has(id));
         mog('FETCHED/FAILED Safe', { fetchedIDs, failedIDs });
+        await this._redisCache.mset(rawLambdaResp.toObject('id', JSON.stringify));
 
-        lambdaResponse.successful = rawLambdaResp;
-        lambdaResponse.failed = failedIDs;
-
-        await this._redisCache.mset(lambdaResponse.successful.toObject('id', JSON.stringify));
-
-        this._redisCache.mset(
-          lambdaResponse.successful.toObject(
+        await this._redisCache.mset(
+          rawLambdaResp.toObject(
             val => this._transformer.encodeCacheKey(this._UserAccessLabel, response.locals.userId, val.id),
             val => val.id
           )
         );
+        mog('Lambda Response', {
+          successful: rawLambdaResp.map(item => item.id),
+          failed: failedIDs,
+          cachedHits: cachedHits.map(item => item.id),
+        });
+        response.status(statusCodes.OK).json({
+          failed: failedIDs,
+          successful: [...rawLambdaResp, ...cachedHits],
+        });
       }
-
-      mog('Lambda Response', {
-        successful: lambdaResponse.successful.map(item => item.id),
-        failed: lambdaResponse.failed,
-        cachedHits: cachedHits.map(item => item.id),
-      });
       response.status(statusCodes.OK).json({
-        failed: lambdaResponse.failed,
-        successful: [...lambdaResponse.successful, ...cachedHits],
+        failed: [],
+        successful: cachedHits,
       });
     } catch (error) {
       next(error);
