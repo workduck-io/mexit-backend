@@ -7,9 +7,9 @@ import { Redis } from '../libs/RedisClass';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
+import { globalInvoker } from '../middlewares/invoker';
 import { initializeNodeRoutes } from '../routes/NodeRoutes';
 import { LocalsX } from '../utils/Locals';
-import { mog } from '../utils/mog';
 
 class NodeController {
   public _urlPath = '/node';
@@ -101,38 +101,27 @@ class NodeController {
 
       const lambdaResponse = { successful: [], failed: [] };
       if (!nonCachedIds.isEmpty()) {
-        const rawLambdaResp = await response.locals.invoker(
-          'GetMultipleNodes',
-          {
-            payload: { ids: nonCachedIds },
-            ...(namespaceID && {
-              queryStringParameters: { namespaceID: namespaceID },
-            }),
-          },
-          'APIGateway'
-        );
+        const rawLambdaResp = await globalInvoker('GetMultipleNodes', response.locals, {
+          payload: { ids: nonCachedIds },
+          ...(namespaceID && {
+            queryStringParameters: { namespaceID: namespaceID },
+          }),
+        });
         const fetchedIDs = new Set(rawLambdaResp.map(node => node.id));
         const failedIDs = nonCachedIds.filter(id => !fetchedIDs.has(id));
-        mog('FETCHED/FAILED', { fetchedIDs, failedIDs });
 
         lambdaResponse.successful = rawLambdaResp;
         lambdaResponse.failed = failedIDs;
 
         await this._redisCache.mset(lambdaResponse.successful.toObject('id', JSON.stringify));
 
-        this._redisCache.mset(
+        await this._redisCache.mset(
           lambdaResponse.successful.toObject(
             val => this._transformer.encodeCacheKey(this._UserAccessLabel, response.locals.userId, val.id),
             val => val.id
           )
         );
       }
-
-      mog('Lambda Response', {
-        successful: lambdaResponse.successful.map(item => item.id),
-        failed: lambdaResponse.failed,
-        cachedHits: cachedHits.map(item => item.id),
-      });
       response.status(statusCodes.OK).json({
         failed: lambdaResponse.failed,
         successful: [...lambdaResponse.successful, ...cachedHits],

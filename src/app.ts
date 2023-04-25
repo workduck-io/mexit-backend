@@ -30,6 +30,7 @@ import { errorCodes } from './libs/errorCodes';
 import logger from './libs/logger';
 import { Redis } from './libs/RedisClass';
 import expressListRoutes, { COLORS, colorText } from './libs/routeList';
+import { asyncHandler } from './middlewares/asyncHandler';
 import { InvokeLambda } from './middlewares/invoker';
 import { jsonErrorHandler } from './middlewares/jsonerrorhandler';
 import { LogRequest } from './middlewares/logrequest';
@@ -56,12 +57,14 @@ class App {
   }
 
   private initializeMiddlewares() {
-    this._app.use(compression());
-    this._app.use(cors());
-    this._app.use(express.json({ reviver: parseReviver }));
-    this._app.use(LogRequest);
-    this._app.use(wdRequestIdExpressParser);
-    this._app.use(InvokeLambda);
+    this._app.use(
+      compression(),
+      cors(),
+      express.json({ reviver: parseReviver }),
+      LogRequest,
+      wdRequestIdExpressParser,
+      asyncHandler(InvokeLambda)
+    );
   }
 
   private initializeErrorHandlers() {
