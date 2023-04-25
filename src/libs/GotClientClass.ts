@@ -1,7 +1,6 @@
 import got, { OptionsOfJSONResponseBody, OptionsOfTextResponseBody, type Response as GotResponse } from 'got';
 import { injectable } from 'inversify';
 import StatsMap from 'stats-map';
-import mem from 'mem';
 
 @injectable()
 export class GotClient {
@@ -20,9 +19,9 @@ export class GotClient {
   };
 
   private _client = got.extend(this._gotConfig);
-  private _memGot = mem(this._client, { cache: this._cache });
+  // private _memGot = mem(this._client, { cache: this._cache });
 
   async request(url: string, options: OptionsOfJSONResponseBody): Promise<GotResponse<any>> {
-    return await this._memGot(url, options).json();
+    return await this._client(url, options).json();
   }
 }
