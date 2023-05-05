@@ -186,6 +186,8 @@ class NodeController {
         blockID: data.blockId,
         sourceNodeID: data.sourceNodeId,
         destinationNodeID: data.destinationNodeId,
+        sourceNamespaceID: data.sourceNamespaceId,
+        destinationNamespaceID: data.destinationNamespaceId,
       };
 
       await response.locals.invoker('CopyOrMoveBlock', { payload: payload }, 'APIGateway');

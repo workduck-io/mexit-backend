@@ -45,7 +45,7 @@ export const initializeNodeRoutes = (nodeControllerObject: NodeController): void
     nodeControllerObject.bulkCreateNode
   );
 
-  nodeControllerObject._router.post(
+  nodeControllerObject._router.patch(
     `${nodeControllerObject._urlPath}/block/movement`,
     [AuthRequest],
     nodeControllerObject.copyOrMoveBlock

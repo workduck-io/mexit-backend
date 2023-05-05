@@ -16,6 +16,8 @@ export interface CopyOrMoveBlockRequest {
   blockId: string;
   sourceNodeId: string;
   destinationNodeId: string;
+  sourceNamespaceId: string;
+  destinationNamespaceId: string;
 }
 
 export interface NodePath {

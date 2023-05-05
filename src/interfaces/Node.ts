@@ -141,6 +141,8 @@ export interface CopyOrMoveBlock {
   blockID: string;
   sourceNodeID: string;
   destinationNodeID: string;
+  sourceNamespaceID: string;
+  destinationNamespaceID: string;
   action: 'move';
 }
 
