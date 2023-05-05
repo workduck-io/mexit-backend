@@ -161,6 +161,26 @@
             ],
             "type": "object"
         },
+        "BaseEntityRequest": {
+            "properties": {
+                "nodeNamespaceMap": {
+                    "properties": {
+                        "namespaceID": {
+                            "type": "string"
+                        },
+                        "nodeID": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "namespaceID",
+                        "nodeID"
+                    ],
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        },
         "Block": {
             "properties": {
                 "elements": {
@@ -945,6 +965,46 @@
             ],
             "type": "object"
         },
+        "HighlightRequest": {
+            "properties": {
+                "data": {
+                    "properties": {
+                        "properties": {
+                            "$ref": "types#/definitions/Record<string,any>"
+                        }
+                    },
+                    "required": [
+                        "properties"
+                    ],
+                    "type": "object"
+                },
+                "nodeNamespaceMap": {
+                    "properties": {
+                        "namespaceID": {
+                            "type": "string"
+                        },
+                        "nodeID": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "namespaceID",
+                        "nodeID"
+                    ],
+                    "type": "object"
+                },
+                "type": {
+                    "enum": [
+                        "EntityTypeRequest"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "type"
+            ],
+            "type": "object"
+        },
         "ILink": {
             "properties": {
                 "createdAt": {
@@ -1345,6 +1405,9 @@
             ],
             "type": "object"
         },
+        "Record<string,any>": {
+            "type": "object"
+        },
         "RefactorRequest": {
             "properties": {
                 "existingNodePath": {
@@ -1514,11 +1577,17 @@
                         "nodeID"
                     ],
                     "type": "object"
+                },
+                "type": {
+                    "enum": [
+                        "EntityTypeRequest"
+                    ],
+                    "type": "string"
                 }
             },
             "required": [
                 "data",
-                "nodeNamespaceMap"
+                "type"
             ],
             "type": "object"
         },

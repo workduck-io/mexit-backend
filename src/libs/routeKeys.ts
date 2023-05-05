@@ -10,6 +10,10 @@ export type Destination = {
   functionName?: string;
 };
 
+export const FunctionNames = {
+  Highlight: `mex-backend-${STAGE}-Highlights:latest`,
+};
+
 export const RouteKeys = {
   // Ping Endpoint
   Ping: { route: 'GET /ping', APIGateway: 'Node' },
@@ -305,8 +309,25 @@ export const RouteKeys = {
   getStatsByURL: { functionName: `mex-url-shortner-${STAGE}-stats` },
 
   createSmartCapture: { functionName: `mex-backend-${STAGE}-SmartCapture:latest`, route: 'POST /v1/capture' },
-  updateCapture: { functionName: `mex-backend-${STAGE}-SmartCapture:latest`, route: 'POST /v1/capture/{id}' },
+  updateCapture: { functionName: `mex-backend-${STAGE}-SmartCapture:latest`, route: 'PUT /v1/capture/{id}' },
   getCapture: { functionName: `mex-backend-${STAGE}-SmartCapture:latest`, route: 'GET /v1/capture/{id}' },
   deleteCapture: { functionName: `mex-backend-${STAGE}-SmartCapture:latest`, route: 'DELETE /v1/capture/{id}' },
   filterAllCaptures: { functionName: `mex-backend-${STAGE}-SmartCapture:latest`, route: 'GET /v1/capture/filter' },
+
+  CreateHighlight: { functionName: FunctionNames.Highlight, route: 'POST /v1/highlight' },
+  GetHighlight: { functionName: FunctionNames.Highlight, route: 'GET /v1/highlight/{id}' },
+  GetAllHighlightInstances: {
+    functionName: FunctionNames.Highlight,
+    route: 'GET /v1/highlight/instances/all/{id}',
+  },
+  GetHighlightsByIds: {
+    functionName: FunctionNames.Highlight,
+    route: 'POST /v1/highlight/ids',
+  },
+  UpdateHighlight: { functionName: FunctionNames.Highlight, route: 'PUT /v1/highlight/{id}' },
+  DeleteHighlight: { functionName: FunctionNames.Highlight, route: 'DELETE /v1/highlight/{id}' },
+  GetAllHighlightsOfWorkspace: {
+    functionName: FunctionNames.Highlight,
+    route: 'GET /v1/highlight/all',
+  },
 } satisfies Record<string, Destination>;

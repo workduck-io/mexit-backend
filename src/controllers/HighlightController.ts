@@ -18,14 +18,63 @@ class HighlightController {
 
   createHighlight = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const data = new RequestClass(request).data;
-      this._redisCache.del(data.entityId);
-      const result = await response.locals.invoker('createHighlight', {
-        payload: data,
-        sendRawBody: true,
+      const parentID = request.query.parentID;
+      const requestPayload = new RequestClass(request, 'HighlightRequest').data;
+
+      const highlightId = await response.locals.invoker('CreateHighlight', {
+        payload: { ...requestPayload },
+        ...(parentID && { queryStringParameters: { parentID } }),
       });
 
-      response.status(statusCodes.OK).json(result);
+      response.status(statusCodes.OK).json(highlightId);
+      const highlight = { id: highlightId, ...requestPayload };
+
+      // set only if the body contains the data field
+      // this case is for the instance duplication
+      if (requestPayload.data) await this._redisCache.set(highlightId, highlight.data);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  updateHighlight = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
+    try {
+      const body = new RequestClass(request, 'HighlightRequest').data;
+      const id = request.params.id;
+
+      await response.locals.invoker('UpdateHighlight', {
+        payload: { ...body },
+        pathParameters: { id: id },
+      });
+
+      response.status(statusCodes.NO_CONTENT).send();
+
+      await this._redisCache.del(id);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getHighlight = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
+    try {
+      const id = request.params.id;
+      const queryParams = {
+        namespaceID: request.query['namespaceID'] as string,
+        nodeID: request.query['nodeID'] as string,
+      };
+
+      const highlightResult = await this._redisCache.getOrSet(
+        {
+          key: id,
+        },
+        () =>
+          response.locals.invoker('GetHighlight', {
+            pathParameters: { id: id },
+            queryStringParameters: queryParams,
+          })
+      );
+
+      response.status(statusCodes.OK).json(highlightResult);
     } catch (error) {
       next(error);
     }
@@ -39,15 +88,15 @@ class HighlightController {
       const nonCachedIds = data.ids.minus(cachedHits.map(item => item.id));
 
       const lambdaResponse = !nonCachedIds.isEmpty()
-        ? await response.locals.invoker('getHighlightByIDs', {
-            payload: { ids: nonCachedIds },
-            sendRawBody: true,
-          })
+        ? (
+            await response.locals.invoker('GetHighlightsByIds', {
+              payload: { ids: nonCachedIds },
+            })
+          ).items
         : [];
 
-      this._redisCache.mset(lambdaResponse.toObject('entityId', JSON.stringify));
-
       response.status(statusCodes.OK).json([...lambdaResponse, ...cachedHits]);
+      await this._redisCache.mset(lambdaResponse.toObject('id', JSON.stringify));
     } catch (error) {
       next(error);
     }
@@ -55,11 +104,26 @@ class HighlightController {
 
   getAllHighlightsOfWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await response.locals.invoker('getAllHighlightsOfWorkspace', { sendRawBody: true });
-
-      this._redisCache.mset(result.Items.toObject('entityId', JSON.stringify));
+      const result = (await response.locals.invoker('GetAllHighlightsOfWorkspace')).items;
 
       response.status(statusCodes.OK).json(result);
+      await this._redisCache.mset(result.toObject('id', JSON.stringify));
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getAllHighlightInstances = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
+    try {
+      const id = request.params.id;
+      const result = (
+        await response.locals.invoker('GetAllHighlightInstances', {
+          pathParameters: { id },
+        })
+      ).items;
+
+      response.status(statusCodes.OK).json(result);
+      await this._redisCache.mset(result.toObject('id', JSON.stringify));
     } catch (error) {
       next(error);
     }
@@ -67,15 +131,19 @@ class HighlightController {
 
   deleteHighlight = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const entityId = request.params.entityId;
-      await response.locals.invoker('deleteHighlightByID', {
-        pathParameters: { entityId: entityId },
-        sendRawBody: true,
+      const id = request.params.id;
+      const queryParams = {
+        namespaceID: request.query['namespaceID'] as string,
+        nodeID: request.query['nodeID'] as string,
+      };
+
+      await response.locals.invoker('DeleteHighlight', {
+        pathParameters: { id },
+        queryStringParameters: queryParams,
       });
 
-      this._redisCache.del(entityId);
-
       response.status(statusCodes.NO_CONTENT).send();
+      await this._redisCache.del(id);
     } catch (error) {
       next(error);
     }

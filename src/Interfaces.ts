@@ -26,6 +26,7 @@ import {
 } from './interfaces/Node';
 import {
   AppendBlockRequest,
+  BaseEntityRequest,
   BulkCreateNode,
   Comment,
   ConnectToLochService,
@@ -40,6 +41,7 @@ import {
   FilterValue,
   GetMultipleIds,
   GlobalFilterJoin,
+  HighlightRequest,
   NodePath,
   PostView,
   Reaction,
@@ -151,4 +153,7 @@ export default class Interfaces implements Definitions {
   ConnectToLochService: ConnectToLochService;
   UpdateParentNodeForLochService: UpdateParentNodeForLochService;
   SmartCaptureRequest: SmartCaptureRequest;
+  HighlightRequest: HighlightRequest;
+  BaseEntityRequest: BaseEntityRequest;
+  'Record<string,any>': Record<string, any>;
 }
