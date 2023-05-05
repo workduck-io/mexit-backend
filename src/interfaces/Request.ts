@@ -13,6 +13,7 @@ export interface SnippetUpdateVersionRequest extends ContentNode {
 }
 
 export interface CopyOrMoveBlockRequest {
+  action: 'move' | 'copy';
   blockId: string;
   sourceNodeId: string;
   destinationNodeId: string;

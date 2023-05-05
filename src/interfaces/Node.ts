@@ -143,7 +143,7 @@ export interface CopyOrMoveBlock {
   destinationNodeID: string;
   sourceNamespaceID: string;
   destinationNamespaceID: string;
-  action: 'move';
+  action: 'move' | 'copy';
 }
 
 export interface ILink {

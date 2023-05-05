@@ -722,6 +722,7 @@
             "properties": {
                 "action": {
                     "enum": [
+                        "copy",
                         "move"
                     ],
                     "type": "string"
@@ -729,7 +730,13 @@
                 "blockID": {
                     "type": "string"
                 },
+                "destinationNamespaceID": {
+                    "type": "string"
+                },
                 "destinationNodeID": {
+                    "type": "string"
+                },
+                "sourceNamespaceID": {
                     "type": "string"
                 },
                 "sourceNodeID": {
@@ -745,7 +752,9 @@
             "required": [
                 "action",
                 "blockID",
+                "destinationNamespaceID",
                 "destinationNodeID",
+                "sourceNamespaceID",
                 "sourceNodeID",
                 "type"
             ],
@@ -753,10 +762,23 @@
         },
         "CopyOrMoveBlockRequest": {
             "properties": {
+                "action": {
+                    "enum": [
+                        "copy",
+                        "move"
+                    ],
+                    "type": "string"
+                },
                 "blockId": {
                     "type": "string"
                 },
+                "destinationNamespaceId": {
+                    "type": "string"
+                },
                 "destinationNodeId": {
+                    "type": "string"
+                },
+                "sourceNamespaceId": {
                     "type": "string"
                 },
                 "sourceNodeId": {
@@ -764,8 +786,11 @@
                 }
             },
             "required": [
+                "action",
                 "blockId",
+                "destinationNamespaceId",
                 "destinationNodeId",
+                "sourceNamespaceId",
                 "sourceNodeId"
             ],
             "type": "object"

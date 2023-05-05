@@ -181,9 +181,9 @@ class NodeController {
       this._redisCache.del(data.destinationNodeId);
 
       const payload: CopyOrMoveBlock = {
-        action: 'move',
-        type: 'BlockMovementRequest',
+        action: data.action,
         blockID: data.blockId,
+        type: 'BlockMovementRequest',
         sourceNodeID: data.sourceNodeId,
         destinationNodeID: data.destinationNodeId,
         sourceNamespaceID: data.sourceNamespaceId,
