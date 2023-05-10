@@ -34,6 +34,7 @@ import {
   CreateNamespace,
   DeleteBlocksRequest,
   DeleteNamespace,
+  EditBlockRequest,
   Filter,
   FilterJoin,
   FilterType,
@@ -109,6 +110,7 @@ export default class Interfaces implements Definitions {
   ActivityNodeResponse: ActivityNodeResponse;
   QueryStringParameters: QueryStringParameters;
   CopyOrMoveBlockRequest: CopyOrMoveBlockRequest;
+  EditBlockRequest: EditBlockRequest;
   CopyOrMoveBlock: CopyOrMoveBlock;
   BulkResponse: BulkResponse;
   UserPreference: UserPreference;

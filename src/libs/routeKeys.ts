@@ -56,6 +56,11 @@ export const RouteKeys = {
     APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
+  EditBlock: {
+    route: 'PATCH /node/{id}/block',
+    APIGateway: 'Node',
+    functionName: `mex-backend-${STAGE}-Node:latest`,
+  },
   MakeNodePublic: {
     route: 'PATCH /node/makePublic/{id}',
     APIGateway: 'Node',

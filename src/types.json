@@ -830,6 +830,17 @@
             },
             "type": "object"
         },
+        "EditBlockRequest": {
+            "properties": {
+                "data": {
+                    "$ref": "types#/definitions/NodeChildData"
+                }
+            },
+            "required": [
+                "data"
+            ],
+            "type": "object"
+        },
         "Filter": {
             "properties": {
                 "id": {

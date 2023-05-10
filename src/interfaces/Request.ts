@@ -1,4 +1,4 @@
-import { ContentNode } from './Node';
+import { ContentNode,NodeChildData } from './Node';
 
 export interface ContentNodeRequest extends ContentNode {
   createdBy?: string;
@@ -19,6 +19,10 @@ export interface CopyOrMoveBlockRequest {
   destinationNodeId: string;
   sourceNamespaceId: string;
   destinationNamespaceId: string;
+}
+
+export interface EditBlockRequest {
+  data: NodeChildData;
 }
 
 export interface NodePath {

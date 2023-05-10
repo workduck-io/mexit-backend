@@ -338,6 +338,32 @@ class NodeController {
     }
   };
 
+  editBlock = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
+    try {
+      const body = new RequestClass(request, 'EditBlockRequest').data;
+      const nodeID = request.params.nodeId;
+      const namespaceID = request.query['namespaceID'] as string;
+
+      this._redisCache.del(nodeID);
+
+      await response.locals.invoker(
+        'EditBlock',
+        {
+          payload: { ...body, type: 'SingleElementRequest' },
+          pathParameters: { id: nodeID },
+          ...(namespaceID && {
+            queryStringParameters: { namespaceID: namespaceID },
+          }),
+        },
+        'APIGateway'
+      );
+
+      response.status(statusCodes.NO_CONTENT).send();
+    } catch (error) {
+      next(error);
+    }
+  };
+
   getArchivedNodes = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const getArchiveResp = await response.locals.invoker('GetArchivedNodes', undefined, 'APIGateway');

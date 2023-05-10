@@ -52,6 +52,12 @@ export const initializeNodeRoutes = (nodeControllerObject: NodeController): void
   );
 
   nodeControllerObject._router.patch(
+    `${nodeControllerObject._urlPath}/:nodeId/block`,
+    [AuthRequest],
+    nodeControllerObject.editBlock
+  );
+
+  nodeControllerObject._router.patch(
     `${nodeControllerObject._urlPath}/:id/makePublic`,
     [AuthRequest],
     nodeControllerObject.makeNodePublic
