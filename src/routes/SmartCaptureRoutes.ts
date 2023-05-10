@@ -10,11 +10,7 @@ export const initializeSmartCaptureRoutes = (smartCaptureObject: SmartCaptureCon
 
   smartCaptureObject._router.post(`${smartCaptureObject._urlPath}/`, [AuthRequest], smartCaptureObject.createCapture);
 
-  smartCaptureObject._router.post(
-    `${smartCaptureObject._urlPath}/:id`,
-    [AuthRequest],
-    smartCaptureObject.updateCapture
-  );
+  smartCaptureObject._router.put(`${smartCaptureObject._urlPath}/:id`, [AuthRequest], smartCaptureObject.updateCapture);
 
   smartCaptureObject._router.get(`${smartCaptureObject._urlPath}/:id`, [AuthRequest], smartCaptureObject.getCapture);
 
