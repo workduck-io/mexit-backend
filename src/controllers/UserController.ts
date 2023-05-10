@@ -37,6 +37,21 @@ class UserController {
     }
   };
 
+
+  addExistingUserToWorksapce = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
+    const data = new RequestClass(request).data;
+
+    try {
+      const result = await response.locals.invoker('addExistingUserToWorkspace', {
+        payload: data,
+        sendRawBody: true,
+      });
+      response.status(statusCodes.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   updateUserPreference = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
       const userId = response.locals.userIdRaw;
@@ -100,6 +115,16 @@ class UserController {
     }
   };
 
+  getUsersOfWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
+    try {
+      const result = await response.locals.invoker('getUsersOfWorkspace');
+
+      response.status(statusCodes.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   createInvite = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
       const payload = new RequestClass(request, 'InviteProperties').data;
@@ -135,15 +160,7 @@ class UserController {
       next(error);
     }
   };
-  getUsersOfWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
-    try {
-      const result = await response.locals.invoker('getUsersOfWorkspace');
 
-      response.status(statusCodes.OK).json(result);
-    } catch (error) {
-      next(error);
-    }
-  };
   getUserByLinkedin = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
       const payload = request.body;
