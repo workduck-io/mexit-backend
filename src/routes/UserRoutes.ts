@@ -20,6 +20,8 @@ export const initializeUserRoutes = (userObject: UserController): void => {
 
   userObject._router.put(`${userObject._urlPath}/info`, [AuthRequest], userObject.updateUser);
 
+  userObject._router.post(`${userObject._urlPath}/workspace`, [AuthRequest], userObject.addExistingUserToWorksapce);
+
   userObject._router.put(`${userObject._urlPath}/preference`, [AuthRequest], userObject.updateUserPreference);
 
   userObject._router.post(`${userObject._urlPath}/linkedin`, [AuthRequest], userObject.getUserByLinkedin);

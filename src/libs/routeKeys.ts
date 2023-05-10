@@ -112,6 +112,7 @@ export const RouteKeys = {
   updateUserPreference: { route: 'PUT /preference', functionName: `workduck-user-service-${STAGE}-user` },
   getUserByLinkedin: { route: 'POST /linkedin', functionName: `workduck-user-service-${STAGE}-getUser` },
   registerStatus: { route: 'GET /status', functionName: `workduck-user-service-${STAGE}-registerStatus` },
+  addExistingUserToWorkspace: { route: 'POST /workspace', functionName: `workduck-user-service-${STAGE}-user` },
 
   //User Invite
   getInvite: { route: 'GET /invite/{inviteId}', functionName: `workduck-user-service-${STAGE}-invite` },
