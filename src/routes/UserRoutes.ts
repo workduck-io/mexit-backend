@@ -20,7 +20,7 @@ export const initializeUserRoutes = (userObject: UserController): void => {
 
   userObject._router.put(`${userObject._urlPath}/info`, [AuthRequest], userObject.updateUser);
 
-  userObject._router.post(`${userObject._urlPath}/workspace`, [AuthRequest], userObject.addExistingUserToWorksapce);
+  userObject._router.post(`${userObject._urlPath}/workspace`, [AuthRequest], userObject.addExistingUserToWorkspace);
 
   userObject._router.put(`${userObject._urlPath}/preference`, [AuthRequest], userObject.updateUserPreference);
 

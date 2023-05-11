@@ -38,7 +38,7 @@ class UserController {
   };
 
 
-  addExistingUserToWorksapce = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
+  addExistingUserToWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     const data = new RequestClass(request).data;
 
     try {

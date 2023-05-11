@@ -26,6 +26,7 @@ import SmartCaptureController from './controllers/SmartCaptureController';
 import SnippetController from './controllers/SnippetController';
 import UserController from './controllers/UserController';
 import ViewController from './controllers/ViewController';
+import WorkspaceController from './controllers/WorkspaceController';
 import { errorCodes } from './libs/errorCodes';
 import logger from './libs/logger';
 import { Redis } from './libs/RedisClass';
@@ -109,6 +110,7 @@ const application = new App([
   new LochController(),
   new ActionController(),
   new PromptController(),
+  new WorkspaceController()
 ]);
 
 application.build();

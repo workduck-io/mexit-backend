@@ -124,6 +124,11 @@ export const RouteKeys = {
   createInvite: { route: 'POST /invite', functionName: `workduck-user-service-${STAGE}-invite` },
   deleteInvite: { route: 'DELETE /invite/{inviteId}', functionName: `workduck-user-service-${STAGE}-invite` },
 
+  //Workspace Ops
+  getAllWorkspaceOfUser: { route: 'GET /workspace/user', functionName: `mex-backend-${STAGE}-Workspace:latest` },
+  updateWorkspace: { route: 'PATCH /v1/workspace', functionName: `mex-backend-${STAGE}-Workspace:latest` },
+
+
   // Share Note Ops
   shareNode: { route: 'POST /shared/node', functionName: `mex-backend-${STAGE}-Node:latest` },
   updateAccessTypeForshareNode: { route: 'PUT /shared/node', functionName: `mex-backend-${STAGE}-Node:latest` },
