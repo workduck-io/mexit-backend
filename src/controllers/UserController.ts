@@ -52,6 +52,20 @@ class UserController {
     }
   };
 
+  updateActiveWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
+    const data = new RequestClass(request).data;
+
+    try {
+      await response.locals.invoker('updateActiveWorkspace', {
+        payload: data,
+        sendRawBody: true,
+      });
+      response.status(statusCodes.NO_CONTENT).send()
+    } catch (error) {
+      next(error);
+    }
+  };
+
   updateUserPreference = async (request: Request, response: Response, next: NextFunction): Promise<any> => {
     try {
       const userId = response.locals.userIdRaw;
