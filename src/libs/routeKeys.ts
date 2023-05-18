@@ -128,7 +128,7 @@ export const RouteKeys = {
   //Workspace Ops
   getAllWorkspaceOfUser: { route: 'GET /workspace/user', functionName: `mex-backend-${STAGE}-Workspace:latest` },
   updateWorkspace: { route: 'PATCH /v1/workspace', functionName: `mex-backend-${STAGE}-Workspace:latest` },
-
+  getWorkspaceByIds: { route: 'GET /v1/workspace/data/{ids}', functionName: `mex-backend-${STAGE}-Workspace:latest` },
 
   // Share Note Ops
   shareNode: { route: 'POST /shared/node', functionName: `mex-backend-${STAGE}-Node:latest` },
