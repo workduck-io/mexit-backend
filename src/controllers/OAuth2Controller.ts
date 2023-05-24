@@ -4,7 +4,6 @@ import { OAuth2Client } from 'google-auth-library';
 import { IS_DEV } from '../env';
 import container from '../inversify.config';
 import { GotClient } from '../libs/GotClientClass';
-import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { initializeOAuth2Routes } from '../routes/OAuth2Routes';
 
@@ -38,16 +37,37 @@ class OAuth2Controller {
 
   getNewAccessToken = async (request: Request, response: Response): Promise<void> => {
     try {
-      const requestDetail = new RequestClass(request, 'GoogleAuthRefreshToken');
+      const userId = response.locals.userIdRaw;
+      //Fetch the refresh token from auth service
+      const storedAuth = await response.locals.invoker('getAuth', {
+        pathParameters: { authTypeId: 'GOOGLECALENDAR_OAUTH' },
+        queryStringParameters: {
+          userId,
+        },
+      });
+
+      if (!storedAuth) throw new Error('Token missing in auth service');
+
+      const itemValues: any = Object.values(storedAuth.auth[0])[0];
+      const refreshToken = itemValues.authData.refreshToken as string;
+
       const payload = {
         client_id: process.env.MEXIT_BACKEND_GOOGLE_CLIENT_ID,
         client_secret: process.env.MEXIT_BACKEND_GOOGLE_CLIENT_SECRET,
-        refresh_token: requestDetail.data.refreshToken,
+        refresh_token: refreshToken,
         grant_type: 'refresh_token',
       };
       const result = await this._gotClient.request(OAuth2Controller.googleOAuthTokenUrl, {
         json: payload,
       });
+      //Update the new access token in auth service
+      const newAccessToken = result.body.access_token;
+      const expiryTime = result.body.expires_in;
+      await response.locals.invoker('refreshAuth', {
+        payload: { serviceUserId: userId, accessToken: newAccessToken, expiryTime },
+        pathParameters: { source: 'googlecalendar' },
+      });
+
       response.status(statusCodes.OK).json({ data: result.body, status: result.statusCode });
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
@@ -56,9 +76,21 @@ class OAuth2Controller {
 
   extractTokenFromCode = async (request: Request, response: Response): Promise<void> => {
     const code = request.query.code;
+    const userId = request.query.userId;
     try {
       const { tokens } = await this._oauth2Client.getToken(code.toString());
-      // TODO: store this refresh token into the auth service
+
+      // Persist the tokens in the auth service
+      await response.locals.invoker('createUserAuth', {
+        pathParameters: { source: 'googlecalendar' },
+        queryStringParameters: {
+          state: `DUMMY_WORKSPACE:${userId}`,
+          access_token: tokens.access_token,
+          refresh_token: tokens.refresh_token,
+          email: response.locals.userEmail,
+          expires_in: tokens.expiry_date,
+        },
+      });
       response
         .set('Content-Type', 'text/html')
         .send(

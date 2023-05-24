@@ -296,10 +296,11 @@ export const RouteKeys = {
     route: 'GET /{actionGroupId}/helpers/{actionId}',
     functionName: `actionHelperService-${STAGE}-getAction`,
   },
+  createUserAuth: { route: 'GET /verifyUser/{source}', functionName: `authService-${STAGE}-createUserAuth` },
   getAuth: { route: 'GET /{authTypeId}', functionName: `authService-${STAGE}-getAuth` },
   getAllAuths: { route: 'GET /all', functionName: `authService-${STAGE}-getAllAuths` },
   updateAuth: { route: 'PUT /current/{authTypeId}', functionName: `authService-${STAGE}-updateCurrentWorkspace` },
-  refreshAuth: { route: 'PUT /refresh/{source}', functionName: `authService-${STAGE}-refreshWorkspaceAuth` },
+  refreshAuth: { route: 'POST /refresh/{source}', functionName: `authService-${STAGE}-refreshWorkspaceAuth` },
 
   // Prompt Ops
   getAllPrompts: { route: 'GET /allUser', functionName: `gpt3Prompt-${STAGE}-main` },
