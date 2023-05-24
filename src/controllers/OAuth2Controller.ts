@@ -4,6 +4,7 @@ import { OAuth2Client } from 'google-auth-library';
 import { IS_DEV } from '../env';
 import container from '../inversify.config';
 import { GotClient } from '../libs/GotClientClass';
+import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { initializeOAuth2Routes } from '../routes/OAuth2Routes';
 
@@ -76,21 +77,10 @@ class OAuth2Controller {
 
   extractTokenFromCode = async (request: Request, response: Response): Promise<void> => {
     const code = request.query.code;
-    const userId = request.query.userId;
+
     try {
       const { tokens } = await this._oauth2Client.getToken(code.toString());
 
-      // Persist the tokens in the auth service
-      await response.locals.invoker('createUserAuth', {
-        pathParameters: { source: 'googlecalendar' },
-        queryStringParameters: {
-          state: `DUMMY_WORKSPACE:${userId}`,
-          access_token: tokens.access_token,
-          refresh_token: tokens.refresh_token,
-          email: response.locals.userEmail,
-          expires_in: tokens.expiry_date,
-        },
-      });
       response
         .set('Content-Type', 'text/html')
         .send(
@@ -99,6 +89,26 @@ class OAuth2Controller {
           )
         )
         .status(200);
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
+    }
+  };
+
+  persistAuth = async (request: Request, response: Response): Promise<void> => {
+    try {
+      const { accessToken, email, expiresIn, refreshToken } = new RequestClass(request, 'PersistAuthToken').data;
+      // Persist the tokens in the auth service
+      await response.locals.invoker('createUserAuth', {
+        pathParameters: { source: 'googlecalendar' },
+        queryStringParameters: {
+          state: `DUMMY_WORKSPACE:${response.locals.userIdRaw}`,
+          access_token: accessToken,
+          refresh_token: refreshToken,
+          email: email,
+          expires_in: expiresIn,
+        },
+      });
+      response.send(statusCodes.NO_CONTENT);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
