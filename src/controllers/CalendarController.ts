@@ -3,6 +3,8 @@ import express, { NextFunction, Request, Response } from 'express';
 import { statusCodes } from '../libs/statusCodes';
 import { initializeCalendarRoutes } from '../routes/CalendarRoutes';
 
+import OAuth2Controller from './OAuth2Controller';
+
 class CalendarController {
   public _urlPath = '/calendar';
   public _router = express.Router();
@@ -16,7 +18,7 @@ class CalendarController {
       const allCalendarConfigs = [
         {
           actionGroupId: 'GOOGLE_CAL',
-          authConfig: { authURL: 'https://mexit-backend-staging.workduck.io/api/v1/oauth/google' },
+          authConfig: { authURL: await OAuth2Controller.getGoogleCalendarAuthUrl() },
           icon: 'logos:google-calendar',
           connected: false,
           name: 'Google Calendar',

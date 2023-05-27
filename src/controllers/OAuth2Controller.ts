@@ -13,7 +13,7 @@ class OAuth2Controller {
   public _router = express.Router();
 
   private _gotClient: GotClient = container.get<GotClient>(GotClient);
-  private _oauth2Client: OAuth2Client;
+  private static _oauth2Client: OAuth2Client;
 
   private static readonly redirectUri = IS_DEV
     ? 'http://localhost:5002/api/v1/oauth2/google'
@@ -29,7 +29,7 @@ class OAuth2Controller {
     if (!process.env.MEXIT_BACKEND_GOOGLE_CLIENT_ID) throw new Error('Client Id Not Provided');
     if (!process.env.MEXIT_BACKEND_GOOGLE_CLIENT_SECRET) throw new Error('Client Secret Not Provided');
 
-    this._oauth2Client = new OAuth2Client({
+    OAuth2Controller._oauth2Client = new OAuth2Client({
       clientId: process.env.MEXIT_BACKEND_GOOGLE_CLIENT_ID,
       clientSecret: process.env.MEXIT_BACKEND_GOOGLE_CLIENT_SECRET,
       redirectUri: OAuth2Controller.redirectUri,
@@ -79,7 +79,7 @@ class OAuth2Controller {
     const code = request.query.code;
 
     try {
-      const { tokens } = await this._oauth2Client.getToken(code.toString());
+      const { tokens } = await OAuth2Controller._oauth2Client.getToken(code.toString());
 
       response
         .set('Content-Type', 'text/html')
@@ -116,25 +116,25 @@ class OAuth2Controller {
 
   getGoogleCalendarScopeAuth = async (request: Request, response: Response): Promise<any> => {
     try {
-      const scopes = [
-        'email',
-        'https://www.googleapis.com/auth/calendar',
-        'https://www.googleapis.com/auth/calendar.readonly',
-        'https://www.googleapis.com/auth/calendar.events',
-        'https://www.googleapis.com/auth/userinfo.profile',
-        'https://www.googleapis.com/auth/plus.login',
-      ];
-      const googleAuthUrl = await this.getGoogleAuthUrl(scopes);
+      const googleAuthUrl = await OAuth2Controller.getGoogleCalendarAuthUrl();
       response.send(googleAuthUrl).status(200);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
 
-  private getGoogleAuthUrl(scopes: string[]) {
+  static getGoogleCalendarAuthUrl(): Promise<string> {
+    const scopes = [
+      'email',
+      'https://www.googleapis.com/auth/calendar',
+      'https://www.googleapis.com/auth/calendar.readonly',
+      'https://www.googleapis.com/auth/calendar.events',
+      'https://www.googleapis.com/auth/userinfo.profile',
+      'https://www.googleapis.com/auth/plus.login',
+    ];
     return new Promise((resolve, reject) => {
       try {
-        const authorizeUrl = this._oauth2Client.generateAuthUrl({
+        const authorizeUrl = OAuth2Controller._oauth2Client.generateAuthUrl({
           access_type: 'offline',
           prompt: 'consent',
           scope: scopes.join(' '),
