@@ -17,8 +17,12 @@ class OAuth2Controller {
 
   private static readonly redirectUri = IS_DEV
     ? 'http://localhost:5002/api/v1/oauth2/google'
-    : 'https://mex-webapp-dev.workduck.io/api/v1/oauth2/google';
+    : 'https://mexit-backend-test.workduck.io/api/v1/oauth2/google';
   private static readonly googleOAuthTokenUrl = 'https://www.googleapis.com/oauth2/v4/token';
+
+  private static readonly FRONTEND_REDIRECT = IS_DEV
+    ? 'http://localhost:3333/oauth'
+    : 'https://mexit.workduck.io/oauth';
 
   constructor() {
     initializeOAuth2Routes(this);
@@ -85,7 +89,7 @@ class OAuth2Controller {
         .set('Content-Type', 'text/html')
         .send(
           Buffer.from(
-            `<html lang="en"><head><meta charset="UTF-8"><title>Auth Success</title> <script>window.location.href="mex://redirect?access_token=${tokens.access_token}&id_token=${tokens.id_token}&refresh_token=${tokens.refresh_token}&type=calendar_google"; window.close()</script></head><body><p>Please return to the mex app...</p></body></html>`
+            `<html lang="en"><head><meta charset="UTF-8"><title>Auth Success</title> <script>window.location.href="${OAuth2Controller.FRONTEND_REDIRECT}/google_cal?access_token=${tokens.access_token}&id_token=${tokens.id_token}&refresh_token=${tokens.refresh_token}";</script></head><body><p>Please return to the mex app...</p></body></html>`
           )
         )
         .status(200);
