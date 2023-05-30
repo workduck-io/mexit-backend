@@ -21,7 +21,7 @@ export class GotClient {
   private _client = got.extend(this._gotConfig);
   // private _memGot = mem(this._client, { cache: this._cache });
 
-  async request(url: string, options: OptionsOfJSONResponseBody): Promise<GotResponse<any>> {
-    return await this._client(url, options).json();
+  async request(url: string, options: OptionsOfJSONResponseBody): Promise<any> {
+    return await this._client.post(url, options).json();
   }
 }

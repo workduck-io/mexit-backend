@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import { OAuth2Client } from 'google-auth-library';
+import { STATUS_CODES } from 'http';
 
 import { IS_DEV } from '../env';
 import container from '../inversify.config';
@@ -65,15 +66,16 @@ class OAuth2Controller {
       const result = await this._gotClient.request(OAuth2Controller.googleOAuthTokenUrl, {
         json: payload,
       });
+
       //Update the new access token in auth service
-      const newAccessToken = result.body.access_token;
-      const expiryTime = result.body.expires_in;
+      const newAccessToken = result.access_token;
+      const expiryTime = result.expires_in;
       await response.locals.invoker('refreshAuth', {
         payload: { serviceUserId: userId, accessToken: newAccessToken, expiryTime },
         pathParameters: { source: 'googlecalendar' },
       });
 
-      response.status(statusCodes.OK).json({ data: result.body, status: result.statusCode });
+      response.status(statusCodes.OK).json({ accessToken: result.access_token, status: STATUS_CODES.OK });
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
