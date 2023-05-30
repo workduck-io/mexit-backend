@@ -1315,7 +1315,6 @@
             "required": [
                 "accessToken",
                 "email",
-                "expiresIn",
                 "refreshToken"
             ],
             "type": "object"

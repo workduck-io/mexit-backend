@@ -96,16 +96,16 @@ class OAuth2Controller {
 
   persistAuth = async (request: Request, response: Response): Promise<void> => {
     try {
-      const { accessToken, email, expiresIn, refreshToken } = new RequestClass(request, 'PersistAuthToken').data;
+      const req = new RequestClass(request, 'PersistAuthToken').data;
       // Persist the tokens in the auth service
       await response.locals.invoker('createUserAuth', {
         pathParameters: { source: 'googlecalendar' },
         queryStringParameters: {
           state: `DUMMY_WORKSPACE:${response.locals.userIdRaw}`,
-          access_token: accessToken,
-          refresh_token: refreshToken,
-          email: email,
-          expires_in: expiresIn,
+          access_token: req.accessToken,
+          refresh_token: req.refreshToken,
+          email: req.email,
+          ...(req.expiresIn && { expires_in: req.expiresIn }),
         },
       });
       response.send(statusCodes.NO_CONTENT);
