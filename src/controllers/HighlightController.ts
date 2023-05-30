@@ -22,7 +22,7 @@ class HighlightController {
       const requestPayload = new RequestClass(request, 'HighlightRequest').data;
 
       const highlightId = await response.locals.invoker('CreateHighlight', {
-        payload: { ...requestPayload },
+        payload: { ...requestPayload, type: 'EntityTypeRequest' },
         ...(parentID && { queryStringParameters: { parentID } }),
       });
 
@@ -43,7 +43,7 @@ class HighlightController {
       const id = request.params.id;
 
       await response.locals.invoker('UpdateHighlight', {
-        payload: { ...body },
+        payload: { ...body, type: 'EntityTypeRequest' },
         pathParameters: { id: id },
       });
 

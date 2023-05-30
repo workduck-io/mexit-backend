@@ -992,17 +992,8 @@
                         "nodeID"
                     ],
                     "type": "object"
-                },
-                "type": {
-                    "enum": [
-                        "EntityTypeRequest"
-                    ],
-                    "type": "string"
                 }
             },
-            "required": [
-                "type"
-            ],
             "type": "object"
         },
         "ILink": {
@@ -1577,17 +1568,10 @@
                         "nodeID"
                     ],
                     "type": "object"
-                },
-                "type": {
-                    "enum": [
-                        "EntityTypeRequest"
-                    ],
-                    "type": "string"
                 }
             },
             "required": [
-                "data",
-                "type"
+                "data"
             ],
             "type": "object"
         },

@@ -39,7 +39,7 @@ class SmartCaptureController {
       const body = new RequestClass(request, 'SmartCaptureRequest').data;
 
       const captureResult = await response.locals.invoker('createSmartCapture', {
-        payload: { ...body },
+        payload: { ...body, type: 'EntityTypeRequest' },
       });
 
       response.status(statusCodes.OK).json(captureResult);
@@ -57,7 +57,7 @@ class SmartCaptureController {
       const id = request.params.id;
 
       await response.locals.invoker('createSmartCapture', {
-        payload: { ...body },
+        payload: { ...body, type: 'EntityTypeRequest' },
         pathParameters: { id: id },
       });
 
