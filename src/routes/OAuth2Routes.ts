@@ -8,6 +8,7 @@ export const initializeOAuth2Routes = (oAuth2Object: OAuth2Controller): void => 
     [AuthRequest],
     oAuth2Object.getNewAccessToken
   );
+  oAuth2Object._router.get(`${oAuth2Object._urlPath}/auth`, [AuthRequest], oAuth2Object.getAuth);
   oAuth2Object._router.get(
     `${oAuth2Object._urlPath}/getGoogleAuthUrl`,
     [AuthRequest],

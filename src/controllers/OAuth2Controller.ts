@@ -24,6 +24,7 @@ class OAuth2Controller {
   private static readonly FRONTEND_REDIRECT = IS_DEV
     ? 'http://localhost:3333/oauth'
     : 'https://mexit.workduck.io/oauth';
+  private static readonly GOOGLE_CALENDAR_OAUTH = 'GOOGLE_CALENDAR_OAUTH';
 
   constructor() {
     initializeOAuth2Routes(this);
@@ -46,7 +47,7 @@ class OAuth2Controller {
       const userId = response.locals.userIdRaw;
       //Fetch the refresh token from auth service
       const storedAuth = await response.locals.invoker('getAuth', {
-        pathParameters: { authTypeId: 'GOOGLECALENDAR_OAUTH' },
+        pathParameters: { authTypeId: OAuth2Controller.GOOGLE_CALENDAR_OAUTH },
         queryStringParameters: {
           userId,
         },
@@ -115,6 +116,22 @@ class OAuth2Controller {
         },
       });
       response.send(statusCodes.NO_CONTENT);
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
+    }
+  };
+
+  getAuth = async (request: Request, response: Response): Promise<void> => {
+    try {
+      const userId = response.locals.userIdRaw;
+      const storedAuth = await response.locals.invoker('getAuth', {
+        pathParameters: { authTypeId: OAuth2Controller.GOOGLE_CALENDAR_OAUTH },
+        queryStringParameters: {
+          userId,
+        },
+      });
+      if (!storedAuth) throw new Error('Token missing in auth service');
+      response.status(statusCodes.OK).json(storedAuth);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
