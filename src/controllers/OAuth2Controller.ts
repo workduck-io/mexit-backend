@@ -112,7 +112,8 @@ class OAuth2Controller {
           access_token: req.accessToken,
           refresh_token: req.refreshToken,
           email: req.email,
-          ...(req.expiresIn && { expires_in: req.expiresIn }),
+          // Defaulting the expiry for google_cal
+          expires_in: 0,
         },
       });
       response.send(statusCodes.NO_CONTENT);
