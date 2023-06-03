@@ -64,6 +64,7 @@ class OAuth2Controller {
         refresh_token: refreshToken,
         grant_type: 'refresh_token',
       };
+
       const result = await this._gotClient.request(OAuth2Controller.googleOAuthTokenUrl, {
         json: payload,
       });
@@ -131,8 +132,8 @@ class OAuth2Controller {
           userId,
         },
       });
-      if (!storedAuth) throw new Error('Token missing in auth service');
-      response.status(statusCodes.OK).json(storedAuth);
+
+      response.status(statusCodes.OK).json(storedAuth ?? {});
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
