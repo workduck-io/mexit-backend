@@ -9,6 +9,7 @@ import express from 'express';
 
 import ActionController from './controllers/ActionController';
 import BookmarkController from './controllers/BookmarkController';
+import CalendarController from './controllers/CalendarController';
 import CommentController from './controllers/CommentController';
 import HealthCheckController from './controllers/HealthCheckController';
 import HighlightController from './controllers/HighlightController';
@@ -110,7 +111,8 @@ const application = new App([
   new LochController(),
   new ActionController(),
   new PromptController(),
-  new WorkspaceController()
+  new WorkspaceController(),
+  new CalendarController(),
 ]);
 
 application.build();

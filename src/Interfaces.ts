@@ -1,6 +1,6 @@
 import { AuthorizeRefreshTokenType, AuthorizeType } from './interfaces/Auth';
 import { GenericObjectType, GenericType } from './interfaces/Generics';
-import { GoogleAuthRefreshToken } from './interfaces/GoogleService';
+import { PersistAuthToken } from './interfaces/GoogleService';
 import {
   ActivityNodeDetail,
   ArchiveNodeDetail,
@@ -116,7 +116,7 @@ export default class Interfaces implements Definitions {
   UserPreference: UserPreference;
   User: User;
   InviteProperties: InviteProperties;
-  GoogleAuthRefreshToken: GoogleAuthRefreshToken;
+  PersistAuthToken: PersistAuthToken;
   ILink: ILink;
   SnippetUpdate: SnippetUpdate;
   SnippetUpdateVersionRequest: SnippetUpdateVersionRequest;

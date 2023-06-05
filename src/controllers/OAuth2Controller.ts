@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import { OAuth2Client } from 'google-auth-library';
+import { STATUS_CODES } from 'http';
 
 import { IS_DEV } from '../env';
 import container from '../inversify.config';
@@ -13,12 +14,17 @@ class OAuth2Controller {
   public _router = express.Router();
 
   private _gotClient: GotClient = container.get<GotClient>(GotClient);
-  private _oauth2Client: OAuth2Client;
+  private static _oauth2Client: OAuth2Client;
 
   private static readonly redirectUri = IS_DEV
     ? 'http://localhost:5002/api/v1/oauth2/google'
-    : 'https://mex-webapp-dev.workduck.io/api/v1/oauth2/google';
+    : 'https://mexit-backend-test.workduck.io/api/v1/oauth2/google';
   private static readonly googleOAuthTokenUrl = 'https://www.googleapis.com/oauth2/v4/token';
+
+  private static readonly FRONTEND_REDIRECT = IS_DEV
+    ? 'http://localhost:3333/oauth'
+    : 'https://mexit.workduck.io/oauth';
+  private static readonly GOOGLE_CALENDAR_OAUTH = 'GOOGLE_CALENDAR_OAUTH';
 
   constructor() {
     initializeOAuth2Routes(this);
@@ -29,7 +35,7 @@ class OAuth2Controller {
     if (!process.env.MEXIT_BACKEND_GOOGLE_CLIENT_ID) throw new Error('Client Id Not Provided');
     if (!process.env.MEXIT_BACKEND_GOOGLE_CLIENT_SECRET) throw new Error('Client Secret Not Provided');
 
-    this._oauth2Client = new OAuth2Client({
+    OAuth2Controller._oauth2Client = new OAuth2Client({
       clientId: process.env.MEXIT_BACKEND_GOOGLE_CLIENT_ID,
       clientSecret: process.env.MEXIT_BACKEND_GOOGLE_CLIENT_SECRET,
       redirectUri: OAuth2Controller.redirectUri,
@@ -38,17 +44,40 @@ class OAuth2Controller {
 
   getNewAccessToken = async (request: Request, response: Response): Promise<void> => {
     try {
-      const requestDetail = new RequestClass(request, 'GoogleAuthRefreshToken');
+      const userId = response.locals.userIdRaw;
+      //Fetch the refresh token from auth service
+      const storedAuth = await response.locals.invoker('getAuth', {
+        pathParameters: { authTypeId: OAuth2Controller.GOOGLE_CALENDAR_OAUTH },
+        queryStringParameters: {
+          userId,
+        },
+      });
+
+      if (!storedAuth) throw new Error('Token missing in auth service');
+
+      const itemValues: any = Object.values(storedAuth.auth[0])[0];
+      const refreshToken = itemValues.authData.refreshToken as string;
+
       const payload = {
         client_id: process.env.MEXIT_BACKEND_GOOGLE_CLIENT_ID,
         client_secret: process.env.MEXIT_BACKEND_GOOGLE_CLIENT_SECRET,
-        refresh_token: requestDetail.data.refreshToken,
+        refresh_token: refreshToken,
         grant_type: 'refresh_token',
       };
+
       const result = await this._gotClient.request(OAuth2Controller.googleOAuthTokenUrl, {
         json: payload,
       });
-      response.status(statusCodes.OK).json({ data: result.body, status: result.statusCode });
+
+      //Update the new access token in auth service
+      const newAccessToken = result.access_token;
+      const expiryTime = result.expires_in;
+      await response.locals.invoker('refreshAuth', {
+        payload: { serviceUserId: userId, accessToken: newAccessToken, expiryTime },
+        pathParameters: { source: 'googlecalendar' },
+      });
+
+      response.status(statusCodes.OK).json({ accessToken: result.access_token, status: STATUS_CODES.OK });
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
@@ -56,14 +85,15 @@ class OAuth2Controller {
 
   extractTokenFromCode = async (request: Request, response: Response): Promise<void> => {
     const code = request.query.code;
+
     try {
-      const { tokens } = await this._oauth2Client.getToken(code.toString());
-      // TODO: store this refresh token into the auth service
+      const { tokens } = await OAuth2Controller._oauth2Client.getToken(code.toString());
+
       response
         .set('Content-Type', 'text/html')
         .send(
           Buffer.from(
-            `<html lang="en"><head><meta charset="UTF-8"><title>Auth Success</title> <script>window.location.href="mex://redirect?access_token=${tokens.access_token}&id_token=${tokens.id_token}&refresh_token=${tokens.refresh_token}&type=calendar_google"; window.close()</script></head><body><p>Please return to the mex app...</p></body></html>`
+            `<html lang="en"><head><meta charset="UTF-8"><title>Auth Success</title> <script>window.location.href="${OAuth2Controller.FRONTEND_REDIRECT}/google_cal?access_token=${tokens.access_token}&id_token=${tokens.id_token}&refresh_token=${tokens.refresh_token}";</script></head><body><p>Please return to the mex app...</p></body></html>`
           )
         )
         .status(200);
@@ -72,27 +102,64 @@ class OAuth2Controller {
     }
   };
 
+  persistAuth = async (request: Request, response: Response): Promise<void> => {
+    try {
+      const req = new RequestClass(request, 'PersistAuthToken').data;
+      // Persist the tokens in the auth service
+      await response.locals.invoker('createUserAuth', {
+        pathParameters: { source: 'googlecalendar' },
+        queryStringParameters: {
+          state: `DUMMY_WORKSPACE:${response.locals.userIdRaw}`,
+          access_token: req.accessToken,
+          refresh_token: req.refreshToken,
+          email: req.email,
+          // Defaulting the expiry for google_cal
+          expires_in: 0,
+        },
+      });
+      response.send(statusCodes.NO_CONTENT);
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
+    }
+  };
+
+  getAuth = async (request: Request, response: Response): Promise<void> => {
+    try {
+      const userId = response.locals.userIdRaw;
+      const storedAuth = await response.locals.invoker('getAuth', {
+        pathParameters: { authTypeId: OAuth2Controller.GOOGLE_CALENDAR_OAUTH },
+        queryStringParameters: {
+          userId,
+        },
+      });
+
+      response.status(statusCodes.OK).json(storedAuth ?? {});
+    } catch (error) {
+      response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
+    }
+  };
+
   getGoogleCalendarScopeAuth = async (request: Request, response: Response): Promise<any> => {
     try {
-      const scopes = [
-        'email',
-        'https://www.googleapis.com/auth/calendar',
-        'https://www.googleapis.com/auth/calendar.readonly',
-        'https://www.googleapis.com/auth/calendar.events',
-        'https://www.googleapis.com/auth/userinfo.profile',
-        'https://www.googleapis.com/auth/plus.login',
-      ];
-      const googleAuthUrl = await this.getGoogleAuthUrl(scopes);
+      const googleAuthUrl = await OAuth2Controller.getGoogleCalendarAuthUrl();
       response.send(googleAuthUrl).status(200);
     } catch (error) {
       response.status(statusCodes.INTERNAL_SERVER_ERROR).send(error).json();
     }
   };
 
-  private getGoogleAuthUrl(scopes: string[]) {
+  static getGoogleCalendarAuthUrl(): Promise<string> {
+    const scopes = [
+      'email',
+      'https://www.googleapis.com/auth/calendar',
+      'https://www.googleapis.com/auth/calendar.readonly',
+      'https://www.googleapis.com/auth/calendar.events',
+      'https://www.googleapis.com/auth/userinfo.profile',
+      'https://www.googleapis.com/auth/plus.login',
+    ];
     return new Promise((resolve, reject) => {
       try {
-        const authorizeUrl = this._oauth2Client.generateAuthUrl({
+        const authorizeUrl = OAuth2Controller._oauth2Client.generateAuthUrl({
           access_type: 'offline',
           prompt: 'consent',
           scope: scopes.join(' '),

@@ -954,17 +954,6 @@
             ],
             "type": "string"
         },
-        "GoogleAuthRefreshToken": {
-            "properties": {
-                "refreshToken": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "refreshToken"
-            ],
-            "type": "object"
-        },
         "HighlightRequest": {
             "properties": {
                 "data": {
@@ -1305,6 +1294,28 @@
                 "updatedAt",
                 "version",
                 "workspaceIdentifier"
+            ],
+            "type": "object"
+        },
+        "PersistAuthToken": {
+            "properties": {
+                "accessToken": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "expiresIn": {
+                    "type": "number"
+                },
+                "refreshToken": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "accessToken",
+                "email",
+                "refreshToken"
             ],
             "type": "object"
         },
