@@ -320,6 +320,17 @@ class NodeController {
       );
 
       const { node, changedPaths } = bulkCreateResp;
+
+      const data2 = response.locals.invoker('WebsocketUpdate', {
+        payload: {
+          workspaceId: response.locals.workspaceID,
+          userId: response.locals.userId,
+          data: {
+            ...changedPaths
+          }
+        }
+      })
+
       //TODO: Make part of TransformClass
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { data, dataOrder, ...rest } = node; //Dont relay data to frontend

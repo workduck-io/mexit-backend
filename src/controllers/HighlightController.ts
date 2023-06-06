@@ -26,6 +26,13 @@ class HighlightController {
         ...(parentID && { queryStringParameters: { parentID } }),
       });
 
+      response.locals.invoker('WebsocketUpdate', {
+        payload: {
+          workspaceId: response.locals.workspaceID,
+          userId: response.locals.userId,
+          data: highlightId
+        }
+      })
       response.status(statusCodes.OK).json(highlightId);
       const highlight = { id: highlightId, ...requestPayload };
 
@@ -89,10 +96,10 @@ class HighlightController {
 
       const lambdaResponse = !nonCachedIds.isEmpty()
         ? (
-            await response.locals.invoker('GetHighlightsByIds', {
-              payload: { ids: nonCachedIds },
-            })
-          ).items
+          await response.locals.invoker('GetHighlightsByIds', {
+            payload: { ids: nonCachedIds },
+          })
+        ).items
         : [];
 
       response.status(statusCodes.OK).json([...lambdaResponse, ...cachedHits]);
