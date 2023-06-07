@@ -104,10 +104,16 @@ class HighlightController {
 
   getAllHighlightsOfWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = (await response.locals.invoker('GetAllHighlightsOfWorkspace')).items;
+      const queryParams = {
+        lastKey: request.query['lastKey'] as string,
+      };
+
+      const result = await response.locals.invoker('GetAllHighlightsOfWorkspace', {
+        queryStringParameters: { ...(queryParams && queryParams) },
+      });
 
       response.status(statusCodes.OK).json(result);
-      await this._redisCache.mset(result.toObject('id', JSON.stringify));
+      await this._redisCache.mset(result.items.toObject('id', JSON.stringify));
     } catch (error) {
       next(error);
     }
