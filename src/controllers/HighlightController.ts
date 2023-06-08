@@ -26,16 +26,18 @@ class HighlightController {
         ...(parentID && { queryStringParameters: { parentID } }),
       });
 
-      response.locals.invoker('WebsocketUpdate', {
+
+      response.status(statusCodes.OK).json(highlightId);
+
+      const highlight = { id: highlightId, ...requestPayload };
+      await response.locals.broadcaster({
+        operationType: 'CREATE',
+        entityId: highlightId,
+        entityType: 'HIHGLIGHT',
         payload: {
-          workspaceId: response.locals.workspaceID,
-          userId: response.locals.userId,
-          data: highlightId
+          data: highlight
         }
       })
-      response.status(statusCodes.OK).json(highlightId);
-      const highlight = { id: highlightId, ...requestPayload };
-
       // set only if the body contains the data field
       // this case is for the instance duplication
       if (requestPayload.data) await this._redisCache.set(highlightId, highlight.data);

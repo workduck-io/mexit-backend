@@ -4,13 +4,14 @@ import { NextFunction, Request, Response } from 'express';
 // eslint-disable-next-line
 import Config from '../config.json';
 import { IS_DEV } from '../env';
+import { BroadcastMessage } from '../interfaces/Broadcast';
 import container from '../inversify.config';
 import { errorlib } from '../libs/errorlib';
 import { GotClient } from '../libs/GotClientClass';
 import { invokeAndCheck } from '../libs/LambdaInvoker';
 import { Destination, RouteKeys } from '../libs/routeKeys';
 import { statusCodes } from '../libs/statusCodes';
-import { generateInvokePayload, getPathFromPathParameters, InvokePayloadOptions } from '../utils/generatePayload';
+import { generateInvokePayload, getPathFromPathParameters,InvokePayloadOptions } from '../utils/generatePayload';
 import { LocalsX } from '../utils/Locals';
 
 const APIClient = container.get<GotClient>(GotClient);
@@ -37,7 +38,12 @@ const lambdaInvoker = async <T = any>(
           },
           route
         );
-        return invokeAndCheck(functionName, 'RequestResponse', invokePayload, options?.sendRawBody ?? false);
+        return invokeAndCheck(
+          functionName,
+          options.invocationType ?? 'RequestResponse',
+          invokePayload,
+          options?.sendRawBody ?? false
+        );
       });
 
       return await Promise.allSettled(promises);
@@ -110,6 +116,26 @@ async function InvokeLambda(req: Request, res: Response, next: NextFunction): Pr
   next();
 }
 
+async function BroadcastLambda(req: Request, res: Response, next: NextFunction): Promise<void> {
+  res.locals.broadcaster = async (message: BroadcastMessage): Promise<any> => {
+    return await lambdaInvoker('WebsocketUpdate', res.locals, {
+      invocationType: 'Event',
+      payload: {
+        workspaceId: res.locals.workspaceID,
+        userId: res.locals.userId,
+        data: {
+          payload: message.payload,
+          operationType: message.operationType,
+          entityType: message.entityType,
+          entityId: message.entityId,
+        },
+      },
+    });
+  };
+
+  next();
+}
+
 const globalInvoker = async <T = any>(
   routeKey: keyof typeof RouteKeys,
   locals: LocalsX,
@@ -124,4 +150,4 @@ const globalInvoker = async <T = any>(
   }
 };
 
-export { globalInvoker, InvokeLambda };
+export { BroadcastLambda,globalInvoker, InvokeLambda };

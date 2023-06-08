@@ -43,6 +43,16 @@ class NodeController {
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { data, ...rest } = nodeResult; //Dont relay data to frontend
+      await response.locals.broadcaster({
+        operationType: 'CREATE',
+        entityType: 'NODE',
+        entityId: body.id,
+        payload: {
+          data: body
+        }
+      })
+
+
       response.status(statusCodes.OK).json(rest);
 
       await this.clearILinkCache(response.locals, body.namespaceID);
@@ -321,15 +331,15 @@ class NodeController {
 
       const { node, changedPaths } = bulkCreateResp;
 
-      const data2 = response.locals.invoker('WebsocketUpdate', {
+      await response.locals.broadcaster({
+        operationType: 'CREATE',
+        entityType: 'NODE',
+        entityId: body.id,
         payload: {
-          workspaceId: response.locals.workspaceID,
-          userId: response.locals.userId,
-          data: {
-            ...changedPaths
-          }
+          data: body
         }
       })
+
 
       //TODO: Make part of TransformClass
       // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -1,11 +1,11 @@
 import { fromUtf8, toUtf8 } from '@aws-sdk/util-utf8-node';
 
+import { InvocationType } from '@aws-sdk/client-lambda';
 import { WDError } from '@workduck-io/wderror';
 import { JSONX } from '../utils/JSONX';
 import LambdaConfig from './InvokeLambda';
 import { statusCodes } from './statusCodes';
 
-type InvocationType = 'RequestResponse' | 'Event';
 type InvocationSource = 'Direct' | 'APIGateway';
 
 export interface LambdaInvokeOptions {
@@ -35,23 +35,23 @@ async function invoke(
               invocationSource === 'Direct'
                 ? options.payload
                 : {
-                    ...(options.pathParameters && {
-                      pathParameters: options.pathParameters,
-                    }),
-                    ...(options.payload && {
-                      body: sendRawBody ? options.payload : JSONX.stringify(options.payload),
-                    }),
-                    routeKey: options.routeKey,
-                    ...(options.queryStringParameters && {
-                      queryStringParameters: options.queryStringParameters,
-                    }),
-                    ...{
-                      headers: options.headers,
-                    },
-                    ...(options.httpMethod && {
-                      httpMethod: options.httpMethod,
-                    }),
-                  }
+                  ...(options.pathParameters && {
+                    pathParameters: options.pathParameters,
+                  }),
+                  ...(options.payload && {
+                    body: sendRawBody ? options.payload : JSONX.stringify(options.payload),
+                  }),
+                  routeKey: options.routeKey,
+                  ...(options.queryStringParameters && {
+                    queryStringParameters: options.queryStringParameters,
+                  }),
+                  ...{
+                    headers: options.headers,
+                  },
+                  ...(options.httpMethod && {
+                    httpMethod: options.httpMethod,
+                  }),
+                }
             )
           ),
           InvocationType: invocationType,

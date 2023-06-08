@@ -33,7 +33,7 @@ import logger from './libs/logger';
 import { Redis } from './libs/RedisClass';
 import expressListRoutes, { COLORS, colorText } from './libs/routeList';
 import { asyncHandler } from './middlewares/asyncHandler';
-import { InvokeLambda } from './middlewares/invoker';
+import { BroadcastLambda, InvokeLambda } from './middlewares/invoker';
 import { jsonErrorHandler } from './middlewares/jsonerrorhandler';
 import { LogRequest } from './middlewares/logrequest';
 import responseErrorHandler from './middlewares/responseErrorHandler';
@@ -65,7 +65,8 @@ class App {
       express.json({ reviver: parseReviver }),
       LogRequest,
       wdRequestIdExpressParser,
-      asyncHandler(InvokeLambda)
+      asyncHandler(InvokeLambda),
+      asyncHandler(BroadcastLambda)
     );
   }
 
