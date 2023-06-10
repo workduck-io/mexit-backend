@@ -23,9 +23,8 @@ class NodeController {
     initializeNodeRoutes(this);
   }
 
-  updateILinkCache = async (locals: LocalsX, namespaceID: string): Promise<any> => {
-    const namespace = await locals.invoker('getNamespace', { pathParameters: { id: namespaceID } }, 'APIGateway');
-    await this._redisCache.set(namespaceID, namespace);
+  clearILinkCache = async (locals: LocalsX, namespaceID: string): Promise<any> => {
+    await this._redisCache.del(namespaceID);
   };
 
   createNode = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
@@ -46,7 +45,7 @@ class NodeController {
       const { data, ...rest } = nodeResult; //Dont relay data to frontend
       response.status(statusCodes.OK).json(rest);
 
-      await this.updateILinkCache(response.locals, body.namespaceID);
+      await this.clearILinkCache(response.locals, body.namespaceID);
     } catch (error) {
       next(error);
     }
@@ -236,9 +235,9 @@ class NodeController {
         'APIGateway'
       );
 
+      await this.clearILinkCache(response.locals, namespaceID);
       response.status(statusCodes.OK).json(archiveNodeResult);
 
-      await this.updateILinkCache(response.locals, namespaceID);
     } catch (error) {
       next(error);
     }
@@ -301,10 +300,8 @@ class NodeController {
       const { changedPaths } = refactorResp;
       const parsedChangedPathsRefactor = this._transformer.refactoredPathsHierarchyParser(changedPaths);
 
+      await this._redisCache.mdel([body.existingNodePath.namespaceID, body.newNodePath.namespaceID]);
       response.status(statusCodes.OK).json({ changedPaths: parsedChangedPathsRefactor });
-
-      await this.updateILinkCache(response.locals, body.existingNodePath.namespaceID);
-      await this.updateILinkCache(response.locals, body.newNodePath.namespaceID);
     } catch (error) {
       next(error);
     }
@@ -328,9 +325,9 @@ class NodeController {
       const { data, dataOrder, ...rest } = node; //Dont relay data to frontend
       const parsedChangedPathsRefactor = this._transformer.refactoredPathsHierarchyParser(changedPaths);
 
+      await this.clearILinkCache(response.locals, body.nodePath.namespaceID);
       response.status(statusCodes.OK).json({ node: rest, changedPaths: parsedChangedPathsRefactor });
 
-      await this.updateILinkCache(response.locals, body.nodePath.namespaceID);
     } catch (error) {
       next(error);
     }
