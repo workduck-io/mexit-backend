@@ -66,6 +66,7 @@ class OAuth2Controller {
       };
 
       const result = await this._gotClient.request(OAuth2Controller.googleOAuthTokenUrl, {
+        method: 'POST',
         json: payload,
       });
 
