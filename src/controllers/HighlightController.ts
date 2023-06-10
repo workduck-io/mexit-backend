@@ -108,12 +108,14 @@ class HighlightController {
         lastKey: request.query['lastKey'] as string,
       };
 
-      const result = await response.locals.invoker('GetAllHighlightsOfWorkspace', {
-        queryStringParameters: { ...(queryParams && queryParams) },
-      });
+      const result = (
+        await response.locals.invoker('GetAllHighlightsOfWorkspace', {
+          queryStringParameters: { ...(queryParams && queryParams) },
+        })
+      ).items;
 
       response.status(statusCodes.OK).json(result);
-      await this._redisCache.mset(result.items.toObject('id', JSON.stringify));
+      await this._redisCache.mset(result.toObject('id', JSON.stringify));
     } catch (error) {
       next(error);
     }
