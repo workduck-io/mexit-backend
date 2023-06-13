@@ -7,7 +7,6 @@ import { Redis } from '../libs/RedisClass';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
-import { globalInvoker } from '../middlewares/invoker';
 import { initializeNodeRoutes } from '../routes/NodeRoutes';
 import { LocalsX } from '../utils/Locals';
 
@@ -100,12 +99,16 @@ class NodeController {
 
       const lambdaResponse = { successful: [], failed: [] };
       if (!nonCachedIds.isEmpty()) {
-        const rawLambdaResp = await globalInvoker('GetMultipleNodes', response.locals, {
-          payload: { ids: nonCachedIds },
-          ...(namespaceID && {
-            queryStringParameters: { namespaceID: namespaceID },
-          }),
-        });
+        const rawLambdaResp = await response.locals.invoker(
+          'GetMultipleNodes',
+          {
+            payload: { ids: nonCachedIds },
+            ...(namespaceID && {
+              queryStringParameters: { namespaceID: namespaceID },
+            }),
+          },
+          'APIGateway'
+        );
         const fetchedIDs = new Set(rawLambdaResp.map(node => node.id));
         const failedIDs = nonCachedIds.filter(id => !fetchedIDs.has(id));
 
@@ -237,7 +240,6 @@ class NodeController {
 
       await this.clearILinkCache(response.locals, namespaceID);
       response.status(statusCodes.OK).json(archiveNodeResult);
-
     } catch (error) {
       next(error);
     }
@@ -327,7 +329,6 @@ class NodeController {
 
       await this.clearILinkCache(response.locals, body.nodePath.namespaceID);
       response.status(statusCodes.OK).json({ node: rest, changedPaths: parsedChangedPathsRefactor });
-
     } catch (error) {
       next(error);
     }

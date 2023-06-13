@@ -103,6 +103,16 @@ async function InvokeLambda(req: Request, res: Response, next: NextFunction): Pr
     invokerDestination: 'APIGateway' | 'Lambda' = 'Lambda'
   ): Promise<any> => {
     const useLambdaInvoker = IS_DEV && !forceAPIGatewayInvoker;
+    console.log('LOGG THIS');
+
+    console.log("I'll decide ", {
+      check: invokerDestination === 'Lambda' || useLambdaInvoker,
+      useLambdaInvoker,
+      invokerDestination,
+      forceAPIGatewayInvoker,
+      IS_DEV,
+    });
+
     if (invokerDestination === 'Lambda' || useLambdaInvoker) {
       return await lambdaInvoker(routeKey, res.locals, options);
     } else {
@@ -113,18 +123,4 @@ async function InvokeLambda(req: Request, res: Response, next: NextFunction): Pr
   next();
 }
 
-const globalInvoker = async <T = any>(
-  routeKey: keyof typeof RouteKeys,
-  locals: LocalsX,
-  options?: InvokePayloadOptions<T>,
-  invokerDestination: 'APIGateway' | 'Lambda' = 'Lambda'
-): Promise<any> => {
-  const useLambdaInvoker = IS_DEV && !forceAPIGatewayInvoker;
-  if (invokerDestination === 'Lambda' || useLambdaInvoker) {
-    return await lambdaInvoker(routeKey, locals, options);
-  } else {
-    return await gatewayInvoker(routeKey, locals, options);
-  }
-};
-
-export { globalInvoker, InvokeLambda };
+export { InvokeLambda };
