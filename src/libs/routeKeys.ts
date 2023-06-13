@@ -81,7 +81,7 @@ export const RouteKeys = {
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
   ArchiveNode: {
-    route: `PUT /node/archive/middleware`,
+    route: `PUT /node/archive`,
     APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
