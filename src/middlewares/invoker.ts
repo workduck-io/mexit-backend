@@ -78,6 +78,9 @@ const gatewayInvoker = async <T = any>(
 
     const path = options?.pathParameters ? getPathFromPathParameters(route, options.pathParameters) : route;
     const url = `${Config[APIGateway].url}/${path.split(' ')[1]}`;
+
+    console.log('URL IS ', { url, invokePayload });
+
     const response = await APIClient.request(url, invokePayload);
     return response;
   } catch (error) {
