@@ -7,7 +7,6 @@ import { Redis } from '../libs/RedisClass';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
-import { globalInvoker } from '../middlewares/invoker';
 import { initializeNodeRoutes } from '../routes/NodeRoutes';
 import { LocalsX } from '../utils/Locals';
 
@@ -43,11 +42,6 @@ class NodeController {
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { data, ...rest } = nodeResult; //Dont relay data to frontend
-      console.log({
-        operationType: 'CREATE',
-        entityType: 'NOTE',
-        entityId: body.id,
-      });
       await response.locals.broadcaster({
         operationType: 'CREATE',
         entityType: 'NOTE',
@@ -110,7 +104,7 @@ class NodeController {
 
       const lambdaResponse = { successful: [], failed: [] };
       if (!nonCachedIds.isEmpty()) {
-        const rawLambdaResp = await globalInvoker('GetMultipleNodes', response.locals, {
+        const rawLambdaResp = await response.locals.invoker('GetMultipleNodes', {
           payload: { ids: nonCachedIds },
           ...(namespaceID && {
             queryStringParameters: { namespaceID: namespaceID },

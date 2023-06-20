@@ -11,7 +11,7 @@ import { GotClient } from '../libs/GotClientClass';
 import { invokeAndCheck } from '../libs/LambdaInvoker';
 import { Destination, RouteKeys } from '../libs/routeKeys';
 import { statusCodes } from '../libs/statusCodes';
-import { generateInvokePayload, getPathFromPathParameters,InvokePayloadOptions } from '../utils/generatePayload';
+import { generateInvokePayload, getPathFromPathParameters, InvokePayloadOptions } from '../utils/generatePayload';
 import { LocalsX } from '../utils/Locals';
 
 const APIClient = container.get<GotClient>(GotClient);
@@ -118,7 +118,7 @@ async function InvokeLambda(req: Request, res: Response, next: NextFunction): Pr
 
 async function BroadcastLambda(req: Request, res: Response, next: NextFunction): Promise<void> {
   res.locals.broadcaster = async (message: BroadcastMessage): Promise<any> => {
-    return await lambdaInvoker('WebsocketUpdate', res.locals, {
+    return await lambdaInvoker('BroadcastUpdate', res.locals, {
       invocationType: 'Event',
       payload: {
         workspaceId: res.locals.workspaceID,
@@ -136,18 +136,4 @@ async function BroadcastLambda(req: Request, res: Response, next: NextFunction):
   next();
 }
 
-const globalInvoker = async <T = any>(
-  routeKey: keyof typeof RouteKeys,
-  locals: LocalsX,
-  options?: InvokePayloadOptions<T>,
-  invokerDestination: 'APIGateway' | 'Lambda' = 'Lambda'
-): Promise<any> => {
-  const useLambdaInvoker = IS_DEV && !forceAPIGatewayInvoker;
-  if (invokerDestination === 'Lambda' || useLambdaInvoker) {
-    return await lambdaInvoker(routeKey, locals, options);
-  } else {
-    return await gatewayInvoker(routeKey, locals, options);
-  }
-};
-
-export { BroadcastLambda,globalInvoker, InvokeLambda };
+export { BroadcastLambda, InvokeLambda };

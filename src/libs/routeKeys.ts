@@ -338,8 +338,15 @@ export const RouteKeys = {
     functionName: FunctionNames.Highlight,
     route: 'GET /v1/highlight/all',
   },
-  WebsocketUpdate: {
+
+  //Websocket endpoints
+  BroadcastUpdate: {
     functionName: `mex-realtime-update-service-${STAGE}-broadcastService`,
-    route: 'POST /'
-  }
+    route: 'POST /',
+  },
+  //Websocket endpoints
+  GetBroadcastEvents: {
+    functionName: `mex-realtime-update-service-${STAGE}-backupService`,
+    route: 'POST /backup',
+  },
 } satisfies Record<string, Destination>;

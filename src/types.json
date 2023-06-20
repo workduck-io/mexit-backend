@@ -199,6 +199,26 @@
             ],
             "type": "object"
         },
+        "BroadcastMessage": {
+            "properties": {
+                "entityId": {
+                    "type": "string"
+                },
+                "entityType": {
+                    "$ref": "types#/definitions/EntityType"
+                },
+                "operationType": {
+                    "$ref": "types#/definitions/OperationType"
+                },
+                "payload": {}
+            },
+            "required": [
+                "entityId",
+                "entityType",
+                "operationType"
+            ],
+            "type": "object"
+        },
         "BulkCreateNode": {
             "properties": {
                 "data": {
@@ -825,6 +845,21 @@
             },
             "type": "object"
         },
+        "EntityType": {
+            "enum": [
+                "CAPTURE",
+                "HIGHLIGHT",
+                "LINK",
+                "NAMESPACE",
+                "NOTE",
+                "PROMPT",
+                "SNIPPET",
+                "USER",
+                "VIEW",
+                "WORKSPACE"
+            ],
+            "type": "string"
+        },
         "Filter": {
             "properties": {
                 "id": {
@@ -932,6 +967,17 @@
                     ]
                 }
             ]
+        },
+        "GetBroadcastMessageRequest": {
+            "properties": {
+                "timestamp": {
+                    "type": "number"
+                }
+            },
+            "required": [
+                "timestamp"
+            ],
+            "type": "object"
         },
         "GetMultipleIds": {
             "properties": {
@@ -1296,6 +1342,14 @@
                 "workspaceIdentifier"
             ],
             "type": "object"
+        },
+        "OperationType": {
+            "enum": [
+                "CREATE",
+                "DELETE",
+                "UPDATE"
+            ],
+            "type": "string"
         },
         "PersistAuthToken": {
             "properties": {

@@ -206,3 +206,7 @@ export interface HighlightRequest extends BaseEntityRequest {
     properties: Record<string, any>;
   };
 }
+
+export interface GetBroadcastMessageRequest {
+  timestamp: number;
+}
