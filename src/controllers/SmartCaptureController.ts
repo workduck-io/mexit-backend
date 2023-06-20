@@ -41,10 +41,13 @@ class SmartCaptureController {
       const captureResult = await response.locals.invoker('createSmartCapture', {
         payload: { ...body, type: 'EntityTypeRequest' },
       });
-
       response.status(statusCodes.OK).json(captureResult);
-
       const capture = { id: captureResult, ...body };
+      await response.locals.broadcaster({
+        operationType: 'CREATE',
+        entityType: 'CAPTURE',
+        entityId: captureResult,
+      });
       await this._cache.set(captureResult, capture);
     } catch (error) {
       next(error);
@@ -59,6 +62,11 @@ class SmartCaptureController {
       await response.locals.invoker('createSmartCapture', {
         payload: { ...body, type: 'EntityTypeRequest' },
         pathParameters: { id: id },
+      });
+      await response.locals.broadcaster({
+        operationType: 'UPDATE',
+        entityType: 'CAPTURE',
+        entityId: id,
       });
 
       response.status(statusCodes.NO_CONTENT).send();
@@ -99,6 +107,12 @@ class SmartCaptureController {
       const id = request.params.id;
 
       await response.locals.invoker('deleteCapture', { pathParameters: { id: id } });
+      await response.locals.broadcaster({
+        operationType: 'DELETE',
+        entityType: 'CAPTURE',
+        entityId: id,
+      });
+
       response.status(statusCodes.NO_CONTENT).send();
 
       await this._cache.del(id);

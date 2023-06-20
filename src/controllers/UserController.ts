@@ -35,6 +35,11 @@ class UserController {
         payload: data,
         sendRawBody: true,
       });
+      await response.locals.broadcaster({
+        operationType: 'UPDATE',
+        entityType: 'USER',
+        entityId: userId,
+      });
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);

@@ -32,7 +32,11 @@ class SnippetController {
       });
 
       const deserialisedContent = this._transformer.genericNodeConverter(snippetResult, false);
-
+      await response.locals.broadcaster({
+        operationType: 'CREATE',
+        entityType: 'SNIPPET',
+        entityId: request.body.id,
+      });
       response.status(statusCodes.OK).json(deserialisedContent);
     } catch (error) {
       next(error);
@@ -226,7 +230,11 @@ class SnippetController {
         pathParameters: { id: snippetID },
         ...(version && { queryStringParameters: { version: version } }),
       });
-
+      await response.locals.broadcaster({
+        operationType: 'DELETE',
+        entityType: 'SNIPPET',
+        entityId: snippetID,
+      });
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
       next(error);
@@ -240,7 +248,11 @@ class SnippetController {
       await response.locals.invoker('deleteAllVersionsOfSnippet', {
         pathParameters: { id: snippetID },
       });
-
+      await response.locals.broadcaster({
+        operationType: 'DELETE',
+        entityType: 'SNIPPET',
+        entityId: snippetID,
+      });
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
       next(error);
@@ -255,7 +267,11 @@ class SnippetController {
         pathParameters: { id: request.params.id },
         payload: { ...body, type: 'MetadataRequest' },
       });
-
+      await response.locals.broadcaster({
+        operationType: 'UPDATE',
+        entityType: 'SNIPPET',
+        entityId: request.params.id,
+      });
       this._redisCache.del(request.params.id);
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {

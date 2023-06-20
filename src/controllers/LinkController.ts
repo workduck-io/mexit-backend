@@ -20,7 +20,11 @@ class LinkController {
         payload: data,
         sendRawBody: true,
       });
-
+      await response.locals.broadcaster({
+        operationType: 'CREATE',
+        entityType: 'LINK',
+        entityId: data.url,
+      });
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -47,7 +51,11 @@ class LinkController {
         pathParameters: { url: request.params.url },
         sendRawBody: true,
       });
-
+      await response.locals.broadcaster({
+        operationType: 'CREATE',
+        entityType: 'LINK',
+        entityId: request.params.url,
+      });
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);

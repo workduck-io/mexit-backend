@@ -45,6 +45,11 @@ class NamespaceController {
       response.locals.invoker('createNamespace', {
         payload: { ...body, type: 'NamespaceRequest' },
       });
+      await response.locals.broadcaster({
+        operationType: 'CREATE',
+        entityType: 'NAMESPACE',
+        entityId: body.id,
+      });
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
@@ -80,7 +85,14 @@ class NamespaceController {
       });
 
       await this._cache.del(body.id);
-
+      await response.locals.broadcaster({
+        operationType: 'UPDATE',
+        entityType: 'NAMESPACE',
+        entityId: body.id,
+        payload: {
+          data: body,
+        },
+      });
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
       next(error);
@@ -273,7 +285,11 @@ class NamespaceController {
           },
         }),
       });
-
+      await response.locals.broadcaster({
+        operationType: 'DELETE',
+        entityType: 'NAMESPACE',
+        entityId: namespaceID,
+      });
       this._cache.del(namespaceID);
       if (successorNamespaceID) {
         this.updateILinkCache(response.locals, successorNamespaceID);

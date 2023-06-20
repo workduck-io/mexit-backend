@@ -26,18 +26,14 @@ class HighlightController {
         ...(parentID && { queryStringParameters: { parentID } }),
       });
 
-
       response.status(statusCodes.OK).json(highlightId);
 
       const highlight = { id: highlightId, ...requestPayload };
       await response.locals.broadcaster({
         operationType: 'CREATE',
         entityId: highlightId,
-        entityType: 'HIHGLIGHT',
-        payload: {
-          data: highlight
-        }
-      })
+        entityType: 'HIGHLIGHT',
+      });
       // set only if the body contains the data field
       // this case is for the instance duplication
       if (requestPayload.data) await this._redisCache.set(highlightId, highlight.data);
@@ -54,6 +50,12 @@ class HighlightController {
       await response.locals.invoker('UpdateHighlight', {
         payload: { ...body, type: 'EntityTypeRequest' },
         pathParameters: { id: id },
+      });
+
+      await response.locals.broadcaster({
+        operationType: 'UPDATE',
+        entityId: id,
+        entityType: 'HIGHLIGHT',
       });
 
       response.status(statusCodes.NO_CONTENT).send();
@@ -98,10 +100,10 @@ class HighlightController {
 
       const lambdaResponse = !nonCachedIds.isEmpty()
         ? (
-          await response.locals.invoker('GetHighlightsByIds', {
-            payload: { ids: nonCachedIds },
-          })
-        ).items
+            await response.locals.invoker('GetHighlightsByIds', {
+              payload: { ids: nonCachedIds },
+            })
+          ).items
         : [];
 
       response.status(statusCodes.OK).json([...lambdaResponse, ...cachedHits]);
@@ -157,6 +159,12 @@ class HighlightController {
       await response.locals.invoker('DeleteHighlight', {
         pathParameters: { id },
         queryStringParameters: queryParams,
+      });
+
+      await response.locals.broadcaster({
+        operationType: 'DELETE',
+        entityId: id,
+        entityType: 'HIGHLIGHT',
       });
 
       response.status(statusCodes.NO_CONTENT).send();
