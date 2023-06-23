@@ -344,9 +344,16 @@ export const RouteKeys = {
     functionName: `mex-realtime-update-service-${STAGE}-broadcastService`,
     route: 'POST /',
   },
-  //Websocket endpoints
   GetBroadcastEvents: {
     functionName: `mex-realtime-update-service-${STAGE}-backupService`,
-    route: 'POST /backup',
+    route: 'GET /backup',
+  },
+  GetBackupFile: {
+    functionName: `mex-realtime-update-service-${STAGE}-backupService`,
+    route: 'GET /file',
+  },
+  CreateBackupFile: {
+    functionName: `mex-realtime-update-service-${STAGE}-backupService`,
+    route: 'POST /file',
   },
 } satisfies Record<string, Destination>;
