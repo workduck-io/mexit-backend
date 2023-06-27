@@ -47,11 +47,24 @@ class LinkController {
     }
   };
 
+  getLinkOfWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
+    try {
+      const result = await response.locals.invoker('getAllShortsOfWorkspace', {
+        httpMethod: 'GET',
+        sendRawBody: true,
+      });
+
+      response.status(statusCodes.OK).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   deleteShort = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const result = await response.locals.invoker('deleteShort', {
         httpMethod: 'DELETE',
-        pathParameters: { url: request.params.url },
+        queryStringParameters: { url: request.query.url },
         sendRawBody: true,
       });
       await response.locals.broadcaster({
@@ -69,7 +82,7 @@ class LinkController {
     try {
       const result = await response.locals.invoker('getStatsByURL', {
         httpMethod: 'GET',
-        pathParameters: { url: request.params.url },
+        queryStringParameters: { url: request.query.url },
         sendRawBody: true,
       });
 
