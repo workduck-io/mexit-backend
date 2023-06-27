@@ -71,7 +71,7 @@ export const RouteKeys = {
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
   UpdateNodeMetadata: {
-    route: 'PATCH /node/metadata/{id}',
+    route: 'PATCH /v1/node/metadata/{id}',
     APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
@@ -81,7 +81,7 @@ export const RouteKeys = {
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
   ArchiveNode: {
-    route: `PUT /node/archive/middleware`,
+    route: `PUT /v1/node/archive/middleware`,
     APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
