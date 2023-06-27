@@ -24,6 +24,9 @@ class LinkController {
         operationType: 'CREATE',
         entityType: 'LINK',
         entityId: data.url,
+        payload: {
+          body: result,
+        },
       });
       response.status(statusCodes.OK).json(result);
     } catch (error) {
