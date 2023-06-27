@@ -52,7 +52,7 @@ class LinkController {
         sendRawBody: true,
       });
       await response.locals.broadcaster({
-        operationType: 'CREATE',
+        operationType: 'DELETE',
         entityType: 'LINK',
         entityId: request.params.url,
       });
