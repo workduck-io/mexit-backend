@@ -24,9 +24,6 @@ class LinkController {
         operationType: 'CREATE',
         entityType: 'LINK',
         entityId: data.url,
-        payload: {
-          body: result,
-        },
       });
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -35,19 +32,6 @@ class LinkController {
   };
 
   getAllShortsOfWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
-    try {
-      const result = await response.locals.invoker('getAllShortsOfWorkspace', {
-        httpMethod: 'GET',
-        sendRawBody: true,
-      });
-
-      response.status(statusCodes.OK).json(result);
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  getLinkOfWorkspace = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
       const result = await response.locals.invoker('getAllShortsOfWorkspace', {
         httpMethod: 'GET',
@@ -70,7 +54,7 @@ class LinkController {
       await response.locals.broadcaster({
         operationType: 'DELETE',
         entityType: 'LINK',
-        entityId: request.params.url,
+        entityId: request.query.url as string,
       });
       response.status(statusCodes.OK).json(result);
     } catch (error) {
