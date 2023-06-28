@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import { OAuth2Client } from 'google-auth-library';
 import { STATUS_CODES } from 'http';
 
-import { IS_DEV } from '../env';
+import { IS_DEV, STAGE } from '../env';
 import container from '../inversify.config';
 import { GotClient } from '../libs/GotClientClass';
 import { RequestClass } from '../libs/RequestClass';
@@ -18,12 +18,15 @@ class OAuth2Controller {
 
   private static readonly redirectUri = IS_DEV
     ? 'http://localhost:5002/api/v1/oauth2/google'
-    : 'https://mexit-backend-test.workduck.io/api/v1/oauth2/google';
+    : `https://mexit-backend-${STAGE}.workduck.io/api/v1/oauth2/google`;
   private static readonly googleOAuthTokenUrl = 'https://www.googleapis.com/oauth2/v4/token';
 
   private static readonly FRONTEND_REDIRECT = IS_DEV
     ? 'http://localhost:3333/oauth'
+    : STAGE === 'test'
+    ? 'https://mexit-test.workduck.io/oauth'
     : 'https://mexit.workduck.io/oauth';
+
   private static readonly GOOGLE_CALENDAR_OAUTH = 'GOOGLE_CALENDAR_OAUTH';
 
   constructor() {
