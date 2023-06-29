@@ -267,6 +267,13 @@ class NodeController {
         },
         'APIGateway'
       );
+      body.ids.forEach(async id => {
+        await response.locals.broadcaster({
+          operationType: 'DELETE',
+          entityType: 'NOTE',
+          entityId: id,
+        });
+      });
 
       await this.clearILinkCache(response.locals, namespaceID);
       response.status(statusCodes.OK).json(archiveNodeResult);
@@ -310,7 +317,13 @@ class NodeController {
         },
         'APIGateway'
       );
-
+      body.ids.forEach(async id => {
+        await response.locals.broadcaster({
+          operationType: 'CREATE',
+          entityType: 'NOTE',
+          entityId: id,
+        });
+      });
       response.status(statusCodes.OK).json(archiveNodeResult);
     } catch (error) {
       next(error);
