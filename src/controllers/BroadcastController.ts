@@ -15,10 +15,8 @@ class BroadcastController {
 
   fetchEvents = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
     try {
-      const data = new RequestClass(request, 'GetBroadcastMessageRequest').data;
       const result = await response.locals.invoker('GetBroadcastEvents', {
-        payload: data,
-        sendRawBody: true,
+        queryStringParameters: { timestamp: request?.query?.timestamp },
       });
       response.status(statusCodes.OK).json(result);
     } catch (error) {
