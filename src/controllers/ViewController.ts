@@ -65,7 +65,7 @@ class ViewController {
       await response.locals.broadcaster({
         operationType: 'UPDATE',
         entityType: 'VIEW',
-        entityId: request.params.viewID,
+        entityId: request.body.entityId,
       });
 
       response.status(statusCodes.OK).json(result);
