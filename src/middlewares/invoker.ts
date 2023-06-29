@@ -122,7 +122,7 @@ async function BroadcastLambda(req: Request, res: Response, next: NextFunction):
       invocationType: 'Event',
       payload: {
         workspaceId: res.locals.workspaceID,
-        userId: res.locals.userId,
+        userId: res.locals.userIdRaw,
         data: {
           payload: message.payload,
           operationType: message.operationType,
