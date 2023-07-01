@@ -5,8 +5,7 @@ import { statusCodes } from '../libs/statusCodes';
 import { initializeBroadcastRoutes } from '../routes/BroadcastRoutes';
 
 class BroadcastController {
-  public _urlPath = '/events';
-  public _fileUrlPath = '/file';
+  public _urlPath = '/broadcast';
   public _router = express.Router();
 
   constructor() {
