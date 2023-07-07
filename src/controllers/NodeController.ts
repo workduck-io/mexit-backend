@@ -46,6 +46,9 @@ class NodeController {
         operationType: 'CREATE',
         entityType: 'NOTE',
         entityId: body.id,
+        payload: {
+          referenceID: body.referenceID,
+        },
       });
       response.status(statusCodes.OK).json(rest);
 
