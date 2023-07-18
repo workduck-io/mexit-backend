@@ -7,7 +7,6 @@ import { Redis } from '../libs/RedisClass';
 import { RequestClass } from '../libs/RequestClass';
 import { statusCodes } from '../libs/statusCodes';
 import { Transformer } from '../libs/TransformerClass';
-import { globalInvoker } from '../middlewares/invoker';
 import { initializeNodeRoutes } from '../routes/NodeRoutes';
 import { LocalsX } from '../utils/Locals';
 
@@ -43,6 +42,14 @@ class NodeController {
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { data, ...rest } = nodeResult; //Dont relay data to frontend
+      await response.locals.broadcaster({
+        operationType: 'CREATE',
+        entityType: 'NOTE',
+        entityId: body.id,
+        payload: {
+          referenceID: body.referenceID,
+        },
+      });
       response.status(statusCodes.OK).json(rest);
 
       await this.clearILinkCache(response.locals, body.namespaceID);
@@ -100,7 +107,7 @@ class NodeController {
 
       const lambdaResponse = { successful: [], failed: [] };
       if (!nonCachedIds.isEmpty()) {
-        const rawLambdaResp = await globalInvoker('GetMultipleNodes', response.locals, {
+        const rawLambdaResp = await response.locals.invoker('GetMultipleNodes', {
           payload: { ids: nonCachedIds },
           ...(namespaceID && {
             queryStringParameters: { namespaceID: namespaceID },
@@ -142,6 +149,11 @@ class NodeController {
         },
         'APIGateway'
       );
+      await response.locals.broadcaster({
+        operationType: 'UPDATE',
+        entityType: 'NOTE',
+        entityId: nodeID,
+      });
       this._redisCache.del(nodeID);
       response.status(statusCodes.OK).json(result);
     } catch (error) {
@@ -154,6 +166,11 @@ class NodeController {
       const nodeBlockMap = new RequestClass(request, 'DeleteBlocksRequest').data;
 
       const result = Object.entries(nodeBlockMap).map(([nodeId, blockIds]) => {
+        response.locals.broadcaster({
+          operationType: 'UPDATE',
+          entityType: 'NOTE',
+          entityId: nodeId,
+        });
         return response.locals.invoker(
           'DeleteBlocks',
           {
@@ -163,7 +180,6 @@ class NodeController {
           'APIGateway'
         );
       });
-
       this._redisCache.mdel(Object.keys(nodeBlockMap));
 
       response.status(statusCodes.OK).json(result);
@@ -186,8 +202,19 @@ class NodeController {
         sourceNodeID: data.sourceNodeId,
         destinationNodeID: data.destinationNodeId,
       };
-
       await response.locals.invoker('CopyOrMoveBlock', { payload: payload }, 'APIGateway');
+      await Promise.allSettled([
+        response.locals.broadcaster({
+          operationType: 'UPDATE',
+          entityType: 'NOTE',
+          entityId: data.sourceNodeId,
+        }),
+        response.locals.broadcaster({
+          operationType: 'UPDATE',
+          entityType: 'NOTE',
+          entityId: data.destinationNodeId,
+        }),
+      ]);
 
       response.status(statusCodes.NO_CONTENT).json();
     } catch (error) {
@@ -199,6 +226,11 @@ class NodeController {
     try {
       const nodeId = request.params.id;
       await response.locals.invoker('MakeNodePublic', { pathParameters: { id: nodeId } }, 'APIGateway');
+      await response.locals.broadcaster({
+        operationType: 'UPDATE',
+        entityType: 'NOTE',
+        entityId: nodeId,
+      });
 
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
@@ -210,7 +242,11 @@ class NodeController {
     try {
       const nodeId = request.params.id;
       await response.locals.invoker('MakeNodePrivate', { pathParameters: { id: nodeId } }, 'APIGateway');
-
+      await response.locals.broadcaster({
+        operationType: 'UPDATE',
+        entityType: 'NOTE',
+        entityId: nodeId,
+      });
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
       next(error);
@@ -234,10 +270,16 @@ class NodeController {
         },
         'APIGateway'
       );
+      body.ids.forEach(async id => {
+        await response.locals.broadcaster({
+          operationType: 'DELETE',
+          entityType: 'NOTE',
+          entityId: id,
+        });
+      });
 
       await this.clearILinkCache(response.locals, namespaceID);
       response.status(statusCodes.OK).json(archiveNodeResult);
-
     } catch (error) {
       next(error);
     }
@@ -278,7 +320,13 @@ class NodeController {
         },
         'APIGateway'
       );
-
+      body.ids.forEach(async id => {
+        await response.locals.broadcaster({
+          operationType: 'CREATE',
+          entityType: 'NOTE',
+          entityId: id,
+        });
+      });
       response.status(statusCodes.OK).json(archiveNodeResult);
     } catch (error) {
       next(error);
@@ -299,7 +347,14 @@ class NodeController {
 
       const { changedPaths } = refactorResp;
       const parsedChangedPathsRefactor = this._transformer.refactoredPathsHierarchyParser(changedPaths);
-
+      await response.locals.broadcaster({
+        operationType: 'UPDATE',
+        entityType: 'NAMESPACE',
+        entityId: body.nodeID,
+        payload: {
+          body: { changedPaths: parsedChangedPathsRefactor },
+        },
+      });
       await this._redisCache.mdel([body.existingNodePath.namespaceID, body.newNodePath.namespaceID]);
       response.status(statusCodes.OK).json({ changedPaths: parsedChangedPathsRefactor });
     } catch (error) {
@@ -320,6 +375,13 @@ class NodeController {
       );
 
       const { node, changedPaths } = bulkCreateResp;
+
+      await response.locals.broadcaster({
+        operationType: 'CREATE',
+        entityType: 'NOTE',
+        entityId: body.id,
+      });
+
       //TODO: Make part of TransformClass
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { data, dataOrder, ...rest } = node; //Dont relay data to frontend
@@ -327,7 +389,6 @@ class NodeController {
 
       await this.clearILinkCache(response.locals, body.nodePath.namespaceID);
       response.status(statusCodes.OK).json({ node: rest, changedPaths: parsedChangedPathsRefactor });
-
     } catch (error) {
       next(error);
     }
@@ -352,6 +413,12 @@ class NodeController {
         { payload: { ...body, type: 'MetadataRequest' }, pathParameters: { id: nodeID } },
         'APIGateway'
       );
+      await response.locals.broadcaster({
+        operationType: 'UPDATE',
+        entityType: 'NOTE',
+        entityId: nodeID,
+      });
+
       this._redisCache.del(nodeID);
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {

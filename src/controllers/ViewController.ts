@@ -44,7 +44,11 @@ class ViewController {
         pathParameters: { entityId: request.params.viewID },
         additionalHeaders: this._additionalHeaders,
       });
-
+      await response.locals.broadcaster({
+        operationType: 'DELETE',
+        entityType: 'VIEW',
+        entityId: request.params.viewID,
+      });
       response.status(statusCodes.NO_CONTENT).send();
     } catch (error) {
       next(error);
@@ -57,6 +61,11 @@ class ViewController {
         additionalHeaders: this._additionalHeaders,
         payload: request.body,
         sendRawBody: true,
+      });
+      await response.locals.broadcaster({
+        operationType: 'UPDATE',
+        entityType: 'VIEW',
+        entityId: request.body.entityId,
       });
 
       response.status(statusCodes.OK).json(result);

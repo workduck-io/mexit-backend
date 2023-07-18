@@ -1,4 +1,5 @@
 import { AuthorizeRefreshTokenType, AuthorizeType } from './interfaces/Auth';
+import { BroadcastMessage, EntityType, OperationType } from './interfaces/Broadcast';
 import { GenericObjectType, GenericType } from './interfaces/Generics';
 import { PersistAuthToken } from './interfaces/GoogleService';
 import {
@@ -39,6 +40,7 @@ import {
   FilterJoin,
   FilterType,
   FilterValue,
+  GetBroadcastMessageRequest,
   GetMultipleIds,
   GlobalFilterJoin,
   HighlightRequest,
@@ -155,5 +157,9 @@ export default class Interfaces implements Definitions {
   SmartCaptureRequest: SmartCaptureRequest;
   HighlightRequest: HighlightRequest;
   BaseEntityRequest: BaseEntityRequest;
+  BroadcastMessage: BroadcastMessage;
+  EntityType: EntityType;
+  OperationType: OperationType;
+  GetBroadcastMessageRequest: GetBroadcastMessageRequest;
   'Record<string,any>': Record<string, any>;
 }

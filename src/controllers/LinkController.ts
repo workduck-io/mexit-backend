@@ -20,7 +20,11 @@ class LinkController {
         payload: data,
         sendRawBody: true,
       });
-
+      await response.locals.broadcaster({
+        operationType: 'CREATE',
+        entityType: 'LINK',
+        entityId: data.url,
+      });
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -44,10 +48,14 @@ class LinkController {
     try {
       const result = await response.locals.invoker('deleteShort', {
         httpMethod: 'DELETE',
-        pathParameters: { url: request.params.url },
+        queryStringParameters: { url: request.query.url },
         sendRawBody: true,
       });
-
+      await response.locals.broadcaster({
+        operationType: 'DELETE',
+        entityType: 'LINK',
+        entityId: request.query.url as string,
+      });
       response.status(statusCodes.OK).json(result);
     } catch (error) {
       next(error);
@@ -58,7 +66,7 @@ class LinkController {
     try {
       const result = await response.locals.invoker('getStatsByURL', {
         httpMethod: 'GET',
-        pathParameters: { url: request.params.url },
+        queryStringParameters: { url: request.query.url },
         sendRawBody: true,
       });
 

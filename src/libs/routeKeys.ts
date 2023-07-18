@@ -71,7 +71,7 @@ export const RouteKeys = {
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
   UpdateNodeMetadata: {
-    route: 'PATCH /node/metadata/{id}',
+    route: 'PATCH /v1/node/metadata/{id}',
     APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
@@ -81,7 +81,7 @@ export const RouteKeys = {
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
   ArchiveNode: {
-    route: `PUT /node/archive/middleware`,
+    route: `PUT /v1/node/archive/middleware`,
     APIGateway: 'Node',
     functionName: `mex-backend-${STAGE}-Node:latest`,
   },
@@ -337,5 +337,23 @@ export const RouteKeys = {
   GetAllHighlightsOfWorkspace: {
     functionName: FunctionNames.Highlight,
     route: 'GET /v1/highlight/all',
+  },
+
+  //Websocket endpoints
+  BroadcastUpdate: {
+    functionName: `mex-realtime-update-service-${STAGE}-broadcastService`,
+    route: 'POST /',
+  },
+  GetBroadcastEvents: {
+    functionName: `mex-realtime-update-service-${STAGE}-backupService`,
+    route: 'GET /backup',
+  },
+  GetBackupFile: {
+    functionName: `mex-realtime-update-service-${STAGE}-backupService`,
+    route: 'GET /file',
+  },
+  CreateBackupFile: {
+    functionName: `mex-realtime-update-service-${STAGE}-backupService`,
+    route: 'POST /file',
   },
 } satisfies Record<string, Destination>;

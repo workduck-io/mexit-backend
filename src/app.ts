@@ -9,6 +9,7 @@ import express from 'express';
 
 import ActionController from './controllers/ActionController';
 import BookmarkController from './controllers/BookmarkController';
+import BroadcastController from './controllers/BroadcastController';
 import CalendarController from './controllers/CalendarController';
 import CommentController from './controllers/CommentController';
 import HealthCheckController from './controllers/HealthCheckController';
@@ -33,7 +34,7 @@ import logger from './libs/logger';
 import { Redis } from './libs/RedisClass';
 import expressListRoutes, { COLORS, colorText } from './libs/routeList';
 import { asyncHandler } from './middlewares/asyncHandler';
-import { InvokeLambda } from './middlewares/invoker';
+import { BroadcastLambda, InvokeLambda } from './middlewares/invoker';
 import { jsonErrorHandler } from './middlewares/jsonerrorhandler';
 import { LogRequest } from './middlewares/logrequest';
 import responseErrorHandler from './middlewares/responseErrorHandler';
@@ -65,7 +66,8 @@ class App {
       express.json({ reviver: parseReviver }),
       LogRequest,
       wdRequestIdExpressParser,
-      asyncHandler(InvokeLambda)
+      asyncHandler(InvokeLambda),
+      asyncHandler(BroadcastLambda)
     );
   }
 
@@ -113,6 +115,7 @@ const application = new App([
   new PromptController(),
   new WorkspaceController(),
   new CalendarController(),
+  new BroadcastController(),
 ]);
 
 application.build();

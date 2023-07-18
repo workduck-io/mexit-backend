@@ -1,3 +1,5 @@
+import { InvocationType } from '@aws-sdk/client-lambda';
+
 import { LambdaInvokeOptions } from '../libs/LambdaInvoker';
 
 import { LocalsX } from './Locals';
@@ -16,6 +18,7 @@ export interface InvokePayloadOptions<T> {
   };
   httpMethod?: HTTPMethod;
   sendRawBody?: boolean;
+  invocationType?: InvocationType
 }
 
 interface GatewayInvokeOptions {

@@ -26,7 +26,11 @@ class WorkspaceController {
       await response.locals.invoker('updateWorkspace', {
         payload: { ...data, type: 'WorkspaceRequest' },
       });
-
+      await response.locals.broadcaster({
+        operationType: 'UPDATE',
+        entityType: 'WORKSPACE',
+        entityId: data.id,
+      });
       await this._redisCache.del(userSpecificKey);
 
       response.status(statusCodes.NO_CONTENT).send();
