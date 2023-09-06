@@ -124,7 +124,9 @@ export interface NodeMetadata {
   createdAt?: number;
   lastEditedBy?: string;
   updatedAt?: number;
-
+  conditions?: Record<string, any>;
+  templateID?: string;
+  usedTemplateID?: string;
   userTags?: any[];
   pageMetaTags?: any[];
 }

@@ -14,6 +14,7 @@ export interface NodeResponse {
   workspaceIdentifier: string;
   bookmarked: boolean | null;
   template?: boolean;
+  metadata?: any;
 }
 
 export interface ActivityNodeResponse extends NodeResponse {
