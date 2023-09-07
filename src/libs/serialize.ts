@@ -1,5 +1,3 @@
-import { NodeMetadata } from '../interfaces/Node';
-
 const removeNulls = (obj: any): any => {
   if (obj === null) {
     return undefined;
@@ -12,22 +10,12 @@ const removeNulls = (obj: any): any => {
   return obj;
 };
 
-const extractMetadata = (data: any): NodeMetadata => {
-  const metadata: any = {
-    lastEditedBy: data.lastEditedBy,
-    updatedAt: data.updatedAt,
-    createdBy: data.createdBy,
-    createdAt: data.createdAt,
-  };
-  return removeNulls(metadata);
-};
-
 // const ElementsWithProperties = [ELEMENT_PARAGRAPH]
 // const ElementsWithURL = [ELEMENT_LINK, ELEMENT_IMAGE, ELEMENT_MEDIA_EMBED]
 
 // Direct properties are collated in the properties for api
 // and then unfurled when converting back to editor content
-const directPropertyKeys = ['bold', 'italic', 'underline', 'highlight', 'code', 'url', 'value', 'body'];
+const directPropertyKeys = ['bold', 'italic', 'underline', 'highlight', 'code', 'url', 'value', 'body', 'properties'];
 
 // From API to content
 export const deserializeContent = (sanatizedContent: any[]) => {
