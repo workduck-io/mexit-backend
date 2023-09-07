@@ -64,6 +64,7 @@
                 "lastEditedBy": {
                     "type": "string"
                 },
+                "metadata": {},
                 "namespaceID": {
                     "type": "string"
                 },
@@ -1245,6 +1246,9 @@
         },
         "NodeMetadata": {
             "properties": {
+                "conditions": {
+                    "$ref": "types#/definitions/Record<string,any>"
+                },
                 "createdAt": {
                     "type": "number"
                 },
@@ -1258,8 +1262,14 @@
                     "items": {},
                     "type": "array"
                 },
+                "templateID": {
+                    "type": "string"
+                },
                 "updatedAt": {
                     "type": "number"
+                },
+                "usedTemplateID": {
+                    "type": "string"
                 },
                 "userTags": {
                     "items": {},
@@ -1309,6 +1319,7 @@
                 "lastEditedBy": {
                     "type": "string"
                 },
+                "metadata": {},
                 "namespaceID": {
                     "type": "string"
                 },

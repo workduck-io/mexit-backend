@@ -226,7 +226,7 @@ export class Transformer {
       lastEditedBy: nodeResponse.lastEditedBy,
       userTags: [],
       pageMetaTags: [],
-      ...nodeResponse.metadata,
+      ...nodeResponse?.metadata,
     };
 
     const contentResponse = {
