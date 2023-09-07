@@ -15,7 +15,32 @@ const removeNulls = (obj: any): any => {
 
 // Direct properties are collated in the properties for api
 // and then unfurled when converting back to editor content
-const directPropertyKeys = ['bold', 'italic', 'underline', 'highlight', 'code', 'url', 'value', 'body', 'properties'];
+export const directPropertyKeys = [
+  'bold',
+  'italic',
+  'underline',
+  'strikethrough',
+  'highlight',
+  'code',
+  'email',
+  'url',
+  'caption',
+  'value',
+  'blockValue',
+  'checked',
+  'blockId',
+  'body',
+  'align',
+  'questionId',
+  'question',
+  'answer',
+  'actionContext',
+  'blockMeta',
+  'status',
+  'lang',
+  'workspace',
+  'properties',
+];
 
 // From API to content
 export const deserializeContent = (sanatizedContent: any[]) => {
