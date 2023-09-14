@@ -20,6 +20,7 @@ import NamespaceController from './controllers/NamespaceController';
 import NodeController from './controllers/NodeController';
 import OAuth2Controller from './controllers/OAuth2Controller';
 import PromptController from './controllers/PromptController';
+import PropertyValueController from './controllers/PropertyValueController';
 import PublicController from './controllers/PublicController';
 import ReactionController from './controllers/ReactionController';
 import ReminderController from './controllers/ReminderController';
@@ -116,6 +117,7 @@ const application = new App([
   new WorkspaceController(),
   new CalendarController(),
   new BroadcastController(),
+  new PropertyValueController(),
 ]);
 
 application.build();

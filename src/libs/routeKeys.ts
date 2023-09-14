@@ -12,6 +12,7 @@ export type Destination = {
 
 export const FunctionNames = {
   Highlight: `mex-backend-${STAGE}-Highlights:latest`,
+  PropertyValues: `superblock-${STAGE}-main`,
 };
 
 export const RouteKeys = {
@@ -337,6 +338,36 @@ export const RouteKeys = {
   GetAllHighlightsOfWorkspace: {
     functionName: FunctionNames.Highlight,
     route: 'GET /v1/highlight/all',
+  },
+
+  //PropertyValues endpoint
+  CreateProperty: {
+    functionName: FunctionNames.PropertyValues,
+    route: 'POST /',
+  },
+  DeleteProperty: {
+    functionName: FunctionNames.PropertyValues,
+    route: 'DELETE /{propertyId}',
+  },
+  UpdateProperty: {
+    functionName: FunctionNames.PropertyValues,
+    route: 'POST /{propertyId}',
+  },
+  GetProperty: {
+    functionName: FunctionNames.PropertyValues,
+    route: 'GET /{propertyId}',
+  },
+  GetAllProperties: {
+    functionName: FunctionNames.PropertyValues,
+    route: 'GET /all',
+  },
+  AddPropertyValue: {
+    functionName: FunctionNames.PropertyValues,
+    route: 'POST /{propertyId}/value',
+  },
+  DeletePropertyValue: {
+    functionName: FunctionNames.PropertyValues,
+    route: 'DELETE /{propertyId}/value',
   },
 
   //Websocket endpoints
